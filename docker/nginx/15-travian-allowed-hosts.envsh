@@ -1,0 +1,16 @@
+# Sourced by the nginx image's entrypoint before templates are rendered.
+# Derives TRAVIAN_ALLOWED_HOSTS: the host names this stack answers to. Any other
+# Host header is dropped by the default server (444), so a forged Host cannot
+# reach PHP. Always includes the local and health-check names.
+allowed="localhost 127.0.0.1 [::1] web"
+base_host=$(printf '%s' "${TRAVIAN_BASE_URL:-}" | sed -n 's#^[A-Za-z][A-Za-z0-9+.-]*://\([^/:?#]*\|\[[^]]*\]\).*#\1#p')
+if [ -n "$base_host" ]; then
+    allowed="$allowed $base_host"
+fi
+for extra in ${TRAVIAN_EXTRA_HOSTS:-}; do
+    case "$extra" in
+        *[!A-Za-z0-9.\[\]:*-]*) echo "15-travian-allowed-hosts: ignoring invalid host '$extra'" >&2 ;;
+        *) allowed="$allowed $extra" ;;
+    esac
+done
+export TRAVIAN_ALLOWED_HOSTS="$allowed"

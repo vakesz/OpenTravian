@@ -1,0 +1,6146 @@
+@font-face {
+  font-display: swap;
+  font-family: "Homepage Noto Serif";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/homepage/noto-serif-bold.ttf") format("truetype");
+}
+
+.contentNavi .content .tabItem {
+  max-width: 100%;
+}
+
+/* The reference shell leaves the grid edge-to-edge; the legacy base pack adds
+ * five pixels of horizontal padding and pulls both sidebars inward. */
+#center {
+  padding-inline: 0;
+}
+
+#content.village3 table#troops tbody.noPadding td {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#content.village3 table.vil_troops tbody.noPadding td {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@font-face {
+  font-family: "IRYekan";
+  src:
+    url(../fonts/iranyekanweblight.woff2) format("woff2"),
+    url(../fonts/iranyekanweblight.woff) format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IRYekan";
+  src:
+    url(../fonts/iranyekanwebbold.woff2) format("woff2"),
+    url(../fonts/iranyekanwebbold.woff) format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IRANSans";
+  src:
+    url(../fonts/IranSans4/woff2/IRANSansWeb.woff2) format("woff2"),
+    url(../fonts/IranSans4/woff/IRANSansWeb.woff) format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url(../fonts/robotolight.woff2) format("woff2"),
+    url(../fonts/robotolight.woff) format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url(../fonts/robotoregular.woff2) format("woff2"),
+    url(../fonts/robotoregular.woff) format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url(../fonts/robotobold.woff2) format("woff2"),
+    url(../fonts/robotobold.woff) format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+body.fa-IR,
+body.fa-IR * {
+  --fontFamily:
+    Roboto, IRYekan, IRANSans, Arial, Helvetica, Verdana, sans-serif;
+}
+
+body.fa-IR {
+  font-family: Roboto, IRYekan, IRANSans, Arial, Helvetica, Verdana, sans-serif;
+}
+
+body.fa-IR div.messages #bbEditor .messageEditor {
+  font-family: IRYekan, IRANSans, Roboto, Arial, Helvetica, Verdana, sans-serif;
+}
+
+.subNavi .normal .content .tabItem {
+  padding: 8px 3px 0;
+}
+
+#statisticsV2 .recharts-layer {
+  direction: ltr;
+}
+
+.mobileForced div.village1 .villageInfoWrapper {
+  left: 10px;
+  right: 10px;
+  width: auto;
+  grid-template-columns: minmax(0, 1fr) 230px;
+}
+
+.mobileForced div.village1 .villageInfoWrapper .villageInfobox.production {
+  display: block;
+}
+
+.mobileForced div.village1 .villageInfoWrapper .villageInfobox.units {
+  bottom: 180px;
+  max-height: max(120px, calc(100% - 650px));
+}
+
+.mobileForced div.village1 .villageInfoWrapper .showTroopsToggleMobile {
+  bottom: 112px;
+}
+
+@media screen and (max-width: 620px) and (orientation: portrait) {
+  .mobileOptimized div.village1 .villageInfoWrapper {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    grid-template-columns: minmax(0, 1fr) 230px;
+  }
+
+  .mobileOptimized div.village1 .villageInfoWrapper .villageInfobox.production {
+    display: block;
+  }
+
+  .mobileOptimized div.village1 .villageInfoWrapper .villageInfobox.units {
+    bottom: 180px;
+    max-height: max(120px, calc(100% - 650px));
+  }
+
+  .mobileOptimized div.village1 .villageInfoWrapper .showTroopsToggleMobile {
+    bottom: 112px;
+  }
+}
+
+div.player .description1,
+div.player .description2 {
+  font-size: 12px;
+}
+
+div#build.gid13 .information .errorMessage,
+div#build.gid22 .information .errorMessage {
+  display: block;
+}
+
+.sidebar #sidebarBoxLinklist .content ul li a {
+  overflow: visible;
+  word-wrap: break-word;
+}
+
+#tileDetails .detailImage .options {
+  margin-bottom: 10px;
+}
+
+.dialog.paymentShopV1
+  div#paymentWizard
+  .buyGoldInfoStep
+  .buyGoldInfoStepContent,
+.dialog.paymentShopV3
+  div#paymentWizard
+  .buyGoldInfoStep
+  .buyGoldInfoStepContent {
+  overflow: visible;
+}
+
+.dialog.paymentShopV3 .paymentPopupDialogWrapper .feature {
+  min-height: 60px;
+}
+
+.flag_fa-IR,
+.flag_ir {
+  background-position: -1712px 0;
+}
+
+i.flag.fa {
+  background-image: url("../img_common/misc/flags/country-sprite.png");
+  background-position: -1712px 0;
+}
+i.flag.fa-IR {
+  background-image: url("../img_common/misc/flags/country-sprite.png");
+  background-position: -1712px 0;
+}
+
+.flags img {
+  height: 11px;
+  width: 16px;
+  background-image: url("../img_common/misc/flags/country-sprite.png");
+}
+.rtl .flags img,
+.rtl i.flag.fa,
+.rtl i.flag.fa-IR {
+  background-image: url("../img_common/misc/flags/country-sprite.png");
+}
+.flag_ad {
+  background-position: 0 0;
+}
+.flag_ae {
+  background-position: -16px 0;
+}
+.flag_ar-AE,
+.flag_arabia {
+  background-position: -3968px 0;
+}
+.flag_af {
+  background-position: -32px 0;
+}
+.flag_ag {
+  background-position: -48px 0;
+}
+.flag_ai {
+  background-position: -64px 0;
+}
+.flag_al {
+  background-position: -80px 0;
+}
+.flag_am {
+  background-position: -96px 0;
+}
+.flag_an {
+  background-position: -112px 0;
+}
+.flag_ao {
+  background-position: -128px 0;
+}
+.flag_ar {
+  background-position: -144px 0;
+}
+.flag_as {
+  background-position: -160px 0;
+}
+.flag_at {
+  background-position: -176px 0;
+}
+.flag_au {
+  background-position: -192px 0;
+}
+.flag_aw {
+  background-position: -208px 0;
+}
+.flag_ax {
+  background-position: -224px 0;
+}
+.flag_az {
+  background-position: -240px 0;
+}
+.flag_bs-BA-Latn,
+.flag_ba {
+  background-position: -256px 0;
+}
+.flag_bb {
+  background-position: -272px 0;
+}
+.flag_bd {
+  background-position: -288px 0;
+}
+.flag_be {
+  background-position: -304px 0;
+}
+.flag_bf {
+  background-position: -320px 0;
+}
+.flag_bg-BG,
+.flag_bg {
+  background-position: -336px 0;
+}
+.flag_bh {
+  background-position: -352px 0;
+}
+.flag_bi {
+  background-position: -368px 0;
+}
+.flag_bj {
+  background-position: -384px 0;
+}
+.flag_bm {
+  background-position: -400px 0;
+}
+.flag_bn {
+  background-position: -416px 0;
+}
+.flag_bo {
+  background-position: -432px 0;
+}
+.flag_pt-BR,
+.flag_br {
+  background-position: -448px 0;
+}
+.flag_bs {
+  background-position: -464px 0;
+}
+.flag_bt {
+  background-position: -480px 0;
+}
+.flag_bv {
+  background-position: -496px 0;
+}
+.flag_bw {
+  background-position: -512px 0;
+}
+.flag_by {
+  background-position: -528px 0;
+}
+.flag_bz {
+  background-position: -544px 0;
+}
+.flag_ca {
+  background-position: -560px 0;
+}
+.flag_catalonia {
+  background-position: -576px 0;
+}
+.flag_cc {
+  background-position: -592px 0;
+}
+.flag_cd {
+  background-position: -608px 0;
+}
+.flag_cf {
+  background-position: -624px 0;
+}
+.flag_cg {
+  background-position: -640px 0;
+}
+.flag_ch {
+  background-position: -656px 0;
+}
+.flag_ci {
+  background-position: -672px 0;
+}
+.flag_ck {
+  background-position: -688px 0;
+}
+.flag_es-CL,
+.flag_cl {
+  background-position: -704px 0;
+}
+.flag_cm {
+  background-position: -720px 0;
+}
+.flag_cn {
+  background-position: -736px 0;
+}
+.flag_co {
+  background-position: -752px 0;
+}
+.flag_cr {
+  background-position: -768px 0;
+}
+.flag_cs {
+  background-position: -784px 0;
+}
+.flag_cu {
+  background-position: -800px 0;
+}
+.flag_cv {
+  background-position: -816px 0;
+}
+.flag_cx {
+  background-position: -832px 0;
+}
+.flag_cy {
+  background-position: -848px 0;
+}
+.flag_cs-CZ,
+.flag_cz {
+  background-position: -864px 0;
+}
+.flag_de-DE,
+.flag_de {
+  background-position: -880px 0;
+}
+.flag_dj {
+  background-position: -896px 0;
+}
+.flag_da-DK,
+.flag_dk {
+  background-position: -912px 0;
+}
+.flag_dm {
+  background-position: -928px 0;
+}
+.flag_do {
+  background-position: -944px 0;
+}
+.flag_dz {
+  background-position: -960px 0;
+}
+.flag_ec {
+  background-position: -976px 0;
+}
+.flag_et-EE,
+.flag_ee {
+  background-position: -992px 0;
+}
+.flag_eg {
+  background-position: -1008px 0;
+}
+.flag_eh {
+  background-position: -1024px 0;
+}
+.flag_en {
+  background-position: -1040px 0;
+}
+.flag_er {
+  background-position: -1056px 0;
+}
+.flag_es-ES,
+.flag_es,
+.flag_net {
+  background-position: -1072px 0;
+}
+.flag_et {
+  background-position: -1088px 0;
+}
+.flag_europeanunion {
+  background-position: -1104px 0;
+}
+.flag_fam {
+  background-position: -1120px 0;
+}
+.flag_fi-FI,
+.flag_fi {
+  background-position: -1136px 0;
+}
+.flag_fj {
+  background-position: -1152px 0;
+}
+.flag_fk {
+  background-position: -1168px 0;
+}
+.flag_fm {
+  background-position: -1184px 0;
+}
+.flag_fo {
+  background-position: -1200px 0;
+}
+.flag_fr-FR,
+.flag_fr {
+  background-position: -1216px 0;
+}
+.flag_ga {
+  background-position: -1232px 0;
+}
+.flag_uk,
+.flag_gb {
+  background-position: -1248px 0;
+}
+.flag_gd {
+  background-position: -1264px 0;
+}
+.flag_ge {
+  background-position: -1280px 0;
+}
+.flag_gf {
+  background-position: -1296px 0;
+}
+.flag_gh {
+  background-position: -1312px 0;
+}
+.flag_gi {
+  background-position: -1328px 0;
+}
+.flag_gl {
+  background-position: -1344px 0;
+}
+.flag_gm {
+  background-position: -1360px 0;
+}
+.flag_gn {
+  background-position: -1376px 0;
+}
+.flag_gp {
+  background-position: -1392px 0;
+}
+.flag_gq {
+  background-position: -1408px 0;
+}
+.flag_el-GR,
+.flag_gr {
+  background-position: -1424px 0;
+}
+.flag_gs {
+  background-position: -1440px 0;
+}
+.flag_gt {
+  background-position: -1456px 0;
+}
+.flag_gu {
+  background-position: -1472px 0;
+}
+.flag_gw {
+  background-position: -1488px 0;
+}
+.flag_gy {
+  background-position: -1504px 0;
+}
+.flag_hk {
+  background-position: -1520px 0;
+}
+.flag_hm {
+  background-position: -1536px 0;
+}
+.flag_hn {
+  background-position: -1552px 0;
+}
+.flag_hr-HR,
+.flag_hr {
+  background-position: -1568px 0;
+}
+.flag_ht {
+  background-position: -1584px 0;
+}
+.flag_hu-HU,
+.flag_hu {
+  background-position: -1600px 0;
+}
+.flag_id-ID,
+.flag_id {
+  background-position: -1616px 0;
+}
+.flag_ie {
+  background-position: -1632px 0;
+}
+.flag_he-IL,
+.flag_il {
+  background-position: -1648px 0;
+}
+.flag_in {
+  background-position: -1664px 0;
+}
+.flag_io {
+  background-position: -1680px 0;
+}
+.flag_iq {
+  background-position: -1696px 0;
+}
+.flag_is {
+  background-position: -1728px 0;
+}
+.flag_it-IT,
+.flag_it {
+  background-position: -1744px 0;
+}
+.flag_jm {
+  background-position: -1760px 0;
+}
+.flag_jo {
+  background-position: -1776px 0;
+}
+.flag_ja-JP,
+.flag_jp {
+  background-position: -1792px 0;
+}
+.flag_ke {
+  background-position: -1808px 0;
+}
+.flag_kg {
+  background-position: -1824px 0;
+}
+.flag_kh {
+  background-position: -1840px 0;
+}
+.flag_ki {
+  background-position: -1856px 0;
+}
+.flag_km {
+  background-position: -1872px 0;
+}
+.flag_kn {
+  background-position: -1888px 0;
+}
+.flag_kp {
+  background-position: -1904px 0;
+}
+.flag_kr {
+  background-position: -1920px 0;
+}
+.flag_kw {
+  background-position: -1936px 0;
+}
+.flag_ky {
+  background-position: -1952px 0;
+}
+.flag_kz {
+  background-position: -1968px 0;
+}
+.flag_la {
+  background-position: -1984px 0;
+}
+.flag_lb {
+  background-position: -2000px 0;
+}
+.flag_lc {
+  background-position: -2016px 0;
+}
+.flag_li {
+  background-position: -2032px 0;
+}
+.flag_lk {
+  background-position: -2048px 0;
+}
+.flag_lr {
+  background-position: -2064px 0;
+}
+.flag_ls {
+  background-position: -2080px 0;
+}
+.flag_lt-LT,
+.flag_lt {
+  background-position: -2096px 0;
+}
+.flag_lu {
+  background-position: -2112px 0;
+}
+.flag_lv-LV,
+.flag_lv {
+  background-position: -2128px 0;
+}
+.flag_ly {
+  background-position: -2144px 0;
+}
+.flag_ma {
+  background-position: -2160px 0;
+}
+.flag_mc {
+  background-position: -2176px 0;
+}
+.flag_md {
+  background-position: -2192px 0;
+}
+.flag_me {
+  background-position: -2208px 0;
+}
+.flag_mg {
+  background-position: -2224px 0;
+}
+.flag_mh {
+  background-position: -2240px 0;
+}
+.flag_mk {
+  background-position: -2256px 0;
+}
+.flag_ml {
+  background-position: -2272px 0;
+}
+.flag_mm {
+  background-position: -2288px 0;
+}
+.flag_mn {
+  background-position: -2304px 0;
+}
+.flag_mo {
+  background-position: -2320px 0;
+}
+.flag_mp {
+  background-position: -2336px 0;
+}
+.flag_mq {
+  background-position: -2352px 0;
+}
+.flag_mr {
+  background-position: -2368px 0;
+}
+.flag_ms {
+  background-position: -2384px 0;
+}
+.flag_mt {
+  background-position: -2400px 0;
+}
+.flag_mu {
+  background-position: -2416px 0;
+}
+.flag_mv {
+  background-position: -2432px 0;
+}
+.flag_mw {
+  background-position: -2448px 0;
+}
+.flag_mx {
+  background-position: -2464px 0;
+}
+.flag_ms-MY,
+.flag_my {
+  background-position: -2480px 0;
+}
+.flag_mz {
+  background-position: -2496px 0;
+}
+.flag_na {
+  background-position: -2512px 0;
+}
+.flag_nc {
+  background-position: -2528px 0;
+}
+.flag_ne {
+  background-position: -2544px 0;
+}
+.flag_nf {
+  background-position: -2560px 0;
+}
+.flag_ng {
+  background-position: -2576px 0;
+}
+.flag_ni {
+  background-position: -2592px 0;
+}
+.flag_nl-NL,
+.flag_nl {
+  background-position: -2608px 0;
+}
+.flag_no-NO,
+.flag_no {
+  background-position: -2624px 0;
+}
+.flag_np {
+  background-position: -2640px 0;
+}
+.flag_nr {
+  background-position: -2656px 0;
+}
+.flag_nu {
+  background-position: -2672px 0;
+}
+.flag_nz {
+  background-position: -2688px 0;
+}
+.flag_om {
+  background-position: -2704px 0;
+}
+.flag_pa {
+  background-position: -2720px 0;
+}
+.flag_pe {
+  background-position: -2736px 0;
+}
+.flag_pf {
+  background-position: -2752px 0;
+}
+.flag_pg {
+  background-position: -2768px 0;
+}
+.flag_ph {
+  background-position: -2784px 0;
+}
+.flag_pk {
+  background-position: -2800px 0;
+}
+.flag_pl-PL,
+.flag_pl {
+  background-position: -2816px 0;
+}
+.flag_pm {
+  background-position: -2832px 0;
+}
+.flag_pn {
+  background-position: -2848px 0;
+}
+.flag_pr {
+  background-position: -2864px 0;
+}
+.flag_ps {
+  background-position: -2880px 0;
+}
+.flag_pt-PT,
+.flag_pt {
+  background-position: -2896px 0;
+}
+.flag_pw {
+  background-position: -2912px 0;
+}
+.flag_py {
+  background-position: -2928px 0;
+}
+.flag_qa {
+  background-position: -2944px 0;
+}
+.flag_re {
+  background-position: -2960px 0;
+}
+.flag_ro-RO,
+.flag_ro {
+  background-position: -2976px 0;
+}
+.flag_sr-RS-Cyrl,
+.flag_rs {
+  background-position: -2992px 0;
+}
+.flag_ru-RU,
+.flag_ru {
+  background-position: -3008px 0;
+}
+.flag_rw {
+  background-position: -3024px 0;
+}
+.flag_sa {
+  background-position: -3040px 0;
+}
+.flag_sb {
+  background-position: -3056px 0;
+}
+.flag_sc {
+  background-position: -3072px 0;
+}
+.flag_scotland {
+  background-position: -3088px 0;
+}
+.flag_sd {
+  background-position: -3104px 0;
+}
+.flag_sv-SE,
+.flag_se {
+  background-position: -3120px 0;
+}
+.flag_sg {
+  background-position: -3136px 0;
+}
+.flag_sh {
+  background-position: -3152px 0;
+}
+.flag_sl-SI,
+.flag_si {
+  background-position: -3168px 0;
+}
+.flag_sj {
+  background-position: -3184px 0;
+}
+.flag_sk-SK,
+.flag_sk {
+  background-position: -3200px 0;
+}
+.flag_sl {
+  background-position: -3216px 0;
+}
+.flag_sm {
+  background-position: -3232px 0;
+}
+.flag_sn {
+  background-position: -3248px 0;
+}
+.flag_so {
+  background-position: -3264px 0;
+}
+.flag_sr {
+  background-position: -3280px 0;
+}
+.flag_st {
+  background-position: -3296px 0;
+}
+.flag_sv {
+  background-position: -3312px 0;
+}
+.flag_sy {
+  background-position: -3328px 0;
+}
+.flag_sz {
+  background-position: -3344px 0;
+}
+.flag_tc {
+  background-position: -3360px 0;
+}
+.flag_td {
+  background-position: -3376px 0;
+}
+.flag_tf {
+  background-position: -3392px 0;
+}
+.flag_tg {
+  background-position: -3408px 0;
+}
+.flag_th-TH,
+.flag_asia,
+.flag_th {
+  background-position: -3424px 0;
+}
+.flag_tj {
+  background-position: -3440px 0;
+}
+.flag_tk {
+  background-position: -3456px 0;
+}
+.flag_tl {
+  background-position: -3472px 0;
+}
+.flag_tm {
+  background-position: -3488px 0;
+}
+.flag_tn {
+  background-position: -3504px 0;
+}
+.flag_to {
+  background-position: -3520px 0;
+}
+.flag_tr-TR,
+.flag_tr {
+  background-position: -3536px 0;
+}
+.flag_tt {
+  background-position: -3552px 0;
+}
+.flag_tv {
+  background-position: -3568px 0;
+}
+.flag_zh-TW,
+.flag_tw {
+  background-position: -3584px 0;
+}
+.flag_tz {
+  background-position: -3600px 0;
+}
+.flag_uk-UA,
+.flag_ua {
+  background-position: -3616px 0;
+}
+.flag_ug {
+  background-position: -3632px 0;
+}
+.flag_um {
+  background-position: -3648px 0;
+}
+.flag_en-US,
+.flag_us {
+  background-position: -3664px 0;
+}
+.flag_uy {
+  background-position: -3680px 0;
+}
+.flag_uz {
+  background-position: -3696px 0;
+}
+.flag_va {
+  background-position: -3712px 0;
+}
+.flag_vc {
+  background-position: -3728px 0;
+}
+.flag_ve {
+  background-position: -3744px 0;
+}
+.flag_vg {
+  background-position: -3760px 0;
+}
+.flag_vi {
+  background-position: -3776px 0;
+}
+.flag_vi-VN,
+.flag_vn {
+  background-position: -3792px 0;
+}
+.flag_vu {
+  background-position: -3808px 0;
+}
+.flag_wales {
+  background-position: -3824px 0;
+}
+.flag_wf {
+  background-position: -3840px 0;
+}
+.flag_ws {
+  background-position: -3856px 0;
+}
+.flag_ye {
+  background-position: -3872px 0;
+}
+.flag_yt {
+  background-position: -3888px 0;
+}
+.flag_za {
+  background-position: -3904px 0;
+}
+.flag_zm {
+  background-position: -3920px 0;
+}
+.flag_zw {
+  background-position: -3936px 0;
+}
+.flag_com {
+  background-position: -3952px 0;
+}
+.dialogOverlay {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 400ms;
+  display: -ms-inline-grid;
+  display: inline-grid;
+  pointer-events: none;
+}
+
+/* Keep the legacy hero views visually consistent with the current Travian HUD. */
+#center
+  #contentOuterContainer
+  .contentContainer
+  #content.heroV2:not(.heroV2Appearance) {
+  background-color: #3a3c31;
+  color: #5e463a;
+  background-image: url(../img_ltr/views/hero-v2/hero-page-background.jpg);
+  background-position: center 50px;
+  background-repeat: no-repeat;
+}
+#content.heroV2Inventory > .heroV2,
+#content.heroV2Attributes > .heroV2 {
+  background-image: url(../img_ltr/views/hero-v2/hero-page-background.jpg);
+  background-position: center 50px;
+  background-repeat: no-repeat;
+}
+#content.heroV2Inventory .heroPropertiesContent .resourcePick {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px 8px;
+  width: 100%;
+}
+#content.heroV2Inventory .heroPropertiesContent .attribute.res {
+  float: none;
+  width: 100%;
+}
+#content.heroV2Inventory .heroPropertiesContent .resourcePick .resource {
+  flex: 1 1 68px;
+  min-width: 68px;
+  margin: 0;
+}
+#content.heroV2Inventory .heroPropertiesContent .resourcePick .resource label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+#content.heroV2Inventory .heroPropertiesContent .resourcePick .resource.last {
+  flex: 0 0 auto;
+}
+#content.heroV2Inventory .heroPropertiesContent .roundedCornersBox {
+  border-radius: 4px;
+}
+/*
+ * Hero inventory tiles are interactive.  The generic V1 slot rule disables
+ * pointer events for its decorative children, but the actual `.item` is the
+ * element that owns the inventory metadata and native drag/click handlers.
+ */
+#content.heroV2Inventory .inventoryWrapper .heroItemV1 > .item {
+  pointer-events: auto;
+}
+#content.heroV2Inventory .inventoryWrapper .heroResourceClaimMessage {
+  margin: 0 8px 8px;
+  color: #6d5a47;
+  font-size: 12px;
+}
+body[data-theme="night"] #content.heroV2Inventory .inventoryWrapper .heroResourceClaimMessage {
+  color: #e8ddc7;
+}
+body[data-theme="default"]
+  #content.heroV2Inventory
+  #attributes
+  .roundedCornersBox,
+#content.heroV2Attributes #attributes .roundedCornersBox,
+body[data-theme="default"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .roundedCornersBox {
+  background-color: #f2ead8;
+  color: #49382b;
+}
+body[data-theme="night"]
+  #content.heroV2Inventory
+  #attributes
+  .roundedCornersBox,
+#content.heroV2Attributes #attributes .roundedCornersBox,
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .roundedCornersBox {
+  background-color: #29271f;
+  color: #e8ddc7;
+  border-color: #74634d;
+}
+body[data-theme="night"] #content.heroV2Inventory .heroPropertiesContent {
+  background-color: #29271f;
+  color: #e8ddc7;
+}
+body[data-theme="night"]
+  #content.heroV2Inventory
+  #attributes
+  .roundedCornersBox,
+#content.heroV2Attributes #attributes .roundedCornersBox,
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .roundedCornersBox,
+body[data-theme="night"] #content.heroV2Inventory .heroPropertiesContent {
+  background-color: #29271f;
+  color: #e8ddc7;
+  border-color: #74634d;
+}
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .attributes,
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .attributes
+  th,
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .attributes
+  td {
+  color: #e8ddc7;
+}
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  input.text {
+  background-color: #fffdf7;
+  color: #49382b;
+  border-color: #a88e61;
+}
+body[data-theme="night"]
+  #content.heroV2Inventory
+  .heroPropertiesContent
+  .bar-bg {
+  background-color: #d0bc92;
+  border-color: #866f4a;
+}
+
+/* Statistics player rows share the compact tribe icon used by the overview. */
+#content.statistics.statisticsPlayer .tribe {
+  width: 30px;
+  text-align: center;
+}
+#content.statistics.statisticsPlayer .tribeIcon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.goldFeatureConfirmation {
+  min-width: 280px;
+  max-width: 520px;
+  padding: 12px 16px;
+  color: #49382b;
+}
+.goldFeatureConfirmation > p {
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+.goldFeatureConfirmationCost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 12px 0;
+}
+.goldFeatureConfirmationButtons {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+/* finishNow uses Gpack #finishNowDialog; keep dialog readable in night theme. */
+#finishNowDialog {
+  min-width: 280px;
+  max-width: 520px;
+  color: #49382b;
+}
+#finishNowDialog .finishNowSection {
+  margin: 0 0 8px;
+}
+#finishNowDialog .finishNowSection > strong {
+  display: block;
+  margin: 0 0 2px;
+}
+body[data-theme="night"] .goldFeatureConfirmation,
+body[data-theme="night"] #finishNowDialog {
+  color: #49382b;
+}
+@media (max-width: 480px) {
+  .goldFeatureConfirmation,
+  #finishNowDialog {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    padding: 10px;
+  }
+}
+.npcExchange {
+  box-sizing: border-box;
+  min-width: min(620px, 80vw);
+  padding: 8px;
+  color: #3d3429;
+}
+.npcExchangeDescription {
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+.npcExchangeTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+.npcExchangeTable th,
+.npcExchangeTable td {
+  padding: 7px 5px;
+  border-bottom: 1px solid #d8cfb7;
+}
+.npcExchangeTable thead th {
+  font-weight: 700;
+}
+.npcExchangeTable thead i {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.npcExchangeTable .npcExchangeCurrent {
+  background: #eee9d8;
+}
+.npcExchangeTable .npcExchangeDesired {
+  background: #f8f5e9;
+}
+.npcExchangeTable .npcExchangeDesired input {
+  box-sizing: border-box;
+  width: 82px;
+  max-width: 100%;
+  text-align: right;
+}
+.npcExchangeValidation {
+  min-height: 18px;
+  margin: 8px 0;
+  color: #9b2b1b;
+}
+.npcExchangeFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+.npcExchangeFooter > .goldFeatureConfirmationCost {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.npcExchangeSubmit.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+body[data-theme="night"] .npcExchange {
+  color: #e8ddc7;
+}
+
+/* The maintained gpack's title controls use one 12px inter-button gap.
+ * Older local rules left a second right margin on hero pages, which shifted
+ * the help and favourite controls away from the reference header rhythm. */
+#center
+  #contentOuterContainer.heroPageShell
+  > .contentTitle
+  .contentTitleButton,
+#center
+  #contentOuterContainer.heroPageShell
+  > .contentContainer
+  a#tabFavorButton {
+  margin-right: 0;
+}
+#center
+  #contentOuterContainer.heroPageShell
+  > .contentTitle
+  a#closeContentButton {
+  right: 47px;
+}
+
+@media (max-width: 480px) {
+  .npcExchange {
+    min-width: 0;
+    width: 100%;
+    padding: 4px;
+  }
+  .npcExchangeTable th,
+  .npcExchangeTable td {
+    padding: 5px 2px;
+  }
+  .npcExchangeTable .npcExchangeDesired input {
+    width: 62px;
+  }
+}
+
+/* Daily quest Ajax content shares the native V2 gpack styles.
+   Layout/grid/reward artwork and dialog-owned scrolling come from
+   imports.css (`#dailyQuests.contentV2`). */
+#dailyQuests.contentV2 {
+  color: #5e463a;
+}
+
+#dailyQuests.contentV2 h1,
+#dailyQuests.contentV2 h1 + div {
+  color: #5e463a;
+}
+#dailyQuests.contentV2 .dailyQuest.completed .title {
+  color: #5e463a;
+}
+#paymentWizard.pros .infoArea.prosLegacyFeatureInfo {
+  display: none !important;
+}
+
+#paymentWizard.pros .contentArea.prosAdvantagesArea {
+  position: relative;
+  inset: auto;
+  float: none;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#paymentWizard.pros .contentWrapper {
+  display: block;
+  width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+}
+
+#paymentWizard.pros .paymentPopupDialogWrapper {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+#paymentWizard.pros .prosAdvantagesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: none !important;
+  grid-auto-rows: minmax(155px, auto);
+  gap: 12px;
+  align-content: start;
+  width: 100%;
+  height: auto;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+#paymentWizard.pros .prosAdvantagesGrid > .prosAdvantageCard {
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+#paymentWizard.pros .prosAdvantageCard {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 155px;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 1px solid #c8b894;
+  border-radius: 5px;
+  background: #f8f5ec;
+  color: #3d3528;
+  box-sizing: border-box;
+}
+
+#paymentWizard.pros .prosAdvantageCard .featureContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: auto;
+  min-height: 153px;
+  padding: 14px;
+  border: 0;
+  background: transparent;
+  box-sizing: border-box;
+  text-align: start;
+}
+
+#paymentWizard.pros .prosAdvantageHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 64px;
+  text-align: start;
+}
+
+#paymentWizard.pros .prosAdvantageHeading > div:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#paymentWizard.pros .prosAdvantageCard .featureImage {
+  display: block !important;
+  position: relative;
+  inset: auto;
+  float: none;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  margin: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+#paymentWizard.pros .prosAdvantageCard .featureImage.goldclub {
+  background-image: url("../img_ltr/legacy/views/shop/gold-club-large.png");
+}
+
+#paymentWizard.pros .prosAdvantageCard .featureImage.plus {
+  background-image: url("../img_ltr/legacy/views/shop/travian-plus-large.png");
+}
+
+#paymentWizard.pros .prosAdvantageCard .prosResourceIcon-wood {
+  background-image: url("../img_ltr/global/resources/lumber-medium.png");
+}
+
+#paymentWizard.pros .prosAdvantageCard .prosResourceIcon-clay {
+  background-image: url("../img_ltr/global/resources/clay-medium.png");
+}
+
+#paymentWizard.pros .prosAdvantageCard .prosResourceIcon-iron {
+  background-image: url("../img_ltr/global/resources/iron-medium.png");
+}
+
+#paymentWizard.pros .prosAdvantageCard .prosResourceIcon-crop {
+  background-image: url("../img_ltr/global/resources/crop-medium.png");
+}
+
+#paymentWizard.pros .prosAdvantageCard .featureTitle {
+  display: block;
+  margin: 0 0 5px;
+  color: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: start;
+}
+
+#paymentWizard.pros .prosAdvantageFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 36px;
+  padding-top: 10px;
+  border-top: 1px solid #e0d8c6;
+}
+
+#paymentWizard.pros .prosAdvantageFooter .featureDuration {
+  min-width: 0;
+  color: #615848;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+#paymentWizard.pros .prosAdvantageFooter .featureRemainingTime {
+  margin: 0;
+}
+
+#paymentWizard.pros .prosAdvantageFooter .featureButton {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+#paymentWizard.pros .prosAdvantageRenewal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding-top: 2px;
+  font-size: 11px;
+}
+
+#paymentWizard.pros .prosAdvantageRenewal label {
+  cursor: pointer;
+}
+
+#paymentWizard.pros #featureIndicator {
+  display: none !important;
+}
+
+body[data-theme="night"] #paymentWizard.pros .prosAdvantageCard {
+  border-color: #66766e;
+  background: #263330;
+  color: #f0eadc;
+}
+
+body[data-theme="night"]
+  #paymentWizard.pros
+  .prosAdvantageFooter
+  .featureDuration {
+  color: #c5cbbd;
+}
+
+body[data-theme="night"] #paymentWizard.pros .prosAdvantageFooter {
+  border-top-color: #46574f;
+}
+
+@media screen and (max-width: 620px) {
+  #paymentWizard.pros .prosAdvantagesGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 2px;
+  }
+
+  #paymentWizard.pros .prosAdvantageCard .featureContent {
+    padding: 11px;
+  }
+}
+
+/* Public login follows the reference V2 dialog and deliberately bypasses the
+ * obsolete generic content-page header/frame.  Keep #center on the normal
+ * login shell so its 800px reference floor and relative positioning survive. */
+body.login #contentOuterContainer.loginSceneContainer {
+  position: static;
+  min-height: 0;
+  width: auto;
+}
+
+body.login #loginScene:not(.loginRecoveryScene) #dialogOverlay {
+  overflow: hidden;
+}
+
+body.login #loginScene:not(.loginRecoveryScene) .dialogWrapper {
+  position: absolute;
+  inset: 104px 0 auto;
+  margin: 0 auto;
+}
+
+body.login #loginScene .dialogWrapper .dialog {
+  min-height: 500px;
+}
+
+body.login #loginScene .dialogContents {
+  min-height: 481px;
+}
+
+body.login #loginScene .loginRecoveryDescription,
+body.login #loginScene .loginRecoverySuccess {
+  margin: 0 0 20px;
+  color: #5e463a;
+  line-height: 1.45;
+}
+
+body.login #loginScene .loginRecoverySuccess {
+  color: #52751c;
+}
+
+body.login #sidebarBoxMenu a {
+  text-transform: uppercase;
+}
+
+body.login #sidebarBoxMenu {
+  display: inline-block;
+}
+
+@media screen and (max-width: 620px) {
+  body.login #loginScene:not(.loginRecoveryScene) .dialogWrapper {
+    position: absolute;
+    top: 90px;
+  }
+
+  /* Guest pages use Wimpel's checkbox drawer at this breakpoint. The desktop
+   * sidebar menu would otherwise appear alongside the drawer. */
+  body.login.mobileOptimized #sidebarBoxMenu {
+    display: none;
+  }
+}
+
+/* The post-logout screen uses the same compact public shell as login. */
+body.logout #background {
+  background-color: rgba(10, 21, 11, 0.55);
+  background-blend-mode: multiply;
+}
+
+body.logout #center {
+  min-height: 740px;
+}
+
+body.logout #center #contentOuterContainer {
+  top: 89px;
+  width: 500px;
+  justify-self: center;
+}
+
+body.logout div#center div#contentOuterContainer {
+  top: 89px;
+  width: 500px;
+}
+
+body.logout #center #contentOuterContainer .contentTitle {
+  height: 14px;
+  border-radius: 8px 8px 0 0;
+}
+
+body.logout #center #contentOuterContainer.contentPage h1.titleInHeader {
+  display: none;
+}
+
+body.logout #center #contentOuterContainer .contentContainer {
+  padding-bottom: 8px;
+  margin-bottom: 0;
+  background-color: #d2bda1;
+}
+
+body.logout #center #contentOuterContainer .contentContainer #content.logout {
+  width: calc(100% - 24px);
+  min-height: 470px;
+  padding: 22px 24px 26px;
+  background: #f8f4e8;
+  color: #5e463a;
+}
+
+.logoutCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.logoutCard .logoutCardHeading {
+  position: relative;
+  z-index: 2;
+  max-width: 390px;
+  margin: 0;
+  color: #5e463a;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.logoutThanks {
+  margin: 24px 0 0;
+  color: #5e463a;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.logoutCookieNotice {
+  max-width: 390px;
+  margin: 9px 0 0;
+  color: #6d624f;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.logoutDeleteCookies {
+  margin: 10px 0 0;
+  font-size: 13px;
+}
+
+.logoutDeleteCookies a {
+  color: #52751c;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logoutDeleteCookies a:hover,
+.logoutDeleteCookies a:focus-visible {
+  text-decoration: underline;
+}
+
+.logoutRelogin {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #ded3bf;
+}
+
+.logoutRelogin h2 {
+  margin: 0;
+  color: #5e463a;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.logoutLoginForm {
+  margin-top: 15px;
+}
+
+.logoutLoginField + .logoutLoginField {
+  margin-top: 14px;
+}
+
+.logoutLoginField label {
+  display: block;
+  margin-bottom: 6px;
+  color: #5e463a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body.logout
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.logout
+  .logoutLoginField
+  input.text {
+  width: 100%;
+  max-width: none;
+  height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #a5946d;
+  border-radius: 2px;
+  background: #fffdf8;
+  color: #3d3528;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+body.logout
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.logout
+  .logoutLoginField
+  input.text:focus {
+  outline: 2px solid rgba(112, 151, 42, 0.45);
+  outline-offset: 1px;
+  border-color: #6f8d37;
+}
+
+.logoutSubmit {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.logoutSubmit button.textButtonV1 {
+  min-width: 132px;
+  height: 34px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.logoutInformation {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #ded3bf;
+}
+
+.logoutInformation h2 {
+  margin: 0 0 8px;
+  color: #5e463a;
+  font-family: Georgia, serif;
+  font-size: 15px;
+}
+
+.logoutInformationContent {
+  color: #6d624f;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* The guest support route keeps its existing form contract without the legacy tables. */
+body.support #background {
+  background-color: rgba(10, 21, 11, 0.55);
+  background-blend-mode: multiply;
+}
+
+body.support #center {
+  min-height: 800px;
+}
+
+body.support #center #contentOuterContainer,
+body.support div#center div#contentOuterContainer {
+  /* A margin, not a `top` offset: the window's height then counts, so the footer sits below it. */
+  margin-top: 104px;
+  width: 500px;
+  justify-self: center;
+}
+
+body.support #center #contentOuterContainer .contentTitle {
+  height: 14px;
+  border-radius: 8px 8px 0 0;
+}
+
+body.support #center #contentOuterContainer .contentContainer {
+  padding-bottom: 8px;
+  margin-bottom: 0;
+  background-color: #d2bda1;
+}
+
+body.support #center #contentOuterContainer .contentContainer #content.support {
+  width: calc(100% - 24px);
+  min-height: 590px;
+  /* The top padding keeps the first line below the header bar, whose title is drawn by the shell. */
+  padding: 43px 24px 26px;
+  background: #f8f4e8;
+  color: #5e463a;
+}
+
+.supportCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.supportCardDescription,
+.supportCardScope {
+  margin: 12px 0 0;
+  color: #6d624f;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.supportCardScope {
+  color: #5e463a;
+  font-weight: 700;
+}
+
+.supportForm {
+  margin-top: 21px;
+}
+
+.supportField + .supportField {
+  margin-top: 14px;
+}
+
+.supportField label {
+  display: block;
+  margin-bottom: 6px;
+  color: #5e463a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body.support
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.support
+  .supportField
+  input.text,
+body.support
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.support
+  .supportField
+  select,
+body.support
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.support
+  .supportField
+  textarea {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid #a5946d;
+  border-radius: 2px;
+  background: #fffdf8;
+  color: #3d3528;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+body.support
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.support
+  .supportField
+  input.text,
+body.support
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.support
+  .supportField
+  select {
+  height: 38px;
+}
+
+body.support
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.support
+  .supportField
+  textarea {
+  min-height: 114px;
+  line-height: 1.35;
+  resize: vertical;
+}
+
+.supportField input.text:focus,
+.supportField select:focus,
+.supportField textarea:focus {
+  outline: 2px solid rgba(112, 151, 42, 0.45);
+  outline-offset: 1px;
+  border-color: #6f8d37;
+}
+
+.supportError {
+  min-height: 0;
+  margin-top: 4px;
+  color: #a32c20;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.supportSubmit {
+  display: flex;
+  justify-content: center;
+  margin-top: 21px;
+}
+
+.supportSubmit button.textButtonV1 {
+  min-width: 132px;
+  height: 34px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.supportSuccessCard {
+  padding-top: 3px;
+}
+
+.supportSuccessAction {
+  margin: 22px 0 0;
+  text-align: center;
+}
+
+.supportSuccessAction a {
+  color: #52751c;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.supportSuccessAction a:hover,
+.supportSuccessAction a:focus-visible {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 620px) {
+  body.support #center #contentOuterContainer,
+  body.support div#center div#contentOuterContainer {
+    width: calc(100% - 24px);
+  }
+
+  body.support
+    #center
+    #contentOuterContainer
+    .contentContainer
+    #content.support {
+    width: calc(100% - 20px);
+    padding: 20px 16px 24px;
+  }
+}
+
+/* Password reset shares the focused login shell while preserving its one-time-token flow. */
+.passwordResetCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+body.passwordReset
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.login {
+  min-height: 290px;
+}
+
+.passwordResetHeading {
+  margin: 0;
+  color: #5e463a;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.passwordResetMessage {
+  margin: 20px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.passwordResetMessage.error {
+  color: #a32c20;
+}
+
+.passwordResetMessage.success {
+  color: #52751c;
+  font-weight: 700;
+}
+
+.passwordResetForm {
+  margin-top: 25px;
+}
+
+.passwordResetField + .passwordResetField {
+  margin-top: 19px;
+}
+
+.passwordResetField label {
+  display: block;
+  margin-bottom: 7px;
+  color: #5e463a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body.login
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.login
+  .passwordResetField
+  input.text {
+  width: 100%;
+  max-width: none;
+  height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #a5946d;
+  border-radius: 2px;
+  background: #fffdf8;
+  color: #3d3528;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.passwordResetField input.text:focus {
+  outline: 2px solid rgba(112, 151, 42, 0.45);
+  outline-offset: 1px;
+  border-color: #6f8d37;
+}
+
+.passwordResetSubmit {
+  display: flex;
+  justify-content: center;
+  margin-top: 23px;
+}
+
+.passwordResetSubmit button.textButtonV1 {
+  min-width: 132px;
+  height: 34px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Keep public error states as concise cards in the shared guest shell. */
+body.error_site
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.logout {
+  min-height: 290px;
+}
+
+.notFoundCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding-top: 3px;
+}
+
+.notFoundHeading {
+  margin: 0;
+  color: #5e463a;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.notFoundDescription {
+  margin: 18px 0 0;
+  color: #6d624f;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notFoundAction {
+  margin: 22px 0 0;
+  text-align: center;
+}
+
+.notFoundAction a {
+  color: #52751c;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.notFoundAction a:hover,
+.notFoundAction a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Email-verification outcomes use the focused login shell instead of inline styles. */
+body.emailVerification
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.login {
+  min-height: 290px;
+}
+
+.verificationCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding-top: 3px;
+}
+
+.verificationHeading {
+  margin: 0;
+  color: #5e463a;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.verificationMessage {
+  margin: 20px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.verificationCard--error .verificationMessage {
+  color: #a32c20;
+}
+
+.verificationCard--warning .verificationMessage {
+  color: #6d624f;
+}
+
+.verificationCard--success .verificationMessage {
+  color: #52751c;
+}
+
+.verificationMessage a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* The authenticated CAPTCHA gate uses the same restrained game-panel language. */
+body.recaptcha #center #contentOuterContainer {
+  top: 89px;
+  width: 500px;
+  justify-self: center;
+}
+
+body.recaptcha
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.recaptcha {
+  min-height: 360px;
+  padding: 22px 24px 26px;
+  background: #f8f4e8;
+  color: #5e463a;
+}
+
+.recaptchaCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.recaptchaHeading {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  text-transform: uppercase;
+}
+
+.recaptchaForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.recaptchaImage {
+  max-width: 100%;
+}
+.recaptchaReload {
+  margin-top: 9px;
+  color: #52751c;
+  background: none;
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+.recaptchaForm label {
+  align-self: stretch;
+  margin: 18px 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+body.recaptcha #content.recaptcha .recaptchaForm input.text {
+  width: 100%;
+  height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #a5946d;
+  box-sizing: border-box;
+}
+.recaptchaError {
+  align-self: stretch;
+  margin: 6px 0 0;
+  color: #a32c20;
+  font-size: 12px;
+  font-weight: 700;
+}
+.recaptchaSubmit {
+  margin-top: 20px;
+}
+
+/* Public system states share one compact, readable card. */
+body.publicStatus #center #contentOuterContainer {
+  top: 89px;
+  width: 500px;
+  justify-self: center;
+}
+body.publicStatus
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.publicStatus {
+  min-height: 290px;
+  padding: 22px 24px 26px;
+  background: #f8f4e8;
+  color: #5e463a;
+}
+.statusCard {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding-top: 3px;
+}
+.statusCardHeading {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  text-transform: uppercase;
+}
+.statusCardMessage {
+  margin: 18px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.statusCard--error .statusCardMessage {
+  color: #a32c20;
+}
+.statusCard--warning .statusCardMessage {
+  color: #6d624f;
+}
+.statusCardAction {
+  margin: 22px 0 0;
+  text-align: center;
+}
+.statusCardAction a {
+  color: #52751c;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.statusCardAction a:hover,
+.statusCardAction a:focus-visible {
+  text-decoration: underline;
+}
+
+/*
+ * Public homepage
+ *
+ * Keep the public start page inside the one maintained Gpack rather than
+ * reusing the old out-of-game card.  Its fixed stage mirrors the current
+ * international landing composition; local routes and the shared local footer
+ * remain the only outbound destinations.
+ */
+body.localHomepage {
+  min-width: 0;
+  overflow-x: hidden;
+  background: #202020;
+}
+
+body.localHomepage #background {
+  min-width: 0;
+  min-height: 0;
+  background: #202020;
+}
+
+body.localHomepage #topBar,
+body.localHomepage #topBarHeroWrapper,
+body.localHomepage #sidebarBeforeContent,
+body.localHomepage #sidebarAfterContent,
+body.localHomepage #center .behindContent {
+  display: none;
+}
+
+body.localHomepage #center,
+body.localHomepage #contentOuterContainer,
+body.localHomepage #contentOuterContainer.homepageFullBleed,
+body.localHomepage #content.homepageContent {
+  position: static;
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.localHomepage #center {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body.localHomepage #contentOuterContainer,
+body.localHomepage #contentOuterContainer.homepageFullBleed,
+body.localHomepage .homepageContent {
+  width: 100% !important;
+  max-width: none !important;
+  justify-self: stretch !important;
+  grid-column: auto !important;
+}
+
+.homepageHeader {
+  position: fixed;
+  /* The legacy layout paints a 40px #background pseudo-element at z-index 26. */
+  z-index: 27;
+  top: 0;
+  right: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 40px;
+  height: 80px;
+  min-width: 360px;
+  padding: 0;
+  border-block-end: 3px solid rgb(31 31 31 / 80%);
+  background: linear-gradient(180deg, #4a494a, #272727);
+  color: #cba467;
+  font-size: 13px;
+}
+
+.homepageHeaderStart,
+.homepageAccount {
+  display: inline-grid;
+  box-sizing: border-box;
+  align-items: center;
+  align-self: stretch;
+  column-gap: var(--homepage-page-padding);
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.homepageHeaderStart {
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-items: start;
+  container-name: homepageHeaderStart;
+}
+
+.homepageAccount {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  container-name: homepageHeaderEnd;
+}
+
+.homepageMenuIcon {
+  display: grid;
+  gap: 3px;
+  width: 30px;
+}
+
+/* Reference hamburger: 4px bars with a 1px dark outline (its svg `.outline` path strokes 2px). */
+.homepageMenuIcon i {
+  display: block;
+  width: 100%;
+  height: 4px;
+  border-radius: 1px;
+  background: #cba467;
+  box-shadow: 0 0 0 1px #34220d;
+}
+
+.homepageMenuIcon i:first-child {
+  width: 19px;
+}
+
+.homepageMenuIcon i:last-child {
+  width: 25px;
+}
+
+.homepageLanguage,
+.homepageAccountLink,
+.homepageAuthLink {
+  box-sizing: border-box;
+  min-height: 34px;
+  border: 1px solid #cba467;
+  border-radius: 19px;
+  color: #cba467;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.homepageLanguage {
+  display: grid;
+  min-width: 100px;
+  padding: 1px;
+  place-items: center;
+}
+
+.homepageLanguageContent {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 23px minmax(0, 1fr) 23px;
+  align-items: center;
+  column-gap: 10px;
+  justify-self: stretch;
+  padding-inline: 10px;
+  font-weight: 700;
+}
+
+.homepageLanguageName {
+  overflow: hidden;
+  direction: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.homepageLanguage img {
+  box-sizing: border-box;
+  width: 23px;
+  height: 18px;
+  border: 1px solid rgb(38 31 22 / 50%);
+  object-fit: cover;
+}
+
+.homepageLanguageChevron {
+  justify-self: center;
+  width: 0;
+  height: 0;
+  border-top: 4px solid currentColor;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.homepageWordmark {
+  display: inline-flex;
+  align-items: center;
+  height: 70px;
+  justify-self: center;
+  color: #f2f2f2;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 0.72;
+  text-decoration: none;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 55%);
+}
+
+.homepageWordmark :is(img, svg) {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 70px;
+  margin: 0;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.homepageAccountLink {
+  display: inline-grid;
+  min-width: 170px;
+  margin-inline: var(--homepage-page-padding);
+  padding: 1px;
+  place-items: center;
+}
+
+.homepageAccountContent {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 16px minmax(0, 1fr) 16px;
+  align-items: center;
+  column-gap: 10px;
+  justify-self: stretch;
+  padding-inline: 10px;
+  font-weight: 700;
+}
+
+.homepageAccountName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.homepageAccountIcon {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+}
+
+.homepageAccountIcon svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
+.homepageChevron {
+  width: 8px;
+  height: 8px;
+  margin: -5px 0 0 3px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.homepageAuthLink {
+  display: inline-grid;
+  min-width: 170px;
+  margin-inline: var(--homepage-page-padding);
+  padding: 1px 10px;
+  place-items: center;
+}
+
+.homepageAccountLink:hover,
+.homepageAccountLink:focus-visible {
+  color: #f2d597;
+  background: rgb(203 164 103 / 14%);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* `body[data-theme] div#footer` in the Gpack paints the in-game white hairline layer; the public footer is a plain dark bar like the reference public site. */
+body.localHomepage[data-theme] div#footer,
+body.localHomepage div#footer {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  box-sizing: border-box;
+  min-height: 56px;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 18px 20px;
+  background: #292929;
+  color: #cba467;
+}
+
+body.localHomepage #footer #pageLinks {
+  position: static;
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+/* Reference `footer nav a`: gold, bold, underlined, no hover/focus recolouring. */
+body.localHomepage #footer #pageLinks a {
+  display: inline-block;
+  margin: 0 10px;
+  padding: 0;
+  border: 0;
+  color: #cba467;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20.8px;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+/* Release label after the footer links; styled like a link without a destination. */
+div#footer div#pageLinks .footerVersion {
+  border-left: 1px solid #f2f2f2;
+  margin: 0 10px 0 0;
+  padding: 0 0 0 10px;
+  color: #f2f2f2;
+}
+
+body.localHomepage #footer #pageLinks .footerVersion {
+  display: inline-block;
+  margin: 0 10px;
+  padding: 0;
+  border: 0;
+  color: #cba467;
+  font-size: 16px;
+  line-height: 20.8px;
+}
+
+body.localHomepage #footer #pageLinks a:hover { color: #99c01a; }
+body.localHomepage #footer #pageLinks a:active { color: #ff8000; }
+
+body[data-theme="night"].localHomepage #background,
+body[data-theme="night"].localHomepage .homepageHero {
+  background: #151515;
+}
+
+body[data-theme="night"].localHomepage .homepageInfoCard {
+  background: linear-gradient(135deg, rgb(29 29 29 / 97%), rgb(14 14 14 / 97%));
+}
+
+/* Apollodorus / Teutobod SeasonalRewards and shop package art were recovered
+ * from live gpack/692 into the self-hosted travian pack (2026-10-28).
+ * Do not reintroduce star_small / specialOffer fallbacks here — the native
+ * imports.css selectors already point at the recovered files. */
+
+/*
+ * The daily-overview renderer is current, but its detail templates still use
+ * the small V1 button structure.  The mirrored pack does not ship those V1
+ * button rules, leaving the two reward actions as unframed text.  Keep the
+ * original markup and client hooks, and present the controls with the same
+ * compact green treatment used by current in-game calls to action.
+ */
+.dialog.questInformation #dialogContent .questWrapper.achievements {
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 12px 16px 16px;
+  color: #49382b;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.dialog.questInformation #dialogContent .questWrapper.achievements .questTitle,
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .questRewardTitle {
+  color: #5b4335;
+}
+
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .questDescription {
+  margin: 16px 0 20px;
+}
+
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .questDescription
+  ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .achievementLine {
+  height: 0;
+  margin: 12px 0;
+  border: 0;
+  border-top: 1px solid #d8c39c;
+}
+
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .questButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: auto;
+  margin: 18px 0 0;
+}
+
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .questButtons
+  .textButtonV2 {
+  min-width: 126px;
+  margin: 0;
+}
+
+.dialog.questInformation
+  #dialogContent
+  .questWrapper.achievements
+  .questButtons
+  .textButtonV2:focus-visible {
+  outline: 3px solid #d6e68d;
+  outline-offset: 2px;
+}
+
+/* The statistics secondary tabs place padding on each link. */
+div.statistics > .contentNavi.tabNavi .container .content {
+  padding: 0;
+}
+
+/* Report role templates publish the combat result artwork as image elements,
+ * while the Gpack rules size the equivalent inline SVG elements. Keep the
+ * outcome art anchored to the role header so the source SVG's intrinsic size
+ * cannot create a tall red/blue column over the report. */
+#reportWrapper .body .role .header .outcome > img.losses {
+  position: absolute;
+  inset-inline-end: 15px;
+  inset-block-end: -3px;
+  width: 48px;
+  height: 60px;
+}
+
+#reportWrapper .body .role .header .outcome > img.loot,
+#reportWrapper .body .role .header .outcome > img.skull {
+  position: absolute;
+  inset-inline-end: 2px;
+  inset-block-end: 2px;
+  width: 26px;
+  height: 32px;
+}
+
+.rtl #reportWrapper .body .role .header .outcome > img.losses,
+.rtl #reportWrapper .body .role .header .outcome > img.loot,
+.rtl #reportWrapper .body .role .header .outcome > img.skull {
+  transform: scaleX(-1);
+}
+
+/* Village groups are part of the native V2 village-list hierarchy; the header uses the Gpack rules. */
+#sidebarBoxVillageList .villageList .listEntry.group .secondaryIconButton svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Match reference sidebar quickLinks geometry (44px slots, −30px bottom margin).
+   Do not set an explicit height on .header — that blocks the margin collapse that keeps the box compact. */
+#sidebarBoxActiveVillage .buttonsWrapper.quickLinks,
+#sidebarBoxVillageList .buttonsWrapper.quickLinks {
+  margin-inline: 10px;
+  margin-block-end: -30px;
+  column-gap: 1px;
+  min-height: 44px;
+}
+
+/* Wimpel ActiveVillage: five quickLinkSlots + settings (30px). */
+#sidebarBoxActiveVillage .buttonsWrapper.quickLinks {
+  grid-template-columns: repeat(5, 44px) 30px;
+}
+
+#sidebarBoxActiveVillage .quickLinkSlot:has(> .slot) .layoutButton {
+  position: absolute;
+  inset: 2px;
+  margin: 0;
+}
+
+#sidebarBoxVillageList .buttonsWrapper.quickLinks {
+  grid-template-columns: repeat(5, 44px) 30px;
+}
+
+/* Slot action buttons are 40px; settings (⋯) must stay 26px like Wimpel. */
+#sidebarBoxActiveVillage .buttonsWrapper.quickLinks .quickLinkSlot:has(> .slot) .layoutButton:not(.settings),
+#sidebarBoxVillageList .buttonsWrapper.quickLinks .quickLinkSlot:has(> .slot) .layoutButton:not(.settings) {
+  width: 40px;
+  height: 40px;
+  margin: 2px 0 0;
+}
+
+#sidebarBoxActiveVillage .buttonsWrapper.quickLinks .layoutButton.settings,
+#sidebarBoxVillageList .buttonsWrapper.quickLinks .layoutButton.settings {
+  width: 26px;
+  height: 26px;
+  margin-block: 9px;
+  grid-template-columns: 24px;
+  grid-template-rows: 24px;
+}
+
+#sidebarBoxVillageList .quickLinkSlot .layoutButton {
+  position: absolute;
+  inset: 2px;
+  margin: 0;
+}
+
+.quickLinksDialog .quickLinksWrapper > div > .layoutButton {
+  margin: 0;
+}
+
+.quickLinksDialog .quickLinksWrapper > div > .layoutButton > svg {
+  width: 22px;
+  height: 22px;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  min-height: 22px;
+  margin-top: -1px;
+  border-top: 1px solid rgba(104, 80, 60, 0.25);
+  border-bottom: 1px solid rgba(104, 80, 60, 0.25);
+  background: #e5d5b8;
+  color: #4a3c31;
+  box-shadow: inset 3px 0 0 #9a8b78;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group.blue {
+  box-shadow: inset 3px 0 0 #3b7ea8;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group.green {
+  box-shadow: inset 3px 0 0 #5e8b1e;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group.red {
+  box-shadow: inset 3px 0 0 #b54a3a;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group.yellow {
+  box-shadow: inset 3px 0 0 #c9a227;
+}
+
+.rtl #sidebarBoxVillageList .villageList .listEntry.group,
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.blue,
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.green,
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.red,
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.yellow {
+  box-shadow: inset -3px 0 0 #9a8b78;
+}
+
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.blue {
+  box-shadow: inset -3px 0 0 #3b7ea8;
+}
+
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.green {
+  box-shadow: inset -3px 0 0 #5e8b1e;
+}
+
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.red {
+  box-shadow: inset -3px 0 0 #b54a3a;
+}
+
+.rtl #sidebarBoxVillageList .villageList .listEntry.group.yellow {
+  box-shadow: inset -3px 0 0 #c9a227;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColors {
+  display: none;
+  grid-auto-flow: column;
+  column-gap: 3px;
+  align-items: center;
+  margin-inline-start: 6px;
+}
+
+#sidebarBoxVillageList
+  .villageList
+  .listEntry.group.editMode
+  .villageGroupColors {
+  display: inline-grid;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 1px solid rgba(73, 56, 45, 0.55);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor.grey {
+  background: #9a8b78;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor.blue {
+  background: #3b7ea8;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor.green {
+  background: #5e8b1e;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor.red {
+  background: #b54a3a;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor.yellow {
+  background: #c9a227;
+}
+
+#sidebarBoxVillageList .villageList .villageGroupColor.selected {
+  outline: 2px solid #5e8b1e;
+  outline-offset: 1px;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group .dragAndDrop {
+  width: 18px;
+  opacity: 0;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group:hover .dragAndDrop,
+#sidebarBoxVillageList .villageList .listEntry.group:focus-within .dragAndDrop {
+  opacity: 1;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group .iconAndNameWrapper {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group .actions {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group .secondaryIconButton {
+  width: 27px;
+  height: 21px;
+  padding: 2px 5px;
+  border: 0;
+  background: transparent;
+  color: #725b45;
+  cursor: pointer;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group .secondaryIconButton:hover {
+  color: #5e8b1e;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group.editMode {
+  position: relative;
+  z-index: 2;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.group input.name {
+  box-sizing: border-box;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  padding: 0 4px;
+  border: 1px solid #8a745b;
+  border-radius: 2px;
+  background: #fffbea;
+  color: #49382d;
+  font: inherit;
+}
+
+#sidebarBoxVillageList .villageList .groupWrapper.collapsed {
+  display: none;
+}
+
+#sidebarBoxVillageList
+  .villageList
+  .listEntry.group.collapsed
+  .villageGroupToggle
+  svg {
+  transform: rotate(-90deg);
+}
+
+#sidebarBoxVillageList .villageList .groupWrapper .groupContainer {
+  margin-inline-start: 8px;
+  border-inline-start: 1px solid rgba(104, 80, 60, 0.25);
+}
+
+#sidebarBoxVillageList .villageList .listEntry.village[draggable="true"] {
+  cursor: grab;
+}
+
+#sidebarBoxVillageList .villageList .listEntry.village.beingDragged {
+  opacity: 0.45;
+}
+
+#sidebarBoxVillageList .villageList .groupContainer.villageGroupDropTarget,
+#sidebarBoxVillageList .villageList .groupsHeader.villageGroupDropTarget {
+  outline: 2px solid #84ad2c;
+  outline-offset: -2px;
+}
+
+/* Legacy default pack pads #topBar 5px and shifts the logo; imports uses 0. */
+body:not(.login):not(.logout) #topBar {
+  padding: 0;
+}
+
+/*
+ * The legacy shell framed the logo as a 128px button and offset it into the
+ * header. The current game keeps the compact wordmark unframed at the top of
+ * the left header column. Keep the navigation grid unchanged; only the logo
+ * itself has this reference-specific geometry.
+ */
+body:not(.login):not(.logout) #topBar #logo {
+  top: 0;
+  width: 93.09375px;
+  height: 40px;
+  margin-inline-start: 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body:not(.login):not(.logout) #topBar #logo svg {
+  width: 92.09375px;
+  height: 32px;
+  margin-top: 4px;
+}
+
+/*
+ * Legacy default_compressed centers framed icons with absolute+translate.
+ * imports uses inline-grid; without resetting position the SVG
+ * drifts (profile icon leaves the round button). Match Wimpel grid centering.
+ */
+.buttonFramed.withIcon {
+  display: inline-grid;
+  padding: 0;
+  align-items: center;
+  justify-items: center;
+}
+
+.buttonFramed.withIcon svg {
+  position: relative;
+  top: 0;
+  left: 0;
+  transform: none;
+}
+
+.rtl .buttonFramed.withIcon svg,
+.buttonFramed.withIcon .rtl svg {
+  transform: none;
+}
+
+nav#outOfGame .layoutButton svg.profile {
+  top: -1px;
+}
+/*
+ * Link list (V2): native grid rows use svg.link + .name. Keep new-tab /
+ * support rows on the same grid without inline color or spacer <img> hacks.
+ */
+.sidebar #sidebarBoxLinklist .content ul li a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar #sidebarBoxLinklist .content ul li a:hover .name,
+.sidebar #sidebarBoxLinklist .content ul li a:focus-visible .name {
+  color: #6b9630;
+}
+
+.sidebar #sidebarBoxLinklist .content ul li.newTab a,
+.sidebar #sidebarBoxLinklist .content ul li.newTab a .name {
+  color: #c23c2a;
+  font-weight: 700;
+}
+
+.sidebar #sidebarBoxLinklist .content ul li.newTab a svg.link {
+  fill: #c23c2a;
+}
+
+.sidebar #sidebarBoxLinklist .content .linklistNotice {
+  margin-block-start: 8px;
+}
+
+/*
+ * Task-master (V2): keep the native imports geometry. Local pages
+ * still load the older default_compressed base, so these readable overrides
+ * restore pointer input for /tasks and pin mentor sprites to
+ * hud/sidebar/tasks/* (never the retired tall layout portraits).
+ */
+.sidebar #sidebarBoxQuestmaster {
+  display: inline-block;
+  margin-block-start: 10px;
+  z-index: 1;
+}
+
+.sidebar #sidebarBoxQuestmaster .header {
+  display: grid;
+  justify-items: center;
+  margin-bottom: -6px;
+  z-index: 1;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton {
+  position: relative;
+  display: inline-grid;
+  align-items: end;
+  justify-items: center;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: none;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton .mentor,
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton svg {
+  grid-row-start: 1;
+  grid-column-start: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_1 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-roman.png");
+  width: 142px;
+  height: 117px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_2 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-teuton.png");
+  width: 190px;
+  height: 112px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_3 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-gaul.png");
+  width: 150px;
+  height: 118px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_6 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-egyptian.png");
+  width: 142px;
+  height: 114px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_7 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-hun.png");
+  width: 164px;
+  height: 121px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_8 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-spartan.png");
+  width: 134px;
+  height: 121px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton.vid_9 img.mentor {
+  background-image: url("../img_ltr/hud/sidebar/tasks/mentor-viking.png");
+  width: 136px;
+  height: 120px;
+  position: relative;
+  z-index: 2;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_1
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-roman.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_2
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-teuton.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_3
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-gaul.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_6
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-egyptian.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_7
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-hun.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_8
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-spartan.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_9
+  img.mentor {
+  background-image: url("../img_rtl/hud/sidebar/tasks/mentor-viking.png");
+}
+
+.sidebar #sidebarBoxQuestmaster .header #questmasterButton .bigSpeechBubble {
+  pointer-events: none;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_1
+  .bigSpeechBubble {
+  left: -10px;
+  top: 45px;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_2
+  .bigSpeechBubble {
+  left: 15px;
+  top: 45px;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_3
+  .bigSpeechBubble {
+  left: -5px;
+  top: 50px;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_6
+  .bigSpeechBubble {
+  left: -20px;
+  top: 45px;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_7
+  .bigSpeechBubble {
+  left: -12px;
+  top: 50px;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_8
+  .bigSpeechBubble {
+  left: -8px;
+  top: 55px;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_9
+  .bigSpeechBubble {
+  left: 0;
+  top: 60px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_1
+  .bigSpeechBubble {
+  left: auto;
+  right: -10px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_2
+  .bigSpeechBubble {
+  left: auto;
+  right: 15px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_3
+  .bigSpeechBubble {
+  left: auto;
+  right: -5px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_6
+  .bigSpeechBubble {
+  left: auto;
+  right: -20px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_7
+  .bigSpeechBubble {
+  left: auto;
+  right: -12px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_8
+  .bigSpeechBubble {
+  left: auto;
+  right: -8px;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton.vid_9
+  .bigSpeechBubble {
+  left: auto;
+  right: 0;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton
+  .bigSpeechBubble.newQuestSpeechBubble
+  img {
+  background-image: url("../img_ltr/hud/sidebar/tasks/exclamation-mark.png");
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .header
+  #questmasterButton
+  .bigSpeechBubble.newQuestSpeechBubble
+  img {
+  background-image: url("../img_rtl/hud/sidebar/tasks/exclamation-mark.png");
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .content
+  ul#mentorTaskList
+  li
+  a.taskOverviewLink {
+  display: inline-grid;
+  grid-template-columns: 15px minmax(0, 1fr);
+  grid-template-rows: minmax(16px, auto);
+  align-items: center;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .content
+  ul#mentorTaskList
+  li
+  a.taskOverviewLink
+  > * {
+  grid-row-start: 1;
+  align-self: center;
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .content
+  ul#mentorTaskList
+  li
+  a.taskOverviewLink
+  img.finished {
+  width: 12px;
+  height: 12px;
+  background: url("../img_common/hud/content/checkmark-tiny.png") center / contain
+    no-repeat;
+}
+
+.rtl
+  .sidebar
+  #sidebarBoxQuestmaster
+  .content
+  ul#mentorTaskList
+  li
+  a.taskOverviewLink
+  img.finished {
+  background-image: url("../img_common/hud/content/checkmark-tiny.png");
+}
+
+.sidebar
+  #sidebarBoxQuestmaster
+  .content
+  ul#mentorTaskList
+  li
+  a.taskOverviewLink:hover,
+.sidebar
+  #sidebarBoxQuestmaster
+  .content
+  ul#mentorTaskList
+  li
+  a.taskOverviewLink:focus-visible {
+  color: #6b9630;
+}
+
+/*
+ * Wimpel mounts the auction catalogue only after the search control opens.
+ * The native PHP view keeps the reusable catalogue in the DOM instead, so
+ * hide its label (and therefore results) until the same opened state.
+ */
+#auctions .itemTypeSearch.closed label.input.search {
+  display: none;
+}
+
+/*
+ * The current auction table header has a 33px Hero V2 frame on Wimpel.  The
+ * old PHP table otherwise collapses it to 30px, offsetting every result row
+ * and the native pagination below it.
+ */
+#auctions .itemTypeListWrapper table.itemType.detailed thead,
+#auctions .itemTypeListWrapper table.itemType.detailed thead tr,
+#auctions .itemTypeListWrapper table.itemType.detailed thead th {
+  height: 33px;
+}
+
+/* The price summary uses the same inline silver coin as Wimpel's price rows. */
+#auctions .itemTypeDetailedInformation .priceTable .value svg.silverCoin {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+/* Wimpel keeps the auction-detail bid columns stable while individual
+ * bidder names and values change. The native table otherwise redistributes
+ * the available width from active form content. */
+#auctions .auctionListWrapper table.itemType {
+  table-layout: fixed;
+}
+
+#auctions .auctionListWrapper table.itemType col.heroItemImage {
+  width: 71px;
+}
+
+#auctions .auctionListWrapper table.itemType col.itemInformation {
+  width: 202px;
+}
+
+#auctions .auctionListWrapper table.itemType col.bidCount {
+  width: 57px;
+}
+
+#auctions .auctionListWrapper table.itemType col.finishedAt {
+  width: 64px;
+}
+
+/*
+ * The V2 header frame owns a 120px square crop. Header portraits are served
+ * from a dedicated transparent endpoint, whose intrinsic dimensions must not
+ * shrink the image inside the 90px circular viewport. This selector belongs
+ * in the globally loaded pack because the HUD appears on every game route.
+ */
+#topBarHeroWrapper #topBarHero .heroImageButton .heroImageHover .heroImage {
+  position: absolute !important;
+  top: -7px !important;
+  right: -19px !important;
+  bottom: auto !important;
+  left: -19px !important;
+  width: 120px !important;
+  height: 120px !important;
+}
+
+/* The payment wizard is top-aligned like the reference; the premium feature dialogs that share
+ * its paymentShopV5 skin stay centred. */
+.dialogOverlay > .dialogWrapper:has(#paymentWizard) {
+    top: 113px !important;
+}
+
+.dialog.paymentShopV5 #paymentWizard.buyGold #paymentWizardContent {
+    display: block;
+    min-height: 443px;
+    padding: 10px;
+}
+
+.dialog.paymentShopV5 #paymentWizard.advantages #paymentWizardContent {
+    grid-template-rows: 141px 295px;
+}
+
+.dialog.paymentShopV5 .shopEmptyState {
+    align-self: center;
+    color: #5e463a;
+    justify-self: center;
+    text-align: center;
+}
+
+/* The Gpack's .useShip carries a negative bottom margin for the a2b table. In the merchants box
+ * the ship row is a full-width third row, so it stays inside the bordered box. */
+#content.buildMarketSendResources .merchantsInformation .useShip {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+/* Oasis tile-details reports table (#mapReports in map/viewTileDetails_oasisFree.php).
+   Local-only: Wimpel's imports.css (gpack/692) styles #troop_info.rep but
+   not this table. Same declarations the pre-parity imports copy carried for it. */
+#tileDetails table#mapReports {
+  margin-bottom: 20px;
+}
+#tileDetails table#mapReports.rep tbody {
+  line-height: 16px;
+}
+#tileDetails table#mapReports.rep img {
+  float: left;
+  margin-right: 5px;
+}
+#tileDetails table#mapReports.rep img.carry {
+  float: right;
+  margin-right: 55px;
+}
+.rtl #tileDetails table#mapReports.rep img {
+  float: right;
+  margin-right: 0;
+  margin-left: 5px;
+}
+.rtl #tileDetails table#mapReports.rep img.carry {
+  float: left;
+  margin-right: 0;
+  margin-left: 55px;
+}
+
+/* Wimpel's Messages composer reserves four pixels below the 370px editor.
+   Keep the send row and paper frame on its observed desktop baseline without
+   changing the editor's own dimensions. */
+div.messages.messagesWrite #message_container {
+  padding-block-end: 4px;
+}
+
+/* The public password-recovery view uses the Lobby modal surface. */
+#loginScene.loginRecoveryScene #dialogOverlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  box-sizing: border-box;
+  padding-top: 100px;
+  background: rgb(0 0 0 / 70%);
+}
+#loginScene.loginRecoveryScene #dialogOverlay > .dialogWrapper,
+#loginScene.loginRecoveryScene .dialog,
+#loginScene.loginRecoveryScene .dialogContainer,
+#loginScene.loginRecoveryScene .dialogContents {
+  display: contents;
+}
+#loginScene.loginRecoveryScene #passwordRecovery {
+  box-sizing: border-box;
+  width: min(450px, calc(100vw - 30px));
+  min-height: 311px;
+  padding: 15px;
+  color: #5e463a;
+  background: linear-gradient(#c8a36c, #f2dfb9 30px, #fef0ce 200px, transparent 0) no-repeat, #fef0ce linear-gradient(0deg, #c8a46c, #f5e3bd 30px, #fef0ce 200px, transparent 0) no-repeat;
+  border: 1px solid #333;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 16.9px;
+}
+#loginScene.loginRecoveryScene #passwordRecovery .back {
+  display: inline-grid;
+  width: 131.078125px;
+  height: 32px;
+  margin: 0 0 20px;
+  padding: 1px;
+  place-items: center;
+  color: #5e463a;
+  background: #fffdf8;
+  border: 1px solid #427107;
+  border-radius: 3px;
+  font-size: 14.3px;
+  line-height: 18.59px;
+}
+#loginScene.loginRecoveryScene #passwordRecovery .back > div {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 10px;
+}
+#loginScene.loginRecoveryScene #passwordRecovery .back svg {
+  width: 12px;
+  height: 7.4px;
+  transform: rotate(90deg);
+}
+#loginScene.loginRecoveryScene #passwordRecovery h1 {
+  width: calc(100% - 50px);
+  margin: 0 50px 20px 0;
+  color: #5e463a;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 23.4px;
+  text-transform: none;
+}
+#loginScene.loginRecoveryScene #passwordRecovery p {
+  margin: 13px 0;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text {
+  position: relative;
+  display: grid;
+  grid-template-areas: "label" "input";
+  grid-template-rows: 18px 40px;
+  width: 100%;
+  height: 80px;
+  padding-bottom: 22px;
+  box-sizing: border-box;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text input {
+  grid-area: input;
+  width: 100%;
+  height: 40px;
+  padding: 15px;
+  box-sizing: border-box;
+  color: #5e463a;
+  background: #fff;
+  border: 1px solid #5e463a;
+  border-radius: 2px;
+  font: inherit;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text .label {
+  grid-area: label;
+  margin-bottom: 2px;
+  color: #5e463a;
+  font-size: 12.35px;
+  font-weight: 700;
+  line-height: 16.055px;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text > svg,
+#loginScene.loginRecoveryScene #passwordRecovery label.text .validation {
+  display: none;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text.invalid .invalid,
+#loginScene.loginRecoveryScene #passwordRecovery label.text .validation.show {
+  display: block;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text.invalid .invalid {
+  position: absolute;
+  inset: 28px 12px auto auto;
+  width: 20px;
+  height: 20px;
+  fill: #c42c17;
+}
+#loginScene.loginRecoveryScene #passwordRecovery label.text .validation.show {
+  position: absolute;
+  inset: 63px auto auto 0;
+  width: 100%;
+  color: #c42c17;
+  font-size: 13px;
+  line-height: 16.9px;
+}
+#loginScene.loginRecoveryScene #passwordRecovery .actions {
+  height: 57px;
+  text-align: center;
+}
+#loginScene.loginRecoveryScene #passwordRecovery .actions button {
+  display: inline-grid;
+  width: 157.609375px;
+  height: 37px;
+  margin-top: 20px;
+  padding: 5px;
+  place-items: center;
+}
+
+/* Local differences (docs/development.md, Local differences): the Harbor level badge sits on the
+ * roof of the sprite instead of the 120x120 slot centre, and the Harbor slot stacks above
+ * the wall slot (a40, z-index 42) so the whole sprite opens the Harbor. */
+#contentOuterContainer .village2 #villageContent .buildingSlot.a38.g49 {
+  z-index: 43;
+}
+#contentOuterContainer .village2 #villageContent .buildingSlot.a38.g49 .level {
+  left: 152px;
+  top: 105px;
+}
+body.rtl #contentOuterContainer .village2 #villageContent .buildingSlot.a38.g49 .level {
+  left: auto;
+  right: 152px;
+}
+
+/* Homepage public-route controls and local-only route panels. */
+.publicHomepage .homepageMenuButton,
+.publicHomepage .homepageLanguage,
+.publicHomepage .homepageAccountLink,
+.publicHomepage .homepageAuthLink {
+  appearance: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.publicHomepage .homepageMenuButton {
+  display: grid;
+  align-items: center;
+  align-self: stretch;
+  padding-block: 0;
+  padding-inline: var(--homepage-page-padding);
+  border: 0;
+  background: transparent;
+}
+
+.publicHomepage .homepageLanguage,
+.publicHomepage .homepageAccountLink,
+.publicHomepage .homepageAuthLink {
+  background: transparent;
+}
+
+.publicHomepage .homepageAuthLink {
+  text-decoration: none;
+}
+
+.publicHomepage .homepageInfoBodyLink {
+  box-sizing: border-box;
+  color: inherit;
+  text-decoration: none;
+}
+
+.publicHomepage .homepageDialog[hidden] {
+  display: none;
+}
+
+/* Reference modals render in Arial, sans-serif (measured in LTR and RTL). */
+.publicHomepage .homepageDialog { --fontFamily: Arial, sans-serif; }
+body.publicHomepageShell #footer { --fontFamily: "Homepage Noto Sans", sans-serif; }
+
+.publicHomepage .homepageDialog {
+  position: fixed;
+  z-index: 45;
+  inset: 0;
+  display: grid;
+  align-items: start;
+  justify-items: start;
+  padding: 98px 30px 30px;
+  background: rgb(0 0 0 / 58%);
+}
+
+.publicHomepage .homepageDialogPanel {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  box-sizing: border-box;
+  width: min(390px, calc(100vw - 60px));
+  max-height: calc(100vh - 128px);
+  padding: 30px;
+  overflow: auto;
+  border: 2px solid #8c7048;
+  background: linear-gradient(135deg, #393939, #1d1d1d);
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 46%), 0 10px 36px rgb(0 0 0 / 48%);
+}
+
+.publicHomepage[dir="rtl"] .homepageDialog {
+  justify-items: end;
+}
+
+.publicHomepage .homepageDialog h2 {
+  margin: 0;
+  color: #cba467;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  line-height: 1.1;
+}
+
+.publicHomepage .homepageDialog a {
+  color: #f2f2f2;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.publicHomepage .homepageDialog a:hover,
+.publicHomepage .homepageDialog a:focus-visible {
+  color: #f2d597;
+  text-decoration: underline;
+}
+
+.publicHomepage .homepageDialogClose {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #cba467;
+  background: #2a2a2a;
+  color: #cba467;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.publicHomepage[dir="rtl"] .homepageDialogClose {
+  right: auto;
+  left: 7px;
+}
+
+.publicHomepage .homepageDialogClose:hover,
+.publicHomepage .homepageDialogClose:focus-visible {
+  color: #f2d597;
+}
+
+.publicHomepage .homepageLanguageSearch {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 11px;
+  border: 1px solid #cba467;
+  background: #f2f2f2;
+  color: #292929;
+  font: inherit;
+}
+
+.publicHomepage .homepageNoLanguageMatch {
+  margin: 0;
+  color: #f2f2f2;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.publicHomepage .homepageLanguageGroups {
+  display: grid;
+  gap: 12px;
+}
+
+.publicHomepage .homepageLanguageOptions {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+}
+
+.publicHomepage .homepageLanguageOption {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px 31px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid rgb(119 119 119 / 80%);
+  color: #f2f2f2;
+  cursor: pointer;
+}
+
+.publicHomepage .homepageLanguageOption:hover,
+.publicHomepage .homepageLanguageOption:has(.homepageLanguageOptionInput:checked) {
+  border-color: #f2d597;
+  background: rgb(203 164 103 / 18%);
+}
+
+.publicHomepage .homepageLanguageOptionInput {
+  z-index: 1;
+  grid-row: 1;
+  grid-column: 1;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.publicHomepage .homepageLanguageRadio {
+  display: grid;
+  grid-row: 1;
+  grid-column: 1;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+}
+
+.publicHomepage .homepageLanguageRadio svg {
+  width: 18px;
+  height: 18px;
+}
+
+.publicHomepage .homepageLanguageRadio path { fill: #fff; stroke: #5e463a; stroke-width: 1px; transition: stroke .15s; }
+.publicHomepage .homepageLanguageRadio circle { fill: transparent; transition: fill .15s; }
+.publicHomepage .homepageLanguageOption:hover .homepageLanguageRadio path,
+.publicHomepage .homepageLanguageOptionInput:checked + .homepageLanguageRadio path { stroke: #5a9a0a; }
+.publicHomepage .homepageLanguageOption:hover .homepageLanguageRadio circle,
+.publicHomepage .homepageLanguageOptionInput:checked + .homepageLanguageRadio circle { fill: #5a9a0a; }
+
+.publicHomepage .homepageLanguageOptionFlag {
+  grid-row: 1;
+  grid-column: 2;
+  width: 31px;
+  height: 24px;
+  object-fit: cover;
+}
+
+.publicHomepage .homepageLanguageOptionText {
+  grid-row: 1;
+  grid-column: 3;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.publicHomepage .homepageLanguageOptionText .addition {
+  color: #c8c8c8;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.publicHomepage .homepageLanguageOptionInput:focus-visible + .homepageLanguageRadio {
+  outline: 3px solid #f2d597;
+  outline-offset: 3px;
+}
+
+.publicHomepage .homepageDialogLinkButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f2f2f2;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+}
+
+.publicHomepage .homepageDialogLinkButton:hover,
+.publicHomepage .homepageDialogLinkButton:focus-visible {
+  color: #f2d597;
+  text-decoration: underline;
+}
+
+.publicHomepage .homepageConsentActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.publicHomepage .homepageConsentButton {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #cba467;
+  background: linear-gradient(#4d8c3d, #24531d);
+  color: #f2f2f2;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.publicHomepage .homepageConsentButtonSecondary {
+  background: linear-gradient(#4a4a4a, #252525);
+  color: #cba467;
+}
+
+.publicHomepage .homepageAccountDialog .homepageDialogPanel {
+  width: min(260px, calc(100vw - 60px));
+}
+
+.publicHomepage .homepageReferencePage {
+  box-sizing: border-box;
+  min-height: calc(100vh - 56px);
+  padding: 124px max(30px, calc((100vw - 960px) / 2)) 72px;
+  background:
+    radial-gradient(circle at 50% -10%, rgb(100 91 72 / 58%), transparent 54%),
+    linear-gradient(#292929, #181818);
+}
+
+.publicHomepage .homepageReferencePage > h1 {
+  margin: 0 0 28px;
+  color: #e6dbc9;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 2px 3px rgb(0 0 0 / 56%);
+}
+
+.publicHomepage .homepageReferenceCard {
+  display: grid;
+  grid-template-columns: minmax(180px, 30%) minmax(0, 1fr);
+  gap: 22px;
+  box-sizing: border-box;
+  width: min(860px, 100%);
+  margin: 0 auto;
+  padding: 18px;
+  border: 2px solid #8c7048;
+  background: linear-gradient(135deg, rgb(54 54 54 / 98%), rgb(30 30 30 / 98%));
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 42%), 0 8px 22px rgb(0 0 0 / 34%);
+}
+
+.publicHomepage .homepageReferenceCardLink {
+  display: contents;
+  color: inherit;
+  text-decoration: none;
+}
+
+.publicHomepage .homepageReferenceCard img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border: 1px solid #cba467;
+}
+
+.publicHomepage .homepageReferenceCard h2 {
+  margin: 0 0 13px;
+  color: #cba467;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.08;
+}
+
+.publicHomepage .homepageReferenceCard p {
+  margin: 15px 0 0;
+  color: #f2f2f2;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.publicHomepage .homepageReferenceCard time {
+  color: #c8c8c8;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.publicHomepage .homepageCalendarCard {
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: center;
+}
+
+.publicHomepage .homepageCalendarDate {
+  display: grid;
+  width: 82px;
+  height: 82px;
+  place-items: center;
+  border: 2px solid #cba467;
+  border-radius: 50%;
+  color: #f2f2f2;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 35px;
+  font-weight: 700;
+}
+
+.publicHomepage .homepageMenuButton:focus-visible,
+.publicHomepage .homepageLanguage:focus-visible,
+.publicHomepage .homepageAccountLink:focus-visible,
+.publicHomepage .homepageAuthLink:focus-visible,
+.publicHomepage .homepageStageControl:focus-visible,
+.publicHomepage .homepageInfoAction:focus-visible,
+.publicHomepage .homepageInfoBodyLink:focus-visible,
+.publicHomepage .homepageReferenceCardLink:focus-visible,
+.publicHomepage .homepageBackAction:focus-visible,
+.publicHomepage .homepageDialog a:focus-visible,
+.publicHomepage .homepageDialogLinkButton:focus-visible,
+.publicHomepage .homepageConsentButton:focus-visible,
+.publicHomepage .homepageLanguageSearch:focus-visible {
+  outline: 3px solid #f2d597;
+  outline-offset: 3px;
+}
+
+@media (max-width: 680px) {
+  .publicHomepage .homepageDialog {
+    align-items: start;
+    justify-items: center;
+    padding: 78px 14px 14px;
+  }
+
+  .publicHomepage[dir="rtl"] .homepageDialog {
+    justify-items: center;
+  }
+
+  .publicHomepage .homepageDialogPanel,
+  .publicHomepage .homepageAccountDialog .homepageDialogPanel {
+    width: min(390px, calc(100vw - 28px));
+    max-height: calc(100vh - 92px);
+    padding: 28px 20px 20px;
+  }
+
+  .publicHomepage .homepageReferencePage {
+    min-height: calc(100vh - 56px);
+    padding: 92px 14px 54px;
+  }
+
+  .publicHomepage .homepageReferenceCard {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 15px;
+    padding: 12px;
+  }
+
+  .publicHomepage .homepageReferenceCard img {
+    max-height: 180px;
+  }
+
+  .publicHomepage .homepageReferenceCard h2 {
+    font-size: 22px;
+  }
+
+  .publicHomepage .homepageCalendarCard {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .publicHomepage .homepageCalendarDate {
+    width: 62px;
+    height: 62px;
+    font-size: 28px;
+  }
+}
+
+/* Canonical self-hosted public-homepage surface, measured against the rendered
+ * Travian public start page. Keep its stage and bottom action grid together:
+ * separate absolute CTA/card layouts drift at every source breakpoint. */
+@font-face {
+  font-family: "Homepage Noto Sans";
+  src: url(../fonts/homepage/noto-sans-regular.ttf) format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Homepage Noto Sans";
+  src: url(../fonts/homepage/noto-sans-bold.ttf) format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Homepage Red Rose";
+  src: url(../fonts/homepage/red-rose-bold.ttf) format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.publicHomepage {
+  --homepage-font: "Homepage Noto Sans", sans-serif;
+  --fontFamily: var(--homepage-font);
+  --homepage-headline-font: "Homepage Red Rose", Georgia, serif;
+  --homepage-page-padding: 30px;
+  --homepage-scale-x: 1;
+  box-sizing: border-box;
+  width: 100%;
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+}
+
+.publicHomepage[dir="rtl"] {
+  --homepage-scale-x: -1;
+}
+
+.publicHomepage .homepageHero {
+  position: relative;
+  display: grid;
+  align-content: end;
+  box-sizing: border-box;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  background: #2c292c;
+}
+
+.publicHomepage .homepageStage {
+  container: homepageTribeStage / size;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+  background: #2c292c;
+}
+
+.publicHomepage .homepageStage::after {
+  position: absolute;
+  z-index: 1;
+  inset-block-end: 0;
+  width: 100%;
+  max-height: 200px;
+  aspect-ratio: 1500 / 200;
+  background: linear-gradient(180deg, transparent 2.56%, #2c292c 46.41%);
+  content: "";
+}
+
+/* The stage covers its box like the reference's: as wide as the box, or as tall as it when that is wider (the
+   artwork is 2688 x 1512), centred and anchored to the top, so a wide window crops the bottom instead of
+   leaving dark bands at the sides. */
+.publicHomepage .homepageStageSvg {
+  position: absolute !important;
+  top: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+  display: block;
+  justify-self: center;
+  width: max(100cqw, 100cqh * 2688 / 1512);
+  height: auto !important;
+  aspect-ratio: 2688 / 1512;
+  max-width: 2688px;
+  min-height: 0;
+  overflow: visible;
+  transform: translateX(-50%) scaleX(var(--homepage-scale-x));
+}
+
+.publicHomepage .homepageStageTint {
+  filter: none;
+}
+
+.publicHomepage .homepageSceneLayer,
+.publicHomepage .homepageTribeLayer {
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(.9);
+  transform-origin: center bottom;
+  transition: .25s ease-in;
+}
+
+.publicHomepage .homepageStage[data-tribe="romans"] .homepageSceneLayer[data-tribe="romans"],
+.publicHomepage .homepageStage[data-tribe="romans"] .homepageTribeLayer[data-tribe="romans"],
+.publicHomepage .homepageStage[data-tribe="teutons"] .homepageSceneLayer[data-tribe="teutons"],
+.publicHomepage .homepageStage[data-tribe="teutons"] .homepageTribeLayer[data-tribe="teutons"],
+.publicHomepage .homepageStage[data-tribe="gauls"] .homepageSceneLayer[data-tribe="gauls"],
+.publicHomepage .homepageStage[data-tribe="gauls"] .homepageTribeLayer[data-tribe="gauls"] {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.publicHomepage .homepageStage[data-tribe="romans"] .homepageStageTint {
+  filter: url("#homepageTribeStageFilterRoman");
+}
+
+.publicHomepage .homepageStage[data-tribe="teutons"] .homepageStageTint {
+  filter: url("#homepageTribeStageFilterTeuton");
+}
+
+.publicHomepage .homepageStage[data-tribe="gauls"] .homepageStageTint {
+  filter: url("#homepageTribeStageFilterGaul");
+}
+
+.publicHomepage .homepageHeadlineContainer {
+  transform: scaleX(var(--homepage-scale-x));
+  transform-origin: 15% 0;
+  transition: transform .15s ease-out;
+}
+
+.publicHomepage .homepageStageHeadline {
+  display: block;
+  fill: #fff;
+  font-family: var(--homepage-headline-font);
+  font-size: 200px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.publicHomepage .homepageForeignObjectContainer {
+  transform: scaleX(var(--homepage-scale-x));
+  transform-origin: 65% 0;
+  transition: .25s ease-in;
+}
+
+.publicHomepage .homepageStageDescription {
+  display: block;
+  width: auto !important;
+  max-width: 25%;
+  color: #fff;
+  font-family: var(--homepage-font);
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-shadow: none;
+  visibility: hidden;
+}
+
+.publicHomepage .homepageStage[data-tribe="romans"] .homepageTribeLayer[data-tribe="romans"] .homepageStageDescription,
+.publicHomepage .homepageStage[data-tribe="teutons"] .homepageTribeLayer[data-tribe="teutons"] .homepageStageDescription,
+.publicHomepage .homepageStage[data-tribe="gauls"] .homepageTribeLayer[data-tribe="gauls"] .homepageStageDescription {
+  visibility: visible;
+}
+
+.publicHomepage .homepageStageControls {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: auto;
+  inset-block-end: max(200px, 50%);
+  inset-inline: 30px;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  justify-self: center;
+  width: calc(100% - 60px);
+  max-width: 2628px;
+  transform: none;
+}
+
+.publicHomepage .homepageStageControl {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #cba467;
+  border-radius: 50%;
+  border-color: #cba467;
+  background: rgb(30 32 34 / 45%);
+  color: #cba467;
+  cursor: pointer;
+}
+
+.publicHomepage .homepageStageControl svg {
+  width: 20px;
+  height: 36px;
+  fill: currentColor;
+}
+
+.publicHomepage .homepageStageControlBack svg {
+  transform: scaleX(var(--homepage-scale-x)) translateX(-3px);
+}
+
+.publicHomepage .homepageStageControlForward svg {
+  transform: scaleX(calc(var(--homepage-scale-x) * -1)) translateX(-3px);
+}
+
+.publicHomepage .homepageCtaWrapper {
+  position: relative;
+  inset: auto;
+  z-index: 2;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(420px, 440px) minmax(420px, 460px) minmax(420px, 440px);
+  box-sizing: border-box;
+  width: min(1380px, calc(100% - 60px));
+  margin: 0 auto 10px;
+}
+
+.publicHomepage .homepageInfoBox {
+  z-index: 1;
+  display: grid !important;
+  grid-auto-flow: row;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: stretch;
+  height: 162px;
+  min-height: 0;
+  gap: 0 !important;
+  padding: 0 !important;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.publicHomepage .homepageInfoBodyLink {
+  position: relative;
+  display: grid;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 2px solid #cba467;
+  background: linear-gradient(135deg, rgb(44 41 44 / 98%), rgb(27 26 28 / 98%));
+  box-shadow: inset 0 0 0 1px #34220d;
+}
+
+.publicHomepage .homepageInfoCard :is(h2, h3) {
+  margin: 5px 0 7px;
+  color: #cba467;
+  font-family: var(--homepage-font);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Next upcoming game world: reference .calendarGameworldPreview geometry. */
+.publicHomepage .homepageWorldCard .homepageInfoBodyLink {
+  display: block;
+  padding: 6px 6px 0;
+  container: calendarGameworldPreviewContainer / inline-size;
+}
+
+.publicHomepage .homepageGameworldPreview {
+  --columnGap: 5px;
+  --rowGap: 10px;
+  --marginInline: 5px;
+  --infoBoxBackgroundColorStart: #312c2cd9;
+  --infoBoxBackgroundColorEnd: #1a1e1fd9;
+  --fontColor: #e6dbc9;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto 1fr auto 140px;
+  grid-template-rows: 1fr 50px;
+  gap: var(--rowGap) var(--columnGap);
+  height: 114px;
+  position: relative;
+  border: 2px solid #cba467;
+  background-image: linear-gradient(180deg, var(--infoBoxBackgroundColorStart), var(--infoBoxBackgroundColorEnd));
+  box-shadow: 2px 2px 6px 0 #0000004d;
+  color: var(--fontColor);
+  font-family: var(--homepage-font);
+  font-size: 13px;
+  transition: --infoBoxBackgroundColorStart .25s, --infoBoxBackgroundColorEnd .25s, --decorationColor .25s, --fontColor .25s;
+}
+
+.publicHomepage .homepageInfoBodyLink:hover .homepageGameworldPreview,
+.publicHomepage .homepageInfoBodyLink:active .homepageGameworldPreview {
+  --infoBoxBackgroundColorStart: #cba467;
+  --infoBoxBackgroundColorEnd: #cba467;
+  --fontColor: #1f1f1f;
+}
+
+.publicHomepage .homepageInfoBodyLink:active .homepageGameworldPreview {
+  --infoBoxBackgroundColorStart: #9d763a;
+  --infoBoxBackgroundColorEnd: #9d763a;
+}
+
+.publicHomepage .homepageGameworldPreview h3 {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: start;
+  margin: 0 var(--marginInline);
+  padding-inline: calc(var(--columnGap) * 2);
+  color: #cba467;
+  font-family: var(--homepage-font);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.publicHomepage .homepageInfoBodyLink:hover .homepageGameworldPreview h3,
+.publicHomepage .homepageInfoBodyLink:active .homepageGameworldPreview h3 {
+  color: #1f1f1f;
+}
+
+.publicHomepage .homepageGameworldPreview > * {
+  align-content: center;
+  justify-self: start;
+  padding-inline-start: calc(var(--columnGap) * 2);
+  padding-inline-end: var(--columnGap);
+  font-family: var(--homepage-font);
+  font-weight: 700;
+  line-height: normal;
+  text-align: center;
+}
+
+.publicHomepage .homepageGameworldPreview > :not(h3):not(.day) {
+  border-inline-start: 1px solid var(--fontColor);
+  border-image: linear-gradient(#0000, var(--fontColor)) 0 0 0 1 / auto repeat;
+}
+
+.publicHomepage .homepageGameworldPreview .day {
+  margin-inline-start: var(--marginInline);
+}
+
+.publicHomepage .homepageGameworldPreview .title {
+  display: grid;
+  align-items: center;
+  position: relative;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.publicHomepage .homepageGameworldPreview .title .text,
+.publicHomepage .homepageGameworldPreview .title .name {
+  overflow: hidden;
+}
+
+.publicHomepage .homepageGameworldPreview .title .name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.publicHomepage .homepageGameworldPreview .tribes {
+  display: grid;
+  justify-self: stretch;
+  overflow: hidden;
+  place-content: center;
+}
+
+.publicHomepage .homepageGameworldPreview .tribeImages {
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  height: 70px;
+  margin: 10px 0 0;
+  transform: scale(.45);
+}
+
+.publicHomepage .homepageGameworldPreview .tribe {
+  --decreaseGap: -20px;
+  position: relative;
+  display: block;
+  margin-inline-start: var(--decreaseGap);
+  filter: brightness(1.2);
+}
+
+.publicHomepage .homepageGameworldPreview .tribe:first-child { --decreaseGap: 0px; z-index: 6; }
+.publicHomepage .homepageGameworldPreview .tribe:nth-child(2) { z-index: 5; }
+.publicHomepage .homepageGameworldPreview .tribe:nth-child(3) { z-index: 4; }
+.publicHomepage .homepageGameworldPreview .tribe:nth-child(4) { z-index: 3; }
+.publicHomepage .homepageGameworldPreview .tribe:nth-child(5) { z-index: 2; }
+.publicHomepage .homepageGameworldPreview .tribe:nth-child(6) { z-index: 1; }
+.publicHomepage .homepageGameworldPreview .roman + .gaul { --decreaseGap: -25px; }
+.publicHomepage .homepageGameworldPreview .teuton { --decreaseGap: -35px; }
+.publicHomepage .homepageGameworldPreview .hun { --decreaseGap: -25px; }
+.publicHomepage .homepageGameworldPreview .roman { width: 75px; height: 79px; }
+.publicHomepage .homepageGameworldPreview .teuton { width: 76px; height: 75px; }
+.publicHomepage .homepageGameworldPreview .gaul { width: 64px; height: 84px; }
+.publicHomepage .homepageGameworldPreview .egyptian { width: 52px; height: 81px; }
+.publicHomepage .homepageGameworldPreview .hun { width: 71px; height: 76px; }
+
+@container calendarGameworldPreviewContainer (width < 385px) {
+  .publicHomepage .homepageGameworldPreview {
+    --columnGap: 3px;
+    --rowGap: 0;
+    grid-template-columns: auto 1fr auto 95px;
+    grid-template-rows: 1fr 40px;
+    height: 80px;
+  }
+
+  .publicHomepage .homepageGameworldPreview .tribeImages { transform: scale(.35); }
+}
+
+@container calendarGameworldPreviewContainer (width < 308px) {
+  .publicHomepage .homepageGameworldPreview { grid-template-columns: auto 1fr auto; }
+  .publicHomepage .homepageGameworldPreview .speed { margin-inline-end: var(--marginInline); }
+  .publicHomepage .homepageGameworldPreview .tribes { display: none; }
+}
+
+.publicHomepage .homepageInfoAction {
+  position: static;
+  display: grid;
+  box-sizing: border-box;
+  min-width: 200px;
+  min-height: 38px;
+  padding: 0 16px;
+  place-items: center;
+  justify-self: center;
+  border: 1px solid #8c7048;
+  background: linear-gradient(#4d4a45, #292526);
+  box-shadow: inset 0 0 0 1px #34220d;
+  color: #cba467;
+  font-family: var(--homepage-font);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transform: none;
+}
+
+.publicHomepage .homepageInfoActionIcon {
+  display: none;
+  width: 20px;
+  max-height: 20px;
+  fill: currentColor;
+}
+
+.publicHomepage .homepageLobbyCta {
+  position: relative;
+  inset: auto;
+  z-index: 2;
+  display: grid;
+  grid-column: 2;
+  grid-row: 1;
+  box-sizing: border-box;
+  width: min(100%, 456px);
+  min-width: 320px;
+  max-width: 500px;
+  height: 130px;
+  padding: 9px 9px 9px 7px;
+  place-self: start center;
+  isolation: isolate;
+  border-radius: 15px;
+  background-color: #98f98a;
+  background-image: url(../img_common/homepage/cta-frame.jpg), radial-gradient(circle at 50% 300%, #0b2a09 75%, transparent 79%), radial-gradient(circle at -20% 53%, rgb(0 0 0 / 65%) 21%, transparent 25%), radial-gradient(circle at 120% 53%, rgb(0 0 0 / 72%) 21%, transparent 24%);
+  /* The 414px texture is stretched to the button; the reference tiles it and shows a seam. */
+  background-size: 100% auto, auto, auto, auto;
+  background-blend-mode: multiply;
+  color: #f2f8f1;
+  text-decoration: none;
+  margin: 0;
+  transform: none;
+  transition: .15s ease-out;
+}
+
+.publicHomepage[dir="rtl"] .homepageLobbyCta {
+  background-image: url(../img_common/homepage/cta-frame.jpg), radial-gradient(circle at 50% 300%, #0b2a09 75%, transparent 79%), radial-gradient(circle at -20% 53%, rgb(0 0 0 / 65%) 21%, transparent 25%), radial-gradient(circle at 120% 53%, rgb(0 0 0 / 72%) 21%, transparent 24%);
+}
+
+.publicHomepage .homepageLobbyCta::before {
+  position: absolute;
+  z-index: -1;
+  inset: -16px -15px -17px;
+  background-image: url(../img_common/homepage/cta-corner-top-left.png), url(../img_common/homepage/cta-corner-top-right.png), url(../img_common/homepage/cta-corner-bottom-left.png), url(../img_common/homepage/cta-corner-bottom-right.png);
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-repeat: no-repeat;
+  content: "";
+  transition: .15s ease-in-out;
+}
+
+.publicHomepage[dir="rtl"] .homepageLobbyCta::before {
+  background-image: url(../img_common/homepage/cta-corner-top-left.png), url(../img_common/homepage/cta-corner-top-right.png), url(../img_common/homepage/cta-corner-bottom-left.png), url(../img_common/homepage/cta-corner-bottom-right.png);
+}
+
+.publicHomepage .homepageLobbyCta span {
+  display: grid;
+  box-sizing: border-box;
+  height: 100%;
+  white-space: nowrap;
+  padding: 20px 40px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 15px;
+  background-image: url(../img_common/homepage/cta-frame.jpg), linear-gradient(#60c751, rgb(11 42 9 / 90%));
+  background-size: 100% auto, auto;
+  background-blend-mode: multiply;
+  box-shadow: 0 -4px 1px rgb(152 249 138 / 70%), -3px 0 5px rgb(0 0 0 / 20%), 3px 0 5px rgb(0 0 0 / 25%);
+  color: #f2f8f1;
+  font-family: var(--homepage-headline-font);
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 20px 15px rgb(11 42 9 / 80%);
+  transition: filter .15s ease-out, box-shadow .15s ease-out, background-position .15s ease-out;
+}
+
+.publicHomepage[dir="rtl"] .homepageLobbyCta span {
+  background-image: url(../img_common/homepage/cta-frame.jpg), linear-gradient(#60c751, rgb(11 42 9 / 90%));
+}
+
+.publicHomepage .homepageLobbyCta:hover span,
+.publicHomepage .homepageLobbyCta:focus-visible span { filter: brightness(1.2); }
+.publicHomepage .homepageLobbyCta:hover:not(:active)::before,
+.publicHomepage .homepageLobbyCta:focus-visible:not(:active)::before { margin: -3px -4px; }
+.publicHomepage .homepageLobbyCta:active { background-color: rgb(80 135 71); box-shadow: inset 0 2px 5px rgb(11 42 9 / 90%); }
+.publicHomepage .homepageLobbyCta:active span {
+  background-position: 0 -15%;
+  box-shadow: 0 -8px 1px rgb(152 249 138 / 70%), -3px 0 5px rgb(0 0 0 / 20%), 3px 0 5px rgb(0 0 0 / 25%), inset 0 0 20px rgb(11 42 9 / 90%);
+  filter: brightness(.75);
+}
+
+@container homepageTribeStage (aspect-ratio < 16 / 12) {
+  .publicHomepage .homepageSceneLayer,
+  .publicHomepage .homepageTribeLayer { transform: scale(.9); }
+  .publicHomepage .homepageForeignObjectContainer,
+  .publicHomepage .homepageHeadlineContainer { transform: translate(100px, -25px) scaleX(var(--homepage-scale-x)); }
+}
+
+@container homepageTribeStage (aspect-ratio < 16 / 14) {
+  .publicHomepage .homepageHeadlineContainer { transform: scaleX(calc(var(--homepage-scale-x) * .9)) scaleY(.9) translate(calc(240px * var(--homepage-scale-x)), -70px); }
+  .publicHomepage .homepageForeignObjectContainer { transform: scaleX(calc(var(--homepage-scale-x) * .9)) scaleY(.9) translate(calc(95px * var(--homepage-scale-x)), -75px); }
+  .publicHomepage .homepageStageDescription { max-width: 24%; font-size: 26px; }
+}
+
+@container homepageTribeStage (aspect-ratio < 16 / 18) {
+  .publicHomepage .homepageSceneLayer,
+  .publicHomepage .homepageTribeLayer { transform: scale(.85); }
+  .publicHomepage .homepageHeadlineContainer { transform: scaleX(calc(var(--homepage-scale-x) * .6)) scaleY(.6) translate(calc(580px * var(--homepage-scale-x)), -150px); }
+  .publicHomepage .homepageForeignObjectContainer { transform: scaleX(calc(var(--homepage-scale-x) * .6)) scaleY(.6) translate(calc(-310px * var(--homepage-scale-x)), -150px); }
+  .publicHomepage .homepageStageDescription { max-width: 70%; font-size: 45px; }
+}
+
+@container homepageTribeStage (aspect-ratio < 16 / 20) {
+  .publicHomepage .homepageHeadlineContainer { transform: scaleX(calc(var(--homepage-scale-x) * .45)) scaleY(.45) translate(calc(1010px * var(--homepage-scale-x)), -150px); }
+  .publicHomepage .homepageForeignObjectContainer { transform: scaleX(calc(var(--homepage-scale-x) * .45)) scaleY(.45) translate(calc(-630px * var(--homepage-scale-x)), -150px); }
+  .publicHomepage .homepageStageDescription { max-width: 70%; font-size: 60px; }
+}
+
+@container homepageTribeStage (aspect-ratio < 16 / 27) {
+  .publicHomepage .homepageHeadlineContainer { transform: scaleX(calc(var(--homepage-scale-x) * .4)) scaleY(.4) translate(calc(1450px * var(--homepage-scale-x)), -100px); }
+  .publicHomepage .homepageForeignObjectContainer { transform: scaleX(calc(var(--homepage-scale-x) * .4)) scaleY(.4) translate(calc(-570px * var(--homepage-scale-x)), -80px); }
+  .publicHomepage .homepageStageDescription { max-width: 70%; font-size: 70px; }
+}
+
+@container homepageTribeStage (aspect-ratio < 16 / 32) {
+  .publicHomepage .homepageHeadlineContainer { transform: scaleX(calc(var(--homepage-scale-x) * .3)) scaleY(.3) translate(calc(2270px * var(--homepage-scale-x)), -300px); }
+  .publicHomepage .homepageForeignObjectContainer { transform: scaleX(calc(var(--homepage-scale-x) * .3)) scaleY(.3) translate(calc(-860px * var(--homepage-scale-x)), -260px); }
+  .publicHomepage .homepageStageDescription { max-width: 65%; font-size: 85px; }
+}
+
+@media screen and (max-width: 1360px) {
+  .publicHomepage .homepageCtaWrapper {
+    grid-template-columns: minmax(420px, 500px) minmax(420px, 500px);
+    justify-content: center;
+  }
+
+  .publicHomepage .homepageLobbyCta {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .publicHomepage { --homepage-page-padding: 20px; }
+  .publicHomepage .homepageStageControls { inset-inline: 20px; width: calc(100% - 40px); }
+}
+
+@container homepageHeaderStart (width < 250px) {
+  .publicHomepage .homepageLanguage {
+    display: grid;
+    width: 47px;
+    min-width: 47px;
+    min-height: 34px;
+    padding: 1px;
+    place-items: center;
+  }
+
+  .publicHomepage .homepageLanguageContent {
+    grid-template-columns: 1fr;
+    padding-inline: 0;
+  }
+
+  .publicHomepage .homepageLanguageName,
+  .publicHomepage .homepageLanguageChevron { display: none; }
+
+  .publicHomepage .homepageLanguage img { justify-self: center; }
+}
+
+@container homepageHeaderEnd (width < 250px) {
+  .publicHomepage .homepageAccountLink,
+  .publicHomepage .homepageAuthLink {
+    display: grid;
+    width: 45px;
+    min-width: 45px;
+    min-height: 34px;
+    padding: 1px;
+    place-items: center;
+  }
+
+  .publicHomepage .homepageAccountContent {
+    grid-template-columns: 1fr;
+    padding-inline: 0;
+    justify-items: center;
+  }
+
+  .publicHomepage .homepageAccountName,
+  .publicHomepage .homepageChevron { display: none; }
+
+  .publicHomepage .homepageAuthContent { grid-template-columns: 1fr; padding-inline: 0; justify-items: center; }
+  .publicHomepage .homepageAuthContent span { display: none; }
+  .publicHomepage .homepageAuthContent svg { margin-inline-end: 5px; }
+
+  .publicHomepage .homepageAccountIcon,
+  .publicHomepage .homepageAccountIcon svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .publicHomepage .homepageCtaWrapper {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    row-gap: clamp(20px, 2vh, 33px);
+    width: calc(100% - 20px);
+  }
+
+  .publicHomepage .homepageLobbyCta {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: calc(100vw - 40px);
+  }
+
+  .publicHomepage .homepageNewsCard { grid-row: 2; }
+  .publicHomepage .homepageWorldCard { grid-column: 1; grid-row: 3; }
+
+  .publicHomepage .homepageInfoBox {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: 1fr !important;
+    column-gap: max(12px, 4vw) !important;
+    width: min(500px, 100%);
+    height: 114px;
+  }
+
+  .publicHomepage .homepageInfoBox .homepageInfoAction {
+    min-width: auto;
+    min-height: auto;
+    padding: 1px 8px;
+  }
+
+  .publicHomepage .homepageInfoAction span { display: none; }
+  .publicHomepage .homepageInfoActionIcon { display: block; }
+
+  /* Reference `#main .ctaWrapper .goldenFrame` at this width: no padding or corner marks, outline 4px outside. */
+  .publicHomepage .homepageNewsCard .homepageNewsFrame { padding: 0; }
+  .publicHomepage .homepageNewsCard .homepageNewsFrame > svg { display: none; }
+  .publicHomepage .homepageNewsCard .homepageNewsFrame::before { width: auto; height: auto; inset: -4px; }
+  .publicHomepage .homepageWorldCard .homepageInfoBodyLink { overflow: visible; padding: 0; border: 0; box-shadow: none; }
+  .publicHomepage .homepageWorldCard .homepageInfoBodyLink::before { position: absolute; inset: -4px; border: 1px solid #7c694b; content: ""; pointer-events: none; }
+}
+
+@media screen and (max-width: 700px) {
+  .publicHomepage .homepageStageControl { transform: scale(.85); }
+}
+
+@media screen and (max-width: 520px) {
+  .publicHomepage .homepageLobbyCta {
+    width: calc(100% - 30px);
+    height: clamp(110px, 26cqi, 130px);
+  }
+
+  .publicHomepage .homepageLobbyCta,
+  .publicHomepage .homepageLobbyCta span { border-radius: 10px; }
+
+  .publicHomepage .homepageLobbyCta span {
+    padding: 0 30px;
+    font-size: clamp(28px, 8.7vw, 52px);
+    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .publicHomepage .homepageHeader {
+    position: fixed;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+  }
+  .publicHomepage .homepageWordmark { width: 44px; height: 70px; overflow: hidden; direction: ltr; justify-content: flex-start; }
+  .publicHomepage .homepageWordmark :is(img, svg) { width: auto; max-width: none; height: 70px; }
+  .publicHomepage .homepageLanguage {
+    min-width: 45px;
+    padding: 1px;
+  }
+  .publicHomepage .homepageLanguageName,
+  .publicHomepage .homepageLanguageChevron,
+  .publicHomepage .homepageAccountName,
+  .publicHomepage .homepageChevron { display: none; }
+  .publicHomepage .homepageAccountLink {
+    min-width: 45px;
+    padding: 1px;
+  }
+  .publicHomepage .homepageAccountIcon { display: grid; }
+}
+
+@media screen and (max-width: 480px) {
+  .publicHomepage .homepageInfoBox { height: 80px; }
+}
+
+@media screen and (max-width: 400px) {
+  .publicHomepage { --homepage-page-padding: 10px; }
+  .publicHomepage .homepageStageControls { inset-inline: 10px; width: calc(100% - 20px); }
+}
+
+/* The desktop header's 360px floor protects its full language/account labels,
+ * but it must not widen a 320px mobile viewport. At the compact breakpoint
+ * those labels are already hidden and the icon controls fit the viewport. */
+@media screen and (max-width: 359px) {
+  .publicHomepage .homepageHeader { min-width: 0; }
+}
+
+/* The public language selector is a parchment modal, not the generic dark
+ * in-game dialog. Keep the sourced picker rows in their native light surface. */
+.publicHomepage #homepageLanguageDialog .homepageDialogPanel,
+.publicHomepage #homepageRegistrationDialog .homepageDialogPanel,
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogPanel {
+  width: min(500px, calc(100vw - 60px));
+  max-height: none;
+  padding: 15px 10px;
+  gap: 0;
+  overflow: visible;
+  border: 1px solid #333;
+  border-radius: 9px;
+  background-color: #fef0ce;
+  background-image: linear-gradient(#c8a36c, #f2dfb9 30px, #fef0ce 200px, transparent 0), linear-gradient(0deg, #c8a46c, #f5e3bd 30px, #fef0ce 200px, transparent 0);
+  box-shadow: 4px 4px 9px rgb(30 22 17 / 50%) inset;
+  color: #5e463a;
+  font-family: Arial, sans-serif;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageDialogPanel::before,
+.publicHomepage #homepageLanguageDialog .homepageDialogPanel::after,
+.publicHomepage #homepageRegistrationDialog .homepageDialogPanel::after,
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogPanel::after {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+}
+
+.publicHomepage #homepageLanguageDialog .homepageDialogPanel::before,
+.publicHomepage #homepageRegistrationDialog .homepageDialogPanel::before,
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogPanel::before {
+  inset: -8px;
+  background-image: linear-gradient(0deg, #6c7175 0 1px, #4f5257 1px 4px, #4d4648 4px 7px, transparent 7px), linear-gradient(270deg, #6c7175 0 1px, #4f5257 1px 4px, #4d4648 4px 7px, transparent 7px), linear-gradient(#6c7175 0 1px, #4f5257 1px 4px, #4d4648 4px 7px, transparent 7px), linear-gradient(90deg, #6c7175 0 1px, #4f5257 1px 4px, #4d4648 4px 7px, transparent 7px);
+}
+
+.publicHomepage #homepageLanguageDialog .homepageDialogPanel::after,
+.publicHomepage #homepageRegistrationDialog .homepageDialogPanel::after,
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogPanel::after {
+  z-index: 3;
+  inset: -18px -17px -19px;
+  background-image: url(../img_common/homepage/cta-corner-top-left.png), url(../img_common/homepage/cta-corner-top-right.png), url(../img_common/homepage/cta-corner-bottom-left.png), url(../img_common/homepage/cta-corner-bottom-right.png);
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.publicHomepage[dir="rtl"] #homepageLanguageDialog .homepageDialogPanel::after,
+.publicHomepage[dir="rtl"] #homepageRegistrationDialog .homepageDialogPanel::after,
+.publicHomepage[dir="rtl"] #homepageCalendarDetailsDialog .homepageDialogPanel::after {
+  background-image: url(../img_common/homepage/cta-corner-top-left.png), url(../img_common/homepage/cta-corner-top-right.png), url(../img_common/homepage/cta-corner-bottom-left.png), url(../img_common/homepage/cta-corner-bottom-right.png);
+  transform: scaleX(-1);
+}
+
+.publicHomepage #homepageLanguageDialog h2,
+.publicHomepage #homepageRegistrationDialog h2,
+.publicHomepage #homepageCalendarDetailsDialog h2 {
+  margin: 0 40px 19px 0;
+  color: #5e463a;
+  font-family: "Homepage Noto Serif", "Noto Serif", Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.publicHomepage[dir="rtl"] #homepageLanguageDialog h2,
+.publicHomepage[dir="rtl"] #homepageRegistrationDialog h2,
+.publicHomepage[dir="rtl"] #homepageCalendarDetailsDialog h2 {
+  margin: 0 0 19px 40px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageDialogClose,
+.publicHomepage #homepageRegistrationDialog .homepageDialogClose,
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogClose {
+  top: 10px;
+  right: 10px;
+  width: 37px;
+  height: 37px;
+  border: 1px solid #34220d;
+  border-radius: 0;
+  background: linear-gradient(#6caa45, #305f21);
+  box-shadow: inset 0 0 0 3px #d2d29b, inset 0 0 0 5px #376d25;
+  color: #f2f8f1;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 31px;
+}
+
+.publicHomepage[dir="rtl"] #homepageLanguageDialog .homepageDialogClose,
+.publicHomepage[dir="rtl"] #homepageRegistrationDialog .homepageDialogClose,
+.publicHomepage[dir="rtl"] #homepageCalendarDetailsDialog .homepageDialogClose {
+  right: auto;
+  left: 10px;
+}
+
+.publicHomepage .homepageLanguageSearchLabel {
+  display: block;
+  margin: 0 0 4px;
+  color: #5e463a;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageSearch {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #5e463a;
+  border-radius: 2px;
+  background: #fff;
+  color: #5e463a;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageGroups {
+  gap: 0;
+  margin-top: 41px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptions {
+  gap: 0;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptions.others {
+  gap: 15px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptions.recommended {
+  margin-bottom: 31px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgb(94 70 58 / 20%);
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOption {
+  grid-template-columns: 20px minmax(0, 1fr);
+  column-gap: 5px;
+  min-height: 24px;
+  padding: 0 0 8px;
+  border: 0;
+  background: transparent;
+  color: #5e463a;
+  cursor: default;
+  font-size: 13px;
+  line-height: 16.9px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOption:hover,
+.publicHomepage #homepageLanguageDialog .homepageLanguageOption:has(.homepageLanguageOptionInput:checked) {
+  border-color: transparent;
+  background: transparent;
+  color: #5e463a;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOption[hidden] {
+  display: none !important;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptionInput,
+.publicHomepage #homepageLanguageDialog .homepageLanguageRadio,
+.publicHomepage #homepageLanguageDialog .homepageLanguageRadio svg {
+  width: 20px;
+  height: 20px;
+}
+
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptionFlag {
+  grid-row: 1;
+  grid-column: 2;
+  align-self: center;
+  width: 31px;
+  height: 24px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptionText {
+  grid-row: 1;
+  grid-column: 2;
+  align-self: center;
+  padding-inline-start: 32px;
+  color: #5e463a;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  line-height: 24px;
+}
+
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptionText .addition {
+  margin-inline-start: 4px;
+  color: #777;
+  font-size: 11.7px;
+}
+
+@media screen and (max-width: 680px) {
+  .publicHomepage .homepageDialog#homepageLanguageDialog {
+    position: absolute;
+    min-height: 100%;
+    padding: 100px 16px 16px;
+    align-items: start;
+    justify-items: start;
+    background: rgb(0 0 0 / 35%);
+  }
+
+  .publicHomepage #homepageLanguageDialog .homepageDialogPanel {
+    width: 328px;
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/*
+ * ActiveVillage / sidebar boxes: keep parchment border-image above page scenery
+ * (z-index:-1 otherwise drops behind night/shore stacking contexts) and pin
+ * dark text so player/village names never inherit light footer/body colors.
+ */
+.sidebar .sidebarBox .content {
+  isolation: isolate;
+}
+#sidebarBoxActiveVillage .content,
+#sidebarBoxActiveVillage .playerName,
+#sidebarBoxActiveVillage .population,
+#sidebarBoxActiveVillage .loyalty {
+  color: #333333;
+}
+#sidebarBoxActiveVillage .content #villageName,
+#sidebarBoxActiveVillage .content #villageName .villageInput {
+  color: #5e463a;
+  -webkit-text-fill-color: #5e463a;
+  caret-color: #5e463a;
+}
+
+/* Public news articles and the news list use the same full-width reference
+ * scene (the list's `main#news:before`); articles add the framed reading
+ * surface of Travian's rendered article view. The assets are local
+ * Gpack copies; keep the direction-specific URL alongside the other public
+ * homepage artwork. */
+.publicHomepage :is(.homepageArticlePage, .homepageNewsPage) {
+  --homepage-news-background: url(../img_common/homepage/news-background-1920x1080.jpg);
+  position: relative;
+  z-index: 1;
+}
+
+.publicHomepage .homepageArticlePage {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-height: calc(100vh - 56px);
+}
+
+.publicHomepage[dir="rtl"] :is(.homepageArticlePage, .homepageNewsPage) {
+  --homepage-news-background: url(../img_common/homepage/news-background-1920x1080.jpg);
+}
+
+.publicHomepage :is(.homepageArticlePage, .homepageNewsPage)::before {
+  position: fixed;
+  z-index: -1;
+  inset: 80px 0 0;
+  /* Reference: the scene is a full viewport tall below the 80px header offset (the box overhangs the bottom edge). */
+  height: 100vh;
+  background-image: linear-gradient(rgb(0 0 0 / 35%), rgb(0 0 0 / 0) 15%), var(--homepage-news-background);
+  background-position: 50% 50%, 50% 50%;
+  background-repeat: repeat, repeat;
+  background-size: cover, cover;
+  pointer-events: none;
+  transform: scaleX(var(--homepage-scale-x, 1));
+  content: "";
+}
+
+.publicHomepage .homepageArticlePage > h1 {
+  margin: 0 0 20px;
+  color: #cba467;
+  font-family: var(--homepage-headline-font);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.publicHomepage .homepageArticleFrame {
+  position: relative;
+  box-sizing: border-box;
+  width: min(1100px, 100%);
+  margin: 30px auto 0;
+  padding: 8px;
+}
+
+.publicHomepage .homepageArticleFrame::before {
+  position: absolute;
+  z-index: 1;
+  inset: 3px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  border: 1px solid #7c694b;
+  pointer-events: none;
+  content: "";
+}
+
+.publicHomepage .homepageArticleFrameCorner {
+  position: absolute;
+  z-index: 2;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+}
+
+.publicHomepage .homepageArticleFrameCorner--start-start {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  transform: scaleX(var(--homepage-scale-x, 1));
+}
+
+.publicHomepage .homepageArticleFrameCorner--start-end {
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  transform: scaleX(var(--homepage-scale-x, 1)) rotate(90deg);
+}
+
+.publicHomepage .homepageArticleFrameCorner--end-start {
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  transform: scaleX(var(--homepage-scale-x, 1)) rotate(-90deg);
+}
+
+.publicHomepage .homepageArticleFrameCorner--end-end {
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  transform: scaleX(var(--homepage-scale-x, 1)) rotate(180deg);
+}
+
+.publicHomepage .homepageArticlePage .homepageBackAction {
+  position: absolute;
+  inset-block-start: -40px;
+  inset-inline-start: 8px;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  margin: 0;
+  padding: 1px 11px 1px 9px;
+  border: 1px solid #cba467;
+  border-radius: 3px;
+  background: #1e202273;
+  color: #cba467;
+  font-family: var(--homepage-font);
+  font-size: 16.5px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.publicHomepage .homepageArticlePage .homepageBackAction svg {
+  width: 16px;
+  height: 7.4px;
+  flex: none;
+  fill: currentColor;
+  stroke: currentColor;
+  transform: rotate(calc(90deg * var(--homepage-scale-x, 1)));
+  transition: transform .2s ease-out .1s;
+}
+
+.publicHomepage .homepageArticlePage .homepageBackAction > span {
+  font-family: var(--homepage-font);
+  font-weight: 700;
+}
+
+.publicHomepage[dir="rtl"] .homepageArticlePage .homepageBackAction > span {
+  font-family: "Noto Sans", sans-serif;
+}
+
+.publicHomepage .homepageArticlePage .homepageBackAction:hover svg,
+.publicHomepage .homepageArticlePage .homepageBackAction:focus-visible svg {
+  transform: translateX(calc(-2px * var(--homepage-scale-x, 1))) rotate(calc(90deg * var(--homepage-scale-x, 1)));
+}
+
+.publicHomepage .homepageArticle {
+  overflow: hidden;
+  border: 2px solid #cba467;
+  background: linear-gradient(180deg, rgb(49 44 44 / 85%), rgb(26 30 31 / 85%));
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleBanner {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.publicHomepage[dir="rtl"] .homepageArticleBanner {
+  transform: scaleX(-1);
+}
+
+.publicHomepage .homepageArticleTitle {
+  margin: clamp(10px, 2cqi, 20px) clamp(10px, 4cqi, 40px) 0;
+  color: #cba467;
+  font-family: "Homepage Noto Sans", Arial, sans-serif;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleDate {
+  display: block;
+  margin: 10px clamp(10px, 4cqi, 40px) 0;
+  color: #e6dbc9;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleContent {
+  margin-block: clamp(10px, 2cqi, 20px) clamp(10px, 4cqi, 40px);
+  margin-inline: clamp(10px, 4cqi, 40px);
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleContent :is(p, li, h1, h2, h3, h4, strong, em, a, small, span) {
+  font-family: var(--homepage-font);
+}
+
+.publicHomepage .homepageArticleContent > :first-child:not(h1) {
+  margin-block-start: 0;
+}
+
+.publicHomepage .homepageArticleContent > :last-child {
+  margin-block-end: 0;
+}
+
+.publicHomepage .homepageArticleContent h1 {
+  margin: 60px 0 20px;
+  color: #cba467;
+  font-family: var(--homepage-headline-font);
+  font-size: 30px;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.publicHomepage .homepageArticleContent h2 {
+  margin: 0 0 15px;
+  color: #cba467;
+  font-family: var(--homepage-font);
+  font-size: 18px;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.publicHomepage .homepageArticleContent h3 {
+  margin: 0 0 10px;
+  color: #cba467;
+  font-family: var(--homepage-font);
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleContent h4 {
+  margin: 0;
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleContent p {
+  margin: 1em 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+}
+
+.publicHomepage .homepageArticleSection {
+  margin: 45px 0 0;
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.publicHomepage .homepageArticleSection[data-homepage-article-spacing="large"] {
+  margin-top: 60px;
+}
+
+.publicHomepage .homepageArticleContent :is(ul, ol) {
+  margin: 0 0 0 clamp(15px, 3cqi, 25px);
+  padding: 0;
+  font-family: var(--homepage-font);
+}
+
+.publicHomepage[dir="rtl"] .homepageArticleContent :is(ul, ol) {
+  margin-right: 25px;
+  margin-left: 0;
+}
+
+.publicHomepage .homepageArticleContent ul li {
+  margin: 0;
+  list-style: disc;
+}
+
+.publicHomepage .homepageArticleContent a {
+  display: inline-block;
+  color: #5a9a0a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.publicHomepage .homepageArticleContent a strong {
+  font-weight: inherit;
+}
+
+.publicHomepage .homepageArticleContent a:hover { color: #99c01a; }
+.publicHomepage .homepageArticleContent a:active { color: #ff8000; }
+
+.publicHomepage .homepageArticleColumns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin: 0;
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+}
+
+.publicHomepage .homepageArticleColumn {
+  min-width: 300px;
+  flex: 1;
+}
+
+.publicHomepage .homepageArticleColumn h3 {
+  margin-top: 0;
+}
+
+.publicHomepage table.homepageArticleTimeline {
+  width: 100%;
+  margin: 52px 0 39px;
+  padding: 0;
+  border-collapse: collapse;
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.publicHomepage table.homepageArticleTimeline td {
+  padding: 1em;
+  border: 1px solid #5e463a;
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: center;
+  vertical-align: baseline;
+}
+
+.publicHomepage .homepageArticleTimelineDot {
+  width: 14px;
+  height: 14px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #cba467;
+  font-family: var(--homepage-font);
+}
+
+.publicHomepage .homepageArticleTimelineLabel {
+  margin-top: .5em;
+  font-family: var(--homepage-font);
+}
+
+.publicHomepage .homepageArticleTimelineLabel small {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.publicHomepage .homepageArticleFeatureList li {
+  list-style: disc;
+}
+
+.publicHomepage .homepageArticleContent .homepageArticleFeatureList {
+  color: #e6dbc9;
+  font-family: var(--homepage-font);
+  line-height: 1.6;
+  padding-left: 1.5em;
+  list-style-type: disc;
+}
+
+.publicHomepage .homepageArticleFeatureList span {
+  display: block;
+  margin-inline-start: 0;
+  margin-left: 1.2em;
+}
+
+@media screen and (max-width: 680px) {
+  .publicHomepage .homepageArticlePage {
+    min-height: calc(100vh - 56px);
+    background-attachment: scroll;
+  }
+
+  .publicHomepage .homepageArticleFrame {
+    margin-top: 30px;
+  }
+
+  .publicHomepage .homepageArticlePage .homepageBackAction {
+    inset-inline-start: 8px;
+  }
+
+}
+
+/* Public registration overlay (#registration): parchment dialog over the
+ * landing page, measured 450px wide and 100px from the top at 1920 x 1080; the height is
+ * content-driven like the reference modal. */
+.publicHomepage .homepageRegistrationDialog {
+  justify-items: center;
+  padding-block-start: 100px;
+}
+
+.publicHomepage #homepageRegistrationDialog .homepageDialogPanel,
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogPanel {
+  display: block;
+  width: min(450px, calc(100vw - 30px));
+  max-height: none;
+  padding: 15px;
+  font-size: 13px;
+  line-height: 1.3;
+  overflow: visible;
+}
+
+.publicHomepage #homepageRegistrationDialog h2,
+.publicHomepage #homepageCalendarDetailsDialog h2 {
+  width: calc(100% - 50px);
+  margin: 0 50px 20px 0;
+  font-size: 18px;
+  font-variant: small-caps;
+  line-height: 23.39px;
+  letter-spacing: .1em;
+  text-transform: none;
+}
+
+.publicHomepage[dir="rtl"] #homepageRegistrationDialog h2 { margin: 0 0 20px 50px; }
+
+.publicHomepage #homepageRegistrationDialog .registrationStep[hidden] { display: none; }
+.publicHomepage #homepageRegistrationDialog .registrationStep.active { display: grid; grid-template-columns: 1fr; }
+.publicHomepage #homepageRegistrationDialog .registerForm,
+.publicHomepage #homepageRegistrationDialog .registrationStep { min-width: 0; }
+
+.publicHomepage #homepageRegistrationDialog label.text {
+  position: relative;
+  display: inline-grid;
+  grid-template-areas: "label" "input";
+  grid-template-rows: 18.89px 40px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 80.89px;
+  margin: 0 0 12px;
+  padding-block-end: 22px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.text input,
+.publicHomepage #homepageRegistrationDialog label.input input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 15px;
+  border: 1px solid #5e463a;
+  border-radius: 2px;
+  background: #fff;
+  color: #5e463a;
+  font: inherit;
+  transition: border-color .15s;
+}
+
+.publicHomepage #homepageRegistrationDialog label.text input:not(:disabled):hover,
+.publicHomepage #homepageRegistrationDialog label.text input:not(:disabled):focus { border-color: #5a9a0a; }
+.publicHomepage #homepageRegistrationDialog label.text input:disabled { border-color: #9b9999; background-color: #d9d9d9; color: #777; cursor: not-allowed; }
+
+.publicHomepage #homepageRegistrationDialog label.text input { grid-area: input; }
+
+.publicHomepage #homepageRegistrationDialog label.text .label,
+.publicHomepage #homepageRegistrationDialog label.input .label {
+  margin-block-end: 2px;
+  color: #5e463a;
+  font-size: 12.35px;
+  font-weight: 700;
+  line-height: 16.06px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.text .label { grid-area: label; }
+
+.publicHomepage #homepageRegistrationDialog label.input {
+  position: relative;
+  display: grid;
+  width: 100%;
+  margin: 0 0 12px;
+  padding-block-end: 20px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.input .label { order: -1; }
+
+.publicHomepage #homepageRegistrationDialog label > svg.valid,
+.publicHomepage #homepageRegistrationDialog label > svg.invalid {
+  position: absolute;
+  inset-block-start: 28px;
+  inset-inline-end: 12px;
+  display: none;
+  width: 20px;
+  height: 20px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.text.valid > .valid,
+.publicHomepage #homepageRegistrationDialog label.text.invalid > .invalid,
+.publicHomepage #homepageRegistrationDialog label.input.invalid > .invalid { display: block; }
+.publicHomepage #homepageRegistrationDialog label > .valid { fill: #5a9a0a; }
+.publicHomepage #homepageRegistrationDialog label > .invalid { fill: #c42c17; }
+
+.publicHomepage #homepageRegistrationDialog .validation {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  display: none;
+  width: 100%;
+  color: #c42c17;
+  font-size: 12px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.text .validation { inset-block-start: 63px; inset-block-end: auto; }
+.publicHomepage #homepageRegistrationDialog .validation.show,
+.publicHomepage #homepageRegistrationDialog label.input.invalid .validation { display: block; }
+
+.publicHomepage #homepageRegistrationDialog label.checkbox {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 20px 1fr;
+  grid-auto-rows: minmax(22px, auto);
+  column-gap: 5px;
+  width: 100%;
+  margin: 0 0 12px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.checkbox input {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  opacity: 0;
+}
+
+.publicHomepage #homepageRegistrationDialog label.checkbox > svg.checkbox {
+  width: 18px;
+  height: 18px;
+  margin-block-start: 1px;
+  fill: none;
+  stroke: #5e463a;
+  stroke-width: 2px;
+}
+
+.publicHomepage #homepageRegistrationDialog label.checkbox .box { fill: #fff; stroke-width: 1px; transition: fill .15s, stroke .15s; }
+.publicHomepage #homepageRegistrationDialog label.checkbox input:not(:checked):not(:disabled):is(:hover, :focus) + svg .box { stroke: #99c01a; }
+.publicHomepage #homepageRegistrationDialog label.checkbox input:checked:is(:hover, :focus) + svg .box { fill: #99c01a; stroke: #99c01a; }
+.publicHomepage #homepageRegistrationDialog label.checkbox input:disabled + svg .box { fill: #d9d9d9; stroke: #9b9999; }
+.publicHomepage #homepageRegistrationDialog label.checkbox input:focus-visible + svg { outline: 0; box-shadow: 0 0 2px 3px rgb(0 102 255 / 70%); }
+.publicHomepage #homepageRegistrationDialog label.checkbox .checkmark,
+.publicHomepage #homepageRegistrationDialog label.checkbox .indeterminate { display: none; }
+.publicHomepage #homepageRegistrationDialog label.checkbox input:checked + svg .box { fill: #5a9a0a; stroke: #5a9a0a; }
+.publicHomepage #homepageRegistrationDialog label.checkbox input:checked + svg .checkmark { display: block; stroke: #fff; }
+.publicHomepage #homepageRegistrationDialog label.checkbox .label { min-width: 0; padding-block-start: 2px; white-space: normal; }
+
+.publicHomepage #homepageRegistrationDialog .actions { position: relative; text-align: center; }
+.publicHomepage #homepageRegistrationDialog .actions > div:last-child { line-height: 16.89px; }
+.publicHomepage #homepageRegistrationDialog .actions a,
+.publicHomepage #homepageRegistrationDialog .centeredText a { color: #5a9a0a; font-size: 13px; font-weight: 700; text-decoration: none; }
+.publicHomepage #homepageRegistrationDialog .actions a:hover,
+.publicHomepage #homepageRegistrationDialog .centeredText a:hover { color: #99c01a; }
+.publicHomepage #homepageRegistrationDialog .actions a:active,
+.publicHomepage #homepageRegistrationDialog .centeredText a:active { color: #ff8000; }
+.publicHomepage #homepageRegistrationDialog .buttonFramed:disabled { cursor: not-allowed; }
+
+/* Reference button.buttonFramed.green (startpage.434.css): gold frame, green
+ * inset face, 37px minimum height, label padding 0 15px. */
+.publicHomepage #homepageRegistrationDialog .buttonFramed,
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed,
+.publicHomepage .calendarGameworld .buttonFramed {
+  --buttonBorderColor: #34220d;
+  --fontColor: #fff9eb;
+  --buttonColorBottom: #344a1d;
+  --buttonColorTop: #b9d890;
+  --buttonColorSide: #679f1b;
+  --buttonGradientColorTop: #5d8137;
+  --buttonGradientColorBottom: #466428;
+  position: relative;
+  display: inline-grid;
+  box-sizing: border-box;
+  align-items: center;
+  justify-items: center;
+  min-width: 37px;
+  min-height: 37px;
+  margin: 0 0 20px;
+  padding: 5px;
+  border: 1px solid var(--buttonBorderColor);
+  border-radius: 0;
+  background-color: transparent;
+  background-image: linear-gradient(180deg, #cba467 5%, #f3e2ae 13%, #efbf7b 32%, #aa8050 48%, #835e35 72%, #ad8a54 93%, #d7b672);
+  color: #5e463a;
+  font: 13px / 16.9px Arial, sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+
+.publicHomepage #homepageRegistrationDialog .buttonFramed::before,
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed::before,
+.publicHomepage .calendarGameworld .buttonFramed::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  z-index: 1;
+  border: 1px solid #34353c;
+  background-image: linear-gradient(to bottom, var(--buttonGradientColorTop), var(--buttonGradientColorBottom));
+  box-shadow: inset 0 -4px 0 -2px var(--buttonColorBottom), inset 0 4px 0 -2px var(--buttonColorTop), inset 0 0 0 2px var(--buttonColorSide);
+}
+
+.publicHomepage #homepageRegistrationDialog .buttonFramed > div,
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed > div,
+.publicHomepage .calendarGameworld .buttonFramed > div {
+  position: relative;
+  z-index: 2;
+  padding: 0 15px;
+  color: var(--fontColor);
+  font-weight: 700;
+}
+
+.publicHomepage #homepageRegistrationDialog .buttonFramed:hover:not(:disabled),
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed:hover:not(:disabled),
+.publicHomepage .calendarGameworld .buttonFramed:hover:not(:disabled) {
+  --buttonColorBottom: #83a05b;
+  --buttonColorTop: #cee8ad;
+  --buttonColorSide: #a9d075;
+  --buttonGradientColorTop: #84b253;
+  --buttonGradientColorBottom: #5a8133;
+}
+
+.publicHomepage #homepageRegistrationDialog .buttonFramed:active:not(:disabled),
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed:active:not(:disabled),
+.publicHomepage .calendarGameworld .buttonFramed:active:not(:disabled) {
+  --buttonColorBottom: #48711e;
+  --buttonColorTop: #486727;
+  --buttonColorSide: #4a6e26;
+  --buttonGradientColorTop: #54792f;
+  --buttonGradientColorBottom: #54792f;
+}
+
+.publicHomepage #homepageRegistrationDialog .buttonFramed:disabled,
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed:disabled,
+.publicHomepage .calendarGameworld .buttonFramed:disabled {
+  background-color: #888;
+  background-image: none;
+  cursor: not-allowed;
+}
+
+.publicHomepage #homepageRegistrationDialog .buttonFramed:disabled::before,
+.publicHomepage #homepageCalendarDetailsDialog .buttonFramed:disabled::before,
+.publicHomepage .calendarGameworld .buttonFramed:disabled::before {
+  background-image: none;
+  box-shadow: none;
+}
+
+.publicHomepage #homepageRegistrationDialog #socialBlock { margin: 0 0 20px; }
+.publicHomepage #homepageRegistrationDialog #socialSignIn { margin: 0 0 10px; }
+.publicHomepage #homepageRegistrationDialog #socialSignIn > .label { display: block; margin: 0 0 9px; }
+.publicHomepage #homepageRegistrationDialog .socialButtons { display: flex; justify-content: center; gap: 6px; }
+
+.publicHomepage #homepageRegistrationDialog .socialButtons button {
+  display: grid;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 38px;
+  height: 38px;
+  padding: 7px;
+  place-items: center;
+}
+
+.publicHomepage #homepageRegistrationDialog .socialButtons svg { width: 100%; height: 100%; fill: #1877f2; }
+.publicHomepage #homepageRegistrationDialog .socialButtons button.googleSignInButton,
+.publicHomepage #homepageRegistrationDialog .socialButtons button.appleSignInButton { padding: 0; }
+.publicHomepage #homepageRegistrationDialog .socialButtons img { display: block; width: 100%; height: 100%; }
+.publicHomepage #homepageRegistrationDialog .registerNote { margin: 0 0 16px; color: #5e463a; line-height: 1.45; }
+.publicHomepage #homepageRegistrationDialog .toast { margin: 0 0 14px; color: #c42c17; font-weight: 700; }
+.publicHomepage #homepageRegistrationDialog :focus-visible { outline: 0; box-shadow: 0 0 2px 3px rgb(0 102 255 / 70%); }
+
+@media (max-width: 680px) {
+  .publicHomepage .homepageRegistrationDialog { padding-block-start: 100px; overflow: auto; }
+  .publicHomepage #homepageRegistrationDialog .homepageDialogPanel { width: calc(100vw - 32px); }
+}
+
+/* Game world calendar rows: reference .calendarGameworld rules (startpage.434.css) scoped to the local public route. */
+.publicHomepage .calendarGameworld{background-image:linear-gradient(180deg,#312c2cd9,#1a1e1fd9);border:1px solid #cba467;border-radius:7px;box-shadow:0 0 5px #00000080;display:grid;font-size:18px;grid-template-columns:50px 1fr 94px 220px 156px repeat(3,116px) 70px;grid-template-rows:50px;margin-block-end:10px;pointer-events:none;position:relative;transition-duration:.15s}
+.publicHomepage .calendarGameworld.notification:after{border:1px solid #ff4e00;border-end-start-radius:7px;border-start-start-radius:7px;box-shadow:inset 0 0 7px #ff4e00;content:"";inset-block:-1px;inset-inline:-1px 70px;position:absolute}
+.publicHomepage .calendarGameworld>*{align-content:center;font-weight:700;justify-self:stretch;text-align:center;transition-duration:.15s}
+.publicHomepage .calendarGameworld>:not(:first-child){border-inline-start:1px solid #cba467}
+.publicHomepage .calendarGameworld .day{display:grid;line-height:1em;padding-block-end:4px}
+.publicHomepage .calendarGameworld .day .weekday{font-size:10px;font-weight:400;text-transform:uppercase}
+.publicHomepage .calendarGameworld .day.active{background-image:linear-gradient(90deg,#00bc0080,#0000);border:1px solid #228b22;border-end-start-radius:6px;border-inline-end:none;border-start-start-radius:6px}
+.publicHomepage .calendarGameworld .title{align-items:center;background-image:linear-gradient(90deg,var(--backgroundColor),#0000);border-inline-end:none;display:grid;gap:4%;grid-auto-flow:column;padding-inline:.85em;position:relative;text-align:start;text-transform:uppercase}
+.publicHomepage .calendarGameworld .title .text{overflow:hidden;text-overflow:ellipsis}
+.publicHomepage .calendarGameworld .title .name{white-space:nowrap}
+.publicHomepage .calendarGameworld .title .name:has(~span){border-inline-end:1px solid currentColor;display:inline-block;margin-inline-end:5px;padding-inline-end:5px}
+.publicHomepage .calendarGameworld .title .name~span{font-style:italic;font-weight:400;white-space:nowrap}
+.publicHomepage .calendarGameworld .title i{justify-self:end}
+.publicHomepage .calendarGameworld .tribes{display:grid;overflow:hidden;place-content:center}
+.publicHomepage .calendarGameworld .tribeImages{display:grid;grid-template-columns:repeat(6,auto);height:70px;margin-block-start:15px;margin-inline-start:-5px;transform:scale(.75)}
+.publicHomepage .calendarGameworld .tribeImages .tribe{filter:brightness(1.2);margin-inline-start:var(--decreaseGap);position:relative;--decreaseGap:-20px}
+.publicHomepage .calendarGameworld .tribeImages .tribe:first-child{--decreaseGap:0px;z-index:6}
+.publicHomepage .calendarGameworld .tribeImages .tribe:nth-child(2){z-index:5}
+.publicHomepage .calendarGameworld .tribeImages .tribe:nth-child(3){z-index:4}
+.publicHomepage .calendarGameworld .tribeImages .tribe:nth-child(4){z-index:3}
+.publicHomepage .calendarGameworld .tribeImages .tribe:nth-child(5){z-index:2}
+.publicHomepage .calendarGameworld .tribeImages .tribe:nth-child(6){z-index:1}
+.publicHomepage .calendarGameworld .tribeImages .roman+.gaul{--decreaseGap:-25px}
+.publicHomepage .calendarGameworld .tribeImages .teuton{--decreaseGap:-35px}
+.publicHomepage .calendarGameworld .tribeImages :is(.hun,.publicHomepage .spartan){--decreaseGap:-25px}
+.publicHomepage .calendarGameworld .tribeImages .viking{--decreaseGap:-30px}
+.publicHomepage .calendarGameworld .tribeImages .roman{height:79px;width:75px}
+.publicHomepage .calendarGameworld .tribeImages .teuton{height:75px;width:76px}
+.publicHomepage .calendarGameworld .tribeImages .gaul{height:84px;width:64px}
+.publicHomepage .calendarGameworld .tribeImages .egyptian{height:81px;width:52px}
+.publicHomepage .calendarGameworld .tribeImages .hun{height:76px;width:71px}
+.publicHomepage .calendarGameworld .tribeImages .spartan{height:85px;width:60px}
+.publicHomepage .calendarGameworld .tribeImages .viking{height:79px;width:67px}
+.publicHomepage .calendarGameworld :is(.artefacts,.publicHomepage .constructionPlans,.publicHomepage .endCondition,.publicHomepage .speed,.publicHomepage .startTime){align-items:center;display:grid;font-size:16px;gap:8px;grid-template-columns:auto 1fr;justify-content:center;padding-inline:10px;white-space:nowrap}
+.publicHomepage .calendarGameworld :is(.artefacts,.publicHomepage .constructionPlans,.publicHomepage .endCondition,.publicHomepage .speed,.publicHomepage .startTime) i{background-image:var(--iconUrl);height:var(--iconHeight);width:var(--iconWidth)}
+.publicHomepage .calendarGameworld :is(.artefacts,.publicHomepage .constructionPlans,.publicHomepage .endCondition,.publicHomepage .speed,.publicHomepage .startTime) span{white-space:nowrap}
+.publicHomepage .calendarGameworld .startTime div{justify-self:start}
+.publicHomepage .calendarGameworld .startTime span{font-style:italic;font-weight:400}
+.publicHomepage .calendarGameworld button.action{height:auto;margin:0;border-end-end-radius:6px;border-start-end-radius:6px;--fontColor:#fff9eb;--buttonGradientColorTop:#5d8137;--buttonGradientColorBottom:#466428;background-image:linear-gradient(to bottom,var(--buttonGradientColorTop),var(--buttonGradientColorBottom));border-block:none;border-inline-end:none;pointer-events:auto}
+.publicHomepage .calendarGameworld button.action:before{content:none}
+.publicHomepage .calendarGameworld button.action:hover:not(:active){--buttonGradientColorTop:#84b253;--buttonGradientColorBottom:#5a8133}
+.publicHomepage .calendarGameworld button.action:active{--buttonGradientColorTop:#466428;--buttonGradientColorBottom:#5d8137}
+.publicHomepage .calendarGameworld button.action svg{min-height:1em}
+.publicHomepage .calendarGameworld button.action>div{padding-inline:var(--buttonPadding)}
+@container calendarGrid (width < 1300px){
+  .publicHomepage .calendarGameworld{grid-template-columns:50px 1fr 94px 220px 156px repeat(2,116px) 70px}
+  .publicHomepage .calendarGameworld .endCondition{display:none}
+}
+@container calendarGrid (width < 1185px){
+  .publicHomepage .calendarGameworld{grid-template-columns:50px 1fr 94px 220px 156px 116px 70px}
+  .publicHomepage .calendarGameworld .constructionPlans{display:none}
+}
+@container calendarGrid (width < 1069px){
+  .publicHomepage .calendarGameworld{grid-template-columns:50px 1fr clamp(70px,8cqi,90px) 200px clamp(120px,15cqi,156px) 70px}
+  .publicHomepage .calendarGameworld .tribeImages{transform:scale(.75)}
+  .publicHomepage .calendarGameworld :is(.speed,.publicHomepage .startTime){gap:.3em}
+  .publicHomepage .calendarGameworld :is(.speed,.publicHomepage .startTime) i{zoom:.8}
+  .publicHomepage .calendarGameworld .artefacts{display:none}
+}
+@container calendarGrid (width < 913px){
+  .publicHomepage .calendarGameworld{font-size:clamp(13px,2cqi,18px);grid-template-columns:clamp(38px,6cqi,50px) 1fr clamp(70px,10cqi,90px) 175px clamp(40px,8cqi,70px);grid-template-rows:clamp(40px,6cqi,50px)}
+  .publicHomepage .calendarGameworld.notification:after{inset-inline-end:clamp(40px,8cqi,70px)}
+  .publicHomepage .calendarGameworld .day .weekday{font-size:clamp(8px,1.2cqi,10px)}
+  .publicHomepage .calendarGameworld .speed{gap:.2em;padding-inline:.4em}
+  .publicHomepage .calendarGameworld .tribeImages{transform:scale(.65)}
+  .publicHomepage .calendarGameworld .startTime{display:none}
+}
+@container calendarGrid (width < 800px){
+  .publicHomepage .calendarGameworld{grid-template-columns:clamp(38px,6cqi,50px) 1fr 70px 155px clamp(40px,8cqi,70px)}
+  .publicHomepage .calendarGameworld .title i{zoom:.8}
+  .publicHomepage .calendarGameworld .tribeImages{transform:scale(.55)}
+}
+@container calendarGrid (width < 700px){
+  .publicHomepage .calendarGameworld{grid-template-columns:clamp(38px,6cqi,50px) 1fr 60px 140px clamp(40px,8cqi,70px)}
+  .publicHomepage .calendarGameworld .tribeImages{margin-block-start:10px;transform:scale(.45)}
+}
+@container calendarGrid (width < 600px){
+  .publicHomepage .calendarGameworld{grid-template-columns:clamp(38px,6cqi,50px) 1fr 35px 140px clamp(40px,8cqi,70px)}
+  .publicHomepage .calendarGameworld .speed{display:inline-block;padding-inline:0}
+  .publicHomepage .calendarGameworld .speed i{display:none}
+}
+@container calendarGrid (width < 500px){
+  .publicHomepage .calendarGameworld{cursor:pointer;grid-template-columns:clamp(38px,6cqi,50px) 1fr 32px 95px;pointer-events:auto}
+  .publicHomepage .calendarGameworld .title{padding-inline:.3em}
+  .publicHomepage .calendarGameworld .title .text .name{border:none}
+  .publicHomepage .calendarGameworld .title .text span{display:block;overflow:hidden;text-overflow:ellipsis}
+  .publicHomepage .calendarGameworld .title i{zoom:.7}
+  .publicHomepage .calendarGameworld .tribeImages{margin-inline-start:0;transform:scale(.35)}
+  .publicHomepage .calendarGameworld .action{display:none}
+  .publicHomepage .calendarGameworld.notification:after{border-radius:7px;inset-inline-end:-1px}
+}
+
+.publicHomepage #gameworldCalendar{container:calendarGrid/inline-size;min-width:auto;width:min(1380px,calc(100% - 60px));margin-inline:auto}
+.publicHomepage #gameworldCalendar .noResults{font-size:18px;font-style:italic;margin:150px auto 0;text-align:center}
+.publicHomepage #gameworldCalendar h2.calendarMonth{margin:0 0 10px;color:#e6dbc9;font-size:16px;font-weight:700;text-transform:uppercase}
+.publicHomepage .calendarGameworld{color:#e6dbc9;font-family:var(--homepage-font)}
+.publicHomepage .calendarGameworld .tribeImages img{display:block}
+/* Reference global layer: `:where(*){box-sizing:border-box}` and the element reset (border/margin/padding 0, font inherited, page font family). */
+.publicHomepage :is(.calendarGameworld, #calendarGameworldDetails) :where(*) { box-sizing: border-box; }
+.publicHomepage .calendarGameworld :where(*) { border: 0; margin: 0; padding: 0; font: inherit; font-family: var(--homepage-font); vertical-align: initial; white-space: normal; }
+.publicHomepage .gameworldDetails i.serverStart{--iconUrl:url(../img_common/homepage/calendar-server-start.png);--iconWidth:32px;--iconHeight:32px}
+.publicHomepage .gameworldDetails i.speed{--iconUrl:url(../img_common/homepage/calendar-speed.png);--iconWidth:32px;--iconHeight:32px}
+.publicHomepage .gameworldDetails i.artefacts{--iconUrl:url(../img_common/homepage/calendar-artefacts.png);--iconWidth:32px;--iconHeight:32px}
+.publicHomepage .gameworldDetails i.constructionPlans{--iconUrl:url(../img_common/homepage/calendar-construction-plans.png);--iconWidth:32px;--iconHeight:32px}
+.publicHomepage .gameworldDetails i.serverEnd{--iconUrl:url(../img_common/homepage/calendar-server-end.png);--iconWidth:32px;--iconHeight:32px}
+.publicHomepage .gameworldDetails i.ww{--iconUrl:url(../img_common/homepage/calendar-wonder.png);--iconWidth:32px;--iconHeight:32px}
+.publicHomepage .calendarGameworld .tribeImages .roman{background-image:url(../img_common/homepage/roman-small.png);width:75px;height:79px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .roman{background-image:url(../img_common/homepage/roman-small.png);width:75px;height:79px}
+.publicHomepage .calendarGameworld .tribeImages .teuton{background-image:url(../img_common/homepage/teuton-small.png);width:76px;height:75px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .teuton{background-image:url(../img_common/homepage/teuton-small.png);width:76px;height:75px}
+.publicHomepage .calendarGameworld .tribeImages .gaul{background-image:url(../img_common/homepage/gaul-small.png);width:64px;height:84px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .gaul{background-image:url(../img_common/homepage/gaul-small.png);width:64px;height:84px}
+.publicHomepage .calendarGameworld .tribeImages .egyptian{background-image:url(../img_common/homepage/egyptian-small.png);width:52px;height:81px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .egyptian{background-image:url(../img_common/homepage/egyptian-small.png);width:52px;height:81px}
+.publicHomepage .calendarGameworld .tribeImages .hun{background-image:url(../img_common/homepage/hun-small.png);width:71px;height:76px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .hun{background-image:url(../img_common/homepage/hun-small.png);width:71px;height:76px}
+.publicHomepage .calendarGameworld .tribeImages .spartan{background-image:url(../img_common/homepage/spartan-small.png);width:60px;height:85px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .spartan{background-image:url(../img_common/homepage/spartan-small.png);width:60px;height:85px}
+.publicHomepage .calendarGameworld .tribeImages .viking{background-image:url(../img_common/homepage/viking-small.png);width:67px;height:79px}
+.publicHomepage #calendarGameworldDetails .header .content .tribes .viking{background-image:url(../img_common/homepage/viking-small.png);width:67px;height:79px}
+
+/* Details panel (#calendarGameworldDetails), reference geometry: 475px wide, 140px header. */
+.publicHomepage #homepageCalendarDetailsDialog .homepageDialogPanel { width: min(475px, calc(100vw - 32px)); padding: 0; --modalPadding: 15px; }
+.publicHomepage #calendarGameworldDetails { container: calendarGameworldDetails / inline-size; padding: 0; }
+.publicHomepage #calendarGameworldDetails .header { position: relative; z-index: 1; width: 475px; height: 140px; color: #fffdf8; font-size: 18px; font-weight: 700; container-type: inline-size; container-name: gameworld; --textShadow: drop-shadow(0 0 3px #1f1f1f99); }
+.publicHomepage #calendarGameworldDetails .header .background { position: absolute; inset: 0; z-index: 2; }
+.publicHomepage #calendarGameworldDetails .header .background::before,
+.publicHomepage #calendarGameworldDetails .header .background::after { position: absolute; inset: 0; content: ""; }
+.publicHomepage #calendarGameworldDetails .header .background::before { background-color: #f5e8c8; }
+.publicHomepage #calendarGameworldDetails .header .background::after { background-image: var(--serverImage); background-position: top; opacity: .7; }
+.publicHomepage #calendarGameworldDetails .header .background.default { --serverImage: url(../img_common/homepage/calendar-header-default.jpg); }
+.publicHomepage #calendarGameworldDetails .header .background.defaultSpeed { --serverImage: url(../img_common/homepage/calendar-header-default-speed.jpg); }
+.publicHomepage #calendarGameworldDetails .header .content { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr 1fr; height: 100%; overflow: hidden; border-radius: 4px; }
+.publicHomepage #calendarGameworldDetails .header .content > :not(button) { text-shadow: 1px 0 0 #1f1f1fcc, 1px 1px 0 #1f1f1fcc, 0 1px 0 #1f1f1fcc, -1px 1px 0 #1f1f1fcc, -1px 0 0 #1f1f1fcc, -1px -1px 0 #1f1f1fcc, 0 -1px 0 #1f1f1fcc, 1px -1px 0 #1f1f1fcc; }
+.publicHomepage #calendarGameworldDetails .header .content .title { display: grid; grid-column-start: 1; grid-row: 1 / 3; grid-template-rows: repeat(3, auto); align-self: start; margin-block-start: 12px; margin-inline-start: 12px; filter: var(--textShadow); }
+.publicHomepage #calendarGameworldDetails .header .content .title .gameworldName { letter-spacing: .1em; text-transform: uppercase; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes { display: grid; grid-column-start: 1; grid-row: 2 / 4; grid-template-columns: repeat(6, auto); align-self: end; justify-self: start; height: 70px; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe { --decreaseGap: -15px; position: relative; display: block; margin-inline-start: var(--decreaseGap); filter: drop-shadow(0 0 2px white) brightness(1.2); }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe:first-child { --decreaseGap: 0px; z-index: 6; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe:nth-child(2) { z-index: 5; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe:nth-child(3) { z-index: 4; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe:nth-child(4) { z-index: 3; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe:nth-child(5) { z-index: 2; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .tribe:nth-child(6) { z-index: 1; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .roman + .gaul { --decreaseGap: -20px; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .teuton { --decreaseGap: -30px; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes :is(.hun, .spartan) { --decreaseGap: -20px; }
+.publicHomepage #calendarGameworldDetails .header .content .tribes .viking { --decreaseGap: -25px; }
+.publicHomepage #calendarGameworldDetails section.details { display: grid; grid-template-columns: 1fr 1fr; margin: var(--modalPadding); }
+.publicHomepage #calendarGameworldDetails section.details.hasAction { border-block-end: 1px solid #67543b; }
+.publicHomepage #calendarGameworldDetails section.details > div { display: inline-grid; grid-auto-flow: column; grid-template-columns: auto 1fr; align-items: center; column-gap: 10px; padding-block: 10px; }
+.publicHomepage #calendarGameworldDetails section.details > div i { background-image: var(--iconUrl); height: var(--iconHeight); width: var(--iconWidth); }
+.publicHomepage #calendarGameworldDetails section.details > div span strong { display: block; }
+.publicHomepage #calendarGameworldDetails section.details > div span strong span { font-style: italic; font-weight: 400; }
+.publicHomepage #calendarGameworldDetails section.details > div:nth-child(odd) { padding-inline-end: 10px; }
+.publicHomepage #calendarGameworldDetails section.details > div:nth-child(2n) { padding-inline-start: 10px; }
+.publicHomepage #calendarGameworldDetails section.details > div:nth-child(n+3) { border-block-start: 1px solid #67543b; }
+.publicHomepage #calendarGameworldDetails section.details .endCondition { grid-column: 1 / span 2; }
+.publicHomepage #calendarGameworldDetails section.action { margin-block-end: var(--modalPadding); text-align: center; }
+.publicHomepage #calendarGameworldDetails section.action .buttonFramed { margin: 0; }
+
+/* Reference news / calendar / article page shell: 1380px content, Red Rose h1 (measured at 1920 x 1080). */
+.publicHomepage .homepageReferencePage { padding: 100px max(var(--homepage-page-padding), calc((100% - 1380px) / 2)) 72px; }
+.publicHomepage .homepageReferencePage > h1 { margin: 0 0 20px; color: #cba467; font: 700 30px / 39px var(--homepage-headline-font); text-align: center; text-shadow: none; text-transform: uppercase; }
+.publicHomepage #gameworldCalendar { box-sizing: border-box; width: 100%; margin: 0; }
+.publicHomepage #gameworldCalendar h2.calendarMonth { margin: 0 0 15px; color: #cba467; font: 700 18px / 23.4px var(--homepage-font); }
+.publicHomepage #gameworldCalendar .calendarGameworld { margin-block-end: 10px; }
+
+/* News list: reference .newsPreview card inside the gold frame (startpage.434.css). */
+.publicHomepage .homepageNewsFrame { position: relative; box-sizing: border-box; width: 100%; max-width: 680px; margin-block-end: 20px; padding: 8px; container: newsPreviewContainer / inline-size; }
+.publicHomepage .homepageNewsFrame::before { position: absolute; z-index: 1; inset: 3px; width: calc(100% - 8px); height: calc(100% - 8px); border: 1px solid #7c694b; pointer-events: none; content: ""; }
+.publicHomepage .newsPreview { --columnGap: 20px; --rowGap: 10px; --infoBoxBackgroundColorStart: #312c2cd9; --infoBoxBackgroundColorEnd: #1a1e1fd9; --fontColor: #e6dbc9; position: relative; display: grid; gap: var(--rowGap) var(--columnGap); grid-template-areas: "previewImage title title" "previewImage previewText previewText" "previewImage date linkToArticle"; grid-template-columns: auto 1fr 1fr; grid-template-rows: auto auto 1fr; padding-inline-end: var(--columnGap); border: 2px solid #cba467; background-image: linear-gradient(180deg, var(--infoBoxBackgroundColorStart), var(--infoBoxBackgroundColorEnd)); box-shadow: 2px 2px 6px 0 #0000004d; color: var(--fontColor); cursor: pointer; font-family: var(--homepage-font); font-size: 13px; transition: --infoBoxBackgroundColorStart .25s, --infoBoxBackgroundColorEnd .25s, --decorationColor .25s, --fontColor .25s; }
+.publicHomepage .newsPreview:hover, .publicHomepage .newsPreview:active { --infoBoxBackgroundColorStart: #cba467; --infoBoxBackgroundColorEnd: #cba467; --fontColor: #1f1f1f; --decorationColor: #1f1f1f; }
+.publicHomepage .newsPreview:active { --infoBoxBackgroundColorStart: #9d763a; --infoBoxBackgroundColorEnd: #9d763a; }
+.publicHomepage .newsPreview:hover .title, .publicHomepage .newsPreview:active .title, .publicHomepage .newsPreview:hover .linkToFullArticle a, .publicHomepage .newsPreview:active .linkToFullArticle a { color: #1f1f1f; }
+.publicHomepage .newsPreview .previewImage { grid-area: previewImage; position: relative; }
+.publicHomepage .newsPreview .previewImage::before, .publicHomepage .newsPreview .previewImage::after { position: absolute; z-index: 2; background-color: var(--decorationColor, #cba467); content: ""; }
+.publicHomepage .newsPreview .previewImage::before { inset-block: 0; inset-inline-end: -1px; width: 1px; }
+.publicHomepage .newsPreview .previewImage::after { height: 11px; inset-block-start: 50%; inset-inline-end: -6px; transform: translateY(-50%) rotate(45deg); width: 11px; }
+.publicHomepage .newsPreview .previewImage > * { display: block; width: 160px; height: 160px; object-fit: cover; }
+.publicHomepage .newsPreview .title, .publicHomepage .newsPreview .previewText { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; }
+.publicHomepage .newsPreview .title { grid-area: title; margin: 0; padding-block-start: var(--rowGap); color: #cba467; font: 700 16px / 20.8px var(--homepage-font); -webkit-line-clamp: 2; }
+.publicHomepage .newsPreview .previewText { grid-area: previewText; -webkit-line-clamp: 3; }
+.publicHomepage .newsPreview .date, .publicHomepage .newsPreview .linkToFullArticle { align-self: end; padding-block-end: var(--rowGap); }
+.publicHomepage .newsPreview .date { grid-area: date; font-size: 11px; line-height: 20px; white-space: nowrap; }
+.publicHomepage .newsPreview .date span { font-style: italic; }
+.publicHomepage .newsPreview .linkToFullArticle { grid-area: linkToArticle; justify-self: end; }
+.publicHomepage .newsPreview .linkToFullArticle a { display: inline-grid; grid-auto-flow: column; align-items: center; gap: 5px; color: #5a9a0a; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.publicHomepage .newsPreview .linkToFullArticle a::after { position: absolute; inset: 0; content: ""; }
+.publicHomepage .newsPreview .linkToFullArticle a svg { width: 13px; transform: scaleX(var(--homepage-scale-x, 1)); }
+.publicHomepage .newsPreview .linkToFullArticle .short { display: none; }
+/* Reference home card hides .linkToFullArticle; keep it as the card's focusable, stretched link without visible chrome. */
+.publicHomepage .homepageNewsCard .newsPreview .linkToFullArticle a svg, .publicHomepage .homepageNewsCard .newsPreview .linkToFullArticle a .short { display: none; }
+.publicHomepage .homepageNewsCard .newsPreview .linkToFullArticle a .full { position: absolute; display: block; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.publicHomepage .homepageNewsCard .linkToFullArticle a:focus-visible { outline: 0; }
+.publicHomepage .homepageNewsCard .linkToFullArticle a:focus-visible::after { outline: 2px solid #5e88c0; outline-offset: 2px; }
+@container newsPreviewContainer (width < 500px) { .publicHomepage .newsPreview { --columnGap: 15px; --rowGap: 3px; } .publicHomepage .newsPreview .previewImage > * { width: 110px; height: 110px; } .publicHomepage .newsPreview .previewImage::after { height: 9px; inset-inline-end: -5px; width: 9px; } .publicHomepage .newsPreview .title { padding-block-start: 5px; } .publicHomepage .newsPreview .previewText { -webkit-line-clamp: 2; } }
+@container newsPreviewContainer (width < 450px) { .publicHomepage .newsPreview .linkToFullArticle .full { display: none; } .publicHomepage .newsPreview .linkToFullArticle .short { display: block; } }
+@container newsPreviewContainer (width < 385px) { .publicHomepage .newsPreview { grid-template-areas: "previewImage title title" "previewImage date linkToArticle"; grid-template-rows: minmax(50%, auto) 1fr; --columnGap: 10px; --rowGap: 6px; padding-inline-end: 5px; } .publicHomepage .newsPreview .previewImage > * { width: 76px; height: 76px; } .publicHomepage .newsPreview .title { align-self: center; } .publicHomepage .newsPreview .previewText { display: none; } .publicHomepage .newsPreview .date { font-size: 10px; line-height: 16px; } .publicHomepage .newsPreview .linkToFullArticle { font-size: 11px; } }
+/* Reference rules: `#news.newsPreviewView` and its `.buttonWrapper` (views layer). */
+.publicHomepage .homepageNewsPage { display: grid; align-content: start; gap: 20px; grid-template-columns: 1fr 1fr; }
+.publicHomepage .homepageNewsPage > h1, .publicHomepage .homepageNewsPage > .buttonWrapper { grid-column: 1 / -1; }
+.publicHomepage .homepageNewsPage > .buttonWrapper { color: #e6dbc9; font-family: var(--homepage-font); text-align: center; }
+.publicHomepage .homepageNewsPage .homepageNewsFrame, .publicHomepage .homepageNewsCard .homepageNewsFrame { margin-block-end: 0; }
+@media screen and (max-width: 1112px) { .publicHomepage .homepageNewsPage { gap: 3vw; grid-template-columns: 1fr; max-width: 800px; } .publicHomepage .homepageNewsPage .homepageNewsFrame { max-width: 800px; } }
+
+/* Header menu: reference dropdown (header .pageMenu .menu) under the hamburger, which becomes an X while open. */
+.publicHomepage #homepageNavDialog.homepageDialog { z-index: 26; }
+.publicHomepage #homepageNavDialog.homepageDialog:not([hidden]) { display: block; padding: 0; background: transparent; }
+.publicHomepage #homepageNavDialog .homepageDialogPanel { position: fixed; inset-block-start: 80px; inset-inline-start: 15px; display: block; width: 268px; max-height: none; padding: 0; overflow: hidden; border: 0; border-radius: 0 0 7px 7px; background: #34434d; box-shadow: none; }
+.publicHomepage #homepageNavDialog nav a, .publicHomepage #homepageNavDialog nav .homepageDialogLinkButton { display: grid; grid-template-columns: 20px 1fr 50px; column-gap: 10px; align-items: center; justify-items: start; box-sizing: border-box; width: 100%; min-height: 40px; padding: 10px 20px; border: 0; background: transparent; color: #cba467; font: 700 13px / 16.9px var(--homepage-font); text-align: start; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.publicHomepage #homepageNavDialog nav svg { fill: currentColor; }
+.publicHomepage #homepageNavDialog nav svg:first-child { width: auto; height: 20px; max-width: 20px; max-height: 20px; }
+.publicHomepage #homepageNavDialog nav .homepageNavChevron { justify-self: end; width: auto; height: .5em; transform: rotate(-90deg); transition: transform .2s ease-out .1s; }
+.publicHomepage[dir="rtl"] #homepageNavDialog nav .homepageNavChevron { transform: rotate(90deg); }
+.publicHomepage #homepageNavDialog nav a:hover, .publicHomepage #homepageNavDialog nav a:focus-visible, .publicHomepage #homepageNavDialog nav .homepageDialogLinkButton:hover, .publicHomepage #homepageNavDialog nav .homepageDialogLinkButton:focus-visible { background-color: #cba467; color: #34434d; text-decoration: none; outline-offset: -3px; }
+.publicHomepage #homepageNavDialog nav a:active, .publicHomepage #homepageNavDialog nav .homepageDialogLinkButton:active { background-color: #9d763a; color: #34434d; }
+.publicHomepage .homepageMenuIcon i { transform-origin: left center; transition: transform .15s ease-out, opacity .15s ease-out; }
+.publicHomepage[dir="rtl"] .homepageMenuIcon i { transform-origin: right center; }
+/* Reference `.openClosePageMenu.closed:hover`: the short bar grows, the middle bar shrinks. */
+.publicHomepage .homepageMenuButton[aria-expanded="false"]:hover .homepageMenuIcon i:first-child { transform: scaleX(1.5); }
+.publicHomepage .homepageMenuButton[aria-expanded="false"]:hover .homepageMenuIcon i:nth-child(2) { transform: scaleX(.65); }
+.publicHomepage .homepageMenuIcon i:nth-child(2) { position: relative; }
+.publicHomepage .homepageMenuIcon i:nth-child(2)::after { position: absolute; inset: 0; border-radius: inherit; background: inherit; content: ""; transition: transform .15s ease-out; }
+.publicHomepage .homepageMenuButton[aria-expanded="true"] .homepageMenuIcon i:first-child, .publicHomepage .homepageMenuButton[aria-expanded="true"] .homepageMenuIcon i:last-child { opacity: 0; }
+.publicHomepage .homepageMenuButton[aria-expanded="true"] .homepageMenuIcon i:nth-child(2) { transform: rotate(45deg); }
+.publicHomepage .homepageMenuButton[aria-expanded="true"] .homepageMenuIcon i:nth-child(2)::after { transform: rotate(-90deg); }
+@container calendarGameworldDetails (width < 473px) { .publicHomepage #calendarGameworldDetails .header { width: 100%; } }
+.publicHomepage { line-height: 1.3; }
+
+/* Reference components: `button.buttonSecondary.gold` states, header Login icon, no language chevron. */
+.publicHomepage .homepageAuthContent { display: grid; grid-template-columns: 16px 1fr 16px; align-items: center; justify-self: stretch; column-gap: 5px; font-weight: 700; }
+.publicHomepage .homepageAuthContent svg { width: 15px; height: 15px; fill: currentColor; }
+.publicHomepage .homepageAuthContent span { grid-column: 2; }
+/* Reference `button.buttonSecondary.gold`: one hover/active state for every gold secondary control (border follows the content colour). */
+.publicHomepage :is(.homepageLanguage, .homepageAuthLink, .homepageInfoAction, .homepageStageControl, .homepageBackAction) { transition: .15s ease-out; }
+.publicHomepage :is(.homepageLanguage, .homepageAuthLink, .homepageInfoAction, .homepageStageControl, .homepageBackAction):hover { border-color: #261f16; background: #cba467; color: #261f16; filter: none; }
+.publicHomepage :is(.homepageLanguage, .homepageAuthLink, .homepageInfoAction, .homepageStageControl, .homepageBackAction):active { border-color: #261f16; background: #9d763a; color: #261f16; filter: none; }
+.publicHomepage .homepageInfoAction { min-height: 32px; padding: 1px 9px; border-color: #cba467; background: #1e202273; box-shadow: none; color: #cba467; font-size: 14.3px; font-weight: 400; line-height: 1.3; }
+.publicHomepage .homepageInfoAction { position: relative; }
+.publicHomepage .homepageInfoAction::before { content: ""; position: absolute; inset: -5px; border: 1px solid #7c694b; pointer-events: none; }
+.publicHomepage .homepageInfoAction span { font-weight: 700; }
+.publicHomepage .homepageMenuButton:focus-visible, .publicHomepage .homepageLanguage:focus-visible, .publicHomepage .homepageAuthLink:focus-visible, .publicHomepage .homepageInfoAction:focus-visible, .publicHomepage .homepageLobbyCta:focus-visible, .publicHomepage .homepageStageControl:focus-visible, .publicHomepage .homepageInfoBodyLink:focus-visible { outline: none; box-shadow: 0 0 2px 3px rgb(0 102 255 / 70%); }
+/* Reference `#overlay` / `.modal` / `#languageSelection` rules: centred modals in both directions, scrolling overlay, two-column language list. */
+.publicHomepage[dir="rtl"] .homepageRegistrationDialog { justify-items: center; }
+.publicHomepage #homepageLanguageDialog.homepageDialog:not([hidden]) { justify-items: center; align-items: start; padding: 100px 0 10px; overflow-y: auto; background: rgb(0 0 0 / 70%); }
+.publicHomepage[dir="rtl"] #homepageLanguageDialog.homepageDialog:not([hidden]) { justify-items: center; }
+.publicHomepage #homepageLanguageDialog .homepageDialogPanel { box-sizing: border-box; width: 531px; max-width: calc(100% - 32px); padding: 15px; }
+.publicHomepage #homepageLanguageDialog .homepageLanguageOptions { display: grid; gap: 15px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 680px) { .publicHomepage #homepageLanguageDialog .homepageLanguageOptions { grid-template-columns: 1fr; } }
+.publicHomepage #homepageLanguageDialog h2 { margin-block-end: 20px; margin-inline: 0 50px; }
+.publicHomepage #homepageLanguageDialog .homepageLanguageSearchLabel { margin-block-end: 1px; }
+.publicHomepage #homepageLanguageDialog .homepageLanguageGroups { margin-top: 42px; }
+.publicHomepage[dir="rtl"] #homepageLanguageDialog h2 { margin-block-end: 20px; margin-inline: 0 50px; }
+
+/* RTL centring. css_rtl mirrors `inset-inline-start: 50%` (it becomes `right: 50%`) but the
+ * reference's `translateX(calc(var(--scaleXFactor) * -50%))` keeps its LTR sign, because
+ * `--scaleXFactor` is never -1 here. The element then sits a full width off-screen: the
+ * mobile building queue and sub-navigation tabs, the Rearrange container and its buttons,
+ * and the desktop hero wrapper. Mirror the translate for exactly those elements; a global
+ * `--scaleXFactor: -1` would also mirror every resource and hero icon. */
+body.rtl.mobileForced :is(#contentOuterContainer :is(.village1, .village2) .buildingList, #content .contentNavi.subNavi) {
+  transform: translateX(50%);
+}
+@media screen and (max-width: 620px) and (orientation: portrait) {
+  body.rtl.mobileOptimized :is(#contentOuterContainer :is(.village1, .village2) .buildingList, #content .contentNavi.subNavi) {
+    transform: translateX(50%);
+  }
+}
+body.rtl.rearrangeBuildings .rearrangeBuildings .container,
+body.rtl.rearrangeBuildings .rearrangeBuildings .container button.confirm {
+  transform: translateX(50%);
+}
+:where(body.rtl) #topBarHeroWrapper {
+  transform: translateX(50%);
+}
+
+/* Local difference (mobile pass): the login dialog is a fixed 492px wide, wider than a phone; let it fill the portrait viewport. */
+@media screen and (max-width: 620px) and (orientation: portrait) {
+  #loginScene {
+    width: 100%;
+  }
+  #loginScene .dialogWrapper {
+    width: calc(100% - 20px);
+  }
+  #loginScene .dialogWrapper .dialog {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Reference header Login control on phones: the icon sits centred (the later three-column rule had overridden this). */
+@media screen and (max-width: 1024px) {
+  .publicHomepage .homepageAuthLink .homepageAuthContent { grid-template-columns: 1fr; padding-inline: 0; justify-items: center; }
+}
+
+/* Local-only world stats page (/homepage/world): aggregates in the public gold-on-dark language. */
+.publicHomepage .worldFacts { display: flex; flex-wrap: wrap; gap: 10px 30px; justify-content: center; margin: 0 0 30px; }
+.publicHomepage .worldFacts > div { min-width: 120px; text-align: center; }
+.publicHomepage .worldFacts dt { color: #cba467; font: 700 13px / 18px var(--homepage-font); text-transform: uppercase; }
+.publicHomepage .worldFacts dd { margin: 0; color: #e6dbc9; font: 400 20px / 28px var(--homepage-font); }
+.publicHomepage .worldTables { display: grid; align-items: start; gap: 30px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); margin-block-end: 30px; }
+.publicHomepage .worldTable { border-collapse: collapse; background: none; color: #e6dbc9; font: 400 14px / 20px var(--homepage-font); }
+.publicHomepage .worldTable caption { margin-block-end: 8px; color: #cba467; font: 700 18px / 23.4px var(--homepage-font); text-align: start; }
+.publicHomepage .worldTable th, .publicHomepage .worldTable td { padding: 6px 10px; background: none; border-block-end: 1px solid #67543b; text-align: start; }
+.publicHomepage .worldTable th { color: #cba467; font-weight: 700; }
+.publicHomepage .worldWonderHeading { margin: 0 0 15px; color: #cba467; font: 700 18px / 23.4px var(--homepage-font); text-align: center; }
+
+/* Keyboard focus on the home news card: its link is a 0x0 stretched link without chrome, so ring the card (same ring as the other public controls). */
+.publicHomepage .homepageNewsCard .newsPreview:has(.linkToFullArticle a:focus-visible) { box-shadow: 2px 2px 6px 0 #0000004d, 0 0 2px 3px rgb(0 102 255 / 70%); }

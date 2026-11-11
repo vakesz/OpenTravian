@@ -1,0 +1,52 @@
+# Per-install secrets and generated runtime state. Docker keeps this in the
+# travian_state volume (TRAVIAN_STATE_DIR); the in-tree paths below are only
+# used without Docker or by installs that have not migrated yet.
+.env
+/globalConfig.php
+/smtp.local.php
+/game/deployment/include/connection.local.php
+/game/deployment/include/setup.lock
+/game/deployment/include/*.tmp
+/game/deployment/include/backups/
+/game/deployment/backups/
+/game/deployment/include/error_log.log
+/game/deployment/include/automation.log
+/game/deployment/include/setup-throttle.json
+/runtime/
+
+# Logs and local caches
+*.log
+.npm_cache/
+error_log
+/services/api/include/Templates/Cache/*
+/services/api/include/route.cache
+!/services/api/include/Templates/Cache/.gitkeep
+
+# Local tooling
+.DS_Store
+Thumbs.db
+.idea/
+# Share the workspace settings, extensions and tasks, ignore personal VS Code state.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+/node_modules/
+tmp-qa/
+.npm-cache/
+/dev/phpstan/phpstan.phar
+/dev/phpstan/phpstan.phar.asc
+
+# Dev-only client test runner (dev/client-tests)
+/dev/client-tests/node_modules/
+# Visual-regression actual and diff images from a failed run (baselines are generated locally and not tracked)
+/tests/visual/baselines/
+/tests/visual/out/
+/dev/asset-format/node_modules/
+/dev/client-tests/.env.local
+/dev/client-tests/.password.local
+*.local.php
+
+# Local reference-world hosts
+/reference.local
+__pycache__/

@@ -1,0 +1,11 @@
+{
+  "name": "opentravian-asset-format",
+  "private": true,
+  "description": "Dev-only formatter for recovered/vendored assets. Not part of any runtime image.",
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "prettier": "3.9.10",
+    "svgo": "4.1.0"
+  }
+}

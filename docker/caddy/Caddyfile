@@ -1,0 +1,11 @@
+# HTTPS front end for the web service (compose.tls.yaml). Caddy obtains and
+# renews a certificate for TRAVIAN_DOMAIN, redirects HTTP to HTTPS and proxies to
+# nginx. TRAVIAN_CADDY_TLS is "tls internal" for a local test with Caddy's own CA
+# and empty otherwise (Let's Encrypt).
+{$TRAVIAN_DOMAIN} {
+	{$TRAVIAN_CADDY_TLS}
+	# Browsers keep to HTTPS for a year after the first visit (never sent by the plain-HTTP nginx).
+	header Strict-Transport-Security "max-age=31536000"
+	# Caddy replaces any client-supplied X-Forwarded-For with the real peer address.
+	reverse_proxy web:80
+}

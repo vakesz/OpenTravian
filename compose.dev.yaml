@@ -1,0 +1,41 @@
+# Development layer. The checkout is bind-mounted, so PHP and asset changes need
+# no rebuild. Enable it in .env:
+#   COMPOSE_FILE=compose.yaml:compose.dev.yaml
+services:
+  php:
+    image: ${TRAVIAN_APP_IMAGE:-opentravian-app:dev}
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: runtime
+      args:
+        APP_UID: ${APP_UID:-1000}
+        APP_GID: ${APP_GID:-1000}
+    # The checkout is mounted read-write anyway, and an image built before the
+    # read-only layout does not have /run/travian prepared.
+    read_only: false
+    volumes:
+      - .:/travian
+      - travian_state:/var/lib/travian
+    environment:
+      # Developer tooling (docs/development.md): the request timing footer, off until ?devFooter=1.
+      TRAVIAN_DEV_TOOLS: "1"
+
+  web:
+    image: nginx:stable-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949
+    volumes:
+      - ./docker/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./docker/nginx/15-travian-allowed-hosts.envsh:/docker-entrypoint.d/15-travian-allowed-hosts.envsh:ro
+      - .:/travian:ro
+
+  engine:
+    image: ${TRAVIAN_APP_IMAGE:-opentravian-app:dev}
+    volumes:
+      - .:/travian
+      - travian_state:/var/lib/travian
+
+  installer:
+    image: ${TRAVIAN_APP_IMAGE:-opentravian-app:dev}
+    volumes:
+      - .:/travian
+      - travian_state:/var/lib/travian

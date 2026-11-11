@@ -1,0 +1,29 @@
+<svg class="decoration end" viewBox="0 0 11.97 19" id="svg-7gih1pq">
+  <style>
+    #svg-7gih1pq {
+      --linearGradient: url(#svg-gradient-7gih1pq);
+    }
+  </style>
+  <defs>
+    <linearGradient
+      class="frameGradient"
+      id="svg-gradient-7gih1pq"
+      spreadMethod="pad"
+      gradientTransform="rotate(90)"
+    >
+      <stop class="colorStop1" offset="5%"></stop>
+      <stop class="colorStop2" offset="13%"></stop>
+      <stop class="colorStop3" offset="32%"></stop>
+      <stop class="colorStop4" offset="48%"></stop>
+      <stop class="colorStop5" offset="72%"></stop>
+      <stop class="colorStop6" offset="93%"></stop>
+      <stop class="colorStop7" offset="100%"></stop>
+    </linearGradient>
+  </defs>
+  <path
+    d="M3.94 19c-.53 0-.94-.45-.94-1.03V1.03C3 .45 3.42 0 3.94 0c.27 0 .51.11.68.33l7.11 8.47c.32.4.32.99 0 1.39l-7.11 8.47c-.18.21-.42.33-.68.33Z"
+  ></path>
+  <path
+    d="M1.13 17.64C.5 17.64 0 17.08 0 16.39V2.6c0-.69.5-1.25 1.13-1.25.31 0 .61.14.83.4l5.81 6.89c.4.47.4 1.23 0 1.7l-5.81 6.9c-.21.26-.5.4-.82.4h-.01Z"
+  ></path>
+</svg>

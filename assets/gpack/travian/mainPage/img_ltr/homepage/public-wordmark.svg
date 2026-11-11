@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 172.7 60"
+>
+  <!-- The emblem fills the first 37.7 units: the mobile header shows only that part. -->
+  <path
+    fill="#2B2A2C"
+    stroke="#CBA467"
+    stroke-width="2"
+    stroke-linejoin="round"
+    d="M5 7h27v22c0 11-6.2 18.2-13.5 23.5C11.2 47.2 5 40 5 29z"
+  />
+  <circle
+    cx="18.5"
+    cy="26"
+    r="7.5"
+    fill="none"
+    stroke="#F2F2F2"
+    stroke-width="3"
+  />
+  <path
+    stroke="#CBA467"
+    stroke-width=".8"
+    d="M44 17.5h124M44 42.5h124"
+  />
+  <text
+    x="44"
+    y="36.5"
+    fill="#F2F2F2"
+    font-family="'Homepage Noto Serif', Georgia, 'Times New Roman', serif"
+    font-size="17"
+    font-weight="700"
+    textLength="124"
+    lengthAdjust="spacingAndGlyphs"
+  >OPENTRAVIAN</text>
+</svg>

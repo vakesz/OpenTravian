@@ -1,0 +1,1045 @@
+{
+  "frames": {
+    "female/hairColor/brightbrown/backHair/backHair14-brightbrown": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 231,
+        "h": 617
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 328,
+        "y": 229,
+        "w": 231,
+        "h": 617
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair2-brightbrown": {
+      "frame": {
+        "x": 231,
+        "y": 0,
+        "w": 285,
+        "h": 450
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 374,
+        "y": 250,
+        "w": 285,
+        "h": 450
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair10-brightbrown": {
+      "frame": {
+        "x": 516,
+        "y": 0,
+        "w": 313,
+        "h": 435
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 343,
+        "y": 265,
+        "w": 313,
+        "h": 435
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair13-brightbrown": {
+      "frame": {
+        "x": 0,
+        "y": 617,
+        "w": 233,
+        "h": 434
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 408,
+        "y": 192,
+        "w": 233,
+        "h": 434
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair10-brightbrown": {
+      "frame": {
+        "x": 829,
+        "y": 0,
+        "w": 280,
+        "h": 431
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 358,
+        "y": 181,
+        "w": 280,
+        "h": 431
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair2-brightbrown": {
+      "frame": {
+        "x": 829,
+        "y": 431,
+        "w": 276,
+        "h": 417
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 389,
+        "y": 201,
+        "w": 276,
+        "h": 417
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair1-brightbrown": {
+      "frame": {
+        "x": 516,
+        "y": 435,
+        "w": 197,
+        "h": 412
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 348,
+        "y": 282,
+        "w": 197,
+        "h": 412
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair1-brightbrown": {
+      "frame": {
+        "x": 0,
+        "y": 850,
+        "w": 189,
+        "h": 398
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 362,
+        "y": 199,
+        "w": 189,
+        "h": 398
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair12-brightbrown": {
+      "frame": {
+        "x": 398,
+        "y": 850,
+        "w": 156,
+        "h": 397
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 401,
+        "y": 148,
+        "w": 156,
+        "h": 397
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair9-brightbrown": {
+      "frame": {
+        "x": 0,
+        "y": 1039,
+        "w": 197,
+        "h": 317
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 173,
+        "w": 197,
+        "h": 317
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair6-brightbrown": {
+      "frame": {
+        "x": 317,
+        "y": 1039,
+        "w": 287,
+        "h": 180
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 320,
+        "y": 147,
+        "w": 287,
+        "h": 180
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair11-brightbrown": {
+      "frame": {
+        "x": 604,
+        "y": 1006,
+        "w": 212,
+        "h": 277
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 366,
+        "y": 201,
+        "w": 212,
+        "h": 277
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair6-brightbrown": {
+      "frame": {
+        "x": 231,
+        "y": 450,
+        "w": 272,
+        "h": 141
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 333,
+        "y": 257,
+        "w": 272,
+        "h": 141
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair5-brightbrown": {
+      "frame": {
+        "x": 795,
+        "y": 848,
+        "w": 242,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 351,
+        "y": 252,
+        "w": 242,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair5-brightbrown": {
+      "frame": {
+        "x": 881,
+        "y": 970,
+        "w": 241,
+        "h": 126
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 348,
+        "y": 159,
+        "w": 241,
+        "h": 126
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair11-brightbrown": {
+      "frame": {
+        "x": 1109,
+        "y": 0,
+        "w": 225,
+        "h": 194
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 358,
+        "y": 281,
+        "w": 225,
+        "h": 194
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair3-brightbrown": {
+      "frame": {
+        "x": 1037,
+        "y": 848,
+        "w": 217,
+        "h": 121
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 357,
+        "y": 254,
+        "w": 217,
+        "h": 121
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair13-brightbrown": {
+      "frame": {
+        "x": 1109,
+        "y": 225,
+        "w": 170,
+        "h": 205
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 224,
+        "w": 170,
+        "h": 205
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair3-brightbrown": {
+      "frame": {
+        "x": 1109,
+        "y": 430,
+        "w": 204,
+        "h": 145
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 365,
+        "y": 171,
+        "w": 204,
+        "h": 145
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair8-brightbrown": {
+      "frame": {
+        "x": 713,
+        "y": 435,
+        "w": 203,
+        "h": 105
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 198,
+        "w": 203,
+        "h": 105
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair4-brightbrown": {
+      "frame": {
+        "x": 1105,
+        "y": 634,
+        "w": 171,
+        "h": 192
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 382,
+        "y": 195,
+        "w": 171,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair7-brightbrown": {
+      "frame": {
+        "x": 1007,
+        "y": 970,
+        "w": 147,
+        "h": 146
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 408,
+        "y": 199,
+        "w": 147,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair8-brightbrown": {
+      "frame": {
+        "x": 434,
+        "y": 591,
+        "w": 135,
+        "h": 80
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 257,
+        "w": 135,
+        "h": 80
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair14-brightbrown": {
+      "frame": {
+        "x": 1007,
+        "y": 1117,
+        "w": 126,
+        "h": 119
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 404,
+        "y": 197,
+        "w": 126,
+        "h": 119
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair12-brightbrown": {
+      "frame": {
+        "x": 713,
+        "y": 638,
+        "w": 98,
+        "h": 120
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 489,
+        "y": 311,
+        "w": 98,
+        "h": 120
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair15-brightbrown": {
+      "frame": {
+        "x": 1133,
+        "y": 1117,
+        "w": 120,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 407,
+        "y": 206,
+        "w": 120,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/frontHair/frontHair9-brightbrown": {
+      "frame": {
+        "x": 1153,
+        "y": 969,
+        "w": 118,
+        "h": 104
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 407,
+        "y": 189,
+        "w": 118,
+        "h": 104
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows13-brightbrown": {
+      "frame": {
+        "x": 1105,
+        "y": 805,
+        "w": 104,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 414,
+        "y": 273,
+        "w": 104,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows12-brightbrown": {
+      "frame": {
+        "x": 503,
+        "y": 450,
+        "w": 102,
+        "h": 12
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 278,
+        "w": 102,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows11-brightbrown": {
+      "frame": {
+        "x": 317,
+        "y": 1219,
+        "w": 99,
+        "h": 14
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 274,
+        "w": 99,
+        "h": 14
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows14-brightbrown": {
+      "frame": {
+        "x": 416,
+        "y": 1219,
+        "w": 99,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 416,
+        "y": 274,
+        "w": 99,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows4-brightbrown": {
+      "frame": {
+        "x": 515,
+        "y": 1219,
+        "w": 99,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 272,
+        "w": 99,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows15-brightbrown": {
+      "frame": {
+        "x": 811,
+        "y": 638,
+        "w": 98,
+        "h": 13
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 274,
+        "w": 98,
+        "h": 13
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows1-brightbrown": {
+      "frame": {
+        "x": 614,
+        "y": 1218,
+        "w": 97,
+        "h": 14
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 277,
+        "w": 97,
+        "h": 14
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows3-brightbrown": {
+      "frame": {
+        "x": 811,
+        "y": 736,
+        "w": 96,
+        "h": 15
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 419,
+        "y": 272,
+        "w": 96,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows10-brightbrown": {
+      "frame": {
+        "x": 713,
+        "y": 832,
+        "w": 95,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 421,
+        "y": 272,
+        "w": 95,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows6-brightbrown": {
+      "frame": {
+        "x": 711,
+        "y": 1218,
+        "w": 95,
+        "h": 18
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 419,
+        "y": 269,
+        "w": 95,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows2-brightbrown": {
+      "frame": {
+        "x": 1209,
+        "y": 805,
+        "w": 94,
+        "h": 13
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 420,
+        "y": 272,
+        "w": 94,
+        "h": 13
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows9-brightbrown": {
+      "frame": {
+        "x": 1209,
+        "y": 818,
+        "w": 94,
+        "h": 13
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 419,
+        "y": 273,
+        "w": 94,
+        "h": 13
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows8-brightbrown": {
+      "frame": {
+        "x": 1209,
+        "y": 831,
+        "w": 93,
+        "h": 14
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 421,
+        "y": 273,
+        "w": 93,
+        "h": 14
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/backHair/backHair4-brightbrown": {
+      "frame": {
+        "x": 1253,
+        "y": 1087,
+        "w": 50,
+        "h": 92
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 497,
+        "y": 268,
+        "w": 50,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows5-brightbrown": {
+      "frame": {
+        "x": 713,
+        "y": 758,
+        "w": 92,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 421,
+        "y": 274,
+        "w": 92,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/hairColor/brightbrown/brows/brows7-brightbrown": {
+      "frame": {
+        "x": 818,
+        "y": 435,
+        "w": 91,
+        "h": 10
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 421,
+        "y": 278,
+        "w": 91,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "female-hairColor-brightbrown.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1303,
+      "h": 1236
+    },
+    "scale": 1
+  }
+}

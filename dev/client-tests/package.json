@@ -1,0 +1,11 @@
+{
+  "name": "opentravian-client-tests",
+  "private": true,
+  "description": "Dev-only runner dependencies for tests/client. Not part of any runtime image.",
+  "devDependencies": {
+    "playwright": "1.64.1"
+  },
+  "dependencies": {
+    "pngjs": "7.0.0"
+  }
+}

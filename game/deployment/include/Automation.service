@@ -1,0 +1,23 @@
+# Replace the [SERVER_*] placeholders before installing.
+#   [SERVER_BASH_LOCATION]  executable that runs the engine, e.g.
+#                           /usr/bin/php /path/to/game/deployment/include/Automation.php
+#
+# Type=simple with TRAVIAN_FOREGROUND=1: AutomationEngine.php otherwise forks and
+# the parent exits, and it writes no pid file, so Type=forking cannot track it.
+# In the foreground mode systemd supervises the process directly and logs go to
+# the journal.
+[Unit]
+Description=Travian game engine ([SERVER_WORLD_ID])
+After=network.target
+After=mysqld.service
+
+[Service]
+User=[SERVER_USER]
+Type=simple
+Environment=TRAVIAN_FOREGROUND=1
+ExecStart=[SERVER_BASH_LOCATION]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

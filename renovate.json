@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "groupName": "container images",
+      "groupSlug": "container-images"
+    },
+    {
+      "matchDepNames": ["phpstan/phpstan"],
+      "groupName": "dev tooling",
+      "groupSlug": "dev-tooling"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["dev/client-tests/package.json"],
+      "groupName": "dev tooling",
+      "groupSlug": "dev-tooling"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Pinned dev-only PHPStan PHAR (dev/phpstan); a bump must also refresh phpstan.phar.sha256",
+      "managerFilePatterns": ["/^dev/phpstan/VERSION$/"],
+      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s*$"],
+      "depNameTemplate": "phpstan/phpstan",
+      "datasourceTemplate": "github-releases"
+    }
+  ]
+}

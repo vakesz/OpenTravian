@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  # Branches are checked through their pull request. A push run for the same
+  # commit would be cancelled by the group below and show as a failed check.
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer commit on the same branch cancels the run for the older one.
+concurrency:
+  group: ci-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Offline: relative links and #fragments between the docs. External sites are
+      # not fetched, so the check is deterministic.
+      - name: Check documentation links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --offline --include-fragments --no-progress README.md docs/*.md tools/README.md tests/README.md database/README.md
+          fail: true
+
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # No repository secrets. bootstrap-env.sh generates every required value for
+      # this run, including REDIS_PASSWORD, and selects the dev Compose layer.
+      - name: Write .env
+        run: sh config/bootstrap-env.sh --dev
+
+      - name: Start the dev stack
+        run: docker compose up -d --build --wait
+
+      - name: Install the world headlessly
+        run: dev/install-world.sh
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: dev/client-tests/package-lock.json
+
+      - name: Install Playwright
+        working-directory: dev/client-tests
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: dev/client-tests
+        run: npx playwright install --with-deps chromium
+
+      # The cache only ever holds a PHAR that fetch.sh verified; fetch.sh
+      # re-checks the pinned SHA-256 and, on a miss, the GPG signature too.
+      - name: Cache the PHPStan PHAR
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: dev/phpstan/phpstan.phar
+          key: phpstan-${{ hashFiles('dev/phpstan/VERSION', 'dev/phpstan/phpstan.phar.sha256') }}
+
+      - name: Fetch PHPStan
+        run: dev/phpstan/fetch.sh
+
+      - name: Run dev/check.sh
+        run: dev/check.sh --build
+
+      - name: Collect container logs
+        if: failure()
+        run: docker compose logs --no-color > compose-logs.txt 2>&1 || true
+
+      - name: Upload container logs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: compose-logs
+          path: compose-logs.txt
+          retention-days: 7

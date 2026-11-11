@@ -1,0 +1,23 @@
+{
+  "viewport": { "width": 1920, "height": 1080 },
+  "pixelTolerance": 8,
+  "maxDiffRatio": 0.001,
+  "mask": [
+    "#servertime", ".serverTime", ".timer", ".timerReact", ".clock", ".clock_medium", "[id^='timer']",
+    "td.dat", "#stockBar", "#stockBarFreeCrop", "#l1", "#l2", "#l3", "#l4"
+  ],
+  "routes": [
+    { "name": "dorf1", "path": "/dorf1.php", "auth": true },
+    { "name": "dorf2", "path": "/dorf2.php", "auth": true },
+    { "name": "building", "path": "/build.php?id=39", "auth": true },
+    { "name": "reports", "path": "/report", "auth": true },
+    { "name": "messages", "path": "/messages/inbox", "auth": true },
+    { "name": "map", "path": "/karte.php", "auth": true },
+    { "name": "hero", "path": "/hero", "auth": true },
+    { "name": "statistics", "path": "/statistics", "auth": true },
+    { "name": "alliance", "path": "/alliance", "auth": true },
+    { "name": "options", "path": "/options/game", "auth": true },
+    { "name": "homepage", "path": "/homepage", "auth": false },
+    { "name": "registration", "path": "/homepage#registration", "auth": false, "waitFor": "#homepageRegistrationDialog:not([hidden]), .homepageRegistrationDialog:not([hidden])" }
+  ]
+}

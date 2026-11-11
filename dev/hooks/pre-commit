@@ -1,0 +1,5 @@
+#!/bin/sh
+# Opt-in (dev/install-hooks.sh). Checks the working tree, not the index: the php
+# container bind-mounts the checkout, so a partly staged file is checked with its
+# unstaged edits. Refuses the commit if Docker is down; skip with --no-verify.
+exec "$(git rev-parse --show-toplevel)/dev/check.sh" --fast

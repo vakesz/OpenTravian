@@ -1,0 +1,17 @@
+includes:
+    - common.neon
+
+parameters:
+    paths:
+        - ../../tests
+    excludePaths:
+        analyseAndScan:
+            - ../../tests/fixtures
+    scanDirectories:
+        - ../../game/include
+        - ../../services/api/include/vendor/phpmailer
+    scanFiles:
+        - ../../game/deployment/public/setup.php
+        - ../../game/deployment/include/env.php
+    bootstrapFiles:
+        - ../../game/include/functions.general.php

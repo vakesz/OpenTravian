@@ -1,0 +1,37 @@
+{
+  "frames": {
+    "male/tribeColor/hun/body/body-hun": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 424,
+        "h": 861
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 215,
+        "y": 335,
+        "w": 424,
+        "h": 861
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "male-tribeColor-hun.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 424,
+      "h": 861
+    },
+    "scale": 1
+  }
+}

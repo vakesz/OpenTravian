@@ -1,0 +1,352 @@
+name: opentravian
+
+# This file is the production configuration: published images, no source mounts,
+# only `web` publishes a (loopback) port. Layer files change what it runs:
+#   compose.dev.yaml    bind-mounted checkout for development
+#   compose.build.yaml  build the images from this checkout instead of pulling them
+#   compose.tls.yaml    Caddy in front of web with automatic HTTPS
+# Select layers with COMPOSE_FILE in .env, for example
+#   COMPOSE_FILE=compose.yaml:compose.dev.yaml
+
+# Container logs rotate (5 files of 10 MB per service) instead of growing without bound.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+# Shared by every service: no privilege escalation, no Linux capabilities unless a
+# service adds back the few it needs, rotated logs and a process cap.
+x-service: &service
+  logging: *default-logging
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  pids_limit: ${TRAVIAN_PIDS_LIMIT:-512}
+
+x-app-image: &app-image ${TRAVIAN_APP_IMAGE:-ghcr.io/vakesz/opentravian-app:${TRAVIAN_VERSION:-latest}}
+
+# Settings every PHP container (php, engine, installer) shares.
+x-app-env: &app-env
+  TRAVIAN_ROOT: /travian
+  TRAVIAN_STATE_DIR: /var/lib/travian
+  TRAVIAN_REDIS_HOST: redis
+  TRAVIAN_REDIS_PORT: 6379
+  TRAVIAN_REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env (sh config/bootstrap-env.sh)}
+  # Shown as the release label in the footer when it is a version such as 1.0.0.
+  TRAVIAN_VERSION: ${TRAVIAN_VERSION:-}
+  # Opt-in only. This permits Multihunter to grant gift gold, without
+  # enabling the broader live-game interruption tools.
+  TRAVIAN_ALLOW_ADMIN_GOLD_GRANTS: ${TRAVIAN_ALLOW_ADMIN_GOLD_GRANTS:-0}
+  # Backup retention (newest N, plus the newest per day for D days) and an optional
+  # container path (bind-mount a host directory there) that receives a copy of each backup.
+  # 0 stops the engine's scheduled backups; manual backups and tools/backup.php still work.
+  TRAVIAN_BACKUP_ENABLED: ${TRAVIAN_BACKUP_ENABLED:-1}
+  TRAVIAN_BACKUP_KEEP_LAST: ${TRAVIAN_BACKUP_KEEP_LAST:-3}
+  TRAVIAN_BACKUP_KEEP_DAILY: ${TRAVIAN_BACKUP_KEEP_DAILY:-7}
+  TRAVIAN_BACKUP_EXPORT_DIR: ${TRAVIAN_BACKUP_EXPORT_DIR:-}
+  # Opt-in: also seal the generated state (credentials, two-factor enrolment) into every backup.
+  TRAVIAN_BACKUP_STATE_PASSPHRASE: ${TRAVIAN_BACKUP_STATE_PASSPHRASE:-}
+  # Catch-up after the engine was away: the outage length that triggers it, the rows completed per second,
+  # and the longest the pass may run before it leaves the rest to the workers.
+  TRAVIAN_CATCHUP_AFTER_SECONDS: ${TRAVIAN_CATCHUP_AFTER_SECONDS:-300}
+  TRAVIAN_CATCHUP_RATE_PER_SECOND: ${TRAVIAN_CATCHUP_RATE_PER_SECOND:-50}
+  TRAVIAN_CATCHUP_MAX_SECONDS: ${TRAVIAN_CATCHUP_MAX_SECONDS:-600}
+
+# What the setup wizard and the headless installer need to create a world.
+x-world-env: &world-env
+  TRAVIAN_DB_HOST: db
+  # Administrative account used once to create the app's own DB user. Its
+  # password reaches the installer service only, never php or engine.
+  TRAVIAN_DB_USER: root
+  TRAVIAN_APP_DB_USER: ${TRAVIAN_APP_DB_USER:-travian}
+  TRAVIAN_ACCOUNT_DATABASE: travian_main
+  TRAVIAN_WORLD_DATABASE: travian_world
+  TRAVIAN_WORLD_ID: local
+  TRAVIAN_WORLD_TITLE: Local OpenTravian World
+  # Optional support recipient prefill; Multihunter can edit it afterward.
+  TRAVIAN_SUPPORT_EMAIL: ${TRAVIAN_SUPPORT_EMAIL:-}
+  TRAVIAN_BASE_URL: ${TRAVIAN_BASE_URL:-http://localhost:${APP_PORT:-8080}/}
+
+services:
+  db:
+    <<: *service
+    networks: [backend]
+    image: mariadb:11.4@sha256:d1891ede5a559f1086f55053bb8cc1569b0298338c4d72d71725a7f74f6ba620
+    # The entrypoint starts as root, fixes ownership and drops to the mysql user.
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    read_only: true
+    tmpfs:
+      - /run/mysqld
+      - /tmp
+    mem_limit: ${TRAVIAN_DB_MEM_LIMIT:-1g}
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Set MARIADB_ROOT_PASSWORD in .env (sh config/bootstrap-env.sh)}
+      # The health check script rotates slow.log once it passes this size (docs/configuration.md).
+      TRAVIAN_MARIADB_SLOW_LOG_MAX_MB: ${TRAVIAN_MARIADB_SLOW_LOG_MAX_MB:-50}
+      TRAVIAN_MARIADB_SLOW_LOG_KEEP: ${TRAVIAN_MARIADB_SLOW_LOG_KEEP:-3}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      # Native AIO is faster on supported Linux hosts. Set this to 0 on
+      # OrbStack hosts that cannot grant MariaDB the required io_uring access.
+      - --innodb-use-native-aio=${TRAVIAN_MARIADB_NATIVE_AIO:-1}
+      # The previous 128 MiB upstream default was smaller than the local
+      # database volume. Keep this configurable for constrained hosts.
+      - --innodb-buffer-pool-size=${TRAVIAN_MARIADB_BUFFER_POOL_SIZE:-256M}
+      # SSD and virtual disks. Neighbor flushing is for spinning disks, and the
+      # old capacity of 200 matches that. io_capacity_max stays at its default
+      # 2000, which must remain at least this value.
+      - --innodb-flush-neighbors=${TRAVIAN_MARIADB_FLUSH_NEIGHBORS:-0}
+      - --innodb-io-capacity=${TRAVIAN_MARIADB_IO_CAPACITY:-1000}
+      # Slow-query log, off by default. TRAVIAN_MARIADB_SLOW_LOG=1 writes queries slower than
+      # TRAVIAN_MARIADB_SLOW_LOG_SECONDS to /var/lib/mysql/slow.log inside the db container.
+      - --slow-query-log=${TRAVIAN_MARIADB_SLOW_LOG:-0}
+      - --slow-query-log-file=/var/lib/mysql/slow.log
+      - --long-query-time=${TRAVIAN_MARIADB_SLOW_LOG_SECONDS:-1}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./docker/mariadb/health.sh:/usr/local/bin/travian-db-health.sh:ro
+    healthcheck:
+      test: ["CMD", "sh", "/usr/local/bin/travian-db-health.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    restart: unless-stopped
+
+  redis:
+    <<: *service
+    image: redis:7-alpine@sha256:8da19c7399dca900c6822a1cf30f9d2285585e2c4b457ff4095b0f4500054d3f
+    cap_add: [CHOWN, SETGID, SETUID]
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: ${TRAVIAN_REDIS_MEM_LIMIT:-256m}
+    # The wrapper writes the ACL file from REDIS_PASSWORD, then starts redis-server.
+    command: ["sh", "/usr/local/bin/travian-redis-entrypoint.sh"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env (sh config/bootstrap-env.sh)}
+    volumes:
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./docker/redis/entrypoint.sh:/usr/local/bin/travian-redis-entrypoint.sh:ro
+    networks: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$$REDIS_PASSWORD\" redis-cli ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  php:
+    <<: *service
+    networks: [frontend, backend]
+    image: *app-image
+    # The entrypoint starts as root to prepare the session directory and pool
+    # settings, and php-fpm then drops its workers to www-data.
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run/travian
+    mem_limit: ${TRAVIAN_PHP_MEM_LIMIT:-2g}
+    environment:
+      <<: [*app-env, *world-env]
+      TRAVIAN_SETUP_TOKEN: ${TRAVIAN_SETUP_TOKEN:?Set TRAVIAN_SETUP_TOKEN in .env (sh config/bootstrap-env.sh)}
+      TRAVIAN_CORS_ORIGIN: ${TRAVIAN_CORS_ORIGIN:-http://localhost:${APP_PORT:-8080}}
+      # Emergency break-glass: can only lower the stored administrator two-factor mode (see docs/configuration.md).
+      TRAVIAN_ADMIN_TWO_FACTOR: ${TRAVIAN_ADMIN_TWO_FACTOR:-}
+      # Defaults are deliberately modest and can be sized from the FPM status
+      # endpoint without rebuilding the shared application image.
+      TRAVIAN_FPM_MAX_CHILDREN: ${TRAVIAN_FPM_MAX_CHILDREN:-8}
+      TRAVIAN_FPM_START_SERVERS: ${TRAVIAN_FPM_START_SERVERS:-3}
+      TRAVIAN_FPM_MIN_SPARE_SERVERS: ${TRAVIAN_FPM_MIN_SPARE_SERVERS:-2}
+      TRAVIAN_FPM_MAX_SPARE_SERVERS: ${TRAVIAN_FPM_MAX_SPARE_SERVERS:-5}
+      TRAVIAN_FPM_MAX_REQUESTS: ${TRAVIAN_FPM_MAX_REQUESTS:-500}
+      # Leading colon keeps the image's conf.d and adds the entrypoint's ini
+      # (session password, and OPcache timestamp checks when dev tools are on).
+      PHP_INI_SCAN_DIR: ":/run/travian"
+    volumes:
+      - travian_state:/var/lib/travian
+    working_dir: /travian
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "SCRIPT_NAME=/fpm-ping SCRIPT_FILENAME=/fpm-ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 | grep -q pong"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  web:
+    <<: *service
+    networks: [frontend]
+    image: ${TRAVIAN_WEB_IMAGE:-ghcr.io/vakesz/opentravian-web:${TRAVIAN_VERSION:-latest}}
+    # nginx starts as root, binds port 80 and drops its workers to the nginx user.
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, NET_BIND_SERVICE, SETGID, SETUID]
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /var/cache/nginx
+      # The entrypoint renders the config template here.
+      - /etc/nginx/conf.d
+    mem_limit: ${TRAVIAN_WEB_MEM_LIMIT:-256m}
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-8080}:80"
+    # The metrics listener is reachable on the Compose network only; it is never published.
+    expose:
+      - "9145"
+    environment:
+      # Rendered into the nginx config by the image's envsubst templating.
+      # Single address or CIDR of the reverse proxy allowed to set X-Forwarded-For.
+      TRAVIAN_TRUSTED_PROXY: ${TRAVIAN_TRUSTED_PROXY:-127.0.0.1}
+      # Host names nginx answers to; everything else gets 444. Derived from the base URL.
+      TRAVIAN_BASE_URL: ${TRAVIAN_BASE_URL:-http://localhost:${APP_PORT:-8080}/}
+      TRAVIAN_EXTRA_HOSTS: ${TRAVIAN_EXTRA_HOSTS:-}
+      NGINX_ENVSUBST_FILTER: ^TRAVIAN_
+    depends_on:
+      php:
+        condition: service_healthy
+      # With TRAVIAN_INSTALL_* set, the stack only becomes reachable once the
+      # headless install succeeded; the installer exits at once when it has no work.
+      installer:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    restart: unless-stopped
+
+  engine:
+    <<: *service
+    networks: [backend]
+    # Reuses php's application image; only php builds it.
+    image: *app-image
+    user: www-data
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: ${TRAVIAN_ENGINE_MEM_LIMIT:-1g}
+    # tini forwards SIGTERM; the wait loop exits on TERM and the engine gets
+    # time to run its own shutdown before Docker escalates to SIGKILL.
+    init: true
+    stop_grace_period: 30s
+    command:
+      - sh
+      - -c
+      - |
+        trap 'exit 0' TERM INT
+        until [ -f "$$TRAVIAN_STATE_DIR/setup.lock" ]; do sleep 3 & wait $$!; done
+        export TRAVIAN_FOREGROUND=1
+        exec php /travian/game/deployment/include/Automation.php
+    environment:
+      <<: *app-env
+      TRAVIAN_FOREGROUND: "1"
+    volumes:
+      - travian_state:/var/lib/travian
+    working_dir: /travian
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php", "/usr/local/bin/travian-engine-healthcheck.php"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    restart: unless-stopped
+
+  # One-shot headless installer. `docker compose up` runs it and it exits at once
+  # unless TRAVIAN_INSTALL_MULTIHUNTER_PASSWORD is set or a world is installed;
+  # `docker compose run --rm installer` runs it on demand (tools/install.php).
+  # It is the only service that receives the database administrator password.
+  installer:
+    <<: *service
+    networks: [backend]
+    image: *app-image
+    user: www-data
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: ${TRAVIAN_PHP_MEM_LIMIT:-2g}
+    command: ["install", "--if-configured"]
+    environment:
+      <<: [*app-env, *world-env]
+      TRAVIAN_INSTALL_DB_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Set MARIADB_ROOT_PASSWORD in .env (sh config/bootstrap-env.sh)}
+      TRAVIAN_INSTALL_MULTIHUNTER_PASSWORD: ${TRAVIAN_INSTALL_MULTIHUNTER_PASSWORD:-}
+      TRAVIAN_INSTALL_SPEED: ${TRAVIAN_INSTALL_SPEED:-}
+      TRAVIAN_INSTALL_PLAYER_NAME: ${TRAVIAN_INSTALL_PLAYER_NAME:-}
+      TRAVIAN_INSTALL_PLAYER_PASSWORD: ${TRAVIAN_INSTALL_PLAYER_PASSWORD:-}
+      TRAVIAN_INSTALL_PLAYER_TRIBE: ${TRAVIAN_INSTALL_PLAYER_TRIBE:-}
+      TRAVIAN_INSTALL_TRIBES: ${TRAVIAN_INSTALL_TRIBES:-}
+      TRAVIAN_INSTALL_MAP_SIZE: ${TRAVIAN_INSTALL_MAP_SIZE:-}
+      TRAVIAN_INSTALL_STARTING_GOLD: ${TRAVIAN_INSTALL_STARTING_GOLD:-}
+      TRAVIAN_INSTALL_FARM_VILLAGES: ${TRAVIAN_INSTALL_FARM_VILLAGES:-}
+      TRAVIAN_INSTALL_SMTP_HOST: ${TRAVIAN_INSTALL_SMTP_HOST:-}
+      TRAVIAN_INSTALL_SMTP_PORT: ${TRAVIAN_INSTALL_SMTP_PORT:-}
+      TRAVIAN_INSTALL_SMTP_ENCRYPTION: ${TRAVIAN_INSTALL_SMTP_ENCRYPTION:-}
+      TRAVIAN_INSTALL_SMTP_FROM: ${TRAVIAN_INSTALL_SMTP_FROM:-}
+      TRAVIAN_INSTALL_SMTP_AUTH: ${TRAVIAN_INSTALL_SMTP_AUTH:-}
+      TRAVIAN_INSTALL_SMTP_USERNAME: ${TRAVIAN_INSTALL_SMTP_USERNAME:-}
+      TRAVIAN_INSTALL_SMTP_PASSWORD: ${TRAVIAN_INSTALL_SMTP_PASSWORD:-}
+      TRAVIAN_INSTALL_RULE_VACATION_DAYS: ${TRAVIAN_INSTALL_RULE_VACATION_DAYS:-}
+      TRAVIAN_INSTALL_RULE_START_ADVENTURES: ${TRAVIAN_INSTALL_RULE_START_ADVENTURES:-}
+      TRAVIAN_INSTALL_RULE_REF_LIMIT: ${TRAVIAN_INSTALL_RULE_REF_LIMIT:-}
+      TRAVIAN_INSTALL_RULE_ALLIANCE_MEMBERS_LIMIT: ${TRAVIAN_INSTALL_RULE_ALLIANCE_MEMBERS_LIMIT:-}
+      TRAVIAN_INSTALL_RULE_REGISTER_AUTO_CLOSE: ${TRAVIAN_INSTALL_RULE_REGISTER_AUTO_CLOSE:-}
+      TRAVIAN_INSTALL_RULE_VOUCHER_ENABLED: ${TRAVIAN_INSTALL_RULE_VOUCHER_ENABLED:-}
+      TRAVIAN_INSTALL_RULE_DISABLE_SEASONS: ${TRAVIAN_INSTALL_RULE_DISABLE_SEASONS:-}
+      TRAVIAN_INSTALL_RULE_WW_PLANS_ENABLED: ${TRAVIAN_INSTALL_RULE_WW_PLANS_ENABLED:-}
+      TRAVIAN_INSTALL_RULE_FINISH_CONSTRUCTION: ${TRAVIAN_INSTALL_RULE_FINISH_CONSTRUCTION:-}
+      TRAVIAN_INSTALL_RULE_ONE_FARM_LIST_PER_ACCOUNT: ${TRAVIAN_INSTALL_RULE_ONE_FARM_LIST_PER_ACCOUNT:-}
+      TRAVIAN_INSTALL_RULE_FAKE_AUCTIONS: ${TRAVIAN_INSTALL_RULE_FAKE_AUCTIONS:-}
+      TRAVIAN_INSTALL_RULE_STARVATION: ${TRAVIAN_INSTALL_RULE_STARVATION:-}
+      TRAVIAN_INSTALL_RULE_SPEED_SHORTCUTS: ${TRAVIAN_INSTALL_RULE_SPEED_SHORTCUTS:-}
+      TRAVIAN_INSTALL_RULE_UPGRADE_TO_MAX_LEVEL_GOLD: ${TRAVIAN_INSTALL_RULE_UPGRADE_TO_MAX_LEVEL_GOLD:-}
+      TRAVIAN_INSTALL_RULE_SMITHY_MAX_LEVEL_GOLD: ${TRAVIAN_INSTALL_RULE_SMITHY_MAX_LEVEL_GOLD:-}
+      TRAVIAN_INSTALL_RULE_SMITHY_UPGRADE_ALL_TO_MAX_GOLD: ${TRAVIAN_INSTALL_RULE_SMITHY_UPGRADE_ALL_TO_MAX_GOLD:-}
+      TRAVIAN_INSTALL_RULE_DISCORD_URL: ${TRAVIAN_INSTALL_RULE_DISCORD_URL:-}
+      TRAVIAN_INSTALL_PROFILE_MOVEMENT_SPEED_INCREASE: ${TRAVIAN_INSTALL_PROFILE_MOVEMENT_SPEED_INCREASE:-}
+      TRAVIAN_INSTALL_PROFILE_STORAGE_MULTIPLIER: ${TRAVIAN_INSTALL_PROFILE_STORAGE_MULTIPLIER:-}
+      TRAVIAN_INSTALL_PROFILE_CRANNY_MULTIPLIER: ${TRAVIAN_INSTALL_PROFILE_CRANNY_MULTIPLIER:-}
+      TRAVIAN_INSTALL_PROFILE_TRAP_MULTIPLIER: ${TRAVIAN_INSTALL_PROFILE_TRAP_MULTIPLIER:-}
+      TRAVIAN_INSTALL_PROFILE_CAGE_MULTIPLIER: ${TRAVIAN_INSTALL_PROFILE_CAGE_MULTIPLIER:-}
+      TRAVIAN_INSTALL_PROFILE_PROTECTION_TIME: ${TRAVIAN_INSTALL_PROFILE_PROTECTION_TIME:-}
+      TRAVIAN_INSTALL_PROFILE_OASIS_INITIAL_PROTECTION_TIME: ${TRAVIAN_INSTALL_PROFILE_OASIS_INITIAL_PROTECTION_TIME:-}
+      TRAVIAN_INSTALL_PROFILE_DAILY_QUEST_INTERVAL: ${TRAVIAN_INSTALL_PROFILE_DAILY_QUEST_INTERVAL:-}
+      TRAVIAN_INSTALL_PROFILE_HERO_REGENERATION_MULTIPLIER: ${TRAVIAN_INSTALL_PROFILE_HERO_REGENERATION_MULTIPLIER:-}
+      TRAVIAN_INSTALL_PROFILE_OASIS_ANIMAL_CAP: ${TRAVIAN_INSTALL_PROFILE_OASIS_ANIMAL_CAP:-}
+      TRAVIAN_INSTALL_PROFILE_OASIS_RESPAWN_INTERVAL: ${TRAVIAN_INSTALL_PROFILE_OASIS_RESPAWN_INTERVAL:-}
+      TRAVIAN_INSTALL_PROFILE_ROUND_LENGTH: ${TRAVIAN_INSTALL_PROFILE_ROUND_LENGTH:-}
+    volumes:
+      - travian_state:/var/lib/travian
+    working_dir: /travian
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
+# frontend: web and php (and Caddy in compose.tls.yaml). backend: php, engine, db, redis and the
+# installer, so the web server cannot reach the database or Redis. Neither is `internal`:
+# php and engine send mail and call payment and OAuth providers.
+networks:
+  frontend:
+  backend:
+
+volumes:
+  mariadb_data:
+  # Generated config, setup lock, logs and backups. `docker compose down -v`
+  # removes it together with the databases, so a reset never leaves a stale install.
+  travian_state:

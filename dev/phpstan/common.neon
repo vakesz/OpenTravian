@@ -1,0 +1,13 @@
+# Shared settings for every target. Paths are relative to this file.
+parameters:
+    level: 0
+    # Legacy code is autoloaded by Core\Autoloader and relies on global helpers
+    # and dynamic controller dispatch, so each target scans its runtime tree
+    # instead of listing classes. game/ and services/api/ are separate runtimes
+    # that both use the Core namespace, so they are analysed in separate configs.
+    tmpDir: /tmp/phpstan-cache
+    parallel:
+        maximumNumberOfProcesses: 4
+    # Baseline entries only cover the level-1 template family; they do not
+    # occur at level 0.
+    reportUnmatchedIgnoredErrors: false

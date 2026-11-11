@@ -1,0 +1,21 @@
+# Templates are included from PHPBatchView::display(), which hands them $vars (and a few views hand them more), so
+# the analyser sees these variables as undefined when it reads a template on its own. One path rule covers every
+# template instead of a per-file count that went stale whenever a template changed.
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Variable \$vars might not be defined\.$#'
+			identifier: variable.undefined
+			paths:
+				- ../../game/include/resources/Templates/*
+				- ../../game/include/admin/include/templates/*
+
+		-
+			message: '#^Variable \$resourceField might not be defined\.$#'
+			identifier: variable.undefined
+			path: ../../game/include/resources/Templates/resource-fields/main.php
+
+		-
+			message: '#^Variable \$buildingField might not be defined\.$#'
+			identifier: variable.undefined
+			path: ../../game/include/resources/Templates/village-center/main.php

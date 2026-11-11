@@ -1,0 +1,187 @@
+/* Adventure confirmation uses the dedicated illustrated adventure scene,
+ * not the compact map detail image used by village and oasis popups. */
+#content.heroAdventureStart #tileDetails .detailImage {
+  float: none;
+  width: 564px;
+  height: 343px;
+  min-height: 343px;
+  margin: 0 0 8px;
+  padding: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+
+body.ltr
+  #content.heroAdventureStart
+  #tileDetails.landscape-grassland
+  .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/grassland-big.jpg");
+}
+body.ltr
+  #content.heroAdventureStart
+  #tileDetails.landscape-forest
+  .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/forest-big.jpg");
+}
+body.ltr #content.heroAdventureStart #tileDetails.landscape-clay .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/clay-big.jpg");
+}
+body.ltr #content.heroAdventureStart #tileDetails.landscape-hill .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/hill-big.jpg");
+}
+body.ltr #content.heroAdventureStart #tileDetails.landscape-lake .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/lake-big.jpg");
+}
+body.ltr
+  #content.heroAdventureStart
+  #tileDetails.landscape-vulcano
+  .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/vulcano-big.jpg");
+}
+body.ltr
+  #content.heroAdventureStart
+  #tileDetails.landscape-village-normal
+  .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/normal-village-big.jpg");
+}
+body.ltr
+  #content.heroAdventureStart
+  #tileDetails.landscape-village-natars
+  .detailImage {
+  background-image: url("../img_ltr/views/hero-adventure/place/natar-village-big.jpg");
+}
+
+body.rtl
+  #content.heroAdventureStart
+  #tileDetails.landscape-grassland
+  .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/grassland-big.jpg");
+}
+body.rtl
+  #content.heroAdventureStart
+  #tileDetails.landscape-forest
+  .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/forest-big.jpg");
+}
+body.rtl #content.heroAdventureStart #tileDetails.landscape-clay .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/clay-big.jpg");
+}
+body.rtl #content.heroAdventureStart #tileDetails.landscape-hill .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/hill-big.jpg");
+}
+body.rtl #content.heroAdventureStart #tileDetails.landscape-lake .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/lake-big.jpg");
+}
+body.rtl
+  #content.heroAdventureStart
+  #tileDetails.landscape-vulcano
+  .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/vulcano-big.jpg");
+}
+body.rtl
+  #content.heroAdventureStart
+  #tileDetails.landscape-village-normal
+  .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/normal-village-big.jpg");
+}
+body.rtl
+  #content.heroAdventureStart
+  #tileDetails.landscape-village-natars
+  .detailImage {
+  background-image: url("../img_rtl/views/hero-adventure/place/natar-village-big.jpg");
+}
+
+#content.heroAdventureStart #tileDetails.heroAdventureConfirmation {
+  width: 564px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 0 12px;
+  box-sizing: border-box;
+  background: #f2ead8;
+  color: #49382b;
+}
+
+#content.heroAdventureStart
+  #tileDetails.heroAdventureConfirmation
+  .detailImage {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 564 / 343;
+  margin: 0 0 10px;
+  padding: 0;
+  background-position: center;
+  background-size: cover;
+  float: none;
+}
+
+#content.heroAdventureStart .adventureStatusMessage {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #c9b58e;
+  border-radius: 3px;
+  background: #fff9eb;
+  color: #49382b;
+}
+
+#content.heroAdventureStart .adventureStatusMessage.error {
+  border-color: #b64d37;
+  background: #f8e5df;
+  color: #7d2e20;
+}
+
+#content.heroAdventureStart .adventureDuration {
+  line-height: 1.5;
+}
+
+#content.heroAdventureStart .adventureDuration strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+#content.heroAdventureStart .adventureSend {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  text-align: center;
+}
+
+#content.heroAdventureStart .adventureSendForm {
+  margin: 0;
+}
+
+#content.heroAdventureStart .adventureSendForm button,
+#content.heroAdventureStart .adventureSendForm a {
+  min-width: 100px;
+}
+
+#content.heroAdventureStart .adventureSend .adventureBackButton {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+body[data-theme="night"]
+  #content.heroAdventureStart
+  #tileDetails.heroAdventureConfirmation {
+  background: #29271f;
+  color: #e8ddc7;
+}
+
+body[data-theme="night"] #content.heroAdventureStart .adventureStatusMessage {
+  border-color: #514c42;
+  background: #373329;
+  color: #e8ddc7;
+}
+
+body[data-theme="night"]
+  #content.heroAdventureStart
+  .adventureStatusMessage.error {
+  border-color: #9c5140;
+  background: #402923;
+  color: #f0b7a7;
+}

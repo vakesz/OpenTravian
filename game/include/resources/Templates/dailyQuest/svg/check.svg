@@ -1,0 +1,23 @@
+<svg viewBox="0 0 298.65 301.66" class="check">
+  <defs>
+    <linearGradient id="check-linear-gradient" x1="149.32" x2="149.32" y1="3" y2="298.66" gradientUnits="userSpaceOnUse">
+      <stop offset=".05" stop-color="#cba467"/>
+      <stop offset=".13" stop-color="#f3e2ae"/>
+      <stop offset=".32" stop-color="#efbf7b"/>
+      <stop offset=".48" stop-color="#aa8050"/>
+      <stop offset=".72" stop-color="#835e35"/>
+      <stop offset=".93" stop-color="#ad8a54"/>
+      <stop offset="1" stop-color="#d7b672"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#check-linear-gradient)" fill-rule="evenodd" stroke="#34220d" stroke-width="6" d="M120.08 296.57c-2.11 2.8-6.31 2.8-8.41 0l-38.79-51.52L3.91 151.8a4.56 4.56 0 0 1 .03-5.5l37.37-49.33c1.85-2.44 5.52-2.42 7.34.04l63.5 85.59c1.84 2.48 5.55 2.47 7.38-.01L250.33 4.87c1.82-2.48 5.52-2.49 7.37-.03l37.04 49.51a4.575 4.575 0 0 1 .02 5.46L158.8 245.13l-38.72 51.43Z"/>
+  <g>
+    <g style="isolation:isolate">
+      <path fill="#3d660f" d="M26.85 149.15"/>
+      <path fill="#abd180" d="M115.95 265.43v6.11L24.1 149.14l5.26.03 86.6 116.26Zm0 0v6.11L274.36 57.17l-4.98.02-153.43 208.24Z"/>
+      <path fill="#71c70d" d="m29.36 149.17 15.46-20.42.03-6.67-20.75 27.05 5.26.03Zm86.55 75.43v-5.89l138.2-187.77.02 5.87L115.91 224.6Zm-71.09-95.84.03-6.67 71.05 96.61v5.89l-71.08-95.83Zm209.32-91.95-.02-5.87 20.25 26.23-4.98.02-15.24-20.38Z"/>
+      <path fill="#5a9517" d="m254.14 36.81 15.24 20.38C258.36 72.1 123.53 255.66 115.95 265.43L29.36 149.17l15.46-20.4 71.09 95.83L254.14 36.81Z"/>
+    </g>
+    <path fill="none" stroke="#34353c" stroke-width="2" d="M254.11 30.94 115.9 218.71l-71.05-96.63-20.75 27.06 91.85 122.41L274.36 57.17l-20.25-26.23z"/>
+  </g>
+</svg>

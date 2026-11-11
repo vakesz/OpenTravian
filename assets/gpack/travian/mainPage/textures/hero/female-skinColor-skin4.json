@@ -1,0 +1,2677 @@
+{
+  "frames": {
+    "female/skinColor/skin4/base/base-skin4": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 420,
+        "h": 1362
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 225,
+        "y": 209,
+        "w": 420,
+        "h": 1362
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/rightArm/rightArmDefault-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 0,
+        "w": 101,
+        "h": 312
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 252,
+        "y": 574,
+        "w": 101,
+        "h": 312
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/rightArm/rightArmDown-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 312,
+        "w": 96,
+        "h": 311
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 254,
+        "y": 577,
+        "w": 96,
+        "h": 311
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/leftArm/leftArmDefault-skin4": {
+      "frame": {
+        "x": 521,
+        "y": 0,
+        "w": 147,
+        "h": 281
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 573,
+        "y": 558,
+        "w": 147,
+        "h": 281
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/leftArm/leftArmDown-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 623,
+        "w": 163,
+        "h": 268
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 575,
+        "y": 554,
+        "w": 163,
+        "h": 268
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw10-skin4": {
+      "frame": {
+        "x": 516,
+        "y": 312,
+        "w": 263,
+        "h": 95
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 334,
+        "y": 280,
+        "w": 263,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw9-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 891,
+        "w": 113,
+        "h": 263
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 115,
+        "w": 113,
+        "h": 263
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase4-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 1154,
+        "w": 225,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 416,
+        "y": 279,
+        "w": 225,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/leftArm/leftArmUp-skin4": {
+      "frame": {
+        "x": 533,
+        "y": 891,
+        "w": 119,
+        "h": 220
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 575,
+        "y": 388,
+        "w": 119,
+        "h": 220
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/rightArm/rightArmUp-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 1182,
+        "w": 129,
+        "h": 212
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 226,
+        "y": 420,
+        "w": 129,
+        "h": 212
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase15-skin4": {
+      "frame": {
+        "x": 420,
+        "y": 1311,
+        "w": 205,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 412,
+        "y": 275,
+        "w": 205,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears5-skin4": {
+      "frame": {
+        "x": 668,
+        "y": 0,
+        "w": 133,
+        "h": 186
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 183,
+        "w": 133,
+        "h": 186
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears4-skin4": {
+      "frame": {
+        "x": 645,
+        "y": 1111,
+        "w": 152,
+        "h": 58
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 272,
+        "w": 152,
+        "h": 58
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears2-skin4": {
+      "frame": {
+        "x": 652,
+        "y": 281,
+        "w": 149,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 385,
+        "y": 272,
+        "w": 149,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose6-skin4": {
+      "frame": {
+        "x": 652,
+        "y": 331,
+        "w": 145,
+        "h": 60
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 377,
+        "y": 281,
+        "w": 145,
+        "h": 60
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears11-skin4": {
+      "frame": {
+        "x": 516,
+        "y": 575,
+        "w": 143,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 276,
+        "w": 143,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears8-skin4": {
+      "frame": {
+        "x": 659,
+        "y": 391,
+        "w": 140,
+        "h": 67
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 272,
+        "w": 140,
+        "h": 67
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears12-skin4": {
+      "frame": {
+        "x": 659,
+        "y": 458,
+        "w": 135,
+        "h": 59
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 274,
+        "w": 135,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears3-skin4": {
+      "frame": {
+        "x": 625,
+        "y": 1311,
+        "w": 135,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 269,
+        "w": 135,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears6-skin4": {
+      "frame": {
+        "x": 659,
+        "y": 517,
+        "w": 135,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 272,
+        "w": 135,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears10-skin4": {
+      "frame": {
+        "x": 645,
+        "y": 1169,
+        "w": 134,
+        "h": 65
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 275,
+        "w": 134,
+        "h": 65
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears15-skin4": {
+      "frame": {
+        "x": 659,
+        "y": 617,
+        "w": 134,
+        "h": 82
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 400,
+        "y": 273,
+        "w": 134,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears13-skin4": {
+      "frame": {
+        "x": 668,
+        "y": 186,
+        "w": 133,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 401,
+        "y": 273,
+        "w": 133,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears14-skin4": {
+      "frame": {
+        "x": 583,
+        "y": 623,
+        "w": 131,
+        "h": 76
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 401,
+        "y": 274,
+        "w": 131,
+        "h": 76
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears7-skin4": {
+      "frame": {
+        "x": 583,
+        "y": 754,
+        "w": 131,
+        "h": 100
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 402,
+        "y": 271,
+        "w": 131,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears9-skin4": {
+      "frame": {
+        "x": 652,
+        "y": 885,
+        "w": 131,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 401,
+        "y": 270,
+        "w": 131,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase5-skin4": {
+      "frame": {
+        "x": 683,
+        "y": 699,
+        "w": 130,
+        "h": 105
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 201,
+        "w": 130,
+        "h": 105
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar4-skin4": {
+      "frame": {
+        "x": 652,
+        "y": 985,
+        "w": 94,
+        "h": 130
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 421,
+        "y": 243,
+        "w": 94,
+        "h": 130
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/ears/ears1-skin4": {
+      "frame": {
+        "x": 611,
+        "y": 391,
+        "w": 129,
+        "h": 48
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 403,
+        "y": 272,
+        "w": 129,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar5-skin4": {
+      "frame": {
+        "x": 710,
+        "y": 1169,
+        "w": 76,
+        "h": 127
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 428,
+        "y": 246,
+        "w": 76,
+        "h": 127
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase9-skin4": {
+      "frame": {
+        "x": 801,
+        "y": 0,
+        "w": 124,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 413,
+        "y": 216,
+        "w": 124,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase6-skin4": {
+      "frame": {
+        "x": 794,
+        "y": 458,
+        "w": 100,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 416,
+        "y": 186,
+        "w": 100,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw12-skin4": {
+      "frame": {
+        "x": 801,
+        "y": 124,
+        "w": 116,
+        "h": 92
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 409,
+        "y": 284,
+        "w": 116,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw8-skin4": {
+      "frame": {
+        "x": 797,
+        "y": 580,
+        "w": 116,
+        "h": 98
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 409,
+        "y": 283,
+        "w": 116,
+        "h": 98
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw11-skin4": {
+      "frame": {
+        "x": 801,
+        "y": 240,
+        "w": 115,
+        "h": 90
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 409,
+        "y": 283,
+        "w": 115,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar1-skin4": {
+      "frame": {
+        "x": 521,
+        "y": 281,
+        "w": 27,
+        "h": 115
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 419,
+        "y": 234,
+        "w": 27,
+        "h": 115
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw2-skin4": {
+      "frame": {
+        "x": 797,
+        "y": 696,
+        "w": 114,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 410,
+        "y": 283,
+        "w": 114,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw14-skin4": {
+      "frame": {
+        "x": 782,
+        "y": 985,
+        "w": 113,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 113,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw1-skin4": {
+      "frame": {
+        "x": 783,
+        "y": 829,
+        "w": 112,
+        "h": 94
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 112,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw13-skin4": {
+      "frame": {
+        "x": 797,
+        "y": 1080,
+        "w": 112,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 112,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw15-skin4": {
+      "frame": {
+        "x": 786,
+        "y": 1192,
+        "w": 112,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 112,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw4-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 0,
+        "w": 112,
+        "h": 93
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 112,
+        "h": 93
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw5-skin4": {
+      "frame": {
+        "x": 893,
+        "y": 124,
+        "w": 112,
+        "h": 95
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 112,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw6-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 236,
+        "w": 112,
+        "h": 93
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 284,
+        "w": 112,
+        "h": 93
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw7-skin4": {
+      "frame": {
+        "x": 891,
+        "y": 696,
+        "w": 112,
+        "h": 96
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 280,
+        "w": 112,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/jaw/jaw3-skin4": {
+      "frame": {
+        "x": 891,
+        "y": 1080,
+        "w": 111,
+        "h": 95
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 411,
+        "y": 283,
+        "w": 111,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase7-skin4": {
+      "frame": {
+        "x": 880,
+        "y": 1192,
+        "w": 108,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 412,
+        "y": 280,
+        "w": 108,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase12-skin4": {
+      "frame": {
+        "x": 880,
+        "y": 1222,
+        "w": 107,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 413,
+        "y": 277,
+        "w": 107,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase13-skin4": {
+      "frame": {
+        "x": 880,
+        "y": 1255,
+        "w": 107,
+        "h": 33
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 413,
+        "y": 277,
+        "w": 107,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar15-skin4": {
+      "frame": {
+        "x": 913,
+        "y": 1255,
+        "w": 24,
+        "h": 107
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 489,
+        "y": 243,
+        "w": 24,
+        "h": 107
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar3-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 348,
+        "w": 93,
+        "h": 107
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 427,
+        "y": 245,
+        "w": 93,
+        "h": 107
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase8-skin4": {
+      "frame": {
+        "x": 652,
+        "y": 1079,
+        "w": 106,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 261,
+        "w": 106,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase11-skin4": {
+      "frame": {
+        "x": 937,
+        "y": 1255,
+        "w": 106,
+        "h": 33
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 414,
+        "y": 276,
+        "w": 106,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase14-skin4": {
+      "frame": {
+        "x": 533,
+        "y": 1111,
+        "w": 106,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 414,
+        "y": 276,
+        "w": 106,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase7-skin4": {
+      "frame": {
+        "x": 760,
+        "y": 1304,
+        "w": 104,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 261,
+        "w": 104,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth2-skin4": {
+      "frame": {
+        "x": 894,
+        "y": 455,
+        "w": 104,
+        "h": 37
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 322,
+        "w": 104,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase1-skin4": {
+      "frame": {
+        "x": 799,
+        "y": 355,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase10-skin4": {
+      "frame": {
+        "x": 829,
+        "y": 355,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase11-skin4": {
+      "frame": {
+        "x": 859,
+        "y": 355,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase12-skin4": {
+      "frame": {
+        "x": 931,
+        "y": 455,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase13-skin4": {
+      "frame": {
+        "x": 931,
+        "y": 558,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase14-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 559,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase15-skin4": {
+      "frame": {
+        "x": 783,
+        "y": 923,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase2-skin4": {
+      "frame": {
+        "x": 783,
+        "y": 953,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase5-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 808,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase6-skin4": {
+      "frame": {
+        "x": 925,
+        "y": 808,
+        "w": 103,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 103,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase9-skin4": {
+      "frame": {
+        "x": 955,
+        "y": 808,
+        "w": 103,
+        "h": 33
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 260,
+        "w": 103,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase3-skin4": {
+      "frame": {
+        "x": 886,
+        "y": 923,
+        "w": 102,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 102,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/browsBase/browsBase4-skin4": {
+      "frame": {
+        "x": 886,
+        "y": 953,
+        "w": 102,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 263,
+        "w": 102,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase10-skin4": {
+      "frame": {
+        "x": 988,
+        "y": 0,
+        "w": 102,
+        "h": 30
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 415,
+        "y": 280,
+        "w": 102,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase1-skin4": {
+      "frame": {
+        "x": 683,
+        "y": 829,
+        "w": 100,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 279,
+        "w": 100,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar11-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 983,
+        "w": 95,
+        "h": 100
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 419,
+        "y": 233,
+        "w": 95,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar13-skin4": {
+      "frame": {
+        "x": 1018,
+        "y": 0,
+        "w": 88,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 422,
+        "y": 247,
+        "w": 88,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar9-skin4": {
+      "frame": {
+        "x": 1018,
+        "y": 100,
+        "w": 86,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 427,
+        "y": 241,
+        "w": 86,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth15-skin4": {
+      "frame": {
+        "x": 895,
+        "y": 662,
+        "w": 99,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 436,
+        "y": 323,
+        "w": 99,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase8-skin4": {
+      "frame": {
+        "x": 988,
+        "y": 102,
+        "w": 98,
+        "h": 28
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 281,
+        "w": 98,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase2-skin4": {
+      "frame": {
+        "x": 970,
+        "y": 1255,
+        "w": 97,
+        "h": 31
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 279,
+        "w": 97,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/eyesBase/eyesBase3-skin4": {
+      "frame": {
+        "x": 683,
+        "y": 860,
+        "w": 97,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 417,
+        "y": 279,
+        "w": 97,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar7-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 200,
+        "w": 78,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 441,
+        "y": 249,
+        "w": 78,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar10-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 278,
+        "w": 57,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 462,
+        "y": 247,
+        "w": 57,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar8-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 335,
+        "w": 90,
+        "h": 83
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 425,
+        "y": 259,
+        "w": 90,
+        "h": 83
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth10-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 418,
+        "w": 80,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 80,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth1-skin4": {
+      "frame": {
+        "x": 611,
+        "y": 308,
+        "w": 69,
+        "h": 41
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 433,
+        "y": 319,
+        "w": 69,
+        "h": 41
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth8-skin4": {
+      "frame": {
+        "x": 961,
+        "y": 455,
+        "w": 66,
+        "h": 37
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 322,
+        "w": 66,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth11-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 466,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth12-skin4": {
+      "frame": {
+        "x": 1066,
+        "y": 466,
+        "w": 65,
+        "h": 38
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth13-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 503,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth14-skin4": {
+      "frame": {
+        "x": 961,
+        "y": 521,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth3-skin4": {
+      "frame": {
+        "x": 1066,
+        "y": 531,
+        "w": 65,
+        "h": 36
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 323,
+        "w": 65,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth4-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 540,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth5-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 577,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth6-skin4": {
+      "frame": {
+        "x": 1066,
+        "y": 596,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 322,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth9-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 614,
+        "w": 65,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 321,
+        "w": 65,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/mouth/mouth7-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 651,
+        "w": 64,
+        "h": 45
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 435,
+        "y": 324,
+        "w": 64,
+        "h": 45
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose4-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 696,
+        "w": 51,
+        "h": 58
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 51,
+        "h": 58
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose5-skin4": {
+      "frame": {
+        "x": 987,
+        "y": 747,
+        "w": 51,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 51,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose7-skin4": {
+      "frame": {
+        "x": 1038,
+        "y": 747,
+        "w": 51,
+        "h": 56
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 51,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose9-skin4": {
+      "frame": {
+        "x": 1038,
+        "y": 798,
+        "w": 51,
+        "h": 56
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 279,
+        "w": 51,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose1-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 849,
+        "w": 51,
+        "h": 55
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 51,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose10-skin4": {
+      "frame": {
+        "x": 988,
+        "y": 900,
+        "w": 53,
+        "h": 55
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 442,
+        "y": 280,
+        "w": 53,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose12-skin4": {
+      "frame": {
+        "x": 1056,
+        "y": 849,
+        "w": 49,
+        "h": 55
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 442,
+        "y": 281,
+        "w": 49,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose2-skin4": {
+      "frame": {
+        "x": 611,
+        "y": 520,
+        "w": 47,
+        "h": 55
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 445,
+        "y": 281,
+        "w": 47,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose3-skin4": {
+      "frame": {
+        "x": 1041,
+        "y": 904,
+        "w": 51,
+        "h": 55
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 51,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose8-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 955,
+        "w": 51,
+        "h": 55
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 51,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose11-skin4": {
+      "frame": {
+        "x": 1056,
+        "y": 955,
+        "w": 48,
+        "h": 54
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 443,
+        "y": 281,
+        "w": 48,
+        "h": 54
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose13-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 1006,
+        "w": 49,
+        "h": 54
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 442,
+        "y": 281,
+        "w": 49,
+        "h": 54
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose14-skin4": {
+      "frame": {
+        "x": 1055,
+        "y": 1009,
+        "w": 51,
+        "h": 54
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 442,
+        "y": 281,
+        "w": 51,
+        "h": 54
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/nose/nose15-skin4": {
+      "frame": {
+        "x": 1001,
+        "y": 1055,
+        "w": 49,
+        "h": 54
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 442,
+        "y": 281,
+        "w": 49,
+        "h": 54
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar14-skin4": {
+      "frame": {
+        "x": 987,
+        "y": 1222,
+        "w": 43,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 473,
+        "y": 242,
+        "w": 43,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar12-skin4": {
+      "frame": {
+        "x": 961,
+        "y": 586,
+        "w": 38,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 448,
+        "y": 247,
+        "w": 38,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/skinColor/skin4/scar/scar2-skin4": {
+      "frame": {
+        "x": 659,
+        "y": 699,
+        "w": 23,
+        "h": 24
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 420,
+        "y": 299,
+        "w": 23,
+        "h": 24
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "female-skinColor-skin4.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1106,
+      "h": 1362
+    },
+    "scale": 1
+  }
+}

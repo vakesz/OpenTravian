@@ -1,0 +1,93 @@
+{
+  // PHP syntax validation. VS Code finds `php` on PATH. Only set an absolute
+  // path if discovery fails; uncomment the one for your platform:
+  // "php.validate.executablePath": "/opt/homebrew/bin/php",  // macOS Apple Silicon
+  // "php.validate.executablePath": "/usr/local/bin/php",     // macOS Intel
+  // "php.validate.executablePath": "/usr/bin/php",           // Linux
+  // "php.validate.executablePath": "C:\\php\\php.exe",       // Windows
+  "php.validate.enable": true,
+  "php.validate.run": "onSave",
+  "php.suggest.basic": false,
+  "intelephense.environment.phpVersion": "8.5.0",
+  "intelephense.diagnostics.undefinedVariables": "off",
+  "intelephense.diagnostics.undefinedTypes": true,
+  "intelephense.diagnostics.undefinedFunctions": true,
+  "intelephense.diagnostics.undefinedConstants": true,
+  "intelephense.diagnostics.undefinedMethods": true,
+  "intelephense.diagnostics.undefinedProperties": true,
+  "intelephense.environment.includePaths": [
+    "game/include",
+    "game/include/stubs",
+    "services/api/include",
+    "services/api/include/vendor"
+  ],
+  // Intelephense's default stubs plus "redis", the one PECL extension the
+  // image adds (docker/php/Dockerfile). This setting replaces the default list.
+  "intelephense.stubs": [
+    "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl",
+    "date", "dba", "dom", "enchant", "exif", "FFI", "fileinfo", "filter", "fpm",
+    "ftp", "gd", "gettext", "gmp", "hash", "iconv", "imap", "intl", "json", "ldap",
+    "libxml", "mbstring", "meta", "mysqli", "oci8", "odbc", "openssl", "pcntl",
+    "pcre", "PDO", "pgsql", "Phar", "posix", "pspell", "random", "readline",
+    "redis", "Reflection", "session", "shmop", "SimpleXML", "snmp", "soap",
+    "sockets", "sodium", "SPL", "sqlite3", "standard", "superglobals", "sysvmsg",
+    "sysvsem", "sysvshm", "tidy", "tokenizer", "uri", "xml", "xmlreader", "xmlrpc",
+    "xmlwriter", "xsl", "Zend OPcache", "zip", "zlib"
+  ],
+  "intelephense.files.exclude": [
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/assets/**",
+    "**/globalConfig.php",
+    "**/connection.local.php"
+  ],
+  "[php]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": false
+  },
+  "[twig]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+  "files.associations": {
+    ".env": "dotenv",
+    ".env.*": "dotenv",
+    ".gitignore": "ignore",
+    ".dockerignore": "ignore",
+    ".prettierignore": "ignore",
+    ".htaccess": "apacheconf",
+    "*.twig": "twig",
+    "*.conf.template": "nginx"
+  },
+
+  // This is a legacy browser-script codebase with no ESLint config;
+  // the extension would otherwise report a missing-config error per file.
+  "eslint.enable": false,
+
+  // The docs keep one paragraph per line.
+  "markdownlint.config": {
+    "MD013": false
+  },
+
+  // Generated state and third-party bundles. "runtime" is the root-level state
+  // directory of a non-Docker install; tests/runtime holds tracked tests.
+  "files.exclude": {
+    "runtime": true,
+    "**/error_log.log": true,
+    "**/automation.log": true
+  },
+  "search.exclude": {
+    "**/assets/gpack/**": true,
+    "**/game/deployment/public/js/default/**": true,
+    "**/services/api/include/vendor/**": true,
+    "**/node_modules/**": true,
+    "runtime": true
+  },
+  "files.watcherExclude": {
+    "**/assets/**": true,
+    "**/services/api/include/vendor/**": true,
+    "**/node_modules/**": true,
+    "runtime/**": true
+  }
+}

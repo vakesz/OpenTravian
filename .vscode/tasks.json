@@ -1,0 +1,75 @@
+{
+  // The commands of docs/development.md as tasks (Terminal > Run Task). They
+  // need the dev stack: sh config/bootstrap-env.sh --dev, then "Dev stack: start".
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev stack: start",
+      "type": "shell",
+      "command": "docker compose up -d --build --wait",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev stack: stop",
+      "type": "shell",
+      "command": "docker compose stop",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev stack: install throwaway world",
+      "type": "shell",
+      "command": "dev/install-world.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: fast (changed files)",
+      "type": "shell",
+      "command": "dev/check.sh --fast",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: full, no browser",
+      "type": "shell",
+      "command": "dev/check.sh --no-browser",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: full",
+      "type": "shell",
+      "command": "dev/check.sh",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      // A contract or runtime check (tests/contracts, tests/runtime): one PHP process per file.
+      "label": "Test: current PHP file",
+      "type": "shell",
+      "command": "docker compose exec -T -w /travian php php -d error_reporting=-1 -d display_errors=1 '${relativeFile}'",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "PHPStan: current file",
+      "type": "shell",
+      "command": "dev/phpstan/run.sh --files '${relativeFile}'",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "PHPStan: all targets",
+      "type": "shell",
+      "command": "dev/phpstan/run.sh",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Client tests (Playwright)",
+      "type": "shell",
+      "command": "dev/client-tests/run.sh",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,4521 @@
+/* Night mood rules mirrored from the Firefox reference Gpack. */
+body[data-village-perspective="perspectiveResources"][data-theme="night"] {
+  background-color: #1c2625;
+  background-image:
+    linear-gradient(180deg, #1a2327 240px, #1d2625 250px),
+    linear-gradient(180deg, #1a2327 240px, #1d2625 250px);
+}
+body[data-village-perspective="perspectiveResources"][data-theme="night"]
+  div#background {
+  background-image: url(../img_ltr/themes/night/background/bg-resources.webp);
+}
+@media screen and (max-width: 1440px) {
+  body[data-village-perspective="perspectiveResources"][data-theme="night"]
+    div#background {
+    background-image: url(../img_ltr/themes/night/background/bg-resources-narrow.jpg);
+  }
+}
+body[data-village-perspective="perspectiveResources"][data-theme="night"]
+  div#background.isShore {
+  background-image: url(../img_ltr/themes/night/background/bg-resources-shore.webp);
+}
+@media screen and (max-width: 1440px) {
+  body[data-village-perspective="perspectiveResources"][data-theme="night"]
+    div#background.isShore {
+    background-image: url(../img_ltr/themes/night/background/bg-resources-shore-narrow.jpg);
+  }
+}
+@media screen and (max-width: 620px) and (orientation: portrait) {
+  body[data-village-perspective="perspectiveResources"][data-theme="night"].mobileOptimized
+    div#background {
+    background-image: url(../img_ltr/themes/night/background/bg-resources-mobile.jpg);
+  }
+  body[data-village-perspective="perspectiveResources"][data-theme="night"].mobileOptimized
+    div#background.isShore {
+    background-image: url(../img_ltr/themes/night/background/bg-resources-shore-mobile.jpg);
+  }
+}
+body[data-village-perspective="perspectiveResources"][data-theme="night"].mobileForced
+  div#background {
+  background-image: url(../img_ltr/themes/night/background/bg-resources-mobile.jpg);
+}
+body[data-village-perspective="perspectiveResources"][data-theme="night"].mobileForced
+  div#background.isShore {
+  background-image: url(../img_ltr/themes/night/background/bg-resources-shore-mobile.jpg);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"] {
+  background-color: #1c2625;
+  background-image:
+    linear-gradient(180deg, #151b2e 256px, #1c2625 450px),
+    linear-gradient(180deg, #151b2e 229px, #1c2625 310px);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].rearrangeBuildings {
+  background-color: #040606;
+  background-image:
+    linear-gradient(180deg, #030407 256px, #040606 450px),
+    linear-gradient(180deg, #030407 229px, #040606 310px);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].rtl {
+  background-image:
+    linear-gradient(180deg, #151b2e 229px, #1c2625 310px),
+    linear-gradient(180deg, #151b2e 256px, #1c2625 450px);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].rtl.rearrangeBuildings {
+  background-image:
+    linear-gradient(180deg, #030407 229px, #040606 310px),
+    linear-gradient(180deg, #030407 256px, #040606 450px);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  div#background {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings.webp);
+}
+@media screen and (max-width: 1440px) {
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+    div#background {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-narrow.jpg);
+  }
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  div#background.isCity {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-city.webp);
+}
+@media screen and (max-width: 1440px) {
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+    div#background.isCity {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-city-narrow.jpg);
+  }
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  div#background.isShore {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-shore.webp);
+}
+@media screen and (max-width: 1440px) {
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+    div#background.isShore {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-narrow.jpg);
+  }
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  div#background.isCity.isShore {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-city.webp);
+}
+@media screen and (max-width: 1440px) {
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+    div#background.isCity.isShore {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-city-narrow.jpg);
+  }
+}
+@media screen and (max-width: 620px) and (orientation: portrait) {
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileOptimized
+    div#background {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-mobile.jpg);
+  }
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileOptimized
+    div#background.isCity {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-city-mobile.jpg);
+  }
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileOptimized
+    div#background.isShore {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-mobile.jpg);
+  }
+  body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileOptimized
+    div#background.isCity.isShore {
+    background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-city-mobile.jpg);
+  }
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileForced
+  div#background {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-mobile.jpg);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileForced
+  div#background.isCity {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-city-mobile.jpg);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileForced
+  div#background.isShore {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-mobile.jpg);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"].mobileForced
+  div#background.isCity.isShore {
+  background-image: url(../img_ltr/themes/night/background/bg-buildings-shore-city-mobile.jpg);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.roman {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/roman/city-wall-bottom.png),
+    url(../img_ltr/themes/night/buildings/roman/city-wall-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.roman.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/roman/city-wall-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.roman.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/roman/city-wall-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.roman.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/roman/city-wall-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.roman.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/roman/city-wall-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.roman.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/roman/city-wall-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.roman
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.roman
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.roman
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.roman
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.teuton {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom.png),
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.teuton.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.teuton.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.teuton.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.teuton.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.teuton.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.teuton
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.teuton
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.teuton
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.teuton
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.gaul {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/gaul/palisade-bottom.png),
+    url(../img_ltr/themes/night/buildings/gaul/palisade-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.gaul.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/gaul/palisade-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.gaul.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/gaul/palisade-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.gaul.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/gaul/palisade-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.gaul.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/gaul/palisade-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.gaul.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/gaul/palisade-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.gaul
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.gaul
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.gaul
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.gaul
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.egyptian {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom.png),
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.egyptian.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.egyptian.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.egyptian.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.egyptian.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.egyptian.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.egyptian
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.egyptian
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.egyptian
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.egyptian
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.hun {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom.png),
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.hun.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.hun.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.hun.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.hun.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.hun.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.hun
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.hun
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.hun
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.hun
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.spartan {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom.png),
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.spartan.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.spartan.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.spartan.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.spartan.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.spartan.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.spartan
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.spartan
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.spartan
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.spartan
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.viking {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/viking/barricade-bottom.png),
+    url(../img_ltr/themes/night/buildings/viking/barricade-top.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.viking.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/viking/barricade-bottom-city.png),
+    url(../img_ltr/themes/night/buildings/viking/barricade-top-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.viking.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/viking/barricade-bottom-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/viking/barricade-top-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.viking.isShore {
+  width: 794px;
+  height: 540px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/viking/barricade-bottom-shore.png),
+    url(../img_ltr/themes/night/buildings/viking/barricade-top-shore.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.viking.isShore.isCity {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/viking/barricade-bottom-shore-city.png),
+    url(../img_ltr/themes/night/buildings/viking/barricade-top-shore-city.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .wall.viking.isShore.isCity.hasWatchtowers {
+  width: 802px;
+  height: 602px;
+  background-image:
+    url(../img_ltr/themes/night/buildings/viking/barricade-bottom-shore-city-watch-towers.png),
+    url(../img_ltr/themes/night/buildings/viking/barricade-top-shore-city-watch-towers.png);
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.viking
+  .tradeShip {
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.viking
+  .warShip {
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.viking
+  .decoyWarShip {
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-village-perspective="perspectiveBuildings"][data-theme="night"]
+  #background
+  .behindContent
+  .harbour.viking
+  .raidShip {
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"] div#footer {
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0),
+      #fff 40%,
+      #fff 60%,
+      rgba(255, 255, 255, 0)
+    ),
+    radial-gradient(
+      50% 100% ellipse at 50% 0,
+      rgba(40, 54, 24, 0.7),
+      rgba(40, 54, 24, 0)
+    );
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField1 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field1.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField2 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field2.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField3 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field3.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField4 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field4.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField5 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field5.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField6 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field6.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField7 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field7.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField8 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field8.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField9 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field9.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField10 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field10.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField11 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field11.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField12 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field12.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.resourceField13 {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/resource-field13.png);
+  width: 473px;
+  height: 304px;
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe1:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe1.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe1.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe1.png);
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe2:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe2.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe2.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe2.png);
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe3:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe3.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe3.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe3.png);
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe6:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe6.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe6.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe6.png);
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe7:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe7.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe7.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe7.png);
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe8:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe8.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe8.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe8.png);
+}
+body[data-theme="night"] div.village1 #resourceFieldContainer.tribe9:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-tribe9.png);
+}
+body[data-theme="night"]
+  div.village1
+  #resourceFieldContainer.tribe9.isShore:after {
+  background-image: url(../img_ltr/themes/night/background/resource-fields/tribe-specific-center/village-center-shore-tribe9.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg
+  > path {
+  fill: rgba(44, 58, 11, 0.57);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg
+  > path:hover {
+  fill: rgba(85, 96, 39, 0.57);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg
+  > path:active {
+  fill: rgba(95, 102, 69, 0.57);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg.emptyWall
+  > path:not(:hover):not(:active),
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg.emptyWall_city
+  > path:not(:hover):not(:active),
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg.emptyWall_shore
+  > path:not(:hover):not(:active),
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot.g0
+  .emptyBuildingSlot
+  ~ svg.emptyWall_shore_city
+  > path:not(:hover):not(:active) {
+  fill: transparent;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g5.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/sawmill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g6.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/brickyard.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g7.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/iron-foundry.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g8.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/grain-mill.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g9.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/bakery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g10.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g11.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g13.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/smithy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g14.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/tournament-square.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g15.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/main-building.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/rally-point.png);
+  width: 125px;
+  height: 160px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/rally-point.png);
+  width: 125px;
+  height: 160px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/rally-point.png);
+  width: 161px;
+  height: 166px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/rally-point.png);
+  width: 126px;
+  height: 160px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/rally-point.png);
+  width: 125px;
+  height: 160px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/rally-point.png);
+  width: 125px;
+  height: 160px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g16.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/rally-point.png);
+  width: 125px;
+  height: 160px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g17.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/marketplace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g18.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/embassy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g19.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g20.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g21.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/workshop.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g22.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/academy.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g23.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/cranny.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g24.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/town-hall.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g25.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/residence.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g26.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/palace.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g27.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/treasury.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g28.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/trade-office.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g29.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/great-barracks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g30.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/great-stable.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g34.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/stonemason-s-lodge.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g37.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/hero-s-mansion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g38.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/great-warehouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g39.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/great-granary.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/hospital.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/hospital.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/hospital.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/hospital.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/hospital.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.spartan {
+  background-image: none;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g46.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/hospital.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g41.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/horse-drinking-trough.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g35.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/brewery.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g36.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/trapper.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g45.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/waterworks.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g44.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/command-center.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g48.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/asclepeion.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g31Top {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g31Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g31Top {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g31Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g31Top {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g31Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g31Top {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g31Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g31Top {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g31Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g31Top {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g31Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/roman/city-wall-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g32Top {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g32Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g32Top {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g32Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g32Top {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g32Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g32Top {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g32Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g32Top {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g32Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g32Top {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g32Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/earth-wall-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g33Top {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g33Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g33Top {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g33Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g33Top {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g33Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g33Top {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g33Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g33Top {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g33Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g33Top {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g33Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/palisade-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g42Top {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g42Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g42Top {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g42Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g42Top {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g42Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g42Top {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g42Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g42Top {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g42Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g42Top {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g42Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/stone-wall-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g43Top {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g43Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g43Top {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g43Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g43Top {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g43Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g43Top {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g43Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g43Top {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g43Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g43Top {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g43Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/hun/makeshift-wall-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g47Top {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g47Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g47Top {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g47Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g47Top {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g47Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g47Top {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g47Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g47Top {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g47Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g47Top {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g47Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/defensive-wall-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g50Top {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-top.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g50Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-bottom.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g50Top {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-top-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.g50Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-bottom-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g50Top {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-top-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.city.watchTowers.g50Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-bottom-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g50Top {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-top-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.g50Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-bottom-shore.png);
+  width: 794px;
+  height: 540px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g50Top {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-top-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.g50Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-bottom-shore-city.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g50Top {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-top-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.shore.city.watchTowers.g50Bottom {
+  background-image: url(../img_ltr/themes/night/buildings/viking/barricade-bottom-shore-city-watch-towers.png);
+  width: 802px;
+  height: 602px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.roman {
+  background-image: url(../img_ltr/themes/night/buildings/roman/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.roman.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/roman/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.roman.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/roman/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.roman.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/roman/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.roman.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/roman/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.roman.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/roman/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.teuton.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.teuton.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.teuton.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.teuton.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.teuton.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.gaul {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.gaul.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.gaul.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.gaul.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.gaul.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.gaul.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/gaul/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.egyptian {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.egyptian.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.egyptian.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.egyptian.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.egyptian.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.egyptian.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.hun {
+  background-image: url(../img_ltr/themes/night/buildings/hun/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.hun.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/hun/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.hun.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/hun/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.hun.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/hun/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.hun.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/hun/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.hun.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/hun/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.spartan {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.spartan.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.spartan.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.spartan.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.spartan.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.spartan.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/spartan/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.viking {
+  background-image: url(../img_ltr/themes/night/buildings/viking/wonder-of-the-world-0.png);
+  width: 299px;
+  height: 440px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.viking.g40_1 {
+  background-image: url(../img_ltr/themes/night/buildings/viking/wonder-of-the-world-1.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.viking.g40_2 {
+  background-image: url(../img_ltr/themes/night/buildings/viking/wonder-of-the-world-2.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.viking.g40_3 {
+  background-image: url(../img_ltr/themes/night/buildings/viking/wonder-of-the-world-3.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.viking.g40_4 {
+  background-image: url(../img_ltr/themes/night/buildings/viking/wonder-of-the-world-4.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g40.viking.g40_5 {
+  background-image: url(../img_ltr/themes/night/buildings/viking/wonder-of-the-world-5.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49
+  ~ .ship {
+  position: absolute;
+  pointer-events: none;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.roman
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.roman
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.roman
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.roman
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/roman/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.teuton
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.teuton
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.teuton
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.teuton
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/teuton/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.gaul
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.gaul
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.gaul
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.gaul
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/gaul/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.egyptian
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.egyptian
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.egyptian
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.egyptian
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/egyptian/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.hun
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.hun
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.hun
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.hun
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/hun/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.spartan
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.spartan
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.spartan
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.spartan
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/spartan/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.viking
+  ~ .raidShip {
+  z-index: 0;
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-raid-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.viking
+  ~ .tradeShip {
+  z-index: 2;
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-trade-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.viking
+  ~ .warShip {
+  z-index: 3;
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g49.viking
+  ~ .decoyWarShip {
+  z-index: 4;
+  background-image: url(../img_ltr/themes/night/buildings/viking/harbor-decoy-war-ship.png);
+  width: 328px;
+  height: 232px;
+}
+body[data-theme="night"][data-language="ar-AE"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  img.g35.teuton {
+  background-image: url(../img_ltr/themes/night/buildings/teuton/brewery-teahouse.png);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  svg
+  .hoverShape:hover
+  + .highlightShape
+  path {
+  fill: rgba(255, 255, 255, 0.2);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  svg
+  .hoverShape:active
+  + .highlightShape
+  path {
+  fill: rgba(255, 255, 255, 0.35);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  svg
+  .highlightShape:hover
+  path {
+  fill: rgba(255, 255, 255, 0.2);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  svg
+  .highlightShape:active
+  path {
+  fill: rgba(255, 255, 255, 0.35);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  svg.hover
+  > .highlightShape
+  path {
+  fill: rgba(255, 255, 255, 0.2);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  svg.active
+  > .highlightShape
+  path {
+  fill: rgba(255, 255, 255, 0.35);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  .level:hover
+  ~ svg
+  .highlightShape
+  path {
+  fill: rgba(255, 255, 255, 0.2);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  .level:active
+  ~ svg
+  .highlightShape
+  path {
+  fill: rgba(255, 255, 255, 0.35);
+}
+body[data-theme="night"]
+  #contentOuterContainer
+  .village2
+  #villageContent
+  .buildingSlot
+  .level:focus-visible
+  ~ svg
+  .highlightShape
+  path {
+  fill: rgba(0, 102, 255, 0.1);
+  stroke: rgba(0, 102, 255, 0.6);
+}

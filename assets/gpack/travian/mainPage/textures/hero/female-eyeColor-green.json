@@ -1,0 +1,373 @@
+{
+  "frames": {
+    "female/eyeColor/green/eyes/eyes11-green": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 130,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 375,
+        "y": 287,
+        "w": 130,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes15-green": {
+      "frame": {
+        "x": 0,
+        "y": 11,
+        "w": 128,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 375,
+        "y": 286,
+        "w": 128,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes12-green": {
+      "frame": {
+        "x": 0,
+        "y": 22,
+        "w": 126,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 377,
+        "y": 285,
+        "w": 126,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes13-green": {
+      "frame": {
+        "x": 0,
+        "y": 34,
+        "w": 101,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 286,
+        "w": 101,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes9-green": {
+      "frame": {
+        "x": 0,
+        "y": 46,
+        "w": 100,
+        "h": 21
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 416,
+        "y": 286,
+        "w": 100,
+        "h": 21
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes10-green": {
+      "frame": {
+        "x": 0,
+        "y": 67,
+        "w": 77,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 426,
+        "y": 288,
+        "w": 77,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes7-green": {
+      "frame": {
+        "x": 0,
+        "y": 78,
+        "w": 77,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 428,
+        "y": 288,
+        "w": 77,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes8-green": {
+      "frame": {
+        "x": 0,
+        "y": 89,
+        "w": 77,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 426,
+        "y": 286,
+        "w": 77,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes5-green": {
+      "frame": {
+        "x": 0,
+        "y": 100,
+        "w": 74,
+        "h": 13
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 429,
+        "y": 287,
+        "w": 74,
+        "h": 13
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes3-green": {
+      "frame": {
+        "x": 101,
+        "y": 34,
+        "w": 69,
+        "h": 10
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 432,
+        "y": 287,
+        "w": 69,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes4-green": {
+      "frame": {
+        "x": 111,
+        "y": 34,
+        "w": 69,
+        "h": 10
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 433,
+        "y": 289,
+        "w": 69,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes2-green": {
+      "frame": {
+        "x": 0,
+        "y": 113,
+        "w": 68,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 432,
+        "y": 288,
+        "w": 68,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes6-green": {
+      "frame": {
+        "x": 77,
+        "y": 67,
+        "w": 67,
+        "h": 10
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 432,
+        "y": 289,
+        "w": 67,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes1-green": {
+      "frame": {
+        "x": 0,
+        "y": 124,
+        "w": 66,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 434,
+        "y": 288,
+        "w": 66,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "female/eyeColor/green/eyes/eyes14-green": {
+      "frame": {
+        "x": 87,
+        "y": 67,
+        "w": 26,
+        "h": 10
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 423,
+        "y": 286,
+        "w": 26,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "female-eyeColor-green.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 130,
+      "h": 134
+    },
+    "scale": 1
+  }
+}

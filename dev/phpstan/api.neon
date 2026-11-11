@@ -1,0 +1,17 @@
+includes:
+    - common.neon
+
+parameters:
+    level: 8
+    paths:
+        - ../../services/api
+    excludePaths:
+        analyse:
+            - ../../services/api/include/vendor
+            - ../../services/api/include/Templates/Cache
+    scanDirectories:
+        - ../../services/api/include
+    # The API loads these two classes from the game tree at runtime.
+    scanFiles:
+        - ../../game/include/Core/Security/Password.php
+        - ../../game/include/Core/Security/LoginAttemptLimiter.php

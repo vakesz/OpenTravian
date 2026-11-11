@@ -1,0 +1,19 @@
+includes:
+    - common.neon
+    - baseline.neon
+
+parameters:
+    paths:
+        - ../../game
+    excludePaths:
+        analyse:
+            - ../../game/deployment/include/*.local.php
+            - ../../game/include/Plugins/securimage
+            - ../../game/include/jdf.php
+    scanDirectories:
+        - ../../game/include
+        # SmtpTransport uses PHPMailer from the API's committed vendor tree.
+        - ../../services/api/include/vendor/phpmailer
+    bootstrapFiles:
+        - game-constants.php
+        - ../../game/include/functions.general.php

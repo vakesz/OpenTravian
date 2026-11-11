@@ -1,0 +1,200 @@
+<svg viewBox="0 0 94 94" class="above">
+  <defs>
+    <linearGradient
+      id="frame-linear-gradient"
+      x1="-39.09"
+      x2="-39.09"
+      y1="1096.4"
+      y2="1095.83"
+      gradientTransform="matrix(9.82878 -9.82878 -9.9702 -9.9702 11330.98 10562.1)"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0.05" stop-color="#cba467"></stop>
+      <stop offset="0.13" stop-color="#f3e2ae"></stop>
+      <stop offset="0.32" stop-color="#efbf7b"></stop>
+      <stop offset="0.48" stop-color="#aa8050"></stop>
+      <stop offset="0.72" stop-color="#835e35"></stop>
+      <stop offset="0.93" stop-color="#ad8a54"></stop>
+      <stop offset="1" stop-color="#d7b672"></stop>
+    </linearGradient>
+    <linearGradient
+      href="#frame-linear-gradient"
+      id="frame-linear-gradient-2"
+      x1="-39.09"
+      x2="-39.09"
+      y1="1096.2"
+      y2="1095.63"
+    ></linearGradient>
+    <linearGradient
+      href="#frame-linear-gradient"
+      id="frame-linear-gradient-3"
+      x1="-41.01"
+      x2="-41.01"
+      y1="1097.28"
+      y2="1096.64"
+      gradientTransform="matrix(0 -13.9 -14.1 0 15472.32 -523.35)"
+    ></linearGradient>
+    <linearGradient
+      href="#frame-linear-gradient"
+      id="frame-linear-gradient-4"
+      x1="-8.47"
+      x2="-8.47"
+      y1="1081.22"
+      y2="1080.21"
+      gradientTransform="matrix(77.17 0 0 -75.97 700.86 82146.94)"
+    ></linearGradient>
+    <linearGradient
+      href="#frame-linear-gradient"
+      id="frame-linear-gradient-5"
+      x1="-54.92"
+      x2="-54.92"
+      y1="1102.15"
+      y2="1101.16"
+      gradientTransform="matrix(10.06 0 0 -10.1 561.59 11172.6)"
+    ></linearGradient>
+    <linearGradient
+      id="frame-linear-gradient-6"
+      x1="47"
+      x2="47"
+      y1="62.86"
+      y2="77.14"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0.05" stop-color="#cba467"></stop>
+      <stop offset="0.13" stop-color="#f3e2ae"></stop>
+      <stop offset="0.32" stop-color="#efbf7b"></stop>
+      <stop offset="0.48" stop-color="#aa8050"></stop>
+      <stop offset="0.72" stop-color="#835e35"></stop>
+      <stop offset="0.93" stop-color="#ad8a54"></stop>
+      <stop offset="1" stop-color="#d7b672"></stop>
+    </linearGradient>
+    <radialGradient
+      id="frame-radial-gradient"
+      cx="46.75"
+      cy="47.25"
+      r="29.75"
+      fx="46.75"
+      fy="47.25"
+      gradientTransform="matrix(.98 0 0 .98 1.31 .28)"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0" stop-color="#538514"></stop>
+      <stop offset="0.5" stop-color="#496e1c"></stop>
+      <stop offset="1" stop-color="#33520c"></stop>
+    </radialGradient>
+    <symbol id="decorationBack" stroke="#34220d" stroke-linecap="round" stroke-linejoin="round">
+      <path
+        fill="url(#frame-linear-gradient)"
+        d="m15.57 15.06 10.04 1.07-9.49 9.49-1.07-10.04c-.03-.29.22-.54.51-.51Z"
+      ></path>
+      <path
+        fill="url(#frame-linear-gradient-2)"
+        d="m17.57 17.06 10.04 1.07-9.49 9.49-1.07-10.04c-.03-.29.22-.54.51-.51Z"
+      ></path>
+    </symbol>
+    <symbol
+      id="extraTip"
+      fill="url(#frame-linear-gradient-3)"
+      stroke="#34220d"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M.85 46.64 9.7 38.3v17.41L.85 47.36a.472.472 0 0 1 0-.73Z"></path>
+    </symbol>
+    <symbol id="decorationFront">
+      <path
+        fill="url(#frame-linear-gradient-5)"
+        stroke="#34220d"
+        d="M13.83 47.41 9.4 51.84a.58.58 0 0 1-.81 0l-4.43-4.43a.58.58 0 0 1 0-.81l4.43-4.43a.58.58 0 0 1 .81 0l4.43 4.43c.22.22.22.59 0 .81Z"
+      ></path>
+      <g>
+        <path
+          fill="none"
+          stroke="#000"
+          stroke-miterlimit="10"
+          d="M7.11 44.93h3.79c.1 0 .18.08.18.18v3.79c0 .1-.08.18-.18.18H7.11a.18.18 0 0 1-.18-.18v-3.79c0-.1.08-.18.18-.18Z"
+          transform="rotate(-45.05 9.007 47.001)"
+        ></path>
+        <path
+          fill="#585b54"
+          d="M11.86 47s-.02-.09-.05-.12L9.13 44.2a.175.175 0 0 0-.25 0L6.2 46.88s-.05.08-.05.12h.75l2.11-2.11L11.12 47h.75Z"
+        ></path>
+        <path
+          fill="#437b01"
+          d="m9.13 49.8 2.68-2.68s.05-.08.05-.12h-.75L9 49.11 6.89 47h-.75s.02.09.05.12l2.68 2.68c.07.07.18.07.25 0Z"
+        ></path>
+        <path fill="#81c236" d="M11.11 46.99H6.89V47L9 49.12 11.11 47v-.01z"></path>
+        <path fill="#8ca078" d="M11.11 46.99 9 44.89l-2.11 2.1h4.22z"></path>
+      </g>
+    </symbol>
+  </defs>
+  <g class="decorationBack">
+    <use href="#decorationBack"></use>
+    <use href="#decorationBack" transform-origin="50% 50%" transform="rotate(90 0 0)"></use>
+    <use href="#decorationBack" transform-origin="50% 50%" transform="rotate(180 0 0)"></use>
+    <use href="#decorationBack" transform-origin="50% 50%" transform="rotate(270 0 0)"></use>
+  </g>
+  <g class="extraTip">
+    <use href="#extraTip" transform-origin="50% 50%" transform="rotate(90 0 0)"></use>
+    <use href="#extraTip" transform-origin="50% 50%" transform="rotate(270 0 0)"></use>
+  </g>
+  <g class="frame">
+    <path
+      id="outerGradient"
+      fill="url(#frame-linear-gradient-4)"
+      stroke="#34220d"
+      d="M47 85.5C25.74 85.5 8.5 68.26 8.5 47S25.74 8.5 47 8.5 85.5 25.74 85.5 47 68.26 85.5 47 85.5Z"
+    ></path>
+    <path
+      id="outerBorder"
+      fill="none"
+      stroke="#34220d"
+      d="M47 83c-19.88 0-36-16.12-36-36s16.12-36 36-36 36 16.12 36 36-16.12 36-36 36Z"
+    ></path>
+    <g id="innerShadow">
+      <path
+        fill="#34220d"
+        d="M47 17c16.57 0 30 13.43 30 30S63.57 77 47 77 17 63.57 17 47s13.43-30 30-30Z"
+      ></path>
+    </g>
+    <g id="innerCircle">
+      <path
+        fill="url(#frame-radial-gradient)"
+        fill-rule="evenodd"
+        d="M47.25 76C31.12 76 18 62.88 18 46.75S31.12 17.5 47.25 17.5 76.5 30.62 76.5 46.75 63.38 76 47.25 76Z"
+      ></path>
+      <path
+        fill="#263615"
+        d="M47.25 18C63.13 18 76 30.87 76 46.75S63.13 75.5 47.25 75.5 18.5 62.63 18.5 46.75 31.37 18 47.25 18m0-1C30.85 17 17.5 30.35 17.5 46.75S30.85 76.5 47.25 76.5 77 63.15 77 46.75 63.65 17 47.25 17Z"
+      ></path>
+    </g>
+  </g>
+  <g class="decorationFront">
+    <use href="#decorationFront" class="inline-start"></use>
+    <use
+      href="#decorationFront"
+      class="block-start"
+      transform-origin="50% 50%"
+      transform="rotate(90 0 0)"
+    ></use>
+    <use
+      href="#decorationFront"
+      class="inline-end"
+      transform-origin="50% 50%"
+      transform="rotate(180 0 0)"
+    ></use>
+    <use
+      href="#decorationFront"
+      class="block-end"
+      transform-origin="50% 50%"
+      transform="rotate(270 0 0)"
+    ></use>
+  </g>
+  <g class="textContainer" stroke="#34220d">
+    <path
+      fill="url(#frame-linear-gradient-6)"
+      d="m82.11 62.86-70.31.12L7.5 71l4.3 8.02 70.31.12L86.5 71l-4.39-8.14z"
+    ></path>
+    <path fill="#5f473b" d="m80.89 65-67.86.08L10 71l3.03 5.92 67.86.08L84 71l-3.11-6z"></path>
+  </g>
+</svg>

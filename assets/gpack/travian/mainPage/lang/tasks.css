@@ -1,0 +1,50 @@
+#tasks .taskImage.group {
+  position: relative;
+  overflow: hidden;
+}
+
+/* The current task renderer supports every playable wall tribe. The legacy
+ * task bundle has artwork for gids 31–43 only, so provide the newer assets for
+ * the Spartan and Viking wall tasks here. */
+#tasks .taskImage.group img.building.g47,
+#tasks .taskImage.group img.building.g50 {
+  bottom: 0;
+  left: 0;
+  width: 73px;
+  height: 73px;
+}
+
+#tasks .taskImage.group img.building.g47 {
+  background-image: url("../img_ltr/views/tasks/type/defensive-wall-group.png");
+}
+
+#tasks .taskImage.group img.building.g50 {
+  background-image: url("../img_ltr/views/tasks/type/barricade-group.png");
+}
+
+.rtl #tasks .taskImage.group img.building.g47 {
+  background-image: url("../img_rtl/views/tasks/type/defensive-wall-group.png");
+}
+
+.rtl #tasks .taskImage.group img.building.g50 {
+  background-image: url("../img_rtl/views/tasks/type/barricade-group.png");
+}
+
+#tasks .noTasks {
+  margin: 20px 0;
+}
+
+/* Task cards keep their native light surface in both world moods. */
+body[data-theme="default"]
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.tasksPage,
+body[data-theme="default"]
+  #center
+  #contentOuterContainer
+  .contentContainer
+  #content.tasks {
+  background-color: #f2ead8;
+  color: #49382b;
+}

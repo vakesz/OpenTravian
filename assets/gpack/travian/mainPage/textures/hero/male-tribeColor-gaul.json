@@ -1,0 +1,37 @@
+{
+  "frames": {
+    "male/tribeColor/gaul/body/body-gaul": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 424,
+        "h": 860
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 215,
+        "y": 335,
+        "w": 424,
+        "h": 860
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "male-tribeColor-gaul.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 424,
+      "h": 860
+    },
+    "scale": 1
+  }
+}

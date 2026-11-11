@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "bmewburn.vscode-intelephense-client",
+    "ms-azuretools.vscode-docker",
+    "mrmlnc.vscode-apache",
+    "ahmadalli.vscode-nginx-conf",
+    "matthewpi.caddyfile-support",
+    "mblode.twig-language-2",
+    "redhat.vscode-yaml",
+    "mikestead.dotenv",
+    "timonwong.shellcheck",
+    "esbenp.prettier-vscode",
+    "davidanson.vscode-markdownlint"
+  ]
+}

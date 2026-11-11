@@ -1,0 +1,1309 @@
+{
+  "frames": {
+    "male/hairColor/violet/frontHair/frontHair9-violet": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 245,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 335,
+        "y": 136,
+        "w": 245,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair10-violet": {
+      "frame": {
+        "x": 245,
+        "y": 0,
+        "w": 221,
+        "h": 358
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 353,
+        "y": 135,
+        "w": 221,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard4-violet": {
+      "frame": {
+        "x": 0,
+        "y": 352,
+        "w": 164,
+        "h": 428
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 368,
+        "y": 234,
+        "w": 164,
+        "h": 428
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair8-violet": {
+      "frame": {
+        "x": 164,
+        "y": 358,
+        "w": 179,
+        "h": 376
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 130,
+        "w": 179,
+        "h": 376
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair11-violet": {
+      "frame": {
+        "x": 343,
+        "y": 358,
+        "w": 173,
+        "h": 372
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 362,
+        "y": 133,
+        "w": 173,
+        "h": 372
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair10-violet": {
+      "frame": {
+        "x": 466,
+        "y": 0,
+        "w": 211,
+        "h": 289
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 347,
+        "y": 181,
+        "w": 211,
+        "h": 289
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard3-violet": {
+      "frame": {
+        "x": 516,
+        "y": 289,
+        "w": 208,
+        "h": 253
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 353,
+        "y": 236,
+        "w": 208,
+        "h": 253
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair9-violet": {
+      "frame": {
+        "x": 516,
+        "y": 542,
+        "w": 257,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 325,
+        "y": 223,
+        "w": 257,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard5-violet": {
+      "frame": {
+        "x": 677,
+        "y": 0,
+        "w": 169,
+        "h": 276
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 367,
+        "y": 230,
+        "w": 169,
+        "h": 276
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard15-violet": {
+      "frame": {
+        "x": 343,
+        "y": 730,
+        "w": 128,
+        "h": 228
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 384,
+        "y": 223,
+        "w": 128,
+        "h": 228
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair3-violet": {
+      "frame": {
+        "x": 0,
+        "y": 780,
+        "w": 195,
+        "h": 136
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 353,
+        "y": 128,
+        "w": 195,
+        "h": 136
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair4-violet": {
+      "frame": {
+        "x": 471,
+        "y": 734,
+        "w": 185,
+        "h": 139
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 355,
+        "y": 101,
+        "w": 185,
+        "h": 139
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard11-violet": {
+      "frame": {
+        "x": 656,
+        "y": 734,
+        "w": 156,
+        "h": 151
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 151
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard10-violet": {
+      "frame": {
+        "x": 724,
+        "y": 276,
+        "w": 156,
+        "h": 146
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair7-violet": {
+      "frame": {
+        "x": 195,
+        "y": 734,
+        "w": 124,
+        "h": 181
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 70,
+        "w": 124,
+        "h": 181
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair5-violet": {
+      "frame": {
+        "x": 471,
+        "y": 873,
+        "w": 153,
+        "h": 140
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 385,
+        "y": 134,
+        "w": 153,
+        "h": 140
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair6-violet": {
+      "frame": {
+        "x": 724,
+        "y": 422,
+        "w": 172,
+        "h": 119
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 364,
+        "y": 130,
+        "w": 172,
+        "h": 119
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard12-violet": {
+      "frame": {
+        "x": 846,
+        "y": 0,
+        "w": 156,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair3-violet": {
+      "frame": {
+        "x": 773,
+        "y": 541,
+        "w": 178,
+        "h": 104
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 357,
+        "y": 205,
+        "w": 178,
+        "h": 104
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard2-violet": {
+      "frame": {
+        "x": 846,
+        "y": 128,
+        "w": 144,
+        "h": 123
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 377,
+        "y": 233,
+        "w": 144,
+        "h": 123
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard9-violet": {
+      "frame": {
+        "x": 624,
+        "y": 885,
+        "w": 156,
+        "h": 113
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 113
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard1-violet": {
+      "frame": {
+        "x": 812,
+        "y": 645,
+        "w": 132,
+        "h": 133
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 382,
+        "y": 230,
+        "w": 132,
+        "h": 133
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair11-violet": {
+      "frame": {
+        "x": 780,
+        "y": 885,
+        "w": 147,
+        "h": 117
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 376,
+        "y": 212,
+        "w": 147,
+        "h": 117
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair6-violet": {
+      "frame": {
+        "x": 812,
+        "y": 778,
+        "w": 172,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 363,
+        "y": 200,
+        "w": 172,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair2-violet": {
+      "frame": {
+        "x": 944,
+        "y": 645,
+        "w": 136,
+        "h": 118
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 380,
+        "y": 178,
+        "w": 136,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard14-violet": {
+      "frame": {
+        "x": 927,
+        "y": 873,
+        "w": 125,
+        "h": 110
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 229,
+        "w": 125,
+        "h": 110
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair14-violet": {
+      "frame": {
+        "x": 984,
+        "y": 763,
+        "w": 124,
+        "h": 110
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 142,
+        "w": 124,
+        "h": 110
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair4-violet": {
+      "frame": {
+        "x": 0,
+        "y": 916,
+        "w": 194,
+        "h": 68
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 351,
+        "y": 174,
+        "w": 194,
+        "h": 68
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair15-violet": {
+      "frame": {
+        "x": 194,
+        "y": 916,
+        "w": 137,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 380,
+        "y": 140,
+        "w": 137,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair1-violet": {
+      "frame": {
+        "x": 880,
+        "y": 251,
+        "w": 124,
+        "h": 104
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 150,
+        "w": 124,
+        "h": 104
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair15-violet": {
+      "frame": {
+        "x": 990,
+        "y": 128,
+        "w": 138,
+        "h": 93
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 378,
+        "y": 264,
+        "w": 138,
+        "h": 93
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard6-violet": {
+      "frame": {
+        "x": 1002,
+        "y": 0,
+        "w": 121,
+        "h": 105
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 388,
+        "y": 235,
+        "w": 121,
+        "h": 105
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair2-violet": {
+      "frame": {
+        "x": 896,
+        "y": 355,
+        "w": 134,
+        "h": 90
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 381,
+        "y": 146,
+        "w": 134,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair13-violet": {
+      "frame": {
+        "x": 896,
+        "y": 445,
+        "w": 141,
+        "h": 85
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 377,
+        "y": 160,
+        "w": 141,
+        "h": 85
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/frontHair/frontHair12-violet": {
+      "frame": {
+        "x": 1004,
+        "y": 221,
+        "w": 138,
+        "h": 59
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 379,
+        "y": 165,
+        "w": 138,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard7-violet": {
+      "frame": {
+        "x": 1004,
+        "y": 280,
+        "w": 107,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 394,
+        "y": 264,
+        "w": 107,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair13-violet": {
+      "frame": {
+        "x": 331,
+        "y": 958,
+        "w": 138,
+        "h": 44
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 379,
+        "y": 200,
+        "w": 138,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/beard/beard8-violet": {
+      "frame": {
+        "x": 1030,
+        "y": 350,
+        "w": 101,
+        "h": 52
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 398,
+        "y": 273,
+        "w": 101,
+        "h": 52
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/backHair/backHair8-violet": {
+      "frame": {
+        "x": 1052,
+        "y": 873,
+        "w": 41,
+        "h": 119
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 484,
+        "y": 198,
+        "w": 41,
+        "h": 119
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows11-violet": {
+      "frame": {
+        "x": 951,
+        "y": 530,
+        "w": 118,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 217,
+        "w": 118,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows6-violet": {
+      "frame": {
+        "x": 927,
+        "y": 983,
+        "w": 100,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 210,
+        "w": 100,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows12-violet": {
+      "frame": {
+        "x": 1002,
+        "y": 105,
+        "w": 118,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 389,
+        "y": 222,
+        "w": 118,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows7-violet": {
+      "frame": {
+        "x": 1027,
+        "y": 992,
+        "w": 105,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 215,
+        "w": 105,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows2-violet": {
+      "frame": {
+        "x": 1030,
+        "y": 402,
+        "w": 107,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 394,
+        "y": 215,
+        "w": 107,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows13-violet": {
+      "frame": {
+        "x": 0,
+        "y": 984,
+        "w": 115,
+        "h": 18
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 390,
+        "y": 218,
+        "w": 115,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows8-violet": {
+      "frame": {
+        "x": 1030,
+        "y": 422,
+        "w": 108,
+        "h": 18
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 393,
+        "y": 217,
+        "w": 108,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows14-violet": {
+      "frame": {
+        "x": 1037,
+        "y": 440,
+        "w": 105,
+        "h": 18
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 215,
+        "w": 105,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows3-violet": {
+      "frame": {
+        "x": 1037,
+        "y": 458,
+        "w": 104,
+        "h": 18
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 220,
+        "w": 104,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows4-violet": {
+      "frame": {
+        "x": 1037,
+        "y": 476,
+        "w": 104,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 219,
+        "w": 104,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows9-violet": {
+      "frame": {
+        "x": 624,
+        "y": 998,
+        "w": 108,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 393,
+        "y": 217,
+        "w": 108,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows1-violet": {
+      "frame": {
+        "x": 951,
+        "y": 568,
+        "w": 106,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 223,
+        "w": 106,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows10-violet": {
+      "frame": {
+        "x": 1037,
+        "y": 493,
+        "w": 102,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 218,
+        "w": 102,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows15-violet": {
+      "frame": {
+        "x": 1037,
+        "y": 508,
+        "w": 105,
+        "h": 13
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 221,
+        "w": 105,
+        "h": 13
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/violet/brows/brows5-violet": {
+      "frame": {
+        "x": 812,
+        "y": 873,
+        "w": 103,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 223,
+        "w": 103,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "male-hairColor-violet.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1142,
+      "h": 1014
+    },
+    "scale": 1
+  }
+}

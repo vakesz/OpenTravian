@@ -1,0 +1,1309 @@
+{
+  "frames": {
+    "male/hairColor/blondepink/beard/beard4-blondepink": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 164,
+        "h": 428
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 368,
+        "y": 234,
+        "w": 164,
+        "h": 428
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair8-blondepink": {
+      "frame": {
+        "x": 164,
+        "y": 0,
+        "w": 179,
+        "h": 374
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 131,
+        "w": 179,
+        "h": 374
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair11-blondepink": {
+      "frame": {
+        "x": 343,
+        "y": 0,
+        "w": 173,
+        "h": 372
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 362,
+        "y": 133,
+        "w": 173,
+        "h": 372
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair10-blondepink": {
+      "frame": {
+        "x": 0,
+        "y": 428,
+        "w": 221,
+        "h": 358
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 353,
+        "y": 135,
+        "w": 221,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair9-blondepink": {
+      "frame": {
+        "x": 516,
+        "y": 0,
+        "w": 245,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 335,
+        "y": 136,
+        "w": 245,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair10-blondepink": {
+      "frame": {
+        "x": 516,
+        "y": 352,
+        "w": 212,
+        "h": 289
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 346,
+        "y": 181,
+        "w": 212,
+        "h": 289
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard5-blondepink": {
+      "frame": {
+        "x": 0,
+        "y": 649,
+        "w": 169,
+        "h": 276
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 367,
+        "y": 230,
+        "w": 169,
+        "h": 276
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair9-blondepink": {
+      "frame": {
+        "x": 761,
+        "y": 0,
+        "w": 257,
+        "h": 192
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 325,
+        "y": 223,
+        "w": 257,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard3-blondepink": {
+      "frame": {
+        "x": 728,
+        "y": 352,
+        "w": 207,
+        "h": 253
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 354,
+        "y": 236,
+        "w": 207,
+        "h": 253
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard15-blondepink": {
+      "frame": {
+        "x": 358,
+        "y": 372,
+        "w": 128,
+        "h": 228
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 384,
+        "y": 223,
+        "w": 128,
+        "h": 228
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair3-blondepink": {
+      "frame": {
+        "x": 728,
+        "y": 605,
+        "w": 195,
+        "h": 136
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 353,
+        "y": 128,
+        "w": 195,
+        "h": 136
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair4-blondepink": {
+      "frame": {
+        "x": 864,
+        "y": 605,
+        "w": 194,
+        "h": 68
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 351,
+        "y": 174,
+        "w": 194,
+        "h": 68
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair4-blondepink": {
+      "frame": {
+        "x": 358,
+        "y": 600,
+        "w": 185,
+        "h": 139
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 355,
+        "y": 101,
+        "w": 185,
+        "h": 139
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair7-blondepink": {
+      "frame": {
+        "x": 497,
+        "y": 641,
+        "w": 124,
+        "h": 184
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 70,
+        "w": 124,
+        "h": 184
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair3-blondepink": {
+      "frame": {
+        "x": 0,
+        "y": 818,
+        "w": 178,
+        "h": 104
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 357,
+        "y": 205,
+        "w": 178,
+        "h": 104
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair6-blondepink": {
+      "frame": {
+        "x": 761,
+        "y": 257,
+        "w": 172,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 363,
+        "y": 200,
+        "w": 172,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair6-blondepink": {
+      "frame": {
+        "x": 276,
+        "y": 800,
+        "w": 172,
+        "h": 119
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 364,
+        "y": 130,
+        "w": 172,
+        "h": 119
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard10-blondepink": {
+      "frame": {
+        "x": 497,
+        "y": 765,
+        "w": 156,
+        "h": 146
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard11-blondepink": {
+      "frame": {
+        "x": 0,
+        "y": 922,
+        "w": 156,
+        "h": 151
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 151
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard12-blondepink": {
+      "frame": {
+        "x": 156,
+        "y": 922,
+        "w": 156,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard9-blondepink": {
+      "frame": {
+        "x": 312,
+        "y": 919,
+        "w": 156,
+        "h": 113
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 369,
+        "y": 235,
+        "w": 156,
+        "h": 113
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair5-blondepink": {
+      "frame": {
+        "x": 468,
+        "y": 921,
+        "w": 153,
+        "h": 140
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 385,
+        "y": 134,
+        "w": 153,
+        "h": 140
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair11-blondepink": {
+      "frame": {
+        "x": 621,
+        "y": 921,
+        "w": 147,
+        "h": 115
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 376,
+        "y": 212,
+        "w": 147,
+        "h": 115
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard2-blondepink": {
+      "frame": {
+        "x": 736,
+        "y": 800,
+        "w": 144,
+        "h": 123
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 377,
+        "y": 233,
+        "w": 144,
+        "h": 123
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair13-blondepink": {
+      "frame": {
+        "x": 643,
+        "y": 765,
+        "w": 141,
+        "h": 84
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 377,
+        "y": 161,
+        "w": 141,
+        "h": 84
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair13-blondepink": {
+      "frame": {
+        "x": 164,
+        "y": 374,
+        "w": 138,
+        "h": 44
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 379,
+        "y": 200,
+        "w": 138,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair15-blondepink": {
+      "frame": {
+        "x": 736,
+        "y": 923,
+        "w": 138,
+        "h": 93
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 378,
+        "y": 265,
+        "w": 138,
+        "h": 93
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair12-blondepink": {
+      "frame": {
+        "x": 829,
+        "y": 923,
+        "w": 138,
+        "h": 59
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 379,
+        "y": 165,
+        "w": 138,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair15-blondepink": {
+      "frame": {
+        "x": 953,
+        "y": 0,
+        "w": 137,
+        "h": 96
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 380,
+        "y": 141,
+        "w": 137,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair2-blondepink": {
+      "frame": {
+        "x": 880,
+        "y": 799,
+        "w": 136,
+        "h": 118
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 380,
+        "y": 178,
+        "w": 136,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair2-blondepink": {
+      "frame": {
+        "x": 953,
+        "y": 137,
+        "w": 134,
+        "h": 90
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 381,
+        "y": 146,
+        "w": 134,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard1-blondepink": {
+      "frame": {
+        "x": 888,
+        "y": 917,
+        "w": 132,
+        "h": 133
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 382,
+        "y": 230,
+        "w": 132,
+        "h": 133
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard14-blondepink": {
+      "frame": {
+        "x": 935,
+        "y": 271,
+        "w": 125,
+        "h": 110
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 229,
+        "w": 125,
+        "h": 110
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair1-blondepink": {
+      "frame": {
+        "x": 935,
+        "y": 396,
+        "w": 124,
+        "h": 105
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 150,
+        "w": 124,
+        "h": 105
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/frontHair/frontHair14-blondepink": {
+      "frame": {
+        "x": 935,
+        "y": 520,
+        "w": 124,
+        "h": 114
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 142,
+        "w": 124,
+        "h": 114
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard6-blondepink": {
+      "frame": {
+        "x": 932,
+        "y": 644,
+        "w": 122,
+        "h": 103
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 387,
+        "y": 235,
+        "w": 122,
+        "h": 103
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/backHair/backHair8-blondepink": {
+      "frame": {
+        "x": 312,
+        "y": 1032,
+        "w": 41,
+        "h": 119
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 484,
+        "y": 198,
+        "w": 41,
+        "h": 119
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows11-blondepink": {
+      "frame": {
+        "x": 681,
+        "y": 641,
+        "w": 118,
+        "h": 38
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 386,
+        "y": 217,
+        "w": 118,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows12-blondepink": {
+      "frame": {
+        "x": 888,
+        "y": 1050,
+        "w": 118,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 389,
+        "y": 222,
+        "w": 118,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows13-blondepink": {
+      "frame": {
+        "x": 497,
+        "y": 372,
+        "w": 115,
+        "h": 18
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 390,
+        "y": 218,
+        "w": 115,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows9-blondepink": {
+      "frame": {
+        "x": 497,
+        "y": 487,
+        "w": 108,
+        "h": 16
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 393,
+        "y": 217,
+        "w": 108,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard7-blondepink": {
+      "frame": {
+        "x": 276,
+        "y": 649,
+        "w": 107,
+        "h": 70
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 394,
+        "y": 264,
+        "w": 107,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows2-blondepink": {
+      "frame": {
+        "x": 156,
+        "y": 1050,
+        "w": 107,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 394,
+        "y": 215,
+        "w": 107,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows1-blondepink": {
+      "frame": {
+        "x": 932,
+        "y": 766,
+        "w": 106,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 223,
+        "w": 106,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows8-blondepink": {
+      "frame": {
+        "x": 468,
+        "y": 785,
+        "w": 106,
+        "h": 19
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 217,
+        "w": 106,
+        "h": 19
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows14-blondepink": {
+      "frame": {
+        "x": 448,
+        "y": 785,
+        "w": 105,
+        "h": 18
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 215,
+        "w": 105,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows15-blondepink": {
+      "frame": {
+        "x": 1035,
+        "y": 644,
+        "w": 105,
+        "h": 13
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 221,
+        "w": 105,
+        "h": 13
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows7-blondepink": {
+      "frame": {
+        "x": 1020,
+        "y": 782,
+        "w": 105,
+        "h": 22
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 395,
+        "y": 215,
+        "w": 105,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows3-blondepink": {
+      "frame": {
+        "x": 178,
+        "y": 818,
+        "w": 104,
+        "h": 18
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 220,
+        "w": 104,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows4-blondepink": {
+      "frame": {
+        "x": 196,
+        "y": 818,
+        "w": 104,
+        "h": 17
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 219,
+        "w": 104,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows5-blondepink": {
+      "frame": {
+        "x": 431,
+        "y": 1061,
+        "w": 103,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 396,
+        "y": 223,
+        "w": 103,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows10-blondepink": {
+      "frame": {
+        "x": 276,
+        "y": 785,
+        "w": 102,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 218,
+        "w": 102,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/beard/beard8-blondepink": {
+      "frame": {
+        "x": 213,
+        "y": 818,
+        "w": 101,
+        "h": 52
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 398,
+        "y": 273,
+        "w": 101,
+        "h": 52
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "male/hairColor/blondepink/brows/brows6-blondepink": {
+      "frame": {
+        "x": 1020,
+        "y": 887,
+        "w": 100,
+        "h": 25
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 397,
+        "y": 210,
+        "w": 100,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 875,
+        "h": 1574
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "male-hairColor-blondepink.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1049,
+      "h": 1073
+    },
+    "scale": 1
+  }
+}

@@ -1,0 +1,1141 @@
+/*
+ * Control panel (admin.php), setup wizard (/setup/) and the local lobby pages.
+ * Built on the Gpack V2 components (formV2, textButtonV2, contentNavi); only
+ * the page shell and the dense table/form layouts are defined here.
+ * Colours are the in-game palette (ink, parchment, border, brown, green) as the
+ * --a-* custom properties below; the light values are the original palette and the
+ * dark values follow the operating system's colour scheme. Logical properties keep
+ * the layout correct in RTL; direction-specific art has an explicit .rtl rule.
+ */
+:root {
+    --a-text: #5e463a;
+    --a-text-strong: #664e40;
+    --a-text-muted: #8a7a6c;
+    --a-bg: #fff9eb;
+    --a-bg-2: #f4efe4;
+    --a-bg-3: #efe3ca;
+    --a-input: #fff;
+    --a-field-text: #000;
+    --a-page: #cfc3a8;
+    --a-border: #b7ad97;
+    --a-border-2: #d7c797;
+    --a-border-3: #a8925b;
+    --a-danger: #b00000;
+    --a-ok: #2f7d0a;
+    --a-warn: #8a4b08;
+    --a-bg-danger: #fde8e6;
+    --a-bg-warn: #fff4d6;
+    --a-bg-ok: #eaf5d3;
+    --a-bg-info: #eef3f8;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.adminPanel,
+    body.setupPage {
+        color-scheme: dark;
+        --a-text: #eadfca;
+        --a-text-strong: #f4ead6;
+        --a-text-muted: #b8aa94;
+        --a-bg: #2b251e;
+        --a-bg-2: #342c23;
+        --a-bg-3: #3d3327;
+        --a-input: #1f1a15;
+        --a-field-text: #f4ead6;
+        --a-page: #241f19;
+        --a-border: #5f5545;
+        --a-border-2: #5a4e36;
+        --a-border-3: #8a7648;
+        --a-danger: #ff9a8f;
+        --a-ok: #a6d65a;
+        --a-warn: #f0b25a;
+        --a-bg-danger: #4a2723;
+        --a-bg-warn: #4a3b1c;
+        --a-bg-ok: #2f3d19;
+        --a-bg-info: #24313f;
+        background-blend-mode: multiply;
+    }
+
+    /* The Gpack form components bring light fields; keep them readable on the dark panels. */
+    body.adminPanel label.input input,
+    body.adminPanel label.select select,
+    body.adminPanel label.textarea textarea,
+    body.setupPage label.input input,
+    body.setupPage label.select select,
+    body.setupPage label.textarea textarea {
+        color: var(--a-text);
+        background-color: var(--a-input);
+        border-color: var(--a-border);
+    }
+
+    .adminMain a:not(.textButtonV2):not(.tabItem) {
+        color: #9fc1ee;
+    }
+
+    /* Out-ranks the Gpack's fixed-label colour (.formV2 label.input.fixed .label). */
+    body.setupPage .formV2 label.fixed .label {
+        color: var(--a-text);
+    }
+
+    /* Tables, fields and framed boxes the older pages draw with the Gpack's light defaults. */
+    .adminMain table td,
+    .adminMain table th {
+        color: var(--a-text);
+        background-color: var(--a-bg-2);
+        border-color: var(--a-border);
+    }
+
+    .adminMain table tr:nth-child(even) td {
+        background-color: var(--a-bg-3);
+    }
+}
+
+body.adminPanel,
+body.setupPage {
+    margin: 0;
+    min-width: 0;
+    min-height: 100vh;
+    color: var(--a-text);
+    font: 13px/18px Arial, Helvetica, Verdana, sans-serif;
+    background: var(--a-page) url(../img_ltr/layout/background2019/bg-buildings.jpg) center top / cover fixed no-repeat;
+}
+
+body.rtl.adminPanel,
+body.rtl.setupPage {
+    background-image: url(../img_rtl/layout/background2019/bg-buildings.jpg);
+}
+
+body.adminPanel > div,
+body.setupPage > div {
+    direction: inherit;
+}
+
+.adminPage {
+    box-sizing: border-box;
+    max-inline-size: 1280px;
+    margin-inline: auto;
+    padding: 0 16px 24px;
+}
+
+/* Header ------------------------------------------------------------ */
+.adminHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-block-size: 64px;
+    margin-block-end: 12px;
+    padding: 6px 16px;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    background: rgba(37, 27, 20, 0.72);
+    border: 1px solid rgba(201, 169, 97, 0.55);
+    border-radius: 0 0 6px 6px;
+}
+
+.adminBrand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.adminBrand img {
+    block-size: 52px;
+    inline-size: auto;
+}
+
+.adminBrand strong {
+    display: block;
+    font: 700 20px/24px "Noto Serif", Georgia, serif;
+    letter-spacing: 0.04em;
+}
+
+.adminBrand small {
+    display: block;
+    opacity: 0.85;
+}
+
+.adminHeaderMeta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.adminHeaderLink,
+.adminFooter a {
+    color: #fff;
+}
+
+.adminHeaderLink {
+    padding: 4px 10px;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 3px;
+}
+
+.adminHeaderLink:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.adminBrand:focus-visible,
+.adminHeaderLink:focus-visible,
+.adminMenu a:focus-visible,
+.adminMenu button:focus-visible,
+.adminMain a:focus-visible,
+.adminMain button:focus-visible,
+.adminMain summary:focus-visible,
+.adminMain .textButtonV2:focus-visible,
+.adminFooter button:focus-visible,
+.setupWizard a:focus-visible,
+.setupWizard button:focus-visible {
+    outline: 2px solid #5e88c0;
+    outline-offset: 2px;
+}
+
+/* Shell -------------------------------------------------------------- */
+.adminShell {
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.adminShell:has(.adminAside) {
+    grid-template-columns: 230px minmax(0, 1fr) 280px;
+}
+
+.adminMenu {
+    position: sticky;
+    inset-block-start: 12px;
+    max-block-size: calc(100vh - 24px);
+    overflow-y: auto;
+    background: var(--a-bg-2);
+    border: 1px solid var(--a-border-3);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px var(--a-bg-2), inset 0 0 0 3px var(--a-border-2), 0 2px 8px rgba(0, 0, 0, 0.35);
+    padding-block: 6px;
+}
+
+.adminMenuTitle {
+    margin: 0;
+    padding: 0;
+    color: var(--a-text-strong);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 14px;
+    text-transform: uppercase;
+}
+
+.adminMenuToggle,
+.adminMenuAll {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: start;
+    text-transform: inherit;
+}
+
+.adminMenuToggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    inline-size: 100%;
+    padding: 8px 12px 4px;
+}
+
+.adminMenuToggle:hover {
+    background: var(--a-bg-3);
+}
+
+.adminMenuChevron {
+    flex: 0 0 auto;
+    inline-size: 6px;
+    block-size: 6px;
+    border-inline-end: 2px solid #8a6f4d;
+    border-block-end: 2px solid #8a6f4d;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+}
+
+.adminMenuToggle[aria-expanded="true"] .adminMenuChevron {
+    transform: rotate(45deg);
+}
+
+[dir="rtl"] .adminMenuToggle[aria-expanded="false"] .adminMenuChevron {
+    transform: rotate(135deg);
+}
+
+.adminMenuList[hidden] {
+    display: none;
+}
+
+.adminMenuAll {
+    display: block;
+    margin: 2px 12px 4px auto;
+    padding: 2px 6px;
+    color: var(--a-text-strong);
+    font-size: 11px;
+    text-decoration: underline;
+}
+
+.adminMenuAll[hidden] {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .adminMenuChevron {
+        transition: none;
+    }
+}
+
+.adminMenuGroup + .adminMenuGroup {
+    border-block-start: 1px solid var(--a-border-2);
+}
+
+.adminMenu a {
+    display: block;
+    padding: 4px 12px;
+    color: var(--a-text);
+    text-decoration: none;
+    border-inline-start: 3px solid transparent;
+}
+
+.adminMenu a:hover {
+    background: var(--a-bg-3);
+}
+
+.adminMenu a.current {
+    background: var(--a-bg);
+    border-inline-start-color: #99c01a;
+    color: #000;
+    font-weight: 700;
+}
+
+.adminMain {
+    box-sizing: border-box;
+    min-inline-size: 0;
+    min-block-size: 420px;
+    padding: 20px;
+    overflow-x: auto;
+    background: var(--a-bg-2);
+    border: 1px solid var(--a-border-3);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px var(--a-bg-2), inset 0 0 0 3px var(--a-border-2), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.adminAside {
+    background: var(--a-bg-2);
+    border: 1px solid var(--a-border);
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.adminFooter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+    margin-block-start: 12px;
+    padding: 6px 16px;
+    background: rgba(37, 27, 20, 0.72);
+    border: 1px solid rgba(201, 169, 97, 0.55);
+    border-radius: 6px 6px 0 0;
+    color: #fff;
+    font-size: 11px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Page content ------------------------------------------------------- */
+.adminMain h1,
+.adminMain h2,
+.adminMain h3 {
+    margin: 0 0 10px;
+    color: var(--a-text-strong);
+    font-weight: 700;
+}
+
+.adminMain h1 {
+    margin-block-end: 14px;
+    padding-block-end: 8px;
+    font: 700 20px/26px "Noto Serif", Georgia, serif;
+    letter-spacing: 0.04em;
+    border-block-end: 1px solid var(--a-border-2);
+}
+
+.adminMain h2 {
+    font-size: 16px;
+}
+
+.adminMain h3 {
+    font-size: 14px;
+}
+
+.adminMain hr {
+    border: 0;
+    border-block-start: 1px solid var(--a-border-2);
+    margin-block: 14px;
+}
+
+.adminMain a {
+    color: var(--a-ok);
+}
+
+.adminMain a:hover {
+    color: var(--a-ok);
+}
+
+.adminMain p {
+    margin: 0 0 10px;
+}
+
+.adminCols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.adminBox {
+    margin-block-end: 16px;
+    background: var(--a-bg);
+    border: 1px solid var(--a-border-3);
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(94, 70, 58, 0.18);
+    overflow: hidden;
+}
+
+.adminMain .adminBoxTitle {
+    margin: 0;
+    padding: 7px 12px;
+    background: linear-gradient(180deg, #7a5f4f, #664e40);
+    border-block-end: 2px solid #c9a961;
+    color: #fff;
+    font-size: 13px;
+    line-height: 18px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.adminBoxBody {
+    padding: 12px;
+}
+
+.adminBoxBody > :last-child {
+    margin-block-end: 0;
+}
+
+.adminLead {
+    font-size: 14px;
+    margin-block-end: 14px;
+}
+
+/* Tables ------------------------------------------------------------- */
+.adminTable {
+    inline-size: 100%;
+    margin-block-end: 14px;
+    border-collapse: collapse;
+    background: var(--a-bg);
+    border: 1px solid var(--a-border);
+}
+
+.adminTable caption {
+    padding: 7px 12px;
+    background: #664e40;
+    color: #fff;
+    font-weight: 700;
+    text-align: start;
+}
+
+.adminTable th,
+.adminTable td {
+    padding: 5px 8px;
+    border: 1px solid var(--a-border-2);
+    text-align: start;
+    vertical-align: middle;
+}
+
+.adminTable thead th {
+    background: #664e40;
+    color: #fff;
+    font-weight: 700;
+}
+
+.adminTable thead td,
+.adminTable td.head {
+    background: var(--a-bg-3);
+    color: var(--a-text-strong);
+    font-weight: 700;
+}
+
+.adminTable tbody tr:nth-child(even) td:not(.head) {
+    background: rgba(239, 227, 202, 0.45);
+}
+
+.adminTable tbody tr:hover td:not(.head) {
+    background: var(--a-bg-3);
+}
+
+.adminTable tfoot th,
+.adminTable tfoot td {
+    background: var(--a-bg-3);
+}
+
+.adminTable td.center,
+.adminTable th.center {
+    text-align: center;
+}
+
+.adminTable img {
+    vertical-align: middle;
+}
+
+/* Forms -------------------------------------------------------------- */
+.adminMain input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="image"]):not([type="submit"]),
+.adminMain select,
+.adminMain textarea {
+    box-sizing: border-box;
+    max-inline-size: 100%;
+    padding: 6px 10px;
+    color: var(--a-field-text);
+    font: inherit;
+    background: var(--a-input);
+    border: 1px solid var(--a-border);
+    border-radius: 3px;
+}
+
+.adminMain input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="image"]):not([type="submit"]),
+.adminMain select {
+    min-block-size: 32px;
+}
+
+.adminMain input:focus-visible:not(:disabled),
+.adminMain select:focus-visible:not(:disabled),
+.adminMain textarea:focus-visible:not(:disabled) {
+    outline: 2px solid #5e88c0;
+    outline-offset: 1px;
+    border-color: #5e88c0;
+}
+
+.adminMain input:disabled,
+.adminMain select:disabled,
+.adminMain textarea:disabled {
+    color: var(--a-text-muted);
+    background: var(--a-bg-3);
+    cursor: not-allowed;
+}
+
+.adminMain [aria-invalid="true"],
+.adminMain input:user-invalid,
+.adminMain select:user-invalid,
+.adminMain textarea:user-invalid {
+    border-color: #d40000;
+    background: var(--a-bg-danger);
+}
+
+.adminMain textarea {
+    inline-size: 100%;
+    min-block-size: 110px;
+}
+
+.adminForm {
+    display: grid;
+    grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+    gap: 8px 14px;
+    align-items: center;
+    margin-block-end: 12px;
+}
+
+.adminForm > label,
+.adminForm > .adminFormLabel {
+    font-weight: 700;
+}
+
+.adminForm .wide {
+    grid-column: 1 / -1;
+}
+
+.adminActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-block: 12px;
+}
+
+.adminHint {
+    margin-block-start: 4px;
+    color: var(--a-text-muted);
+    font-size: 12px;
+}
+
+.adminSecretToggle {
+    position: absolute;
+    inset-block-start: 22px;
+    inset-inline-end: 4px;
+    inline-size: 36px;
+    block-size: 36px;
+    padding: 0;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / 20px no-repeat;
+    border: 0;
+    cursor: pointer;
+}
+
+.adminSecretToggle[aria-pressed="true"] {
+    opacity: 0.6;
+}
+
+label.secret {
+    position: relative;
+}
+
+label.secret input {
+    padding-inline-end: 40px;
+}
+
+/* Notices ------------------------------------------------------------ */
+.adminNotice {
+    margin-block-end: 14px;
+    padding: 10px 14px;
+    background: var(--a-bg-warn);
+    border: 1px solid #d9b45a;
+    border-inline-start-width: 4px;
+    border-radius: 3px;
+}
+
+.adminNotice.error {
+    background: var(--a-bg-danger);
+    border-color: #d40000;
+    color: var(--a-danger);
+}
+
+.adminNotice.success {
+    background: var(--a-bg-ok);
+    border-color: #5a9a0a;
+    color: var(--a-ok);
+}
+
+.adminNotice.info {
+    background: var(--a-bg-info);
+    border-color: #8aa4c0;
+}
+
+.adminError {
+    color: var(--a-danger);
+    font-weight: 700;
+}
+
+.adminMuted {
+    color: var(--a-text-muted);
+}
+
+/* Responsive --------------------------------------------------------- */
+@media (max-width: 900px) {
+    .adminShell,
+    .adminShell:has(.adminAside) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .adminMenu {
+        position: static;
+        max-block-size: none;
+        padding: 8px;
+    }
+
+    .adminMenuList:not([hidden]) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding-block-end: 6px;
+    }
+
+    .adminMenuToggle {
+        padding: 6px 4px 2px;
+    }
+
+    .adminMenu a {
+        padding: 6px 10px;
+        border: 1px solid var(--a-border-2);
+        border-radius: 14px;
+    }
+
+    .adminMenu a.current {
+        border-color: #99c01a;
+    }
+
+    .adminMain {
+        padding: 14px;
+    }
+
+    .adminHeaderMeta {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .adminForm {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .adminHeader {
+        flex-wrap: wrap;
+    }
+}
+
+/* Minimap ------------------------------------------------------------ */
+.adminMinimap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.adminMinimapMap {
+    position: relative;
+    flex: 0 1 520px;
+    inline-size: min(520px, 100%);
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--a-bg-3);
+    border: 1px solid var(--a-border);
+    border-radius: 3px;
+    direction: ltr;
+}
+
+.adminMinimapMap .axis {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.adminMinimapMap .axis.horizontal {
+    inset-block-start: 50%;
+    inset-inline: 0;
+    block-size: 1px;
+}
+
+.adminMinimapMap .axis.vertical {
+    inset-inline-start: 50%;
+    inset-block: 0;
+    inline-size: 1px;
+}
+
+.adminMinimapMap .edge {
+    position: absolute;
+    font-size: 10px;
+    line-height: 12px;
+    color: var(--a-text-strong);
+}
+
+.adminMinimapMap .edge.west { inset-inline-start: 4px; inset-block-start: calc(50% + 4px); }
+.adminMinimapMap .edge.east { inset-inline-end: 4px; inset-block-start: calc(50% + 4px); }
+.adminMinimapMap .edge.north { inset-inline-start: calc(50% + 4px); inset-block-start: 2px; }
+.adminMinimapMap .edge.south { inset-inline-start: calc(50% + 4px); inset-block-end: 2px; }
+
+.mapDot {
+    position: absolute;
+    inline-size: var(--dot, 6px);
+    block-size: var(--dot, 6px);
+    border-radius: 50%;
+    background: #888;
+    transform: translate(-50%, -50%);
+}
+
+a.mapDot:hover,
+a.mapDot:focus-visible {
+    z-index: 2;
+    outline: 2px solid #664e40;
+    outline-offset: 1px;
+}
+
+.mapDot.static {
+    display: inline-block;
+    position: static;
+    inline-size: 8px;
+    block-size: 8px;
+    margin: 0 4px 0 0;
+    vertical-align: middle;
+    transform: none;
+}
+
+.mapDot.tribe0 { background: #7b807e; }
+.mapDot.tribe1 { background: #1605f6; }
+.mapDot.tribe2 { background: #f6050b; }
+.mapDot.tribe3 { background: #09f7f9; }
+.mapDot.tribe5 { background: #f9f109; }
+.mapDot.tribe6 { background: #00ffd2; }
+.mapDot.tribe7 { background: #f600ff; }
+.mapDot.tribe8 { background: #e08a00; }
+.mapDot.tribe9 { background: #5a3a8c; }
+
+.adminMinimapLegend {
+    margin: 0;
+    padding: 10px 14px;
+    list-style: none;
+    background: var(--a-bg);
+    border: 1px solid var(--a-border);
+    border-radius: 3px;
+}
+
+.adminMinimapLegend li {
+    padding-block: 2px;
+}
+
+.adminMain .center {
+    text-align: center;
+}
+
+.adminWarn {
+    color: var(--a-warn);
+    font-weight: 700;
+}
+
+/* Two-column page sections and small status helpers ------------------- */
+.adminCol {
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    inline-size: 49%;
+    margin-inline-end: 1%;
+}
+
+.adminInline {
+    display: inline-block;
+    margin-inline-end: 10px;
+}
+
+.adminSuccess {
+    color: var(--a-ok);
+    font-weight: 700;
+}
+
+.adminStat {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.adminStat.red { color: #b00000; }
+.adminStat.orange { color: #c26a00; }
+.adminStat.green { color: #2f7d0a; }
+
+@media (max-width: 900px) {
+    .adminCol {
+        inline-size: 100%;
+        margin-inline-end: 0;
+    }
+}
+
+/* Setup wizard ------------------------------------------------------- */
+.setupWizard {
+    max-inline-size: 860px;
+}
+
+.setupMain {
+    min-block-size: 0;
+}
+
+.setupSteps {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: setupStep;
+}
+
+.setupSteps li {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-inline-size: 0;
+    padding-block-start: 8px;
+    color: var(--a-text-muted);
+    font-weight: 700;
+    border-block-start: 4px solid var(--a-border-2);
+    counter-increment: setupStep;
+}
+
+.setupSteps li::before {
+    content: counter(setupStep);
+    flex: none;
+    inline-size: 24px;
+    block-size: 24px;
+    line-height: 22px;
+    text-align: center;
+    color: var(--a-text-muted);
+    background: var(--a-bg);
+    border: 1px solid var(--a-border);
+    border-radius: 50%;
+}
+
+.setupSteps li.done,
+.setupSteps li.current {
+    border-color: #99c01a;
+}
+
+.setupSteps li.done::before {
+    content: "\2713";
+    color: #fff;
+    background: #5a9a0a;
+    border-color: #5a9a0a;
+}
+
+.setupSteps li.current {
+    color: var(--a-text);
+}
+
+.setupSteps li.current::before {
+    color: #fff;
+    background: #664e40;
+    border-color: #c9a961;
+    box-shadow: 0 0 0 2px #f4efe4, 0 0 0 3px #c9a961;
+}
+
+.setupWizard fieldset {
+    min-inline-size: 0;
+    margin: 0 0 16px;
+    padding: 0;
+    border: 0;
+}
+
+.setupWizard fieldset > h2 {
+    margin: 0 0 12px;
+    padding: 7px 12px;
+    color: #fff;
+    background: linear-gradient(180deg, #7a5f4f, #664e40);
+    border-block-end: 2px solid #c9a961;
+    border-radius: 3px 3px 0 0;
+    font-size: 14px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.setupWizard label:has(:required) .label::after {
+    content: " *";
+    color: var(--a-danger);
+}
+
+.setupWizard code {
+    padding: 0 4px;
+    background: var(--a-bg-3);
+    border-radius: 2px;
+}
+
+.js .setupWizard fieldset:not(.active) {
+    display: none;
+}
+
+.setupWizard .adminMain h3,
+.setupWizard h3 {
+    margin-block: 18px 6px;
+}
+
+.adminGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+}
+
+.adminGrid .wide {
+    grid-column: 1 / -1;
+}
+
+.adminGrid > *,
+.adminGrid label {
+    min-inline-size: 0;
+}
+
+.adminHint,
+.adminHint code {
+    overflow-wrap: anywhere;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.adminGrid > label,
+.adminGrid > div > label {
+    inline-size: 100%;
+}
+
+.adminGrid label.input,
+.adminGrid label.select,
+.adminGrid label.textarea {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.adminGrid input:not([type="checkbox"]),
+.adminGrid select {
+    box-sizing: border-box;
+    inline-size: 100%;
+}
+
+/* Same specificity as the Gpack's fixed select (content-box, 15px padding), and later, so it wins. */
+.adminGrid label.select.fixed select {
+    box-sizing: border-box;
+    block-size: 40px;
+    padding: 6px 10px;
+}
+
+[data-mode="simple"] .advancedOnly,
+[data-mode="advanced"] .simpleOnly,
+[hidden] {
+    display: none !important;
+}
+
+.no-js-hidden {
+    display: none;
+}
+
+.js .no-js-hidden {
+    display: flex;
+}
+
+.js ol.no-js-hidden {
+    display: flex;
+}
+
+.setupActions {
+    justify-content: flex-end;
+    padding-block-start: 14px;
+    border-block-start: 1px solid var(--a-border-2);
+}
+
+.setupActions .back {
+    margin-inline-end: auto;
+}
+
+@media (max-width: 620px) {
+    .adminGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .setupSteps li {
+        justify-content: center;
+        font-size: 0;
+        border-block-start-width: 6px;
+    }
+
+    .setupSteps li::before {
+        font-size: 13px;
+    }
+
+    .setupWizard .adminMain {
+        padding: 14px;
+    }
+}
+
+.js .setupWizard fieldset.no-js-hidden.active {
+    display: block;
+}
+
+/* Simple / Advanced view ---------------------------------------------------- */
+.adminViewToggle {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid rgba(201, 169, 97, 0.55);
+    border-radius: 4px;
+}
+
+.adminViewToggle a {
+    padding: 2px 10px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.adminViewToggle a[aria-current="true"] {
+    background: rgba(201, 169, 97, 0.55);
+}
+
+.adminViewNote {
+    margin-block: 12px 0;
+    color: var(--a-text-muted);
+}
+
+/* Setup checklist ------------------------------------------------------------ */
+.adminChecklistList {
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+}
+
+.adminChecklist {
+    margin-block: 4px;
+    color: var(--a-text);
+    padding: 6px 10px;
+    border: 1px solid var(--a-border);
+    border-inline-start-width: 4px;
+    border-radius: 3px;
+    background: var(--a-bg);
+}
+
+.adminChecklist.error { border-color: var(--a-danger); }
+.adminChecklist.warning { border-color: var(--a-warn); }
+.adminChecklist.info { border-color: var(--a-border-3); }
+.adminChecklist.success { border-color: var(--a-ok); }
+
+/* Panel checkboxes: AdminUi::checkbox draws the Gpack checkbox svg, but the panel does not load the Gpack form styles the wizard gets from formV2; the native input stays for the keyboard and screen readers. */
+.adminPanel .adminMain label.checkbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    cursor: pointer;
+}
+
+.adminPanel .adminMain label.checkbox input {
+    position: absolute;
+    inset-inline-start: 0;
+    inline-size: 18px;
+    block-size: 18px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.adminPanel .adminMain label.checkbox svg.checkbox {
+    flex: none;
+    inline-size: 18px;
+    block-size: 18px;
+}
+
+.adminPanel .adminMain label.checkbox .box {
+    fill: var(--a-input);
+    stroke: var(--a-border-2);
+    stroke-width: 1;
+}
+
+.adminPanel .adminMain label.checkbox .checkmark {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    opacity: 0;
+}
+
+.adminPanel .adminMain label.checkbox .indeterminate {
+    display: none;
+}
+
+.adminPanel .adminMain label.checkbox input:checked + svg .box {
+    fill: #6f9a12;
+    stroke: #6f9a12;
+}
+
+.adminPanel .adminMain label.checkbox input:checked + svg .checkmark {
+    opacity: 1;
+}
+
+.adminPanel .adminMain label.checkbox input:focus-visible + svg .box {
+    stroke: #99c01a;
+    stroke-width: 2;
+}
+
+.adminPanel .adminMain label.checkbox .label {
+    display: block;
+}

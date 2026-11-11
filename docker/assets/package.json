@@ -1,0 +1,10 @@
+{
+  "name": "opentravian-asset-build",
+  "private": true,
+  "description": "Image-build-only minifiers for the web image's static assets. Exact pins; not a runtime dependency.",
+  "type": "module",
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "svgo": "4.1.0"
+  }
+}
