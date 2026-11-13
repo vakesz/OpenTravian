@@ -6144,12 +6144,3 @@ body.rtl.rearrangeBuildings .rearrangeBuildings .container button.confirm {
 
 /* Keyboard focus on the home news card: its link is a 0x0 stretched link without chrome, so ring the card (same ring as the other public controls). */
 .publicHomepage .homepageNewsCard .newsPreview:has(.linkToFullArticle a:focus-visible) { box-shadow: 2px 2px 6px 0 #0000004d, 0 0 2px 3px rgb(0 102 255 / 70%); }
-
-/* Wonder of the World: the village keeps slots 21, 26, 30, 31 and 32 free for it and draws it from slot 26. Give
- * that slot the 299x440 sprite box and stand the Wonder over the free slots (both directions via inset-inline-start). */
-#contentOuterContainer .village2 #villageContent .buildingSlot.a26.g40 {
-  width: 299px;
-  height: 440px;
-  top: 120px;
-  inset-inline-start: 428px;
-}

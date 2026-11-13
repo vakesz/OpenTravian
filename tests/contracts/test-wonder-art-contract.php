@@ -38,9 +38,29 @@ foreach (['roman', 'teuton', 'gaul', 'egyptian', 'hun', 'spartan', 'viking'] as 
     }
 }
 
-$overrides = (string) file_get_contents($root . '/assets/gpack/travian/mainPage/lang/overrides.css');
-if (preg_match('/\.buildingSlot\.a26\.g40 \{[^}]*width: 299px;[^}]*height: 440px;[^}]*inset-inline-start:/s', $overrides) !== 1) {
-    $fail('The Wonder slot must get the 299x440 sprite box in both directions.');
+// 14 building slots stay free besides the Main Building, Rally Point and wall: the Wonder stands on the other five
+// and is drawn from slot 35, which the Gpack styles as the 299x440 Wonder box in both directions.
+if (\Model\WonderOfTheWorldModel::RESERVED_SLOTS !== [21, 29, 31, 32, 35] || \Model\WonderOfTheWorldModel::DISPLAY_SLOT !== 35) {
+    $fail('A Wonder village must reserve slots 21, 29, 31, 32 and 35 and draw the Wonder from slot 35.');
+}
+if (in_array(26, \Model\WonderOfTheWorldModel::RESERVED_SLOTS, true)) {
+    $fail('A Wonder village keeps its Main Building slot.');
+}
+foreach (['css_ltr' => 'left', 'css_rtl' => 'right'] as $dir => $side) {
+    $css = (string) file_get_contents($root . "/assets/gpack/travian/mainPage/{$dir}/imports.css");
+    if (preg_match('/\.buildingSlot\.a35\.g40 \{\s*width: 299px;\s*height: 440px;\s*top: 147px;\s*' . $side . ': 501px;/', $css) !== 1) {
+        $fail("The {$dir} Gpack must style the Wonder box on slot 35.");
+    }
+}
+$centre = (string) file_get_contents($root . '/game/include/Controller/VillageCenterCtrl.php');
+if (!str_contains($centre, '$i === WonderOfTheWorldModel::DISPLAY_SLOT')) {
+    $fail('The village centre must draw the Wonder from its display slot.');
+}
+foreach (['Core/Village.php', 'Controller/BuildCtrl.php', 'Game/Buildings/AutoUpgradeAI.php'] as $file) {
+    $source = (string) file_get_contents($root . '/game/include/' . $file);
+    if (!str_contains($source, 'WonderOfTheWorldModel::RESERVED_SLOTS') || preg_match('/\[21, ?26, ?3[01]/', $source) === 1) {
+        $fail("{$file} must use WonderOfTheWorldModel::RESERVED_SLOTS.");
+    }
 }
 
 $map = (string) file_get_contents($root . '/game/include/Controller/MapBlockCtrl.php');

@@ -15,6 +15,15 @@ use const MAP_SIZE;
 
 class WonderOfTheWorldModel
 {
+    /**
+     * Village-centre slots the Wonder stands on. A Wonder village keeps 14 building slots besides the Main Building
+     * (26), the Rally Point and the wall; opening one of these five opens the Wonder (field 99).
+     */
+    public const RESERVED_SLOTS = [21, 29, 31, 32, 35];
+
+    /** The reserved slot the village centre draws the Wonder from (the Gpack styles .buildingSlot.a35.g40). */
+    public const DISPLAY_SLOT = 35;
+
     /** Art stage 0-5 of a Wonder at this level: 0-19, 20-39, 40-59, 60-79, 80-89 and 90 or more. */
     public static function stage(int $level): int
     {

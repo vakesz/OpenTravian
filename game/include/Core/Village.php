@@ -1697,7 +1697,7 @@ class Village
         if (Config::getInstance()->dynamic->serverFinished) {
             return false;
         }
-        if ($this->isWW() && in_array($field, [21, 26, 30, 31, 32, 99])) {
+        if ($this->isWW() && in_array($field, [...\Model\WonderOfTheWorldModel::RESERVED_SLOTS, 99])) {
             $field = 99;
         }
         if (!isset($this->buildings[$field])) {

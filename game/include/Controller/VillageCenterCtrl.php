@@ -36,11 +36,11 @@ class VillageCenterCtrl extends GameCtrl
         $village = $this->session->village;
         $maps = [];
         for ($i = 19; $i <= 40; ++$i) {
-            if ($village->isWW() && in_array($i, [21, /*26,*/ 30, 31, 32])) {
+            if ($village->isWW() && $i !== WonderOfTheWorldModel::DISPLAY_SLOT && in_array($i, WonderOfTheWorldModel::RESERVED_SLOTS, true)) {
                 continue;
             }
             $index = $i;
-            if ($village->isWW() && $i == 26) {
+            if ($village->isWW() && $i === WonderOfTheWorldModel::DISPLAY_SLOT) {
                 $index = 99;
             }
             $title = $village->getFieldTitleAsString($index);
