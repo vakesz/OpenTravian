@@ -7,11 +7,14 @@
 #                             changed contracts, no-minified and gpack contracts
 #   dev/check.sh --no-browser skip the Playwright tests
 #   dev/check.sh --visual     also compare screenshots of the key routes with tests/visual/baselines
-#   dev/check.sh --build      also build the production images
+#   dev/check.sh --build      also build the production images (CI does that in its own job)
 #
 # Contracts and runtime checks run one PHP process per file (one process for all
-# of them runs out of memory), 40 files per `compose exec`, 60 s each. A file
-# fails on a non-zero exit, a timeout, or any PHP Warning/Notice/Deprecated.
+# of them runs out of memory), CHECK_BATCH files (default 10) per `compose exec`,
+# CHECK_JOBS batches at once (default 4), 60 s per file. A file fails on a
+# non-zero exit, a timeout, or any PHP Warning/Notice/Deprecated. Tests that share
+# world state run one at a time, after the parallel ones: they are listed, with
+# the reason, in dev/check-serial-contracts.txt and dev/check-serial-runtime.txt.
 # "Changed" means modified, staged or untracked files in the working tree.
 set -u
 
@@ -53,16 +56,48 @@ step() {
 
 php_exec() { docker compose exec -T -w /travian php "$@" </dev/null; }
 
-# php_files <files...>: one process per file, in batches.
-php_files() {
-    printf '%s\n' "$@" | xargs -n 40 docker compose exec -T -w /travian php sh -c '
-        for f in "$@"; do
-            out=$(timeout 60 php -d error_reporting=-1 -d display_errors=1 "$f" 2>&1 </dev/null) || { echo "FAIL $f"; echo "$out" | tail -n 5; continue; }
-            echo "$out" | grep -Eq "(PHP )?(Warning|Notice|Deprecated): " && { echo "FAIL $f"; echo "$out" | grep -E "(Warning|Notice|Deprecated): " | head -n 3; }
-        done' _ > "$tmp/php" 2>&1
-    cat "$tmp/php"
-    ! grep -q '^FAIL ' "$tmp/php"
+jobs=${CHECK_JOBS:-4}
+batch=${CHECK_BATCH:-10}
+
+# The per-file check, run inside the container. Kept in a variable so xargs can hand it to every batch.
+php_batch='
+    for f in "$@"; do
+        out=$(timeout 60 php -d error_reporting=-1 -d display_errors=1 "$f" 2>&1 </dev/null) || { echo "FAIL $f"; echo "$out" | tail -n 5; continue; }
+        echo "$out" | grep -Eq "(PHP )?(Warning|Notice|Deprecated): " && { echo "FAIL $f"; echo "$out" | grep -E "(Warning|Notice|Deprecated): " | head -n 3; }
+    done'
+
+# run_batches <jobs> <files...>: one process per file, in batches of $batch, <jobs> batches
+# at once. Every batch writes its own file, so output from parallel batches never
+# interleaves mid-line; the files are printed together afterwards.
+run_batches() {
+    n=$1; shift
+    dir=$(mktemp -d "$tmp/php.XXXXXX")
+    printf '%s\n' "$@" | xargs -n "$batch" -P "$n" sh -c '
+        dir=$1 script=$2; shift 2
+        docker compose exec -T -w /travian php sh -c "$script" _ "$@" > "$(mktemp "$dir/batch.XXXXXX")" 2>&1' _ "$dir" "$php_batch"
+    cat "$dir"/batch.*
+    ! cat "$dir"/batch.* | grep -q '^FAIL '
 }
+php_files() { run_batches "$jobs" "$@"; }
+php_files_serial() { run_batches 1 "$@"; }
+
+# serial_list <file>: the paths in a serial list, without comments and blank lines.
+serial_list() { grep -v '^[[:space:]]*\(#\|$\)' "$1"; }
+
+# split_tests <dir> <serial list>: sets parallel_tests and serial_tests for the tests in <dir>.
+# A listed file that no longer exists fails the run, so the lists cannot go stale unnoticed.
+split_tests() {
+    all=$(ls "$1"/test-*.php)
+    serial_tests=$(serial_list "$2")
+    for f in $serial_tests; do
+        echo "$all" | grep -qxF "$f" || { echo "dev/check.sh: $2 lists $f, which does not exist." >&2; exit 2; }
+    done
+    parallel_tests=$(echo "$all" | grep -vxF "$serial_tests")
+}
+
+# php -l takes many files and keeps going after an error, but exits 255, which would
+# make xargs stop starting batches; report the errors and exit 1 instead.
+lint_batch='out=$(php -l "$@") || { echo "$out" | grep -v "^No syntax errors"; exit 1; }'
 
 lint() { php_exec sh -c 'for f in "$@"; do php -l "$f" >/dev/null || exit 1; done' _ "$@"; }
 
@@ -86,11 +121,18 @@ else
         COMPOSE_FILE=compose.yaml docker compose config --quiet &&
         COMPOSE_FILE=compose.yaml:compose.build.yaml docker compose config --quiet &&
         COMPOSE_FILE=compose.yaml:compose.tls.yaml TRAVIAN_DOMAIN=game.example.test docker compose config --quiet'
-    step "php -l (all)" php_exec sh -c 'find . -name "*.php" ! -path "*/vendor/*" ! -path "*/node_modules/*" -print0 | xargs -0 -n1 php -l >/dev/null'
-    # shellcheck disable=SC2046
-    step "contracts" php_files $(ls tests/contracts/test-*.php)
-    # shellcheck disable=SC2046
-    step "runtime" php_files $(ls tests/runtime/test-*.php)
+    step "php -l (all)" php_exec sh -c '
+        find . -name "*.php" ! -path "*/vendor/*" ! -path "*/node_modules/*" -print0 | xargs -0 -n 50 -P "$1" sh -c "$2" _' _ "$jobs" "$lint_batch"
+    split_tests tests/contracts dev/check-serial-contracts.txt
+    # shellcheck disable=SC2086
+    step "contracts" php_files $parallel_tests
+    # shellcheck disable=SC2086
+    [ -z "$serial_tests" ] || step "contracts (serial)" php_files_serial $serial_tests
+    split_tests tests/runtime dev/check-serial-runtime.txt
+    # shellcheck disable=SC2086
+    step "runtime" php_files $parallel_tests
+    # shellcheck disable=SC2086
+    [ -z "$serial_tests" ] || step "runtime (serial)" php_files_serial $serial_tests
     step "phpstan" dev/phpstan/run.sh
     [ "$browser" = 0 ] || step "client tests" dev/client-tests/run.sh
     [ "$visual" = 0 ] || step "visual regression" dev/visual-tests/run.sh

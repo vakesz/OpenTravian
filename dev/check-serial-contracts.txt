@@ -1,0 +1,9 @@
+# Contract tests that share state and so run one at a time, after the parallel ones (dev/check.sh).
+# They change rows of the same real race-4 village, or pick random free map slots.
+tests/contracts/test-harbor-ships-contract.php
+tests/contracts/test-ship-movement-contract.php
+tests/contracts/test-high-speed-queue-presentation-contract.php
+tests/contracts/test-village-starter-buildings-contract.php
+
+# Compare a decay that moves every second, so a slow, loaded run can cross a second between insert and read.
+tests/contracts/test-wounded-contract.php

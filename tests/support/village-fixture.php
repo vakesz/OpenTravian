@@ -15,6 +15,10 @@ use Core\Database\DBI;
 function fixtureVillageCreate(?int $race = null): array
 {
     $pdo = DBI::getInstance();
+    // Tests run in parallel (dev/check.sh). The free slot is chosen here and taken by the vdata insert below, so
+    // this lock keeps two processes from choosing the same one. It is released after that insert, and by MariaDB
+    // when the connection closes.
+    $pdo->fetchScalar("SELECT GET_LOCK('zzfx-map-slot', 30)");
     $source = $pdo->fetchSingleRow(
         'SELECT u.id, u.kid FROM users u JOIN vdata v ON v.kid=u.kid JOIN fdata f ON f.kid=v.kid WHERE u.id>2 AND v.capital=1 ORDER BY u.id LIMIT 1'
     );
@@ -64,6 +68,7 @@ function fixtureVillageCreate(?int $race = null): array
     }
     $village = ['kid' => (string)$kid];
     $clone('vdata', 'kid', (int)$source['kid'], ['kid' => (string)$kid, 'owner' => (string)$uid, 'expandedfrom' => '0']);
+    $pdo->fetchScalar("SELECT RELEASE_LOCK('zzfx-map-slot')");
     foreach (['fdata', 'units', 'tdata', 'smithy'] as $table) {
         $clone($table, 'kid', (int)$source['kid'], $village);
     }
