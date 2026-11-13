@@ -15,6 +15,19 @@ use const MAP_SIZE;
 
 class WonderOfTheWorldModel
 {
+    /** Art stage 0-5 of a Wonder at this level: 0-19, 20-39, 40-59, 60-79, 80-89 and 90 or more. */
+    public static function stage(int $level): int
+    {
+        if ($level >= 90) {
+            return 5;
+        }
+        if ($level >= 80) {
+            return 4;
+        }
+
+        return intdiv(max(0, $level), 20);
+    }
+
     public function attackWWVillage(int $kid, int $level): void
     {
         if (!getCustom('attackWWOnLevelUp')) {

@@ -83,29 +83,15 @@
 			
 		
 		<?php elseif ($map['item_id'] == 40):?>
-			<?php if ($map['level'] >= 0 && $map['level'] <= 19):?>
-			<svg width="298" height="318" viewBox="0 0 298 318" class="buildingShape g40_0">
-				<?= $shapeGroups($buildingField['g'.$map['item_id'][0]], $buildingUrl, $map['title']); ?>
-			</svg>
-			<?php elseif ($map['level'] >= 20 && $map['level'] <= 39):?>
-			<svg width="298" height="318" viewBox="0 0 298 318" class="buildingShape g40_1">
-				<?= $shapeGroups($buildingField['g'.$map['item_id'][1]], $buildingUrl, $map['title']); ?>
-			</svg>
-			<?php elseif ($map['level'] >= 40 && $map['level'] <= 59):?>
-			<svg width="298" height="318" viewBox="0 0 298 318" class="buildingShape g40_2">
-				<?= $shapeGroups($buildingField['g'.$map['item_id'][2]], $buildingUrl, $map['title']); ?>
-			</svg>
-			<?php elseif ($map['level'] >= 60 && $map['level'] <= 79):?>
-			<svg width="298" height="318" viewBox="0 0 298 318" class="buildingShape g40_3">
-				<?= $shapeGroups($buildingField['g'.$map['item_id'][3]], $buildingUrl, $map['title']); ?>
-			</svg>
-			<?php elseif ($map['level'] >= 80 && $map['level'] <= 89):?>
-			<svg width="298" height="318" viewBox="0 0 298 318" class="buildingShape g40_4">
-				<?= $shapeGroups($buildingField['g'.$map['item_id'][4]], $buildingUrl, $map['title']); ?>
-			</svg>
-			<?php elseif ($map['level'] >= 90):?>
-			<svg width="298" height="318" viewBox="0 0 298 318" class="buildingShape g40_5">
-				<?= $shapeGroups($buildingField['g'.$map['item_id'][5]], $buildingUrl, $map['title']); ?>
+			<?php
+				// The outline is traced from the viewer's tribe sprite for this stage (dev/wonder-sprites/generate.py),
+				// in the same 299x440 box as the sprite.
+				$wwStage = \Model\WonderOfTheWorldModel::stage((int)$map['level']);
+				$wwPath = $buildingField['g40'][$vars['raceName']][$wwStage] ?? null;
+			?>
+			<?php if ($wwPath !== null):?>
+			<svg width="299" height="440" viewBox="0 0 299 440" class="buildingShape g40_<?= $wwStage; ?>">
+				<?= $shapeGroups($wwPath, $buildingUrl, $map['title']); ?>
 			</svg>
 			<?php endif;?>
 		<?php elseif ((int)$map['item_id'] === 49):?>

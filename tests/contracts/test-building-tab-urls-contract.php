@@ -103,7 +103,8 @@ foreach ([
         $fail("Dorf2 built-slot URL parity is missing {$fragment}.");
     }
 }
-if (substr_count($dorf2, '$shapeGroups(') < 8
+// Five building hit-area kinds plus the Wonder, which draws one stage-selected outline.
+if (substr_count($dorf2, '$shapeGroups(') < 6
     || !str_contains($dorf2, "window.location.href=\\'' . \$url . '\\'")
     || str_contains($dorf2, 'fastUP')
     || str_contains($dorf2, "href=\"/build.php?id=<?= \$map['index']; ?>")) {
