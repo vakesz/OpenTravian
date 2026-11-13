@@ -1,0 +1,50 @@
+# Runtime tests that share state and so run one at a time, after the parallel ones (dev/check.sh).
+# Anything not listed here must only touch its own fixture player and village (tests/support/village-fixture.php).
+
+# Write the world's config row (ArtifactsReleased, round state), or hold a lock on it in a transaction.
+tests/runtime/test-battle-scenarios-runtime.php
+tests/runtime/test-conquer-loyalty-protection-runtime.php
+tests/runtime/test-battle-movement-runtime.php
+tests/runtime/test-world-speed-round-runtime.php
+tests/runtime/test-world-speed-timers-runtime.php
+
+# Create databases, put the world in maintenance mode through Redis, or restore backups over it.
+tests/runtime/test-round-reset-runtime.php
+tests/runtime/test-backup-restore-runtime.php
+tests/runtime/test-db-password-rotation-runtime.php
+tests/runtime/test-restore-aftercare-runtime.php
+
+# Use the shared oasis, artifact and alliance rows, or an alliance tag that is unique.
+tests/runtime/test-artifact-rules-runtime.php
+tests/runtime/test-oasis-bonus-runtime.php
+tests/runtime/test-combat-boosts-runtime.php
+tests/runtime/test-alliance-bonus-contribution-runtime.php
+
+# Count or delete auctions of the whole world.
+tests/runtime/test-auction-lists-runtime.php
+tests/runtime/test-auction-fee-runtime.php
+tests/runtime/test-auction-bidding-runtime.php
+tests/runtime/test-auction-duration-runtime.php
+
+# Delete queued mail by a shared address pattern.
+tests/runtime/test-mail-service-runtime.php
+tests/runtime/test-event-mail-runtime.php
+tests/runtime/test-reminder-mail-runtime.php
+tests/runtime/test-mail-queue-warning-runtime.php
+
+# Read or write world-wide queues, counts and settings.
+tests/runtime/test-webhook-runtime.php
+tests/runtime/test-world-stats-runtime.php
+tests/runtime/test-metrics-runtime.php
+tests/runtime/test-catch-up-runtime.php
+tests/runtime/test-engine-fingerprint-runtime.php
+tests/runtime/test-installer-world-settings.php
+tests/runtime/test-installer-water-runtime.php
+tests/runtime/test-schema-seeds.php
+tests/runtime/test-translations-tool-runtime.php
+tests/runtime/test-account-deletion-runtime.php
+tests/runtime/test-report-retention-runtime.php
+
+# Insert auto-extend rows the engine's own job also picks up; a loaded machine widens that window.
+tests/runtime/test-auto-extend-duration-runtime.php
+tests/runtime/test-daily-boost-extension-runtime.php

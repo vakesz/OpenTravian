@@ -32,6 +32,33 @@ jobs:
           args: --offline --include-fragments --no-progress README.md docs/*.md tools/README.md tests/README.md database/README.md
           fail: true
 
+  # The production images are built here, beside the tests, instead of by
+  # dev/check.sh --build. Nothing is pushed or loaded: the build is the check.
+  production-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Compose needs the required variables to read the files; the values are not used.
+      - name: Write .env
+        run: sh config/bootstrap-env.sh
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      # The runtime stage is shared with the dev image, so its cache is read too.
+      - name: Build the production images
+        uses: docker/bake-action@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
+        with:
+          source: .
+          files: compose.yaml,compose.build.yaml
+          set: |
+            *.cache-from=type=gha,scope=prod
+            *.cache-from=type=gha,scope=dev-php
+            *.cache-to=type=gha,mode=max,scope=prod
+
   check:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -45,8 +72,25 @@ jobs:
       - name: Write .env
         run: sh config/bootstrap-env.sh --dev
 
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      # The dev image (php target `runtime`) copies no source, so its layers stay valid
+      # across commits and come from the Actions cache. `load` puts it into the local
+      # Docker daemon as opentravian-app:dev, which compose then uses without building.
+      # bake-action, not a run step: only the action gets the cache service's credentials.
+      - name: Build the dev image
+        uses: docker/bake-action@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
+        with:
+          source: .
+          files: compose.yaml,compose.dev.yaml
+          targets: php
+          load: true
+          set: |
+            *.cache-from=type=gha,scope=dev-php
+            *.cache-to=type=gha,mode=max,scope=dev-php
+
       - name: Start the dev stack
-        run: docker compose up -d --build --wait
+        run: docker compose up -d --wait
 
       - name: Install the world headlessly
         run: dev/install-world.sh
@@ -77,7 +121,7 @@ jobs:
         run: dev/phpstan/fetch.sh
 
       - name: Run dev/check.sh
-        run: dev/check.sh --build
+        run: dev/check.sh
 
       - name: Collect container logs
         if: failure()
