@@ -1,6 +1,6 @@
 # OpenTravian
 
-OpenTravian is a self-hosted game world. `game/` is the runtime, `assets/gpack/travian/mainPage/` is the game pack, and the images are published multi-arch (amd64 and arm64) containers.
+OpenTravian is a self-hosted game world ([website and screenshots](https://vakesz.github.io/OpenTravian/)). `game/` is the runtime, `assets/gpack/travian/mainPage/` is the game pack, and the images are published multi-arch (amd64 and arm64) containers.
 
 ## Play alone on your own computer
 

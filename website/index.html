@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenTravian</title>
+  <meta name="description" content="A self-hosted browser strategy world, shipped as Docker images. Play solo or host a world for others.">
+  <meta property="og:title" content="OpenTravian">
+  <meta property="og:description" content="A self-hosted browser strategy world, shipped as Docker images. Play solo or host a world for others.">
+  <meta property="og:image" content="https://vakesz.github.io/OpenTravian/screenshots/wonder.webp">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 28V12l6-6 6 6 6-6 6 6v16z' fill='%23b4532a'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="OpenTravian home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 28V12l6-6 6 6 6-6 6 6v16z"/></svg>
+        OpenTravian
+      </a>
+      <nav>
+        <a href="#screens">Screens</a>
+        <a href="#features">Features</a>
+        <a href="#start">Get started</a>
+        <a class="btn btn-small" href="https://github.com/vakesz/OpenTravian">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Self-hosted · MIT · Docker</p>
+          <h1>Your own browser strategy world, on your own machine.</h1>
+          <p class="lede">Build villages, raise armies, raid farms and run an alliance. OpenTravian ships as multi-arch Docker images: play alone in fifteen minutes, or host a world for your friends.</p>
+          <div class="cta">
+            <a class="btn" href="#start">Get started</a>
+            <a class="btn btn-ghost" href="https://github.com/vakesz/OpenTravian">View source</a>
+          </div>
+        </div>
+        <figure class="hero-shot">
+          <img src="screenshots/wonder.webp" alt="A Wonder of the World at level 42 in the middle of its village" width="1440" height="900">
+        </figure>
+      </div>
+    </section>
+
+    <section id="screens" class="screens">
+      <div class="wrap">
+        <h2>A look around</h2>
+        <p class="section-lede">Captured from a local world seeded with three alliances, Natar farms and a Wonder in progress.</p>
+        <div class="tabs" role="tablist" aria-label="Screenshots"></div>
+        <figure class="viewer">
+          <img id="viewer-img" src="screenshots/village.webp" alt="" width="1440" height="900">
+          <figcaption id="viewer-cap"></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <div class="wrap">
+        <h2>What you get</h2>
+        <div class="grid">
+          <article>
+            <h3>Six tribes</h3>
+            <p>Romans, Teutons, Gauls, Egyptians, Huns and Spartans, each with its own troops and buildings.</p>
+          </article>
+          <article>
+            <h3>Your pace</h3>
+            <p>Pick a world speed from the classic 1× to as fast as you like. Stop the stack and time in the world stands still.</p>
+          </article>
+          <article>
+            <h3>Farms to raid</h3>
+            <p>Seed up to a thousand computer-owned villages on the map so a solo world never runs out of targets.</p>
+          </article>
+          <article>
+            <h3>One command</h3>
+            <p>Docker Compose brings up the game, database and cache. Images are published for amd64 and arm64.</p>
+          </article>
+          <article>
+            <h3>Ready to host</h3>
+            <p>HTTPS with Caddy or your own proxy, scheduled backups, health checks and upgrade paths are documented.</p>
+          </article>
+          <article>
+            <h3>Translatable</h3>
+            <p>Export a locale to CSV or PO, edit it in any tool, and import it back into its catalogue.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="start" class="start">
+      <div class="wrap start-grid">
+        <div>
+          <h2>Get started</h2>
+          <p>You need Docker and about 2&nbsp;GB of free memory. The first start builds the game and creates the world.</p>
+          <p>Then open <code>http://localhost:8080</code> and sign in. The <a href="https://github.com/vakesz/OpenTravian#play-alone-on-your-own-computer">step-by-step guide</a> covers choosing your name, tribe and speed without the setup wizard.</p>
+          <ul class="links">
+            <li><a href="https://github.com/vakesz/OpenTravian/blob/main/docs/install.md">Install</a></li>
+            <li><a href="https://github.com/vakesz/OpenTravian/blob/main/docs/deploy.md">Deploy</a></li>
+            <li><a href="https://github.com/vakesz/OpenTravian/blob/main/docs/configuration.md">Configuration</a></li>
+            <li><a href="https://github.com/vakesz/OpenTravian/blob/main/docs/operate.md">Operate</a></li>
+            <li><a href="https://github.com/vakesz/OpenTravian/blob/main/docs/troubleshooting.md">Troubleshooting</a></li>
+          </ul>
+        </div>
+        <pre class="terminal"><code><span class="c"># get the code</span>
+git clone https://github.com/vakesz/OpenTravian.git
+cd OpenTravian
+
+<span class="c"># generate .env with fresh secrets</span>
+sh config/bootstrap-env.sh
+
+<span class="c"># build and start the world</span>
+COMPOSE_FILE=compose.yaml:compose.build.yaml \
+  docker compose up -d --build --wait
+
+<span class="c"># finish setup in the browser</span>
+open http://localhost:8080/setup/</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>Original code is MIT. Bundled game assets, strings and third-party libraries keep their own notices.</p>
+      <p>OpenTravian is an independent project and is not affiliated with, endorsed by or sponsored by Travian Games GmbH.</p>
+    </div>
+  </footer>
+
+  <script>
+    const shots = [
+      { label: "Village", file: "village.webp", caption: "Resource fields, troops at home, incoming attacks and a two-slot build queue." },
+      { label: "Town", file: "town.webp", caption: "The village centre: barracks, academy, marketplace, palace and the city wall." },
+      { label: "Wonder", file: "wonder.webp", caption: "A Wonder of the World at level 42, taken from the Natars and defended by the alliance." },
+      { label: "World map", file: "map.webp", caption: "Neighbours, Natar farms, oases, a Wonder, and map marks for allies and enemies." },
+      { label: "Rally point", file: "rallypoint.webp", caption: "Raids, attacks and reinforcements in flight, with bounty on the way home." },
+      { label: "Battle report", file: "report.webp", caption: "A full battle report: troops sent, losses, bounty and the wall." },
+      { label: "Rankings", file: "statistics.webp", caption: "Player rankings with alliances, population and villages." },
+      { label: "Wonder race", file: "wwstats.webp", caption: "Every Wonder of the World and its level, ranked." },
+      { label: "Hero", file: "hero.webp", caption: "The hero with inventory, attributes and appearance." },
+      { label: "Messages", file: "messages.webp", caption: "In-game messages between allies and rivals." },
+      { label: "Homepage", file: "homepage.webp", caption: "The public homepage of a world, with sign-up and news." },
+    ];
+    const tabs = document.querySelector(".tabs");
+    const img = document.getElementById("viewer-img");
+    const cap = document.getElementById("viewer-cap");
+    function show(i) {
+      img.src = `screenshots/${shots[i].file}`;
+      img.alt = shots[i].caption;
+      cap.textContent = shots[i].caption;
+      tabs.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-selected", String(i === j)));
+    }
+    shots.forEach((s, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.textContent = s.label;
+      b.addEventListener("click", () => show(i));
+      tabs.appendChild(b);
+    });
+    show(0);
+  </script>
+</body>
+</html>
