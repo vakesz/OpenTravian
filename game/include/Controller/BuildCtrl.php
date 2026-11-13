@@ -27,6 +27,7 @@ use Game\ExtraModules;
 use Game\Formulas;
 use Game\GoldHelper;
 use Model\ArtefactsModel;
+use Model\WonderOfTheWorldModel;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
 use Game\Buildings\BuildingAction;
@@ -58,7 +59,7 @@ class BuildCtrl extends GameCtrl
             // authoritative, while gid-only legacy links still resolve.
             $this->selectedBuildingIndex = $village->findBuildingByGid((int)$_REQUEST['gid']);
         }
-        if ($village->isWW() && in_array($this->selectedBuildingIndex, [21, 26, 30, 31, 32,])) {
+        if ($village->isWW() && in_array($this->selectedBuildingIndex, WonderOfTheWorldModel::RESERVED_SLOTS)) {
             $this->selectedBuildingIndex = 99;
         }
         if ($this->selectedBuildingIndex <= 0) {
@@ -141,7 +142,7 @@ class BuildCtrl extends GameCtrl
         if ($this->selectedBuildingIndex == 39 || $this->selectedBuildingIndex == 40) {
             $category = 2;
             $noSoon = true;
-        } elseif (in_array($this->selectedBuildingIndex, [21, 26, 31, 31, 32, 99,]) && $village->isWW()) {
+        } elseif (in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99]) && $village->isWW()) {
             $category = 1;
             $noSoon = true;
         }
@@ -162,7 +163,7 @@ class BuildCtrl extends GameCtrl
         $view->vars = ["selectedId" => $this->selectedBuildingIndex, "activeTab" => $category, "InfrastructureTab" => ["id" => get_button_id(), "text" => T("Buildings", "newBuilding.Infrastructure"),], "MilitaryTab" => ["id" => get_button_id(), "text" => T("Buildings", "newBuilding.Military"),], "ResourcesTab" => ["id" => get_button_id(), "text" => T("Buildings", "newBuilding.Resources"),],];
         $content = $view->output();
         foreach ($newBuilds['available'] as $item_id => $build) {
-            if ($village->isWW() && $item_id <> 40 && in_array($this->selectedBuildingIndex, [21, 26, 30, 31, 32, 99,])) {
+            if ($village->isWW() && $item_id <> 40 && in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99])) {
                 continue;
             } elseif ($this->selectedBuildingIndex == 39 && $item_id <> 16) {
                 continue;
@@ -176,7 +177,7 @@ class BuildCtrl extends GameCtrl
             $content .= T("Buildings", "no_building_available");
             $content .= "</div>";
         }
-        if (!$noSoon && !in_array($this->selectedBuildingIndex, [39, 40,]) && !($village->isWW() && in_array($this->selectedBuildingIndex, [21, 26, 31, 31, 32, 99,]))) {
+        if (!$noSoon && !in_array($this->selectedBuildingIndex, [39, 40,]) && !($village->isWW() && in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99]))) {
             $x = sizeof($newBuilds['soon']);
             if ($x) {
                 $content .= '<h4 class="round spacer">' . T("Buildings", "soon_available") . '</h4>';

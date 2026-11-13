@@ -402,7 +402,7 @@ class AutoUpgradeAI
         } else {
             $rand_field = mt_rand(1, 5) <= 3 ? mt_rand(1, 18) : mt_rand(19, 40);
         }
-        if ($this->isWW && in_array($rand_field, [21, 26, 30, 31, 32])) return false;
+        if ($this->isWW && in_array($rand_field, \Model\WonderOfTheWorldModel::RESERVED_SLOTS)) return false;
         if ($this->buildings[$rand_field]['item_id'] <= 0) {
             return $this->newBuilding($rand_field);
         }

@@ -7,10 +7,11 @@ use function detect_season;
 use Game\Formulas;
 use Game\Map\ImageMapCache;
 use Model\MapModel;
+use Model\WonderOfTheWorldModel;
 
 class MapBlockCtrl extends AnyCtrl
 {
-    private const SPRITE_CACHE_REVISION = 3;
+    private const SPRITE_CACHE_REVISION = 4;
     /** @var mixed */
     private $imgResource;
     /** @var int|null */
@@ -237,7 +238,7 @@ class MapBlockCtrl extends AnyCtrl
     {
         if (0 == $fieldType || 0 == $occupied) return;
         $db = DB::getInstance();
-        $village = $db->query("SELECT owner, pop FROM vdata WHERE kid=$kid")->fetch_assoc();
+        $village = $db->query("SELECT v.owner, v.pop, v.isWW, f.f99 FROM vdata v LEFT JOIN fdata f ON f.kid=v.kid WHERE v.kid=$kid")->fetch_assoc();
         if (!is_array($village) || !is_numeric($village['owner'])) {
             return;
         }
@@ -256,6 +257,14 @@ class MapBlockCtrl extends AnyCtrl
             return;
         }
         $spritePath = "img/map/village/tribe{$tribeId}/{$this->getTileSize()}x{$this->getTileSize()}/village{$index}.png";
+        if ((int)$village['isWW'] === 1) {
+            // A Wonder shows its own art at its current stage (dev/wonder-sprites/generate.py) instead of a village.
+            $stage = WonderOfTheWorldModel::stage((int)($village['f99'] ?? 0));
+            $wonderPath = "img/map/wonder/tribe{$tribeId}/{$this->getTileSize()}x{$this->getTileSize()}/wonder{$stage}.png";
+            if (is_file($wonderPath)) {
+                $spritePath = $wonderPath;
+            }
+        }
         // A missing tribe sprite must not make the complete 10x10 map block
         // unavailable. This can happen on worlds where an optional tribe is
         // enabled before its map-art set has been installed.

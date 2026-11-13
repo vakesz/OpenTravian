@@ -11,6 +11,7 @@ use Game\Buildings\BuildingHelper;
 use Game\Buildings\BuildingRearranger;
 use Game\BuildRequest;
 use Game\Formulas;
+use Model\WonderOfTheWorldModel;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
 
@@ -35,11 +36,11 @@ class VillageCenterCtrl extends GameCtrl
         $village = $this->session->village;
         $maps = [];
         for ($i = 19; $i <= 40; ++$i) {
-            if ($village->isWW() && in_array($i, [21, /*26,*/ 30, 31, 32])) {
+            if ($village->isWW() && $i !== WonderOfTheWorldModel::DISPLAY_SLOT && in_array($i, WonderOfTheWorldModel::RESERVED_SLOTS, true)) {
                 continue;
             }
             $index = $i;
-            if ($village->isWW() && $i == 26) {
+            if ($village->isWW() && $i === WonderOfTheWorldModel::DISPLAY_SLOT) {
                 $index = 99;
             }
             $title = $village->getFieldTitleAsString($index);
@@ -167,24 +168,7 @@ class VillageCenterCtrl extends GameCtrl
     {
         $village = $this->session->village;
         if ($village->isWW() && $k == 99) {
-            if ($village->getField($k)['level'] >= 0 && $village->getField($k)['level'] <= 19) {
-                return 'ww g40 g40_0';
-            }
-            if ($village->getField($k)['level'] >= 20 && $village->getField($k)['level'] <= 39) {
-                return 'ww g40 g40_1';
-            }
-            if ($village->getField($k)['level'] >= 40 && $village->getField($k)['level'] <= 59) {
-                return 'ww g40 g40_2';
-            }
-            if ($village->getField($k)['level'] >= 60 && $village->getField($k)['level'] <= 79) {
-                return 'ww g40 g40_3';
-            }
-            if ($village->getField($k)['level'] >= 80 && $village->getField($k)['level'] <= 89) {
-                return 'ww g40 g40_4';
-            }
-            if ($village->getField($k)['level'] >= 90) {
-                return 'ww g40 g40_5';
-            }
+            return 'ww g40 g40_' . WonderOfTheWorldModel::stage((int)$village->getField($k)['level']);
         }
         if ($village->getField($k)['item_id'] == 0) {
             if ($k == 39) {
