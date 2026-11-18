@@ -32,7 +32,7 @@ echo \resources\View\PHPBatchView::render('layout/tabStrip', [
     'tabs' => $tabs,
     'favor' => true,
     'favorSlug' => $vars['favor'] === null ? null : (string)(int)$vars['favor'],
-    'favorButton' => ['name' => 'buildingMarket', 'key' => (string)$selectedTab, 'slug' => (string)$selectedTab, 'title' => T('inGame', 'Set tab'), 'selector' => '.subNavi .favor', 'successGuard' => false],
+    'favorButton' => ['name' => 'buildingMarket', 'number' => (string)$selectedTab, 'slug' => (string)$selectedTab, 'title' => T('inGame', 'Set tab'), 'selector' => '.subNavi .favor'],
 ]);
 ?>
 <div class="navigationSpacer"></div>

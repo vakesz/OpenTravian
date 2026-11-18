@@ -219,7 +219,7 @@ Gold is credited exactly once per order. A refund takes back the proportional sh
 
 The activation wizard (`/activate.php`) and `/respawn` can ask for a score-based reCAPTCHA v3 before a village is created. It is off by default: with no keys there is no widget, no script is loaded and nothing is verified.
 
-Multihunter configures it under **World > Activation CAPTCHA** in `admin.php?action=captcha`:
+Multihunter configures it under **Integrations > Activation CAPTCHA** in `admin.php?action=captcha`:
 
 1. Create a reCAPTCHA v3 key pair for the world's domain.
 2. Enter the site key and the secret key and save. A blank secret keeps the stored one; **Remove the keys** turns the CAPTCHA off again.
@@ -238,7 +238,7 @@ Events: world start, world end, artifacts released, World Wonder plans released,
 
 The administrator accounts (Support, id 0, and Multihunter, id 2) can be protected with a time-based one-time password (RFC 6238: HMAC-SHA1, 30 second steps, 6 digits), implemented locally; no external service is involved and the QR code is rendered by the game itself. **It is off by default**, so a fresh install, the setup wizard and a headless install (`TRAVIAN_INSTALL_*`) behave exactly as before and need no extra step.
 
-The main administrator (Support) sets the **mode** under **World > Two-factor sign-in** in `admin.php?action=twoFactor`:
+The main administrator (Support) sets the **mode** under **Security > Two-factor sign-in** in `admin.php?action=twoFactor`:
 
 | Mode | Behaviour |
 | --- | --- |
@@ -258,4 +258,4 @@ Details worth knowing:
 
 Every state-changing request in the control panel (a POST that passed the CSRF guard, including a confirmed state-changing GET) and every administrator sign-in event is written to the `admin_log` table of the world: when, the acting administrator (account id and name), the panel action or event, the identifying target (`uid=5 kid=123 section=killHero`), details and the client IP. Recorded events are the panel actions, `sign-in`, `sign-in-failed`, `sign-in-refused` (a sitter), `sign-out` and the two-factor events (`two-factor-passed`, `two-factor-failed`, `two-factor-throttled`, `two-factor-enrolled`, `two-factor-removed`, `two-factor-recovery-codes`, `two-factor-mode`). Only the names of the submitted fields and a whitelist of identifying parameters are stored, never request values, so passwords, codes and secrets cannot reach the log. Viewing the log is not logged.
 
-Read it under **Moderation > Audit log** (`admin.php?action=adminLog`): newest first, 50 per page, filtered by administrator (name or id), action, target text, IP prefix and date range. `admin_log` is world data: it is reshaped in `database/world.sql` (this repository has no migrations, so an existing world needs a reinstall) and the post-round cleanup leaves it alone (the other world tables are emptied), so the trail survives a round reset. Only a full reinstall, which recreates every table from the schema, starts it empty. While both keys are set the wizard loads `recaptcha.net/recaptcha/api.js` and sends the token with the final post; the server verifies it (action `activation`, score at least 0.5) before creating the village and fails closed if the provider cannot be reached. Other providers plug in through `Game\Captcha\CaptchaProvider`.
+Read it under **Security > Audit log** (`admin.php?action=adminLog`): newest first, 50 per page, filtered by administrator (name or id), action, target text, IP prefix and date range. `admin_log` is world data: it is reshaped in `database/world.sql` (this repository has no migrations, so an existing world needs a reinstall) and the post-round cleanup leaves it alone (the other world tables are emptied), so the trail survives a round reset. Only a full reinstall, which recreates every table from the schema, starts it empty. While both keys are set the wizard loads `recaptcha.net/recaptcha/api.js` and sends the token with the final post; the server verifies it (action `activation`, score at least 0.5) before creating the village and fails closed if the provider cannot be reached. Other providers plug in through `Game\Captcha\CaptchaProvider`.

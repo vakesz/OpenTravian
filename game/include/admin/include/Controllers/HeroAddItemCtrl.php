@@ -21,7 +21,8 @@ class HeroAddItemCtrl
             'uid'       => is_string($_REQUEST['uid'] ?? null) ? (int)$_REQUEST['uid'] : null,
             'item'      => is_string($_REQUEST['item'] ?? null) ? $_REQUEST['item'] : null,
             'amount'    => is_string($_REQUEST['amount'] ?? null) ? min(abs((int)$_REQUEST['amount']), 1000000) : 1,
-            'result'    => false,
+            'result'    => null,
+            'noticeTone' => 'success',
             'items_arr' => [
                 1  => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
                 2  => [82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93],
@@ -145,6 +146,7 @@ class HeroAddItemCtrl
             if ($userExists) {
                 if ($params['amount'] <= 0) {
                     $params['result'] = 'Invalid item amount';
+                    $params['noticeTone'] = 'error';
                 } else {
                     if (in_array($type, $params['items_arr'][$btype] ?? [], true)) {
                         $m = new AuctionModel();
@@ -157,10 +159,12 @@ class HeroAddItemCtrl
                         }
                     } else {
                         $params['result'] = 'Invalid item chosen.';
+                        $params['noticeTone'] = 'error';
                     }
                 }
             } else {
                 $params['result'] = 'User does not exists.';
+                $params['noticeTone'] = 'error';
             }
         }
         Dispatcher::getInstance()->appendContent(Template::getInstance()->load($params,

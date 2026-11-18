@@ -28,6 +28,7 @@ class IPBanCtrl
                 } else {
                     IPTracker::blockIP($ip, $params['reason'], $params['time']);
                     $params['error'] = 'IP blocked.';
+                    $params['noticeTone'] = 'success';
                 }
             } else {
                 $params['error'] = 'No IPs to block.';

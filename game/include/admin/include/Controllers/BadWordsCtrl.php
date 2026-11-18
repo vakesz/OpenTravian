@@ -34,11 +34,9 @@ class BadWordsCtrl
             if(!isServerFinished() && is_string($_GET['del'] ?? null) && Session::validateChecker()){
                 $current = $this->getFromCache();
                 $_GET['del'] = (int)$_GET['del'];
-                if(sizeof($current) > 1){
-                    if(isset($current[$_GET['del']])){
-                        unset($current[$_GET['del']]);
-                    }
-                    $this->insertToFile(implode(",", $current));
+                if (isset($current[$_GET['del']])) {
+                    unset($current[$_GET['del']]);
+                    $this->insertToFile(implode(',', $current));
                 }
             }
         }

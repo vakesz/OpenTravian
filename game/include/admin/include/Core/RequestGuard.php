@@ -29,8 +29,9 @@ final class AdminRequestGuard
             'changeTribeToEgyptians', 'changeTribeToHuns',
         ]],
         'editvillage' => [
-            'r' => '*', 'deleteTraining' => '*', 'releaseArtifact' => '*', 'activateArtifact' => '*',
-            'deleteResearch' => '*', 'deleteBuilding' => '*', 'deleteDemolish' => '*',
+            'r' => '*', 'deleteTraining' => '*', 'finishTraining' => '*', 'releaseArtifact' => '*', 'activateArtifact' => '*',
+            'deleteResearch' => '*', 'finishResearch' => '*', 'deleteBuilding' => '*', 'finishBuilding' => '*',
+            'deleteDemolish' => '*', 'finishDemolish' => '*', 'finishFestival' => '*',
         ],
         'editalliance' => ['section' => ['deleteAlliance']],
         'bannedlist' => ['section' => ['unban']],

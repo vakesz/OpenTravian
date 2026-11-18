@@ -66,7 +66,7 @@ class BattleModel
         5 => 10,
         6 => 8,
         7 => 6,
-        8 => 10,
+        8 => 6,
         9 => 6,
     ];
     /** Loyalty a chief lowers (min, max), per tribe. */

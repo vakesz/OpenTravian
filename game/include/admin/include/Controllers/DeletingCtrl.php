@@ -31,7 +31,7 @@ class DeletingCtrl
         if(!$result->num_rows){
             $params['content'] .= '<tr><td colspan="5" class="center adminMuted">No deletions queued.</td></tr>';
         }
-        $params['navigator'] = $this->getNavigator($page, $db->fetchScalar("SELECT COUNT(uid) FROM deleting"), ['action' => 'activationList']);
+        $params['navigator'] = $this->getNavigator($page, $db->fetchScalar("SELECT COUNT(uid) FROM deleting"), ['action' => 'deleting']);
         \Dispatcher::getInstance()->appendContent(\Template::getInstance()->load($params, 'tpl/deleting.tpl')->getAsString());
     }
     const NEXT_SHAPE = '»';

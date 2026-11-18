@@ -176,16 +176,20 @@ class favouriteTab extends AjaxBase
                 $x['message'] = "Tab number is not valid!";
                 return FALSE;
             case "buildingMarket":
-                if(in_array($number, [0, 5, 1, 2])) {
+                if (in_array($number, [0, 5, 1, 2, 3], true)) {
+                    if (!$session->hasGoldClub() && $number === 3) {
+                        $x['error'] = TRUE;
+                        $x['message'] = "Tab number is not valid!";
+                        return FALSE;
+                    }
                     $x['result'] = FALSE;
                     $x['success'] = TRUE;
                     $session->setFavoriteTab($name, $number);
                     return TRUE;
-                } else {
-                    $x['error'] = TRUE;
-                    $x['message'] = "Tab number is not valid!";
-                    return FALSE;
                 }
+                $x['error'] = TRUE;
+                $x['message'] = "Tab number is not valid!";
+                return FALSE;
             case 'hero':
                 if(in_array($number, [1, 2, 3, 4])) {
                     $x['result'] = FALSE;

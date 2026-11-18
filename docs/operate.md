@@ -201,7 +201,7 @@ A world that never ran, or one that was away for less than the threshold, does n
 
 ## Reset the round
 
-When a round has finished (a World Wonder reached level 100, or the Natars finished it), an administrator starts the next round in the same world, without a reinstall, from **World > Round reset** in the control panel (`admin.php?action=roundReset`). Nothing changes until the administrator picks a mode, types the world title and submits the form.
+When a round has finished (a World Wonder reached level 100, or the Natars finished it), an administrator starts the next round in the same world, without a reinstall, from **Operations > Round reset** in the control panel (`admin.php?action=roundReset`). Nothing changes until the administrator picks a mode, types the world title and submits the form.
 
 The reset runs in this order, and the page reports the first step that refuses:
 
@@ -231,7 +231,7 @@ A faster speed has a shorter round, and the engine ends the round, and deletes e
 
 ## Other tools
 
-Scoped migrations for older worlds, the support-ticket and mail-queue schema repairs, and quarantined-task recovery are documented in the [tools guide](../tools/README.md).
+Quarantined-task recovery is documented in the [tools guide](../tools/README.md). Schema changes are made in `database/world.sql` and `database/account.sql`; an existing world picks them up on reinstall.
 
 ## Gold purchases
 

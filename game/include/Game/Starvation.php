@@ -3,6 +3,7 @@
 namespace Game;
 
 use Core\Database\DB;
+use Model\Movements\ReturnProcessor;
 use Model\VillageModel;
 use const SORT_DESC;
 
@@ -212,10 +213,33 @@ class Starvation
             } else if ($isTrapped) {
                 $this->db->query("DELETE FROM trapped WHERE id={$row['id']}");
             } else if ($isMovement) {
+                $this->settleStarvedMovement($row);
                 $this->db->query("DELETE FROM movement WHERE id={$row['id']}");
             }
         }
         return $total_killed;
+    }
+
+    /**
+     * A movement whose troops all starved never arrives, so its ship and any
+     * cargo it was already carrying have to be settled here.
+     *
+     * @param array<mixed> $row
+     */
+    private function settleStarvedMovement(array $row): void
+    {
+        $type = (int) ($row['ship'] ?? 0);
+        if (Ships::isShip($type) && Ships::hasHarbor((int) $this->kid)) {
+            $column = Ships::column($type);
+            $this->db->query('UPDATE units SET ' . $column . '=' . $column . '+1 WHERE kid=' . (int) $this->kid);
+        }
+        if ((int) ($row['mode'] ?? 0) !== 1) {
+            return;
+        }
+        for ($i = 1; $i <= 11; ++$i) {
+            $row['u' . $i] = 0;
+        }
+        new ReturnProcessor($row);
     }
 
     /**

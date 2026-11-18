@@ -25,7 +25,7 @@ class PackageCode
 
     public static function getCodesByPage(int $packageId, int $page, int $pageSize, bool $isGift = false): \mysqli_result|bool
     {
-        $gift = $isGift ? ' AND isGift=1' : '';
+        $gift = $isGift ? ' AND isGift=1' : ' AND isGift=0';
         $offset = ($page - 1) * $pageSize;
 
         return GlobalDB::getInstance()->query("SELECT * FROM package_codes WHERE used=0$gift AND package_id=$packageId ORDER BY id DESC LIMIT $offset, $pageSize");

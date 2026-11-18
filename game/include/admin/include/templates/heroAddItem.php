@@ -32,7 +32,9 @@ foreach (($params['items_arr'] ?? []) as $btype => $types) {
         $itemOptions[$btype . ':' . $type] = $group . ': ' . ($item['name'] ?? ($btype . ':' . $type));
     }
 }
-$notice = isset($params['result']) ? AdminUi::notice((string) $params['result'], 'success') : '';
+$notice = is_string($params['result'] ?? null) && $params['result'] !== ''
+    ? AdminUi::notice($params['result'], ($params['noticeTone'] ?? 'success') === 'error' ? 'error' : 'success')
+    : '';
 
 $body = $notice
     . '<form method="post" action="admin.php?action=heroAddItem">'

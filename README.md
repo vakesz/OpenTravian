@@ -88,5 +88,5 @@ OpenTravian is an independent project and is not affiliated with, endorsed by or
 | [Translations](docs/translations.md) | Exporting a locale to CSV or PO, importing edits into its hand catalogue, and how that meets the generator |
 | [World speed](docs/world-speed.md) | The speed profile |
 | [Architecture](docs/architecture.md) | Services, volumes and how the installer is shared |
-| [Tools](tools/README.md) | Operator CLIs and scoped migrations |
+| [Tools](tools/README.md) | Operator CLIs and quarantined-task recovery |
 | [Contributing](docs/development.md) | Contributor rules and local differences |

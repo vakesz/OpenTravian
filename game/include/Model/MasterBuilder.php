@@ -70,8 +70,6 @@ class MasterBuilder
             $gold = Config::getInstance()->gold->masterBuilderGold;
             if (($player['gift_gold'] + $player['bought_gold']) < $gold) {
                 $db->rollback();
-                $db->query("DELETE FROM building_upgrade WHERE isMaster=1 AND kid={$row['kid']}");
-                logError('MasterBuilder: Not enough gold.');
                 return;
             }
         }

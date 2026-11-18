@@ -56,7 +56,7 @@ $trainingTimeSign = static function (int $reduction): string {
                 <br/>
                 <br/>
                 <br/>
-                <?php if (true/*$vars['itemId'] == 10 || $vars['itemId'] == 38*/): ?>
+                <?php if ($vars['itemId'] == 10 || $vars['itemId'] == 38): ?>
                     <?= T("Buildings", "increase warehouse storage by level 20 storage value"); ?>
                 <?php else: ?>
                     <?= T("Buildings", "increase granny storage by level 20 storage value"); ?>
@@ -363,7 +363,7 @@ $has = $plusAdvertising || !empty($vars['contractLink']['extraModuleButton']);
         <div class="roundedCornersBox big">
             <h4>
                 <div class="statusMessage"
-                     style="color: midnightblue"><?php if (true/*$vars['itemId'] == 10 || $vars['itemId'] == 38*/): ?>
+                     style="color: midnightblue"><?php if ($vars['itemId'] == 10 || $vars['itemId'] == 38): ?>
                         <?= T("Buildings", "increase warehouse storage by level 20 storage value"); ?>
                     <?php else: ?>
                         <?= T("Buildings", "increase granny storage by level 20 storage value"); ?>

@@ -604,19 +604,17 @@ class ExtraModules
      */
     public static function increaseStorage(&$response, $additionalData = null): string
     {
+        $field = abs((int) (is_array($additionalData) ? ($additionalData['gid'] ?? 0) : 0));
+        $slot = Village::getInstance()->getField($field);
+        $itemId = is_array($slot) ? (int) ($slot['item_id'] ?? 0) : 0;
+        $isWarehouse = $itemId === 10 || $itemId === 38;
+        $isGranary = $itemId === 11 || $itemId === 39;
+        if (!$isWarehouse && !$isGranary) {
+            return self::ACTION_UNAVAILABLE;
+        }
+
         $storage = Formulas::storeCAP(20);
         $db = DB::getInstance();
-        //$gid = Village::getInstance()->getField($additionalData['gid'])['item_id'];
-        /*
-        $storage = Formulas::storeCAP(20);
-        if ($gid == 10 || $gid == 38) {
-            //warehouse
-            $db->query("UPDATE vdata SET extraMaxstore=extraMaxstore+1, maxstore=maxstore+$storage WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        } else {
-            //granny
-            $db->query("UPDATE vdata SET extraMaxcrop=extraMaxcrop+1, maxcrop=maxcrop+$storage WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        }*/
-
         $times = abs(is_array($additionalData) && isset($additionalData['times']) ? (int)$additionalData['times'] : 1);
         $coins = self::getCoins(__FUNCTION__);
 
@@ -626,9 +624,13 @@ class ExtraModules
         }
 
         $storage *= $times;
+        $kid = Session::getInstance()->getSelectedVillageID();
         $db->begin_transaction();
-        $db->query("UPDATE vdata SET extraMaxstore=extraMaxstore+$times, maxstore=maxstore+$storage WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        $db->query("UPDATE vdata SET extraMaxcrop=extraMaxcrop+$times, maxcrop=maxcrop+$storage WHERE kid=" . Session::getInstance()->getSelectedVillageID());
+        if ($isWarehouse) {
+            $db->query("UPDATE vdata SET extraMaxstore=extraMaxstore+$times, maxstore=maxstore+$storage WHERE kid=" . $kid);
+        } else {
+            $db->query("UPDATE vdata SET extraMaxcrop=extraMaxcrop+$times, maxcrop=maxcrop+$storage WHERE kid=" . $kid);
+        }
         if (!$db->affectedRows()) {
             $db->rollback();
             return self::ACTION_UNAVAILABLE;

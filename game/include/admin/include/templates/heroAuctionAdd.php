@@ -41,12 +41,13 @@ $timeOptions = [
     '60' => '1 min', '120' => '2 min', '300' => '5 min', '600' => '10 min', '1800' => '30 min',
     '3600' => '1 h', '7200' => '2 h', '21600' => '6 h', '28800' => '8 h', '43200' => '12 h', '86400' => '24 h',
 ];
-$notice = !empty($params['result']) ? AdminUi::notice('Item added to the auction.', 'success') : '';
+$notice = !empty($params['result'])
+    ? AdminUi::notice('Item added to the auction.', 'success')
+    : (!empty($params['error']) ? AdminUi::notice((string) $params['error'], 'error') : '');
 
 $body = $notice
     . '<form method="post" action="admin.php?action=heroAuction">'
     . getCheckerInput()
-    . '<input type="hidden" name="section" value="addBan">'
     . AdminUi::select('item', 'Item', $itemOptions)
     . AdminUi::input('package_amount', 'Package amount', '0', ['type' => 'number', 'min' => '0'])
     . AdminUi::input('silver', 'Silver', '500', ['type' => 'number', 'min' => '1'])

@@ -16,7 +16,9 @@ foreach ([1, 2, 5, 10, 30, 50, 90] as $days) {
 }
 $durationOptions['0'] = 'Forever';
 
-$error = isset($params['error']) ? AdminUi::notice((string) $params['error'], 'error') : '';
+$error = isset($params['error'])
+    ? AdminUi::notice((string) $params['error'], ($params['noticeTone'] ?? 'error') === 'success' ? 'success' : 'error')
+    : '';
 $listBody = (string) ($params['content'] ?? '');
 if ($listBody === '') {
     $listBody = '<tr><td colspan="5" class="center adminMuted">No IP bans.</td></tr>';

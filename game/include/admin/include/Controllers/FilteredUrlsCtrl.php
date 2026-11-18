@@ -36,11 +36,9 @@ class FilteredUrlsCtrl
                 ;
                 $current = $this->getFromCache();
                 $_GET['del'] = (int)$_GET['del'];
-                if(sizeof($current) > 1){
-                    if(isset($current[$_GET['del']])){
-                        unset($current[$_GET['del']]);
-                    }
-                    $this->insertToFile(implode(",", $current));
+                if (isset($current[$_GET['del']])) {
+                    unset($current[$_GET['del']]);
+                    $this->insertToFile(implode(',', $current));
                 }
             }
         }

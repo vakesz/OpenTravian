@@ -337,7 +337,7 @@ class AdventureProcessor
                     ][$tearNum];
                     break;
                 case 4:
-                    $rand = [
+                    $weapons = [
                         1 => [
                             1 => [1 => 16, 19, 22, 25, 28],
                             2 => [1 => 17, 20, 23, 26, 29],
@@ -363,7 +363,14 @@ class AdventureProcessor
                             2 => [1 => 131, 134, 137, 140, 143],
                             3 => [1 => 132, 135, 138, 141, 144],
                         ],
-                    ][$row['race']][$tearNum];
+                        8 => [
+                            1 => [1 => 149, 152, 155, 158, 161],
+                            2 => [1 => 150, 153, 156, 159, 162],
+                            3 => [1 => 151, 154, 157, 160, 163],
+                        ],
+                    ];
+                    // Tribes without a weapon set (Vikings) get no item and still come home.
+                    $rand = $weapons[(int) $row['race']][$tearNum] ?? 0;
                     break;
                 case 5:
                     $rand = [

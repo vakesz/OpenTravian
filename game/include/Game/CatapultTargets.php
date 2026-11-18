@@ -13,8 +13,8 @@ use Model\ArtefactsModel;
 final class CatapultTargets
 {
     private const RESOURCES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    private const INFRASTRUCTURE = [10, 11, 15, 17, 18, 24, 25, 26, 44, 27, 28, 38, 39, 41, 45];
-    private const MILITARY = [13, 14, 16, 19, 20, 21, 22, 29, 30, 35, 37];
+    private const INFRASTRUCTURE = [10, 11, 15, 17, 18, 24, 25, 26, 44, 27, 28, 38, 39, 41, 45, 49];
+    private const MILITARY = [13, 14, 16, 19, 20, 21, 22, 29, 30, 35, 37, 46, 48];
     private const WORLD_WONDER = 40;
 
     /**

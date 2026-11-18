@@ -29,6 +29,8 @@ $top = CatapultTargets::groups(10, true);
 expectTargets(in_array(29, $top['Military'], true) && in_array(30, $top['Military'], true), 'Level 10 must offer Great Barracks and Great Stable.');
 expectTargets(array_slice($top['Military'], 0, 9) === [13, 14, 16, 19, 20, 21, 22, 29, 30], 'Great Barracks and Great Stable follow gid 22.');
 expectTargets(in_array(40, $top['Infrastructure'], true), 'World Wonder is a target once plans are released.');
+expectTargets(in_array(49, $top['Infrastructure'], true), 'Level 10 can aim at the Harbor.');
+expectTargets(in_array(46, $top['Military'], true) && in_array(48, $top['Military'], true), 'Level 10 can aim at the Hospital and the Asclepeion.');
 $noPlans = CatapultTargets::groups(20, false);
 expectTargets(!in_array(40, $noPlans['Infrastructure'], true), 'World Wonder is hidden before plans are released.');
 expectTargets(!in_array(40, CatapultTargets::allowed(20, false), true), 'The request must reject World Wonder before plans are released.');

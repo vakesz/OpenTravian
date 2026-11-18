@@ -314,6 +314,41 @@ CREATE TABLE `preregistration_keys` (
   `used` tinyint(1) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Pending registrations for the companion API. The world database has its own
+-- `activation` table, with different columns, for the in-game wizard.
+--
+
+CREATE TABLE `activation` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `worldId` int(11) NOT NULL,
+  `name` varchar(15) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(90) NOT NULL DEFAULT '',
+  `activationCode` varchar(32) NOT NULL,
+  `mailOptIn` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `refUid` int(11) NOT NULL DEFAULT 0,
+  `time` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `used` tinyint(1) UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Public news shown by the companion API.
+--
+
+CREATE TABLE `news` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `expire` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `time` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `moreLink` varchar(500) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Indexes for dumped tables
 --
@@ -539,6 +574,34 @@ ALTER TABLE `paymentVoucher`
 -- AUTO_INCREMENT for table `preregistration_keys`
 --
 ALTER TABLE `preregistration_keys`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Indexes for table `activation`
+--
+ALTER TABLE `activation`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `pendingName` (`worldId`,`used`,`name`),
+  ADD KEY `pendingEmail` (`worldId`,`used`,`email`),
+  ADD KEY `pendingCode` (`worldId`,`used`,`activationCode`);
+
+--
+-- Indexes for table `news`
+--
+ALTER TABLE `news`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `expire` (`expire`,`time`);
+
+--
+-- AUTO_INCREMENT for table `activation`
+--
+ALTER TABLE `activation`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `news`
+--
+ALTER TABLE `news`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 

@@ -10,7 +10,9 @@ $listBody = (string) ($params['content'] ?? '');
 if ($listBody === '') {
     $listBody = '<tr><td colspan="5" class="center adminMuted">No backups yet.</td></tr>';
 }
-$notice = isset($params['error']) ? AdminUi::notice((string) $params['error'], 'error') : '';
+$notice = isset($params['error'])
+    ? AdminUi::notice((string) $params['error'], ($params['noticeTone'] ?? 'error') === 'success' ? 'success' : 'error')
+    : '';
 
 $body = $notice
     . '<table class="adminTable"><thead><tr><th colspan="5">Backups</th></tr><tr>'
