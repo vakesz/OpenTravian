@@ -16,6 +16,8 @@ class AutoUpgrade
     private $kid;
     /** @var mixed */
     private $race      = 5;
+    /** @var int */
+    private $owner = 0;
 
     public function getBuildings(): void
     {
@@ -30,6 +32,7 @@ class AutoUpgrade
     {
         $this->setKid($kid);
         $this->race = $race;
+        $this->owner = (int) DB::getInstance()->fetchScalar('SELECT owner FROM vdata WHERE kid=?', [(int) $kid]);
         $this->getBuildings();
     }
 
@@ -54,7 +57,7 @@ class AutoUpgrade
         $db = DB::getInstance();
         $helper = new BuildingHelper();
         if ($rand_field == 39) {
-            if ($helper->canCreateNewBuild($this->capital, 5, 16, $this->buildings) == 1) {
+            if ($helper->canCreateNewBuild($this->capital, $this->race, 16, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
                     $this->buildings[$rand_field]['item_id'] = 16;
                     $db->query("UPDATE fdata SET f{$rand_field}t=16 WHERE kid=" . $this->kid);
@@ -66,7 +69,7 @@ class AutoUpgrade
         }
         if ($rand_field == 40) {
             $buildingGID = Formulas::getWallID($this->race);
-            if ($helper->canCreateNewBuild($this->capital, 5, $buildingGID, $this->buildings) == 1) {
+            if ($helper->canCreateNewBuild($this->capital, $this->race, $buildingGID, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
                     $this->buildings[$rand_field]['item_id'] = $buildingGID;
                     $db->query("UPDATE fdata SET f{$rand_field}t=$buildingGID WHERE kid=" . $this->kid);
@@ -120,11 +123,11 @@ class AutoUpgrade
                 continue;
             }
             if ($helper->checkArtifactDependencies(0,
-                    1,
+                    $this->owner,
                     $this->kid,
                     $gid,
                     false,
-                    0) == 0 && $helper->canCreateNewBuild($this->capital, 5, $gid, $this->buildings) == 1) {
+                    0) == 0 && $helper->canCreateNewBuild($this->capital, $this->race, $gid, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
                     $this->buildings[$rand_field]['item_id'] = $gid;
                     $db->query("UPDATE fdata SET f{$rand_field}t=$gid WHERE kid=" . $this->kid);

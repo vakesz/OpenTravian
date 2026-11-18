@@ -275,8 +275,7 @@ class AI_MAIN
             $unitId = nrToUnitId($i, $this->user['race']);
             $neededResources = Formulas::uResearchCost($unitId);
             if (!$this->isResourcesAvailable($neededResources)) continue;
-            if (!$this->_canDoResearch(Formulas::uResearchPreRequests(Session::getInstance()->getRace(),
-                $unitId))) continue;
+            if (!$this->_canDoResearch(Formulas::uResearchPreRequests((int) $this->user['race'], $i))) continue;
             $arr[] = ['nr' => $i, 'costs' => $neededResources, 'duration' => Formulas::uResearchTime($unitId)];
         }
         if (!sizeof($arr)) {

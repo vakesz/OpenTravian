@@ -174,7 +174,7 @@ class SmithyCtrl extends AnyCtrl
             }
             $_template->vars = [
                 'lvl' => "$cur_lvl" . ($this->getResearchLevel($nr) ? (' + ' . $this->getResearchLevel($nr)) : ''),
-                "isMaxLvl" => ($lvl + $this->getResearchLevel($nr)) >= 20,
+                "isMaxLvl" => $lvl >= 20,
                 "unitId" => $unitId,
                 "cost" => $costs,
                 "duration" => $duration,

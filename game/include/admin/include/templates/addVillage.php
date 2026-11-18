@@ -11,7 +11,9 @@ for ($i = 1; $i <= 12; ++$i) {
     $fieldOptions[(string) $i] = $i . ' - ' . implode('-', Formulas::getFieldTypeResourceArr($i));
 }
 $sectorOptions = ['ne' => 'NE', 'nw' => 'NW', 'se' => 'SE', 'sw' => 'SW'];
-$notice = isset($params['result']) ? AdminUi::notice((string) $params['result'], 'success') : '';
+$notice = is_string($params['result'] ?? null) && $params['result'] !== ''
+    ? AdminUi::notice($params['result'], str_contains($params['result'], 'success') ? 'success' : 'error')
+    : '';
 
 $body = $notice
     . '<form method="post" action="admin.php?action=addVillage">'

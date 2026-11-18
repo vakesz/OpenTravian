@@ -136,13 +136,13 @@ class MapPageModel
         $filter = $noFlag ? 'AND type!=2' : '';
         $db = DB::getInstance();
         if ($mode === 0) {
-            return $db->query("SELECT * FROM mapflag WHERE kid=$kid AND uid=$uid $filter");
+            return $db->query("SELECT * FROM mapflag WHERE targetId=$kid AND uid=$uid $filter");
         }
         if ($mode === 1) {
-            return $db->query("SELECT * FROM mapflag WHERE kid=$kid AND uid=0 AND aid=$aid AND aid>0 $filter");
+            return $db->query("SELECT * FROM mapflag WHERE targetId=$kid AND uid=0 AND aid=$aid AND aid>0 $filter");
         }
 
-        return $db->query("SELECT * FROM mapflag WHERE kid=$kid AND (uid=$uid OR (uid=0 AND aid=$aid AND aid>0)) $filter");
+        return $db->query("SELECT * FROM mapflag WHERE targetId=$kid AND (uid=$uid OR (uid=0 AND aid=$aid AND aid>0)) $filter");
     }
 
     public function getPlayerName(?int $uid): string|false

@@ -36,6 +36,10 @@ class BuildingHelper
             return -1;
         }
         $buildMetadata = $buildingMetaData[$item_id - 1];
+        // T3 buildings retired by the current ruleset (the old Blacksmith).
+        if (($buildMetadata['req']['version'] ?? null) === '3-') {
+            return -1;
+        }
         //capital and non capital
         if (isset($buildMetadata['req']['capital'])) {
             if ($buildMetadata['req']['capital'] == -1 && $capital) {
@@ -145,8 +149,8 @@ class BuildingHelper
     public function checkDependencies($item_id, $level, $natar, $cropProduction, $maxstore, $maxcrop): int
     {
         $resRequiredPop = Formulas::buildingCropConsumption($item_id, $level);
-        //ignore WW here.
-        if (getGame("starvation")) {
+        // A Wonder village is not held back by a crop shortage.
+        if (getGame("starvation") && !$natar) {
             if (($cropProduction - $resRequiredPop) <= 0 && $item_id <> 4) {
                 return 1;
             }

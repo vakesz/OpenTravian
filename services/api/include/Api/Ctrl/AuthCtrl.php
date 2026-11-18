@@ -53,19 +53,18 @@ class AuthCtrl extends ApiAbstractCtrl
             $this->response['fields']['password'] = $passwordError;
             return;
         }
-        $db = DB::getInstance();
-        $delete = $db->prepare('DELETE FROM passwordRecovery WHERE id=:id');
-        $delete->bindValue('id', (int) $recovery['id'], PDO::PARAM_INT);
-        $delete->execute();
-        if (!$delete->rowCount()) {
-            // another request used the code first
-            $this->response['fields']['password'] = 'passwordWasNotUpdated';
-            return;
-        }
         $stmt = $serverDB->prepare('UPDATE users SET password=:password WHERE id=:id');
         $stmt->bindValue('password', Password::hash($password), PDO::PARAM_STR);
         $stmt->bindValue('id', (int) $recovery['uid'], PDO::PARAM_INT);
         $stmt->execute();
+        if ($stmt->rowCount() !== 1) {
+            $this->response['fields']['password'] = 'passwordWasNotUpdated';
+            return;
+        }
+        $db = DB::getInstance();
+        $delete = $db->prepare('DELETE FROM passwordRecovery WHERE id=:id');
+        $delete->bindValue('id', (int) $recovery['id'], PDO::PARAM_INT);
+        $delete->execute();
         $this->response['success'] = true;
     }
 

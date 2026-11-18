@@ -9,7 +9,9 @@ $reasonOptions = [];
 foreach (T('Truce', 'reasons') as $key => $value) {
     $reasonOptions[(string) $key] = (string) $value;
 }
-$notice = isset($params['result']) ? AdminUi::notice((string) $params['result'], 'success') : '';
+$notice = is_string($params['result'] ?? null) && $params['result'] !== ''
+    ? AdminUi::notice($params['result'], str_starts_with($params['result'], 'Invalid') ? 'error' : 'success')
+    : '';
 
 $body = $notice
     . AdminUi::notice('Current server time: ' . (string) ($params['now'] ?? ''), 'info')

@@ -64,15 +64,31 @@ class RegisterCtrl extends ApiAbstractCtrl
                 $this->response['fields']['password'] = $passwordError;
                 return;
             }
-            $db = DB::getInstance();
-            $db->query('UPDATE activation SET used=1 WHERE id=' . (int) $activation['id']);
             $server = Server::getServerById((int) $activation['worldId']);
             if ($server === false) {
                 $this->response['fields']['activationCode'] = 'activationNotFound';
                 return;
             }
-            $serverDB = ServerDB::getInstance((string) $server['configFileLocation']);
-            $token = ActivateHandler::addActivation((string) $activation['name'], $password, (string) $activation['email'], (int) $activation['refUid'], $serverDB);
+            $db = DB::getInstance();
+            $db->beginTransaction();
+            try {
+                $spent = $db->prepare('UPDATE activation SET used=1 WHERE id=:id AND used=0');
+                $spent->bindValue('id', (int) $activation['id'], PDO::PARAM_INT);
+                $spent->execute();
+                if ($spent->rowCount() !== 1) {
+                    $db->rollBack();
+                    $this->response['fields']['activationCode'] = 'activationNotFound';
+                    return;
+                }
+                $serverDB = ServerDB::getInstance((string) $server['configFileLocation']);
+                $token = ActivateHandler::addActivation((string) $activation['name'], $password, (string) $activation['email'], (int) $activation['refUid'], $serverDB);
+                $db->commit();
+            } catch (\Throwable $e) {
+                if ($db->inTransaction()) {
+                    $db->rollBack();
+                }
+                throw $e;
+            }
             $this->response['success'] = true;
             $this->response['redirect'] = $server['gameWorldUrl'] . 'activate.php?token=' . $token;
         } else {
@@ -210,13 +226,13 @@ class RegisterCtrl extends ApiAbstractCtrl
             $this->response['redirect'] = $server['gameWorldUrl'] . 'activate.php?token=' . $token;
         } else {
             $db = DB::getInstance();
-            $stmt = $db->prepare("INSERT INTO activation (`worldId`, `name`, `password`, `email`, `activationCode`, `newsletter`, `refUid`, `time`) VALUES (:wid, :username, :password, :email, :activationCode, :newsletter, :refUid, :time)");
+            $stmt = $db->prepare("INSERT INTO activation (`worldId`, `name`, `password`, `email`, `activationCode`, `mailOptIn`, `refUid`, `time`) VALUES (:wid, :username, :password, :email, :activationCode, :mailOptIn, :refUid, :time)");
             $stmt->bindValue('wid', $server['id'], PDO::PARAM_INT);
             $stmt->bindValue('username', $username, PDO::PARAM_STR);
             $stmt->bindValue('password', bin2hex(random_bytes(32)), PDO::PARAM_STR);
             $stmt->bindValue('email', $email, PDO::PARAM_STR);
             $stmt->bindValue('activationCode', $activationCode, PDO::PARAM_STR);
-            $stmt->bindValue('newsletter', $subscribeNewsletter ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue('mailOptIn', $subscribeNewsletter ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue('refUid', $refUid, PDO::PARAM_INT);
             $stmt->bindValue('time', time(), PDO::PARAM_INT);
             $stmt->execute();

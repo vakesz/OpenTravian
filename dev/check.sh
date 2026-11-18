@@ -41,7 +41,9 @@ if [ -z "$(docker compose ps --status running -q php 2>/dev/null)" ]; then
 fi
 
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/travian-check.XXXXXX")
-trap 'rm -rf "$tmp"' EXIT INT TERM
+trap 'rm -rf "$tmp"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 failed=0
 : > "$tmp/summary"
 

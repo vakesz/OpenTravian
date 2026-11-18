@@ -59,6 +59,7 @@ class Village
         'Residence' => 0,
         'Palace' => 0,
         'CommandCenter' => 0,
+        'Waterworks' => 0,
         "IronFoundry" => 0,
         "Trapper" => [],
         "Cranny" => [],
@@ -81,6 +82,7 @@ class Village
         25 => 'Residence',
         26 => 'Palace',
         44 => 'CommandCenter',
+        45 => 'Waterworks',
     ];
     /** @var \Game\Buildings\BuildingHelper */
     private $helper;
@@ -449,7 +451,10 @@ class Village
                 $percent += ($this->specialBuildingsLvl['Bakery']) * 5;
                 break;
         }
-        return $percent + \Game\ResourcesHelper::oasisBonus($this->getKid())['bonus'][$k - 1];
+        $oasis = \Game\ResourcesHelper::oasisBonus($this->getKid())['bonus'][$k - 1];
+        $waterworks = (int) ($this->specialBuildingsLvl['Waterworks'] ?? 0);
+
+        return $percent + ($oasis * (1 + $waterworks * 5 / 100));
     }
 
     /**

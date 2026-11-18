@@ -182,16 +182,18 @@ class EditVillageCtrl
                     }
                 }
             }
-            $smithy = $this->getSmithy($kid);
-            for ($i = 1; $i <= 8; ++$i) {
-                if (is_string($_POST['ul' . $i] ?? null) && (int)$_POST['ul' . $i] >= 0) {
-                    $smithy['u' . $i] = min((int)$_POST['ul' . $i], 20);
-                }
-            }
             $db = DB::getInstance();
-            $db->query("UPDATE smithy SET 
+            if (getCustom('allowInterruptionInGame')) {
+                $smithy = $this->getSmithy($kid);
+                for ($i = 1; $i <= 8; ++$i) {
+                    if (is_string($_POST['ul' . $i] ?? null) && (int)$_POST['ul' . $i] >= 0) {
+                        $smithy['u' . $i] = min((int)$_POST['ul' . $i], 20);
+                    }
+                }
+                $db->query("UPDATE smithy SET 
                                 u1={$smithy['u1']}, u2={$smithy['u2']}, u3={$smithy['u3']}, u4={$smithy['u4']}, 
                                 u5={$smithy['u5']}, u6={$smithy['u6']}, u7={$smithy['u7']}, u8={$smithy['u8']} WHERE kid=$kid");
+            }
             ResourcesHelper::updateVillageUpkeep($villageData['owner'], $kid, $villageData['isWW'] == 1);
             $villageData = $this->db->query("SELECT * FROM vdata WHERE kid=$kid");
             $villageData = $villageData->fetch_assoc();
@@ -302,11 +304,11 @@ class EditVillageCtrl
         if (is_null($params['trainings'])) {
             $params['trainings'] .= '<tr><td colspan="5" class="noData">No training.</td></tr>';
         }
-        if (isset($_REQUEST['deleteResearch'])) {
+        if (isset($_REQUEST['deleteResearch']) && getCustom('allowInterruptionInGame')) {
             //delete Training
             $id = (int)$_REQUEST['deleteResearch'];
             $db->query("DELETE FROM research WHERE id=$id AND kid=$kid");
-        } else if (isset($_REQUEST['finishResearch'])) {
+        } else if (isset($_REQUEST['finishResearch']) && getCustom('allowInterruptionInGame')) {
             //delete Training
             $id = (int)$_REQUEST['finishResearch'];
             $db->query("UPDATE research SET end_time=0 WHERE id=$id AND kid=$kid");
@@ -328,12 +330,12 @@ class EditVillageCtrl
 
         $village_buildings = (new VillageModel())->getBuildingsAssoc($kid);
 
-        if (isset($_REQUEST['deleteBuilding'])) {
+        if (isset($_REQUEST['deleteBuilding']) && getCustom('allowInterruptionInGame')) {
             //delete Training
             $id = (int)$_REQUEST['deleteBuilding'];
             $db->query("DELETE FROM building_upgrade WHERE id=$id AND kid=$kid");
             BuildingAction::fixUnUpgradedBuildings($kid);
-        } else if (isset($_REQUEST['finishBuilding'])) {
+        } else if (isset($_REQUEST['finishBuilding']) && getCustom('allowInterruptionInGame')) {
             //delete Training
             $id = (int)$_REQUEST['finishBuilding'];
             $db->query("UPDATE building_upgrade SET commence=0 WHERE id=$id AND kid=$kid");
@@ -354,11 +356,11 @@ class EditVillageCtrl
             $params['buildings'] .= '<tr><td colspan="5" class="noData">No building in queue.</td></tr>';
         }
 
-        if (isset($_REQUEST['deleteDemolish'])) {
+        if (isset($_REQUEST['deleteDemolish']) && getCustom('allowInterruptionInGame')) {
             //delete Training
             $id = (int)$_REQUEST['deleteDemolish'];
             $db->query("DELETE FROM demolition WHERE id=$id AND kid=$kid");
-        } else if (isset($_REQUEST['finishDemolish'])) {
+        } else if (isset($_REQUEST['finishDemolish']) && getCustom('allowInterruptionInGame')) {
             //delete Training
             $id = (int)$_REQUEST['finishDemolish'];
             $db->query("UPDATE demolition SET end_time=0 WHERE id=$id AND kid=$kid");
@@ -378,7 +380,7 @@ class EditVillageCtrl
         if (is_null($params['demolishes'])) {
             $params['demolishes'] .= '<tr><td colspan="5" class="noData">No demolishes.</td></tr>';
         }
-        if ($villageData['festival'] > time() && isset($_REQUEST['finishFestival'])) {
+        if ($villageData['festival'] > time() && isset($_REQUEST['finishFestival']) && getCustom('allowInterruptionInGame')) {
             $db->query("UPDATE vdata SET festival=0 WHERE kid=$kid");
             $villageData['festival'] = 0;
         }

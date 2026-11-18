@@ -128,11 +128,11 @@ class VillageOverviewModel
     }
 
     /**
-     * @return array{item_id: int, level: int}|false false when the village has no Residence or Palace
+     * @return array{item_id: int, level: int}|false false when the village has no Residence, Palace or Command Center
      */
     public function getResidencePalaceLevel(int $capWref): array|false
     {
-        $building = $this->findBuilding($capWref, [25, 26]);
+        $building = $this->findBuilding($capWref, [25, 26, 44]);
 
         return $building === null ? false : ['item_id' => $building['item_id'], 'level' => $building['level']];
     }

@@ -61,7 +61,8 @@ class GoldPackageCodeGeneratorCtrl
             while ($row = $result->fetch_assoc()) {
                 $row['product'] = PackageCode::getProduct($row['package_id']);
                 $params['content'] .= '<tr>';
-                $params['content'] .= '<td class="center"><a href="admin.php?package=' . $packageId . '&'.Session::getCheckerName().'=' . Session::getInstance()->getChecker() . '&action=goldPackageCodeGenerator&id=' . $row['id'] . '&section=del">Delete</a></td>';
+                $listAction = $params['isGift'] ? 'giftGoldPackageCodeGenerator' : 'goldPackageCodeGenerator';
+                $params['content'] .= '<td class="center"><a href="admin.php?package=' . $packageId . '&'.Session::getCheckerName().'=' . Session::getInstance()->getChecker() . '&action=' . $listAction . '&id=' . $row['id'] . '&section=del">Delete</a></td>';
                 $params['content'] .= '<td class="center">' . $row['id'] . '</td>';
                 $params['content'] .= '<td class="center">' . \Game\AdminUi::esc($row['code']) . '</td>';
                 $params['content'] .= '<td class="center">' . \Game\AdminUi::esc($row['product']['goldProductName']) . ' - ' . ($row['product']['goldProductGold']) . ' Golds</td>';
@@ -72,9 +73,9 @@ class GoldPackageCodeGeneratorCtrl
                 $params['content'] .= '<tr><td colspan="5" class="center adminMuted">No unused codes for this package.</td></tr>';
             }
             if($params['isGift']){
-                $params['navigator'] = $this->getNavigator($page, $db->fetchScalar("SELECT COUNT(id) FROM package_codes WHERE used=0 AND isGift=1"), ['action' => 'goldPackageCodeGenerator', 'packageId' => $packageId]);
+                $params['navigator'] = $this->getNavigator($page, $db->fetchScalar("SELECT COUNT(id) FROM package_codes WHERE used=0 AND isGift=1 AND package_id=$packageId"), ['action' => 'giftGoldPackageCodeGenerator', 'package' => $packageId]);
             } else {
-                $params['navigator'] = $this->getNavigator($page, $db->fetchScalar("SELECT COUNT(id) FROM package_codes WHERE used=0"), ['action' => 'goldPackageCodeGenerator', 'packageId' => $packageId]);
+                $params['navigator'] = $this->getNavigator($page, $db->fetchScalar("SELECT COUNT(id) FROM package_codes WHERE used=0 AND isGift=0 AND package_id=$packageId"), ['action' => 'goldPackageCodeGenerator', 'package' => $packageId]);
             }
         }
         Dispatcher::getInstance()->appendContent(Template::getInstance()->load($params, 'tpl/addPaymentCodeBatch.tpl')->getAsString());

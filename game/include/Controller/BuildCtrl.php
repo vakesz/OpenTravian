@@ -198,7 +198,7 @@ class BuildCtrl extends GameCtrl
     private function getCategoryAvailableBuildings($category)
     {
         $categories = [1 =>
-            [15, 23, 10, 11, 18, 17, 25, 26, 44, 45, 34, 27, 24, 28, 35, 41, 39, 38, 40,],
+            [15, 23, 10, 11, 18, 17, 25, 26, 44, 45, 49, 34, 27, 24, 28, 35, 41, 39, 38, 40,],
             [16, 31, 32, 33, 42, 43, 47, 50, 19, 36, 37, 22, 13, 20, 29, 30, 21, 46, 14, 48],
             [8, 5, 6, 7, 9],
         ];
@@ -815,8 +815,9 @@ class BuildCtrl extends GameCtrl
                 });
                 break;
             case 41:
+                // Training time left, as a percent of the unboosted stable time (1% faster per level).
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
-                    return 100 + $lvl;
+                    return 100 - $lvl;
                 });
                 break;
             case 14:

@@ -148,19 +148,23 @@ class EditPlayerCtrl
                 }
             } else if (!isServerFinished() && $_REQUEST['section'] == 'deletePlayer' && Session::validateChecker()) {
                 $uid = (int)$_REQUEST['uid'];
-                //$db->query("INSERT INTO deleting (uid, time) VALUES ($uid, 0)");
+                $this->db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 600) . ')');
                 $dispatcher = Dispatcher::getInstance();
-                $dispatcher->appendContent(\Game\AdminUi::notice('Player will be deleted in some minutes.', 'info'));;
+                $dispatcher->appendContent(\Game\AdminUi::notice('Player will be deleted in some minutes.', 'info'));
                 AdminLog::getInstance()->addLog("Deleted a player({$uid}).");
                 return;
             } else if (!isServerFinished() && $_REQUEST['section'] == 'punishPlayer') {
                 $this->showPunishPlayer((int)$_REQUEST['uid']);
                 return;
-            } else if (!isServerFinished() && $_REQUEST['section'] == 'fillResources' && !getCustom('allowInterruptionInGame')) {
-                $uid = (int)$_REQUEST['uid'];
-                $this->db->query("UPDATE vdata SET wood=maxstore, clay=maxstore, iron=maxstore, crop=maxcrop WHERE owner=$uid");
+            } else if (!isServerFinished() && $_REQUEST['section'] == 'fillResources') {
                 $dispatcher = Dispatcher::getInstance();
-                $dispatcher->appendContent(\Game\AdminUi::notice('Resources were filled.', 'success'));
+                if (getCustom('allowInterruptionInGame')) {
+                    $uid = (int)$_REQUEST['uid'];
+                    $this->db->query("UPDATE vdata SET wood=maxstore, clay=maxstore, iron=maxstore, crop=maxcrop WHERE owner=$uid");
+                    $dispatcher->appendContent(\Game\AdminUi::notice('Resources were filled.', 'success'));
+                } else {
+                    $dispatcher->appendContent(\Game\AdminUi::notice('Access denied.', 'error'));
+                }
             } else if (!isServerFinished() && $_REQUEST['section'] == 'killHero') {
                 $uid = (int)$_REQUEST['uid'];
                 $db = DB::getInstance();

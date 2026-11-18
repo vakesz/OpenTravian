@@ -26,6 +26,8 @@ class AutoUpgradeAI
     private $kid;
     /** @var mixed */
     private $race = 5;
+    /** @var int */
+    private $owner = 0;
     /** @var mixed */
     private $main_building_lvl = 0;
     /** @var mixed */
@@ -65,6 +67,7 @@ class AutoUpgradeAI
         $this->isWW = $village['isWW'];
         $this->cropProduction = $village['cropp'];
         $this->upkeep = $village['upkeep'];
+        $this->owner = (int) ($village['owner'] ?? 0);
         for ($i = 19; $i <= 38; ++$i) {
             if ($this->buildings[$i]['item_id'] == 15) {
                 $this->main_building_lvl = $this->buildings[$i]['level'];
@@ -136,7 +139,7 @@ class AutoUpgradeAI
         $helper = new BuildingHelper();
         if ($rand_field == 39) {
             $hasResources = $this->isBuildingResourcesAvailable(16, 1);
-            if ($hasResources && $helper->canCreateNewBuild($this->capital, 5, 16, $this->buildings) == 1) {
+            if ($hasResources && $helper->canCreateNewBuild($this->capital, $this->race, 16, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
                     $this->buildings[$rand_field]['item_id'] = 16;
                     $db->query("UPDATE fdata SET f{$rand_field}t=16 WHERE kid=" . $this->kid);
@@ -150,7 +153,7 @@ class AutoUpgradeAI
         if ($rand_field == 40) {
             $buildingGID = Formulas::getWallID($this->race);
             $hasResources = $this->isBuildingResourcesAvailable($buildingGID, 1);
-            if ($hasResources && $helper->canCreateNewBuild($this->capital, 5, $buildingGID, $this->buildings) == 1) {
+            if ($hasResources && $helper->canCreateNewBuild($this->capital, $this->race, $buildingGID, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
                     $this->buildings[$rand_field]['item_id'] = $buildingGID;
                     $db->query("UPDATE fdata SET f{$rand_field}t=$buildingGID WHERE kid=" . $this->kid);
@@ -176,7 +179,7 @@ class AutoUpgradeAI
                 continue;
             }
             $hasResources = $this->isBuildingResourcesAvailable($gid, 1);
-            if ($hasResources && $helper->checkArtifactDependencies(0, 1, $this->kid, $gid, false, 0) == 0 && $helper->canCreateNewBuild($this->capital, 5, $gid, $this->buildings) == 1) {
+            if ($hasResources && $helper->checkArtifactDependencies(0, $this->owner, $this->kid, $gid, false, 0) == 0 && $helper->canCreateNewBuild($this->capital, $this->race, $gid, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
                     $this->buildings[$rand_field]['item_id'] = $gid;
                     $db->query("UPDATE fdata SET f{$rand_field}t=$gid WHERE kid=" . $this->kid);
@@ -206,16 +209,18 @@ class AutoUpgradeAI
     /**
      * @param mixed $field
      */
-    private function addUpgrade($field): void
+    private function addUpgrade($field, ?int $nextLevel = null): void
     {
         $this->workers[$field <= 18 ? 'fieldsNum' : 'buildsNum']++;
         if($this->buildings[$field]['item_id'] == 40){
             $this->workers['WW']++;
         }
-        $this->buildings[$field]['level']++; //increase temporary level to prevent double upgrade
+        // Charge the level this order will finish, including rows already queued.
+        // The in-memory level stays the built level; the next pass reads the new row.
+        $nextLevel ??= (int) $this->buildings[$field]['level'] + $this->getUpgradeState($field) + 1;
         $commence = $this->getLastCommence($field);
-        $this->takeResources($this->buildings[$field]['item_id'], $this->buildings[$field]['level']);
-        $commence += Formulas::buildingUpgradeTime($this->buildings[$field]['item_id'], $this->buildings[$field]['level'], $this->main_building_lvl, $this->isWW);
+        $this->takeResources($this->buildings[$field]['item_id'], $nextLevel);
+        $commence += Formulas::buildingUpgradeTime($this->buildings[$field]['item_id'], $nextLevel, $this->main_building_lvl, $this->isWW);
         $db = DB::getInstance();
         $db->query("INSERT INTO building_upgrade (kid, building_field, isMaster, start_time, commence) VALUES ({$this->kid}, {$field}, 0, ".time().", {$commence})");
     }
@@ -359,7 +364,7 @@ class AutoUpgradeAI
         } else {
             $hasResources = $this->isBuildingResourcesAvailable($this->buildings[$field]['item_id'], $level + 1);
             if ($hasResources) {
-                $this->addUpgrade($field);
+                $this->addUpgrade($field, $level + 1);
                 return true;
             }
         }

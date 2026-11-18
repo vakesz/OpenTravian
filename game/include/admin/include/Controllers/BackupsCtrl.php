@@ -202,6 +202,7 @@ class BackupsCtrl
         ];
         if (isset($_GET['e']) && isset($errors[$_GET['e']])) {
             $params['error'] = $errors[$_GET['e']];
+            $params['noticeTone'] = in_array((int) $_GET['e'], [1, 3, 4, 6, 7, 12], true) ? 'success' : 'error';
         }
         $dispatcher = Dispatcher::getInstance();
         $dispatcher->appendContent(Template::getInstance()->load($params, 'tpl/backups.tpl')->getAsString());

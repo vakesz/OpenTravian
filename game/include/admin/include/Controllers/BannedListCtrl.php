@@ -15,6 +15,14 @@ class BannedListCtrl
         if (is_string($_REQUEST['uid'] ?? null)) {
             $params['uid'] = (int)$_REQUEST['uid'];
         }
+        if (($_REQUEST['section'] ?? null) === 'banToggle' && $params['uid'] !== null) {
+            $uid = (int) $params['uid'];
+            $access = $db->fetchScalar('SELECT access FROM users WHERE id=?', [$uid]);
+            $queued = (int) $db->fetchScalar('SELECT COUNT(id) FROM banQueue WHERE uid=?', [$uid]);
+            if ($access !== false && ((int) $access === 0 || $queued > 0)) {
+                WebService::redirect('admin.php?action=bannedList&section=unban&uid=' . $uid);
+            }
+        }
         if (($_REQUEST['section'] ?? null) === 'unban' && $params['uid'] !== null) {
             $uid = $params['uid'];
             $db->run('UPDATE users SET access=1 WHERE id=?', [$uid]);

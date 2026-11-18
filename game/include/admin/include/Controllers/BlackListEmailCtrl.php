@@ -13,13 +13,15 @@ class BlackListEmailCtrl
         $globalDB = \Core\Database\GlobalDB::getInstance();
         if(!isServerFinished() && WebService::isPost() && Session::validateChecker()){
             if(!empty($params['emails'])){
+                $added = 0;
                 foreach (preg_split('/\R/', $params['emails']) ?: [] as $email) {
                     $email = trim(strtolower($email));
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                         $globalDB->run('INSERT IGNORE INTO `email_blacklist` (`email`, `time`) VALUES (?, ?)', [$email, time()]);
+                        $added++;
                     }
                 }
-                $params['error'] = 'Emails were blacklisted.';
+                $params['error'] = $added > 0 ? 'Emails were blacklisted.' : 'No valid emails to blacklist.';
             } else {
                 $params['error'] = 'no emails to blacklist!';
             }

@@ -208,7 +208,7 @@ class Map
         $mapModel = new MapModel();
         $marks = $m->getWholeMapMarksForKid($kid, $uid, $aid, $mode, TRUE);
         while ($mark = $marks->fetch_assoc()) {
-            if ($marks['aid'] && !$marks['uid']) {
+            if ($mark['aid'] && !$mark['uid']) {
                 //alliances
                 $villages = $db->query("SELECT vdata.kid FROM vdata, users, alidata WHERE alidata.id={$mark['targetId']} AND users.aid=alidata.id AND vdata.owner=users.id");
             } else {
