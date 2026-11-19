@@ -144,7 +144,50 @@ class Village
             ]);
             $this->village = $this->db->fetchSingleRow("SELECT * FROM vdata WHERE kid=?", (int)$this->session->getKid());
         }
+        $this->promoteCelebrationQueue();
         return $this->village !== false;
+    }
+
+    /** A queued celebration starts when the one in front of it ends. */
+    public static function promoteStoredCelebration(int $kid): void
+    {
+        if ($kid <= 0) {
+            return;
+        }
+        $db = DB::getInstance();
+        $result = $db->query("SELECT celebration, type, celebration2, type2 FROM vdata WHERE kid=$kid");
+        $row = $result ? $result->fetch_assoc() : null;
+        if (!is_array($row) || !array_key_exists('celebration2', $row)) {
+            return;
+        }
+        $now = time();
+        $running = (int) $row['celebration'];
+        $queuedEnd = (int) $row['celebration2'];
+        $queuedType = (int) $row['type2'];
+        if ($queuedEnd <= 0 || $running > $now) {
+            return;
+        }
+        if ($queuedEnd > $now) {
+            $db->query("UPDATE vdata SET celebration=$queuedEnd, type=$queuedType, celebration2=0, type2=0 WHERE kid=$kid");
+            return;
+        }
+        $db->query("UPDATE vdata SET celebration2=0, type2=0 WHERE kid=$kid");
+    }
+
+    private function promoteCelebrationQueue(): void
+    {
+        if (!is_array($this->village)) {
+            return;
+        }
+        $kid = (int) $this->village['kid'];
+        self::promoteStoredCelebration($kid);
+        $fresh = $this->db->fetchSingleRow('SELECT celebration, type, celebration2, type2 FROM vdata WHERE kid=?', $kid);
+        if (!is_array($fresh)) {
+            return;
+        }
+        foreach ($fresh as $key => $value) {
+            $this->village[$key] = $value;
+        }
     }
 
     private function populateBuildings(): void
@@ -567,6 +610,12 @@ class Village
     public function setCelebrationType($type): void
     {
         $this->village['type'] = $type;
+    }
+
+    public function setCelebrationQueue(int $end, int $type): void
+    {
+        $this->village['celebration2'] = $end;
+        $this->village['type2'] = $type;
     }
 
     /**
@@ -999,12 +1048,14 @@ class Village
      */
     public function checkDependencies($item_id, $level)
     {
+        $cropGate = \Game\ResourcesHelper::legendsCropGate($this->getKid(), $this->cropLoading + $this->cropLoadingMaster);
         $dep = $this->helper->checkDependencies($item_id,
             $level,
             $this->isWW(),
-            $this->village['cropp'] - $this->village['pop'] - $this->cropLoading - $this->cropLoadingMaster,
+            $cropGate['free'],
             $this->get("maxstore"),
-            $this->get("maxcrop"));
+            $this->get("maxcrop"),
+            $cropGate['base']);
 
         return $dep;
     }
@@ -1438,7 +1489,12 @@ class Village
     {
         $points = 0;
         if ($this->village['loyalty'] < 100) {
-            $points = max($this->specialBuildingsLvl['Palace'] + $this->specialBuildingsLvl['Residence'], 0);
+            $level = max(
+                (int)$this->specialBuildingsLvl['Palace'],
+                (int)$this->specialBuildingsLvl['Residence'],
+                (int)$this->specialBuildingsLvl['CommandCenter']
+            );
+            $points = $level * 2 / 3;
             $points /= 3600;
             $elapsedSeconds = time() - $this->village['last_loyalty_update'];
             $points *= $elapsedSeconds;
@@ -1468,6 +1524,18 @@ class Village
         }
         if ($this->getOnDemolishBuildingFieldId()) {
             return false;
+        }
+        $demolishField = $this->getField($fieldId);
+        $demolishGid = (int)$demolishField['item_id'];
+        $demolishLevel = (int)$demolishField['level'];
+        if (in_array($demolishGid, [8, 9], true) && $demolishLevel > 0) {
+            $cropGate = \Game\ResourcesHelper::legendsCropGate($this->getKid(), $this->cropLoading + $this->cropLoadingMaster);
+            $removed = Formulas::buildingCropConsumption($demolishGid, $demolishLevel);
+            $kept = $demolishLevel > 1 ? Formulas::buildingCropConsumption($demolishGid, $demolishLevel - 1) : 0;
+            $after = $cropGate['free'] + ($removed - $kept) - (0.05 * $cropGate['base']);
+            if ($after < 1) {
+                return false;
+            }
         }
         if (Config::getInstance()->dynamic->serverFinished || $this->session->banned()) {
             return false;

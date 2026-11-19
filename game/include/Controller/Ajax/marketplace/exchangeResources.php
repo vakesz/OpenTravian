@@ -36,8 +36,7 @@ final class exchangeResources extends AjaxBase
             || !ctype_digit((string)$did)
             || (int)$did !== (int)$village->getKid()
             || !$village->hasMarketPlace()
-            || $village->isWW()
-            || $this->session->getTotalPopulation() < 40) {
+            || $village->isWW()) {
             $this->error(T('npc', 'invalid_distribution'));
             return;
         }

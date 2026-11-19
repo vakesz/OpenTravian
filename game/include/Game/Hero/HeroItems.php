@@ -18,7 +18,7 @@ class HeroItems
             1 => range(1, 15),
             2 => range(82, 93),
             3 => array_merge(range(61, 69), range(73, 81)),
-            4 => range(16, 60),
+            4 => array_merge(range(16, 60), range(164, 178)),
             5 => range(94, 102),
             6 => range(103, 105),
             7 => [112],
@@ -46,7 +46,7 @@ class HeroItems
      */
     public static function weaponTypes(): array
     {
-        return array_merge(range(16, 60), range(115, 144), range(149, 163));
+        return array_merge(range(16, 60), range(115, 144), range(149, 163), range(164, 178));
     }
 
     /**
@@ -117,8 +117,29 @@ class HeroItems
         // the name is shown only where the catalogue has one and the effect comes from the tooltip builder.
         if ($btype === 4 && $type >= 149 && $type <= 163) {
             // Hoplite, Shieldsman, Twinsteel Therion, Elpida Rider and Corinthian Crusher, three tiers each.
-            $weapon = [[71, 3, 1], [73, 3, 1], [74, 3, 1], [75, 6, 2], [76, 9, 3]][intdiv($type - 149, 3)];
+            $weapon = [[71, 4, 2], [73, 4, 2], [74, 4, 2], [75, 8, 4], [76, 12, 6]][intdiv($type - 149, 3)];
             $tier = ($type - 149) % 3;
+            $result['name'] = in_array(get_locale(), ['en-US', 'ar-AE', 'el-GR'], true)
+                ? T("HeroItems", "{$btype}.{$type}.name")
+                : '';
+            $result['title'] = '';
+            $result['attributes'] = [];
+            $result['slot'] = 'rightHand';
+            $result['instant'] = FALSE;
+            $result['isUsableIfDead'] = FALSE;
+            $result['unitId'] = $weapon[0];
+            $result['hero_power'] = [375, 1500, 6000][$tier] * $heroItemsSettings['heroIncreaseHeroPower'];
+            $result['unit_power'] = ($weapon[1] + $tier * $weapon[2]) * $heroItemsSettings['heroIncreaseUnitPower'];
+
+            return $result;
+        }
+
+        // Viking weapons (164-178). Heimdall's Eye has none. Thrall and Shield
+        // Maiden are +3/+4/+5; Berserker, Huskarl Rider and Valkyrie's Blessing
+        // are +6/+8/+10, each with fighting strength 250/1000/4000.
+        if ($btype === 4 && $type >= 164 && $type <= 178) {
+            $weapon = [[81, 3, 1], [82, 3, 1], [83, 6, 2], [85, 6, 2], [86, 6, 2]][intdiv($type - 164, 3)];
+            $tier = ($type - 164) % 3;
             $result['name'] = in_array(get_locale(), ['en-US', 'ar-AE', 'el-GR'], true)
                 ? T("HeroItems", "{$btype}.{$type}.name")
                 : '';
@@ -437,7 +458,9 @@ class HeroItems
                 break;
             case 6:
                 if ($type <= 105) {
-                    $result['speed_horse'] = (14 + (($type - 103) * 6)) * $heroItemsSettings['heroIncreaseSpeedRate'];
+                    // Legends article 89: the mount itself is 14 / 17 / 20 fields per
+                    // hour at ×1. Movement scaling is applied when the hero travels.
+                    $result['speed_horse'] = (14 + (($type - 103) * 3)) * $heroItemsSettings['heroIncreaseSpeedRate'];
                     $result['attributes'] = sprintf($result['attributes'], $result['speed_horse']);
                 }
                 break;

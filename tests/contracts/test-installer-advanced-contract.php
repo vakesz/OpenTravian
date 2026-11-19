@@ -69,7 +69,7 @@ $base = [
     'database_host' => 'db', 'database_user' => 'u', 'database_password' => 'p', 'world_database' => 'w',
 ];
 $simple = \Game\Installer\WorldInstaller::buildConnection($base);
-expectInstallerAdvanced(str_contains($simple, "'protection_time' => 10800") && str_contains($simple, "'overrides' => \n  array (\n  )"), 'Simple mode must write the derived profile and no overrides.');
+expectInstallerAdvanced(str_contains($simple, "'protection_time' => 518400") && str_contains($simple, "'overrides' => \n  array (\n  )"), 'Simple mode must write the derived profile and no overrides.');
 $advanced = \Game\Installer\WorldInstaller::buildConnection($base + ['profile' => ['protection_time' => 7200], 'overrides' => ['vacationDays' => 7, 'evil' => 1]]);
 expectInstallerAdvanced(str_contains($advanced, "'protection_time' => 7200") && str_contains($advanced, "'vacationDays' => 7") && !str_contains($advanced, 'evil'), 'Advanced mode must write overrides and drop unknown keys.');
 

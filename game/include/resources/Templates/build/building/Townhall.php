@@ -99,6 +99,13 @@ if (!($vars['bigCelebration']['active'] and $vars['bigCelebration']['points'] > 
             <td class="dur"><?=$vars['timeLeft']; ?></td>
             <td class="fin"><?=$vars['endat']; ?></td>
         </tr>
+        <?php if (!empty($vars['isCelebrationQueued'])): ?>
+        <tr>
+            <td class="desc"><?=T("inGame", (int) $vars['queueType'] === 1 ? "Small celebration" : "Big celebration"); ?></td>
+            <td class="dur"><?=$vars['queueTimeLeft']; ?></td>
+            <td class="fin"><?=$vars['queueEndat']; ?></td>
+        </tr>
+        <?php endif; ?>
         </tbody>
     </table>
 <?php endif; ?>

@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Contract: finishNow / demolishNow / marketplace gold spends follow the shared
  * atomic purchase pattern — lock work inside one transaction, apply effects,
  * then decreaseGold(..., true), then commit and sync session gold. finishNow
- * must complete research and demolition in-request (no end_time=0 deferral).
+ * must complete research in-request (no end_time=0 deferral) and must leave demolitions queued.
  */
 
 function failFinishNowAtomicContract(string $message): never
@@ -29,7 +29,6 @@ foreach ([
     'FROM building_upgrade WHERE kid=$kid AND isMaster=0',
     'FOR UPDATE',
     'BuildingAction::upgrade($kid, $onload[\'building_field\'])',
-    'BuildingAction::downgrade(',
     'UPDATE tdata SET u$nr=1 WHERE kid=$kid',
     'UPDATE smithy SET u$nr=IF(u$nr+1>20, 20, u$nr+1) WHERE kid=$kid',
     'self::decreaseGold($uid, $cost, true)',
@@ -41,8 +40,9 @@ foreach ([
 }
 
 if (str_contains($helper, 'UPDATE research SET end_time=0 WHERE kid=$kid')
-    || str_contains($helper, 'UPDATE demolition SET end_time=0 WHERE kid=$kid')) {
-    failFinishNowAtomicContract('finishNow must not defer research/demolition with end_time=0; complete them in the purchase transaction.');
+    || str_contains($helper, 'UPDATE demolition SET end_time=0 WHERE kid=$kid')
+    || str_contains($helper, 'FROM demolition WHERE kid=$kid')) {
+    failFinishNowAtomicContract('finishNow must complete research in the purchase and must not touch the demolition queue.');
 }
 
 $finishNowPos = strpos($helper, 'function finishImmediatelyBuildings(): string');

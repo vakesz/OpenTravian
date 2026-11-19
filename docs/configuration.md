@@ -32,7 +32,7 @@ Set these in `.env` (Compose reads it automatically); `config/bootstrap-env.sh` 
 | `TRAVIAN_INSTALL_PLAYER_TRIBE` | Common | `1` | Headless install: starter player tribe id |
 | `TRAVIAN_INSTALL_TRIBES` | Common | `1,2,3,6,7,8` | Headless install: playable tribe ids |
 | `TRAVIAN_INSTALL_MAP_SIZE` | Common | `100` | Headless install: map size (100, 200 or 400) |
-| `TRAVIAN_INSTALL_STARTING_GOLD` | Common | `0` | Headless install: starting gold |
+| `TRAVIAN_INSTALL_STARTING_GOLD` | Common | `500` | Headless install: starting gold |
 | `TRAVIAN_INSTALL_FARM_VILLAGES` | Common | `0` | Headless install: Natar farm villages to seed, 0 to 1000 (the wizard offers 0, 40, 150 and 400) |
 | `TRAVIAN_INSTALL_SMTP_HOST` | Common | unset | Headless install: SMTP host; leave unset to install without email |
 | `TRAVIAN_INSTALL_SMTP_PORT` | Common | `587` | Headless install: SMTP port |

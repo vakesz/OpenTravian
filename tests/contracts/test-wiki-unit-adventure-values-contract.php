@@ -27,7 +27,7 @@ if (str_contains((string) file_get_contents(dirname(__DIR__, 2) . '/game/include
     failWikiValuesContract('The unused rs_time unit key is gone.');
 }
 
-foreach ([9 => [15880, 13800, 36400, 22660], 29 => [15880, 22900, 25200, 22660], 12 => [970, 380, 880, 400]] as $id => $cost) {
+foreach ([9 => [15880, 13800, 36400, 22660], 29 => [15880, 22900, 25200, 22660], 12 => [970, 380, 880, 400], 89 => [18250, 13320, 20040, 16480]] as $id => $cost) {
     if (array_map('intval', Formulas::uResearchCost($id)) !== $cost) {
         failWikiValuesContract("Research cost of unit {$id} is " . implode(',', Formulas::uResearchCost($id)) . ', expected ' . implode(',', $cost) . '.');
     }

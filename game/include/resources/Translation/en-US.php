@@ -164,6 +164,10 @@ $Definition['Alliance']['Password'] = 'Password';
 $Definition['Alliance']['Cant kick player'] = 'Cant kick player.';
 $Definition['Alliance']['InvitesAreClosed'] = 'Invites Are Closed.';
 $Definition['Alliance']['There is already an offer'] = 'There is already an offer.';
+$Definition['Alliance']['Too many pacts'] = 'An alliance can have at most 3 non-aggression pacts and confederacies.';
+$Definition['Alliance']['Confederacy too large'] = 'A confederacy can include at most 3 alliances.';
+$Definition['Alliance']['Confederacy needs approval'] = 'The existing confederacy partner must approve this.';
+$Definition['Alliance']['Approve confederacy between x and y'] = 'Approve the confederacy between %s and %s';
 $Definition['Alliance']['Alliance x does not exists'] = 'Alliance %s does not exists.';
 $Definition['Alliance']['offer a confederacy'] = 'offer a confederacy';
 $Definition['Alliance']['offer a NAP'] = 'offer a NAP';
@@ -536,6 +540,7 @@ $Definition['Auction']['Highest bidder (alliance)'] = 'Highest bidder (alliance)
 $Definition['Auction']['searchItems'] = 'Search';
 $Definition['Auction']['Finished auctions'] = 'Finished auctions';
 $Definition['Auction']['AuctionNotFound'] = 'Auction not found!';
+$Definition['Auction']['Bid too high'] = 'That bid is too high. You can no longer bid on this auction.';
 $Definition['Auction']['Not enough items available for auction ([MIN_AMOUNT] items)'] = 'Not enough items available for auction ([MIN_AMOUNT] items).';
 $Definition['Auction']['AuctionFinished'] = 'This auction is finished.';
 $Definition['Auction']['notEnoughSilverAuctionError'] = 'You don\'t have enough silver. %s silver is needed at least!';
@@ -3937,6 +3942,7 @@ $Definition['Options']['You have Gold %s pieces of gold, %s pieces can be transf
 $Definition['Options']['Auto reload status'] = 'Auto reload settings';
 $Definition['Options']['Enable auto reload?'] = 'Enable auto reload?';
 $Definition['Options']['This player is sitter for 2 players'] = 'This player is already sitting two avatars.';
+$Definition['Options']['Sitter must share an alliance'] = 'A sitter must be in your alliance or a confederacy.';
 $Definition['Options']['You can set the page to auto reload, the page will be automatically refreshed when timer reaches 0'] = 'You can set the page to auto reload, the page will be automatically refreshed when timer reaches 0.';
 
 $Definition['Options']['Graphic pack'] = 'Graphic pack';

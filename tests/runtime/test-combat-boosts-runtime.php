@@ -133,7 +133,7 @@ foreach ([
     3 => ['base' => 1.025, 'points' => 8, 'durability' => 2],
     6 => ['base' => 1.025, 'points' => 8, 'durability' => 4],
     7 => ['base' => 1.015, 'points' => 6, 'durability' => 1],
-    8 => ['base' => 1.02, 'points' => 6, 'durability' => 2],
+    8 => ['base' => 1.02, 'points' => 10, 'durability' => 2],
     9 => ['base' => 1.015, 'points' => 6, 'durability' => 3],
 ] as $race => $expectedWall) {
     // The wall tables live once: Formulas::WALL_BASE, and BattleModel's WALL_EXTRA and WALL_DURABILITY, read by the

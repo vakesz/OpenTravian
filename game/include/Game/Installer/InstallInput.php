@@ -82,7 +82,7 @@ final class InstallInput
             'world_id' => getenv('TRAVIAN_WORLD_ID') ?: 'local',
             'title' => getenv('TRAVIAN_WORLD_TITLE') ?: 'Local OpenTravian World',
             'speed' => '1',
-            'starting_gold' => '0',
+            'starting_gold' => '500',
             'farm_villages' => '0',
             'map_size' => '100',
             'index_url' => $baseUrl,

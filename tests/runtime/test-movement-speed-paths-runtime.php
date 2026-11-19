@@ -139,11 +139,15 @@ try {
         $calc->setMinSpeed($heroSpeed);
         $assertSeconds($distance / (7 * $multiplier) * 3600, $calc->calc(), "hero return {$at}");
 
-        // The hero's horse bonus is not scaled with the world speed (+14, +20, +26 fields per hour at every speed).
-        foreach ([103 => 14, 104 => 20, 105 => 26] as $horse => $bonus) {
+        // Mount speed is 14 / 17 / 20 at x1, times the troop movement multiplier.
+        foreach ([103 => 14, 104 => 17, 105 => 20] as $horse => $base) {
             $item = (new HeroHelper())->getHeroItemProperties(6, $horse);
-            if ((float)$item['speed_horse'] !== (float)$bonus) {
-                $fail("horse {$horse} adds {$item['speed_horse']} fields per hour {$at}, expected {$bonus}.");
+            if ((float)$item['speed_horse'] !== (float)$base) {
+                $fail("horse {$horse} is {$item['speed_horse']} fields per hour at x1 {$at}, expected {$base}.");
+            }
+            $ridden = (new HeroHelper())->calcTotalSpeed(1, ['btype' => 6, 'type' => $horse], null);
+            if ((float)$ridden !== (float)($base * $multiplier)) {
+                $fail("a mounted hero on horse {$horse} moves {$ridden} fields per hour {$at}, expected " . ($base * $multiplier) . '.');
             }
         }
 

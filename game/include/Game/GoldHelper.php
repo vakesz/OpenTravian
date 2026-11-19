@@ -281,12 +281,12 @@ class GoldHelper
     }
 
     /**
-     * Completes eligible construction, research and demolition in one purchase
+     * Completes eligible construction and research in one purchase
      * transaction. Gold is debited only after the locked queue effects apply so
      * a mid-loop failure cannot charge the player for a partial village update.
-     * Research and demolition are finished in-request (same effect bodies as
-     * Automation::processResearchTask / processDemolitionTask) instead of
-     * deferring with end_time=0.
+     * Research is finished in-request (same effect body as
+     * Automation::processResearchTask) instead of deferring with end_time=0.
+     * Demolitions are left on their timer.
      *
      * @return 'completed'|'noOrders'|'worldWonder'|'notEnoughGold'
      */
@@ -335,16 +335,7 @@ class GoldHelper
                 $researchRows[] = $row;
             }
 
-            $demolitionResult = $db->query("SELECT * FROM demolition WHERE kid=$kid ORDER BY id ASC FOR UPDATE");
-            if ($demolitionResult === false) {
-                throw new \RuntimeException('Unable to lock demolition queue for finishNow.');
-            }
-            $demolitionRows = [];
-            while ($row = $demolitionResult->fetch_assoc()) {
-                $demolitionRows[] = $row;
-            }
-
-            if ($buildings === [] && $researchRows === [] && $demolitionRows === []) {
+            if ($buildings === [] && $researchRows === []) {
                 $db->rollback();
                 return 'noOrders';
             }
@@ -371,25 +362,6 @@ class GoldHelper
                 $db->query('DELETE FROM research WHERE id=' . (int)$row['id']);
                 if ($db->affectedRows() !== 1) {
                     throw new \RuntimeException('Research queue row disappeared during finishNow.');
-                }
-            }
-
-            foreach ($demolitionRows as $row) {
-                BuildingAction::downgrade(
-                    $kid,
-                    (int)$row['building_field'],
-                    1,
-                    (bool)$row['complete']
-                );
-                $remaining = $db->query('SELECT id FROM demolition WHERE id=' . (int)$row['id'] . ' FOR UPDATE');
-                if ($remaining === false) {
-                    throw new \RuntimeException('Unable to verify demolition completion during finishNow.');
-                }
-                if ($remaining->num_rows) {
-                    $db->query('DELETE FROM demolition WHERE id=' . (int)$row['id']);
-                    if ($db->affectedRows() !== 1) {
-                        throw new \RuntimeException('Demolition queue row disappeared during finishNow.');
-                    }
                 }
             }
 
@@ -1318,19 +1290,6 @@ class GoldHelper
                 "onClick" => "if(jQuery(this).hasClass('disabled')){event.stopPropagation(); return false;} else {}",
                 "onFocus" => "jQuery('button', 'input[type!=hidden]', 'select').trigger('focus'); event.stopPropagation(); return false;",
                 "title"   => T("GoldHelper", "exchangeResources.error_no_marketplace"),
-            ],
-                [],
-                T("GoldHelper", "exchangeResources.exchangeResources")
-            );
-        }
-        if ($session->getTotalPopulation() < 40) {
-            return getButton(
-                [
-                "type"    => "button",
-                "class"   => "textButtonV1 gold exchange disabled",
-                "onClick" => "if(jQuery(this).hasClass('disabled')){event.stopPropagation(); return false;} else {}",
-                "onFocus" => "jQuery('button', 'input[type!=hidden]', 'select').trigger('focus'); event.stopPropagation(); return false;",
-                "title"   => T("GoldHelper", "exchangeResources.error_low_pop"),
             ],
                 [],
                 T("GoldHelper", "exchangeResources.exchangeResources")

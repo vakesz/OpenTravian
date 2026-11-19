@@ -231,12 +231,17 @@ class HeroHelper extends HeroItems
     {
         $horse = $this->procInput($horse);
         $isCavalry = is_array($horse) && in_array($horse['type'], [103, 104, 105]);
-        $base = Formulas::heroSpeed($race, $isCavalry);
+        $rate = max(1.0, (float)getGame('movement_speed_increase'));
         if ($isCavalry) {
             $item = $this->getHeroItemProperties($horse['btype'], $horse['type']);
-            return $base + $item['speed_horse'];
+            // Article 45: a mounted Gaul is 5 fields per hour faster at ×1, and
+            // that bonus scales with the same troop-movement multiplier.
+            $gaul = (int)$race === 3 ? 5 * $rate : 0;
+
+            return $item['speed_horse'] * $rate + $gaul;
         }
-        return $base;
+
+        return Formulas::heroSpeed($race, false);
     }
 
     /**
@@ -275,7 +280,9 @@ class HeroHelper extends HeroItems
         if (is_array($horse) && in_array($horse['type'], [103, 104, 105])) {
             if (is_array($shoes) && in_array($shoes['type'], [100, 101, 102])) {
                 $item = $this->getHeroItemProperties($shoes['btype'], $shoes['type']);
-                return $item['hero_cav_speed'];
+                $rate = max(1.0, (float)getGame('movement_speed_increase'));
+
+                return $item['hero_cav_speed'] * $rate;
             }
         }
         return 0;
@@ -314,7 +321,7 @@ class HeroHelper extends HeroItems
         if (is_array($helmet) && in_array($helmet['type'], [7, 8, 9])) {
             $item = $this->getHeroItemProperties($helmet['btype'], $helmet['type']);
 
-            return $item['cp'];
+            return $item['cp'] * max(1, (int)getGameSpeed());
         }
 
         return 0;

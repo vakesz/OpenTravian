@@ -42,7 +42,8 @@ class attributes extends AjaxBase
 
         $requested = [];
         foreach (self::ATTRIBUTE_FIELDS as $requestKey => $column) {
-            $value = $this->readInteger($attributes[$requestKey] ?? null, 0, 100);
+            $cap = $requestKey === 'offBonus' || $requestKey === 'defBonus' ? 100 : 100000;
+            $value = $this->readInteger($attributes[$requestKey] ?? null, 0, $cap);
             if ($value === null) {
                 $this->error('Invalid hero attribute allocation.');
                 return;
@@ -70,7 +71,7 @@ class attributes extends AjaxBase
             }
 
             $level = Formulas::heroLevel((int)$hero['exp']);
-            $budget = min($level, 100) * 4 + ($level < 100 ? 4 : 0);
+            $budget = (int)$level * 4 + 4;
             // Saved points are permanent; only a Book of Wisdom gives them back.
             foreach ($requested as $column => $value) {
                 if ($value < (int)$hero[$column]) {

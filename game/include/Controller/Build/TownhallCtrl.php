@@ -11,6 +11,7 @@ use Core\Village;
 use Game\Formulas;
 use Game\GoldHelper;
 use Model\DailyQuestModel;
+use Model\VillageModel;
 use resources\View\PHPBatchView;
 
 class TownhallCtrl extends AnyCtrl
@@ -58,7 +59,7 @@ class TownhallCtrl extends AnyCtrl
             $this->view = NULL;
         } else {
             //process requests.
-            if (!$this->isCelebrationRunning() && Session::claimAction($_GET['z'] ?? null) && isset($_GET['type']) && in_array($_GET['type'],
+            if (!$this->celebrationQueueFull() && Session::claimAction($_GET['z'] ?? null) && isset($_GET['type']) && in_array($_GET['type'],
                     [1, 2,])) {
                 if (Session::getInstance()->banned()) {
                     $this->innerRedirect("InGameBannedPage");
@@ -72,21 +73,41 @@ class TownhallCtrl extends AnyCtrl
                     if (Village::getInstance()->isResourcesAvailable($cost) && $this->view->vars[$type == 1 ? 'smallCelebration' : 'bigCelebration']['points'] && $this->view->vars[$type == 1 ? 'smallCelebration' : 'bigCelebration']['active']) {
                         $db = DB::getInstance();
                         $celebrationVillage = Village::getInstance();
-                        $celebration = time() + Formulas::celebrationTime($type == 2, $level);
+                        $duration = Formulas::celebrationTime($type == 2, $level);
                         $celebrationKid = $celebrationVillage->getKid();
-                        $celebrating = $celebrationVillage->transaction(static function () use ($celebrationVillage, $cost, $celebration, $type, $celebrationKid): bool {
-                            // Only an idle village can start one: re-checked under the village lock.
-                            $running = (int)DB::getInstance()->fetchScalar('SELECT celebration FROM vdata WHERE kid=?', [$celebrationKid]);
-                            if ($running > time() || !$celebrationVillage->spend($cost)) {
+                        $celebrating = $celebrationVillage->transaction(static function () use ($celebrationVillage, $cost, $duration, $type, $celebrationKid): bool {
+                            $row = DB::getInstance()->query('SELECT celebration, celebration2 FROM vdata WHERE kid=' . (int) $celebrationKid . ' FOR UPDATE');
+                            $state = $row ? $row->fetch_assoc() : null;
+                            if (!is_array($state)) {
                                 return false;
                             }
-                            $update = DB::getInstance()->run('UPDATE vdata SET celebration=?, type=? WHERE kid=?', [$celebration, $type, $celebrationKid]);
+                            $running = (int) $state['celebration'];
+                            $alreadyQueued = (int) ($state['celebration2'] ?? 0);
+                            if (($running > time() && $alreadyQueued > 0) || !$celebrationVillage->spend($cost)) {
+                                return false;
+                            }
+                            if ($running > time()) {
+                                $update = DB::getInstance()->run(
+                                    'UPDATE vdata SET celebration2=?, type2=? WHERE kid=?',
+                                    [$running + $duration, $type, $celebrationKid]
+                                );
+                            } else {
+                                $update = DB::getInstance()->run(
+                                    'UPDATE vdata SET celebration=?, type=? WHERE kid=?',
+                                    [time() + $duration, $type, $celebrationKid]
+                                );
+                            }
 
                             return $update !== false;
                         });
                         if ($celebrating) {
-                            Village::getInstance()->setCelebration($celebration);
-                            Village::getInstance()->setCelebrationType($_GET['type']);
+                            $fresh = $db->query('SELECT celebration, type, celebration2, type2 FROM vdata WHERE kid=' . (int) $celebrationKid);
+                            $saved = $fresh ? $fresh->fetch_assoc() : null;
+                            if (is_array($saved)) {
+                                Village::getInstance()->setCelebration($saved['celebration']);
+                                Village::getInstance()->setCelebrationType($saved['type']);
+                                Village::getInstance()->setCelebrationQueue((int) ($saved['celebration2'] ?? 0), (int) ($saved['type2'] ?? 0));
+                            }
                             $dailyQuest = new DailyQuestModel();
                             $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), 10);
                             if ($type == 1) {
@@ -113,10 +134,17 @@ class TownhallCtrl extends AnyCtrl
             }
         }
         $this->view->vars['isCelebration'] = $this->isCelebrationRunning();
+        $queuedEnd = (int) (Village::getInstance()->get('celebration2') ?? 0);
+        $this->view->vars['isCelebrationQueued'] = $queuedEnd > time();
         if ($this->view->vars['isCelebration']) {
             $this->view->vars['type'] = Village::getInstance()->getCelebrationType();
             $this->view->vars['timeLeft'] = appendTimer(Village::getInstance()->getCelebration() - time());
             $this->view->vars['endat'] = TimezoneHelper::date("H:i", Village::getInstance()->getCelebration());
+        }
+        if ($this->view->vars['isCelebrationQueued']) {
+            $this->view->vars['queueType'] = (int) (Village::getInstance()->get('type2') ?? 0);
+            $this->view->vars['queueTimeLeft'] = appendTimer($queuedEnd - time());
+            $this->view->vars['queueEndat'] = TimezoneHelper::date("H:i", $queuedEnd);
         }
     }
 
@@ -127,7 +155,7 @@ class TownhallCtrl extends AnyCtrl
      */
     private function getButton($id, $big)
     {
-        if ($this->isCelebrationRunning()) {
+        if ($this->celebrationQueueFull()) {
             return [
                 'npc' => null,
                 'text' => '<div class="errorMessage">' . T("inGame", "one celebration is running") . '</div>',
@@ -165,6 +193,11 @@ class TownhallCtrl extends AnyCtrl
         return Village::getInstance()->getCelebration() > time();
     }
 
+    private function celebrationQueueFull(): bool
+    {
+        return $this->isCelebrationRunning() && (int) (Village::getInstance()->get('celebration2') ?? 0) > time();
+    }
+
     /**
      * @param mixed $uid
      * @return mixed
@@ -172,6 +205,17 @@ class TownhallCtrl extends AnyCtrl
     private function getTotalCulturePoints($uid)
     {
         $db = DB::getInstance();
-        return $db->fetchScalar("SELECT SUM(cp) FROM vdata WHERE isWW=0 AND owner=$uid");
+        $rows = $db->query("SELECT kid, cp FROM vdata WHERE isWW=0 AND owner=" . (int) $uid);
+        $cp = 0;
+        while ($rows && ($row = $rows->fetch_assoc())) {
+            $kid = (int) $row['kid'];
+            // Article 82: a grey village's culture-point production still counts.
+            // Older grey villages stored 0, so their production is read from the buildings.
+            $cp += Formulas::isGrayArea($kid)
+                ? (int) VillageModel::calculateVillageCulturePointsAndPopulation($kid, false)['cp']
+                : (int) $row['cp'];
+        }
+
+        return $cp;
     }
 }

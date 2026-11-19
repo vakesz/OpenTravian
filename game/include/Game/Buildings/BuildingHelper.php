@@ -145,13 +145,18 @@ class BuildingHelper
      * @param (float|int) $cropProduction
      * @param mixed $maxstore
      * @param mixed $maxcrop
+     * @param float|null $baseCrop field, oasis, mill and bakery crop per hour, without the hero or the +25% bonus
      */
-    public function checkDependencies($item_id, $level, $natar, $cropProduction, $maxstore, $maxcrop): int
+    public function checkDependencies($item_id, $level, $natar, $cropProduction, $maxstore, $maxcrop, $baseCrop = null): int
     {
-        $resRequiredPop = Formulas::buildingCropConsumption($item_id, $level);
-        // A Wonder village is not held back by a crop shortage.
-        if (getGame("starvation") && !$natar) {
-            if (($cropProduction - $resRequiredPop) <= 0 && $item_id <> 4) {
+        $currentPop = $level > 1 ? Formulas::buildingCropConsumption($item_id, $level - 1) : 0;
+        $deltaPop = Formulas::buildingCropConsumption($item_id, $level) - $currentPop;
+        if (getGame("starvation") && !$natar && (int)$item_id !== 4 && (int)$item_id !== 40) {
+            $base = $baseCrop === null ? 0.0 : (float)$baseCrop;
+            $raisesCrop = in_array((int)$item_id, [8, 9], true) && (0.05 * $base) > $deltaPop;
+            $firstMainBuilding = (int)$item_id === 15 && (int)$level === 1;
+            $earlyStorage = in_array((int)$item_id, [10, 11, 15], true) && (int)$level <= 10 && $base >= 276;
+            if (!$raisesCrop && !$firstMainBuilding && !$earlyStorage && ($cropProduction - $deltaPop) < 1) {
                 return 1;
             }
         }
@@ -204,7 +209,7 @@ class BuildingHelper
                 if (!$artEffBP) return 2;
                 if (Config::getProperty("custom", "needAllianceWWPlan")) {
                     $wwLevel = (int)$wwLevel;
-                    if ($wwLevel >= 50) {
+                    if ($wwLevel >= 49) {
                         $artEffAllyBP = $aid == 0 ? FALSE : $this->checkIfPlayerAllianceHasWWBuildingPlan($aid, $uid);
                         if ($artEffAllyBP <= 0) {
                             return 3;
@@ -239,16 +244,8 @@ class BuildingHelper
             return FALSE;
         }
         $db = DB::getInstance();
-        $diplos = $db->query("SELECT aid1, aid2 FROM diplomacy WHERE (aid1=$aid OR aid2=$aid) AND accepted<>0");
-        $al = [];
-        $al[] = $aid;
-        while ($row = $diplos->fetch_assoc()) {
-            $al[] = $row['aid1'];
-            $al[] = $row['aid2'];
-        }
         $members = [];
-        $aidArray = implode(",", array_unique($al));
-        $find = $db->query("SELECT id FROM users WHERE aid IN ($aidArray) AND id <> $uid");
+        $find = $db->query("SELECT id FROM users WHERE aid=$aid AND id <> $uid");
         while ($row = $find->fetch_assoc()) {
             $members[] = $row['id'];
         }

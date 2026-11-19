@@ -257,13 +257,14 @@ class MasterBuilder
                 $this->deleteProcess($row['id'], $kid, $row['building_field'], $level);
                 continue;
             }
-            $freeCrop = $village['cropp'] + $village['upkeep'] - $this->getCropLoading($row['kid'], $village['isWW'], $buildings['buildings']);
+            $cropGate = ResourcesHelper::legendsCropGate((int)$row['kid'], $this->getCropLoading($row['kid'], $village['isWW'], $buildings['buildings']));
             if ($helper->checkDependencies($item_id,
                     $level,
                     $village['isWW'],
-                    $freeCrop,
+                    $cropGate['free'],
                     $village['maxstore'],
-                    $village['maxcrop']) <> 0) {
+                    $village['maxcrop'],
+                    $cropGate['base']) <> 0) {
                 $this->deleteProcess($row['id'], $kid, $row['building_field'], $level);
                 continue;
             }

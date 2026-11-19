@@ -45,7 +45,7 @@ class OasesModel
      */
     public static function getOasisAnimalCap(): int
     {
-        return max(15, (int)Config::getProperty('game', 'oasisAnimalCap'));
+        return max(1, (int)Config::getProperty('game', 'oasisAnimalCap'));
     }
 
     public static function getOasisRespawnInterval(): int
@@ -119,9 +119,10 @@ class OasesModel
             }
 
             $gains = array_fill(1, 10, 0);
+            $perAnimal = max(1, (int)getGameSpeed());
             for ($i = 0; $i < $cycles && $sum < $maximum; ++$i) {
                 $unitId = $troops[mt_rand(0, count($troops) - 1)];
-                $amount = min(mt_rand(1, 3), $maximum - $sum);
+                $amount = min(mt_rand(1, 3) * $perAnimal, $maximum - $sum);
                 $gains[$unitId] += $amount;
                 $sum += $amount;
             }
@@ -222,7 +223,7 @@ class OasesModel
     {
         $db = DB::getInstance();
         FarmListInbox::targetChangedOwner($kid);
-        $db->query("UPDATE odata SET did=$did, owner=$uid, loyalty=100, conquered_time=" . time() . ", last_loyalty_update=" . time() . " WHERE kid=$kid");
+        $db->query("UPDATE odata SET did=$did, owner=$uid, loyalty=0, conquered_time=" . time() . ", last_loyalty_update=" . time() . " WHERE kid=$kid");
         $db->query("UPDATE wdata SET occupied=1 WHERE id=$kid");
         Map::OccupyOrLeaveOasisCacheRemove($kid);
         ResourcesHelper::updateVillageResources($did, false);
@@ -245,13 +246,15 @@ class OasesModel
         if (!is_array($row)) {
             return false;
         }
-        if ($row['did']) {
-            return false;
+        $lastmupdate = (int) miliseconds();
+        $protectionEnd = self::getInitialProtectionEndTime() * 1000;
+        if ($lastmupdate < $protectionEnd) {
+            $db->query("UPDATE odata SET lastmupdate=$protectionEnd WHERE kid={$row['kid']}");
+            return true;
         }
         $cur_res = [(float) $row['wood'], (float) $row['clay'], (float) $row['iron'], (float) $row['crop']];
         $production = Formulas::getOasisProduction((int) $row['type']);
-        $lastmupdate = (int) miliseconds();
-        $diff_time = $lastmupdate - (int) $row['lastmupdate'];
+        $diff_time = $lastmupdate - max((int) $row['lastmupdate'], $protectionEnd);
         $resources = [
             ($production[0] / 3600000) * $diff_time,
             ($production[1] / 3600000) * $diff_time,

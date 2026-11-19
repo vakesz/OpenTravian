@@ -42,6 +42,10 @@ class WonderOfTheWorldModel
         if (!getCustom('attackWWOnLevelUp')) {
             return;
         }
+        $natarLevel = (int)DB::getInstance()->fetchScalar('SELECT f99 FROM fdata WHERE kid=' . Formulas::xy2kid(0, 0));
+        if ($natarLevel >= 75) {
+            return;
+        }
         $miliseconds = miliseconds();
         $speed = ceil(getGameSpeed() / (isInstantFinishEnabled() ? 250 : 350));
         if ($speed > 3 && $speed <= 10) {

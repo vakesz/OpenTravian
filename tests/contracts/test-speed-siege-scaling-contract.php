@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 /**
- * Contract: the local siege rule of docs/world-speed.md. Above 50x, rams and catapults do nothing when the attack
- * kills under 33% of the defenders, and a lost attack keeps 0.3-1.5% of its damage; at 50x and below damage is
- * unchanged. Battles and the Rally Point simulator both apply it through BattleSetter.
+ * Contract: rams and catapults keep Legends damage at every speed. Battles and the
+ * Rally Point simulator both go through BattleSetter::fixSpeedCataRamEffect.
  */
 
 use Controller\RallyPoint\Simulator;
@@ -56,13 +55,13 @@ try {
 
 foreach ([
     'At 50x siege damage is unchanged' => [100, $atFifty],
-    'Above 50x an attack killing under 33% of the defenders does no siege damage' => [0, $weakAttack],
-    'Above 50x a lost attack with 45% defender losses keeps 0.3% of its damage' => [0.3, $lostAttack],
-    'Above 50x a lost attack with 85% defender losses keeps 1.5% of its damage' => [1.5, $lostCloseAttack],
-    'Above 50x a lost attack with 90% or more defender losses keeps its damage' => [100, $wipedDefence],
-    'Above 50x a won attack with 33% or more defender losses keeps its damage' => [100, $wonAttack],
+    'At 100x an attack killing under 33% of the defenders keeps its siege damage' => [100, $weakAttack],
+    'At 100x a lost attack with 45% defender losses keeps its damage' => [100, $lostAttack],
+    'At 100x a lost attack with 85% defender losses keeps its damage' => [100, $lostCloseAttack],
+    'At 100x a lost attack with 90% or more defender losses keeps its damage' => [100, $wipedDefence],
+    'At 100x a won attack keeps its damage' => [100, $wonAttack],
     'At 50x the simulated lost attack takes the target from level 10 to 4' => [4, $simulatedAtFifty],
-    'At 100x the simulator applies the rule: the lost attack keeps the target at level 10' => [10, $simulatedAtHundred],
+    'At 100x the simulator uses the same Legends damage and takes the target from level 10 to 4' => [4, $simulatedAtHundred],
 ] as $rule => [$expected, $actual]) {
     if (abs($expected - $actual) > 0.000001) {
         failSpeedSiegeContract("$rule: expected $expected, got $actual.");

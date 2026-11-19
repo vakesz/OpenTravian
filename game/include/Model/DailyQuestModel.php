@@ -446,8 +446,8 @@ class DailyQuestModel
             25 => [2, 3, 4, 1],
             // Lumber, clay, iron, crop, then OpenTravian Plus.
             50 => [2, 3, 4, 5, 1],
-            // Ointments, tablets of law, small bandages, cages, then an additional adventure.
-            75 => [1, 2, 3, 4, 5],
+            // Tablets, small bandages, cages, an adventure, then ointments.
+            75 => [2, 3, 4, 5, 1],
             // One random resource, hero experience, all resources, culture points.
             100 => [2, 3, 4, 1],
         ];
@@ -757,8 +757,8 @@ class DailyQuestModel
         $config = Config::getInstance();
         $lastDailyQuestReset = $db->fetchScalar("SELECT lastDailyQuestReset FROM config");
         if ($lastDailyQuestReset == 0) {
-            $today = strtotime('today 12:00', $config->game->start_time);
-            $db->query("UPDATE config SET lastDailyQuestReset=$today");
+            $start = (int)$config->game->start_time;
+            $db->query("UPDATE config SET lastDailyQuestReset=$start");
             return;
         }
         if (($lastDailyQuestReset + getGame("dailyQuestInterval")) > time()) {

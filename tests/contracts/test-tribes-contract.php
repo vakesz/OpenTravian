@@ -40,7 +40,7 @@ require_once $root . '/game/include/bootstrap.php';
 // ---- the playable-tribe setting ------------------------------------------------
 assertTribes(Tribes::parse('1, 2,3,3,4,5,8,9,x,0,10') === [1, 2, 3, 8, 9], 'Only selectable tribe ids survive parsing (Nature and Natars never do).');
 assertTribes(Tribes::serialize([9, 1, 8]) === '1,8,9', 'The stored form is the sorted comma list.');
-assertTribes(Tribes::DEFAULT_PLAYABLE === [1, 2, 3, 6, 7, 8], 'The default matches playableTribeIds (Vikings off).');
+assertTribes(Tribes::DEFAULT_PLAYABLE === [1, 2, 3, 6, 7, 8, 9], 'The default includes Vikings.');
 $config = Config::getInstance();
 $original = $config->dynamic->playableTribes ?? null;
 try {
@@ -48,7 +48,7 @@ try {
     assertTribes(Tribes::playable() === [1, 8, 9], 'Playable tribes follow the world setting in picker order.');
     assertTribes(Tribes::isPlayable(9) && Tribes::vikingsEnabled() && !Tribes::isPlayable(3), 'Vikings are enabled only when the setting lists tribe 9.');
     $config->dynamic->playableTribes = '';
-    assertTribes(Tribes::playable() === [3, 1, 2, 6, 7, 8], 'An empty setting falls back to the default.');
+    assertTribes(Tribes::playable() === [3, 1, 2, 6, 7, 8, 9], 'An empty setting falls back to the default, including Vikings.');
 } finally {
     $config->dynamic->playableTribes = $original;
 }

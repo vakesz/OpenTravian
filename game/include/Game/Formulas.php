@@ -12,8 +12,6 @@ use function is_null;
 
 class Formulas
 {
-    const PROTECTION_INCREASE = 900;
-    const PROTECTION_INCREASE_INTERVAL = 3600;
     /** Buildings lost when a village changes hands: walls, trapper, brewery, trough, command center, waterworks, hospital and asclepeion. */
     /** City wall equivalents, one per tribe (Natars use the Roman wall). */
     const WALL_BUILDINGS = [31, 32, 33, 42, 43, 47, 50];
@@ -3315,7 +3313,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
                             'time' => 77550,
                             'cap' => 0,
                             'type' => 'i',
-                            'loyality' => [20, 25],
+                            'loyality' => [15, 30],
                             'race' => 7,
                             'breq' => [16 => 10, 22 => 20],
                         ],
@@ -3505,13 +3503,18 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function getOasisProduction($type)
     {
-        $production = array_fill(0, 4, getGameSpeed() * 10);
+        $speed = getGameSpeed();
+        $production = array_fill(0, 4, $speed * 10);
         foreach (self::getOasisEffect($type) as $k => $v) {
             if (!$v) {
                 continue;
             }
             $production[$k - 1] *= 4 * $v;
         }
+        // Legends article 48: crop is 11, 41 or 81 at ×1, one more than the
+        // other resources. The extra crop scales with economic speed.
+        $production[3] += $speed;
+
         return $production;
     }
 
@@ -3520,7 +3523,8 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function minVacationDays()
     {
-        return max(round(3 / getGameSpeed()), 1);
+        // Legends article 61: vacation cannot be shorter than one day.
+        return 1;
     }
 
     public static function maxVacationDays(): int
@@ -3809,30 +3813,29 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function getProtectionExtendTime($registrationTime): float
     {
-        return round(self::getTotalProtectionTime($registrationTime) * 4 / 8);
+        return (float)self::protectionSeconds(false);
     }
 
     /**
+     * Basic protection plus the one optional extension.
+     *
      * @param mixed $registrationTime
-     * @return mixed
+     * @return int
      */
     public static function getTotalProtectionTime($registrationTime)
     {
-        $base = Config::getProperty("game", "protection_time");
-        $startTime = Config::getProperty("game", "start_time");
-        if ($registrationTime > $startTime) {
-            $difTime = $registrationTime - $startTime;
-            $base += floor($difTime / self::PROTECTION_INCREASE_INTERVAL) * self::PROTECTION_INCREASE;
-        }
-        return $base;
+        return self::protectionSeconds(true) + self::protectionSeconds(false);
     }
 
     /**
+     * Offer the extension during the last fifth of the basic window, so the
+     * notice scales with the same schedule as the protection itself.
+     *
      * @param mixed $registrationTime
      */
     public static function getProtectionShowExtendTime($registrationTime): float
     {
-        return round(self::getTotalProtectionTime($registrationTime) * 1 / 8);
+        return max(1, (int)round(self::getProtectionBasicTime($registrationTime) / 5));
     }
 
     /**
@@ -3840,7 +3843,25 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function getProtectionBasicTime($registrationTime): float
     {
-        return round(self::getTotalProtectionTime($registrationTime) * 4 / 8);
+        return (float)self::protectionSeconds(true);
+    }
+
+    /**
+     * The Legends split for this speed. A stored total that is not the
+     * schedule (an operator override) keeps that total and the same ratio.
+     */
+    private static function protectionSeconds(bool $basic): int
+    {
+        $speed = max(1, (int)getGameSpeed());
+        [$base, $extend] = WorldSpeedProfile::protectionParts($speed);
+        $official = $base + $extend;
+        $stored = (int)Config::getProperty('game', 'protection_time');
+        if ($stored > 0 && $official > 0 && $stored !== $official) {
+            $base = (int)round($stored * $base / $official);
+            $extend = $stored - $base;
+        }
+
+        return $basic ? $base : $extend;
     }
 
     /**
@@ -3854,6 +3875,12 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         for ($r = 0; $r < 4; $r++) {
             // Research costs are shown in steps of 10 (Senator and Chieftain wood: 15880).
             $cost[$r] = round(($cost[$r] * $coeffs['k'][$r] + $coeffs['b'][$r]) / 10) * 10;
+        }
+        // Knowledge Base article 139. The shared chief formula is 180 clay and
+        // 360 iron above the Jarl. Wood 18250 and crop 16480 already match.
+        if ((int) $u === 89) {
+            $cost[1] = 13320;
+            $cost[2] = 20040;
         }
 
         return $cost;
@@ -4397,7 +4424,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         // Main Building scaling. This mirrors the official building calculator,
         // including the two ten-second rounding steps at every published speed.
         if ($gid == 40) {
-            return max(1, round10(round10($time) / 2));
+            return max(1, $rate <= 10 ? round10($time) : round($time));
         }
 
         // The official calculator displays ordinary construction rounded to
@@ -4508,7 +4535,8 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
             if (!$capital) {
                 return 10;
             }
-            return !$real ? 20 : (getCustom('allowResourcesToGoToMaximumPossible') ? 1e9 : 21);
+            // A capital field has no level cap. Storage is what stops it.
+            return !$real ? 20 : 1e9;
         }
         return (int)self::$data['buildings'][$gid - 1]['maxLvl'];
     }

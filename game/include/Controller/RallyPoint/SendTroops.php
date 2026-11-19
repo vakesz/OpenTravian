@@ -1076,6 +1076,15 @@ class SendTroops extends RallyPointHTML
             $insert['ctar2'] = 0;
         }
         $move = new MovementsModel();
+        $leaving = (int)array_sum($units);
+        if (MovementsModel::accountOutgoingTroops((int)$session->getPlayerId()) + $leaving > MovementsModel::OUTGOING_CAP) {
+            if ($ship) {
+                \Game\Ships::restore((int)$session->getKid(), $ship);
+            }
+            $this->result['error'] = true;
+            $this->result['errorMsg'] = T('RallyPoint', 'Errors.tooManyTroopsOut', 'You cannot have more than 20,000 troops outside your villages.');
+            return false;
+        }
         $stmtSuccess = Units::modifyUnits($session->getKid(), $units);
         if (!$stmtSuccess) {
             if ($ship) {

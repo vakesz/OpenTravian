@@ -92,9 +92,9 @@ try {
     }
     expectFinishConstructionCapability(
         FinishConstruction::hasEligibleFinishNowQueues([25], true, false, false)
-            && FinishConstruction::hasEligibleFinishNowQueues([26], false, true, false)
+            && !FinishConstruction::hasEligibleFinishNowQueues([26], false, true, false)
             && FinishConstruction::hasEligibleFinishNowQueues([25, 1], false, false, false),
-        'Research, demolition, or another eligible building must retain Finish now.'
+        'Research or another eligible building keeps Finish now. A demolition alone does not.'
     );
 
     $config->dynamic->finishConstruction = 1;

@@ -368,16 +368,26 @@ class ArtefactsModel
         $db = DB::getInstance();
         $db->run('UPDATE artefacts SET status=2 WHERE uid=? AND type<>?', [$uid, self::WW_PLAN]);
         $rows = $db->query('SELECT id, size FROM artefacts WHERE uid=' . $uid . ' AND type<>' . self::WW_PLAN . ' ORDER BY conquered ASC, id ASC');
-        $enabled = [];
-        $hasBig = false;
-        while ($rows && ($row = $rows->fetch_assoc()) && count($enabled) < 3) {
-            if ((int) $row['size'] > 1) {
-                if ($hasBig) {
-                    continue;
+        $account = 0;
+        $villages = [];
+        while ($rows && ($row = $rows->fetch_assoc())) {
+            if ((int)$row['size'] > 1) {
+                if ($account === 0) {
+                    $account = (int)$row['id'];
                 }
-                $hasBig = true;
+                continue;
             }
-            $enabled[] = (int) $row['id'];
+            $villages[] = (int)$row['id'];
+        }
+        $enabled = [];
+        if ($account !== 0) {
+            $enabled[] = $account;
+        }
+        foreach ($villages as $id) {
+            if (count($enabled) >= 3) {
+                break;
+            }
+            $enabled[] = $id;
         }
         if ($enabled !== []) {
             $db->query('UPDATE artefacts SET status=1 WHERE id IN (' . implode(',', $enabled) . ')');
@@ -544,9 +554,12 @@ class ArtefactsModel
     {
         $db = DB::getInstance();
         $activationTime = self::getArtifactActivationTime();
-        $changeInterval = self::getFoolArtifactChangeEffectInterval();
-        $time = time() - $changeInterval;
-        $find = $db->query('SELECT * FROM artefacts WHERE type=' . self::ART_FOOL . " AND status=1 AND (lastupdate=0 OR GREATEST(lastupdate, conquered+$changeInterval+$activationTime) <= $time)");
+        $changeInterval = (int) self::getFoolArtifactChangeEffectInterval();
+        $now = time();
+        // Article 102: after the interval, the next change waits for a full hour.
+        $anchor = 'GREATEST(lastupdate, conquered+' . $changeInterval . '+' . (int) $activationTime . ')';
+        $due = 'FLOOR((' . $anchor . ' + ' . $changeInterval . ' + 3599) / 3600) * 3600';
+        $find = $db->query('SELECT * FROM artefacts WHERE type=' . self::ART_FOOL . " AND status=1 AND (lastupdate=0 OR $due <= $now)");
         while ($find && ($row = $find->fetch_assoc())) {
             $this->updateFoolArtifact($row);
         }
@@ -593,12 +606,13 @@ class ArtefactsModel
         }
         $negative = $size === 1 && mt_rand(1, 3) === 3;
         $effect = match ($effecttype) {
-            self::ARTIFACT_INCREASE_BUILDINGS_STABILITY => $negative ? [1 / 2, 1 / 3, 1 / 4][mt_rand(0, 2)] : [2, 3, 4][mt_rand(0, 2)],
+            // Article 102: the same values as the real artefacts. Buildings may also be 2×, 3× or 5×; the small one is 4×.
+            self::ARTIFACT_INCREASE_BUILDINGS_STABILITY => $negative ? [1 / 2, 1 / 3, 1 / 4, 1 / 5][mt_rand(0, 3)] : [2, 3, 4, 5][mt_rand(0, 3)],
             self::ARTIFACT_INCREASE_SPEED => $negative ? [2 / 3, 1 / 2][mt_rand(0, 1)] : [3 / 2, 2][mt_rand(0, 1)],
             self::ARTIFACT_SPY => $negative ? [1 / 3, 1 / 5, 1 / 10][mt_rand(0, 2)] : [3, 5, 10][mt_rand(0, 2)],
-            self::ARTIFACT_DIET => $negative ? [4 / 3, 2, 3][mt_rand(0, 2)] : [3 / 4, 1 / 2][mt_rand(0, 1)],
-            self::ARTIFACT_CRANNY => $negative ? [3 / 4, 1 / 2, 1 / 4, 1 / 10][mt_rand(0, 3)] : mt_rand(100, 500),
-            self::ARTIFACT_INCREASE_TRAINING_SPEED => $negative ? [3 / 2, 2, 4 / 3][mt_rand(0, 2)] : [1 / 2, 3 / 4][mt_rand(0, 1)],
+            self::ARTIFACT_DIET => $negative ? [4 / 3, 2][mt_rand(0, 1)] : [3 / 4, 1 / 2][mt_rand(0, 1)],
+            self::ARTIFACT_CRANNY => $negative ? [3 / 4, 1 / 2, 1 / 4, 1 / 10][mt_rand(0, 3)] : [100, 200, 500][mt_rand(0, 2)],
+            self::ARTIFACT_INCREASE_TRAINING_SPEED => $negative ? [2, 4 / 3][mt_rand(0, 1)] : [1 / 2, 3 / 4][mt_rand(0, 1)],
         };
         $id = (int) $row['id'];
         $db->run('UPDATE artefacts SET lastupdate=?, effecttype=?, effect=?, aoe=? WHERE id=?', [$time, $effecttype, $effect, $aoe, $id]);

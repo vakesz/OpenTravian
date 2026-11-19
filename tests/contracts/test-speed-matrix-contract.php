@@ -60,14 +60,14 @@ namespace {
 
     // Published values at the official speeds, from the Travian Legends tables.
     $published = [
-        1 => ['movement' => 1, 'storage' => 1, 'protection' => 10800],
-        2 => ['movement' => 2, 'storage' => 1, 'protection' => 10800],
-        3 => ['movement' => 2, 'storage' => 1, 'protection' => 10800],
-        4 => ['movement' => 2, 'storage' => 1, 'protection' => 10800],
-        5 => ['movement' => 2, 'storage' => 1, 'protection' => 10800],
-        10 => ['movement' => 4, 'storage' => 1, 'protection' => 10800],
-        20 => ['movement' => 8, 'storage' => 1, 'protection' => 10800],
-        100 => ['movement' => 20, 'storage' => 50, 'protection' => 72 * 3600],
+        1 => ['movement' => 1, 'storage' => 1, 'protection' => 8 * 86400],
+        2 => ['movement' => 2, 'storage' => 1, 'protection' => 6 * 86400],
+        3 => ['movement' => 2, 'storage' => 1, 'protection' => 6 * 86400],
+        4 => ['movement' => 2, 'storage' => 1, 'protection' => 5 * 86400],
+        5 => ['movement' => 2, 'storage' => 1, 'protection' => 4 * 86400],
+        10 => ['movement' => 4, 'storage' => 1, 'protection' => 2 * 86400],
+        20 => ['movement' => 8, 'storage' => 1, 'protection' => 86400],
+        100 => ['movement' => 20, 'storage' => 50, 'protection' => 6 * 3600],
     ];
     foreach ($published as $speed => $expected) {
         speedMatrixAssertSame($expected['movement'], Profile::movementSpeedMultiplier($speed), "movement at x{$speed}");
@@ -173,13 +173,11 @@ namespace {
         'adventure_spawn_multiplier' => ['up', static fn (int $s) => Profile::adventureSpawnMultiplier($s)],
         'festival_duration' => ['down', static fn (int $s) => Profile::festivalDuration($s)],
         'starvation_crop_multiplier' => ['up', static fn (int $s) => Profile::starvationCropMultiplier($s)],
-        'protection_time' => ['up', static fn (int $s) => Profile::protectionTime($s)],
+        'protection_time' => ['down', static fn (int $s) => Profile::protectionTime($s)],
     ];
     // Named exemptions. 'above' stops direction checks past a speed; 'steps' lists
     // single transitions ("from>to") that are known and tracked.
-    $exemptions = [
-        'protection_time' => ['above' => 100, 'reason' => 'documented: protection peaks at 100x and shortens on extreme worlds (never under 3 h)'],
-    ];
+    $exemptions = [];
 
     foreach ($metrics as $name => [$direction, $compute]) {
         $limit = $exemptions[$name]['above'] ?? PHP_INT_MAX;

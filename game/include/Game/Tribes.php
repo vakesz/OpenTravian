@@ -13,15 +13,15 @@ use Core\Config;
  * 7 Huns, 8 Spartans, 9 Vikings. Nature and Natars are never selectable.
  * Which of the others a player may pick is a world setting (config.playableTribes),
  * chosen at install and editable in the admin panel. Romans, Teutons, Gauls,
- * Egyptians, Huns and Spartans start ticked; Vikings start off.
+ * Egyptians, Huns, Spartans and Vikings start ticked.
  */
 final class Tribes
 {
     /** Tribes a world may offer to players. */
     public const SELECTABLE = [1, 2, 3, 6, 7, 8, 9];
 
-    /** Default playable tribes; Vikings start off. */
-    public const DEFAULT_PLAYABLE = [1, 2, 3, 6, 7, 8];
+    /** Default playable tribes, including Vikings. */
+    public const DEFAULT_PLAYABLE = [1, 2, 3, 6, 7, 8, 9];
 
     /** Display names for the tribes a world may offer. */
     public const NAMES = [1 => 'Romans', 2 => 'Teutons', 3 => 'Gauls', 6 => 'Egyptians', 7 => 'Huns', 8 => 'Spartans', 9 => 'Vikings'];
