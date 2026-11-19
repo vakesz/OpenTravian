@@ -29,6 +29,17 @@ class AuctionModel
     /** Knowledge Base article 94: a sale can be cancelled within the first five minutes. */
     public const CANCEL_WINDOW_SECONDS = 300;
 
+    /** A new listing stays hidden for a random 1–5 minutes at 1×, then that wait is divided by speed. */
+    public const LISTING_DELAY_MIN = 60;
+    public const LISTING_DELAY_MAX = 300;
+
+    /**
+     * The multiple is not published. A bid above twice the current price, made
+     * against someone who is already bidding, is refused and that player cannot
+     * bid on the auction again.
+     */
+    public const LARGE_BID_MULTIPLE = 2;
+
     /**
      * @param array<string, mixed> $auction auction row
      */
@@ -40,6 +51,22 @@ class AuctionModel
             && (int)($auction['time'] ?? 0) >= time()
             && $created > 0
             && $created >= time() - self::CANCEL_WINDOW_SECONDS;
+    }
+
+    /** When a listing placed at $now becomes visible to other players. */
+    public static function listingVisibleAt(int $now): int
+    {
+        $speed = max(1, (int) getGameSpeed());
+        $delay = max(1, intdiv(mt_rand(self::LISTING_DELAY_MIN, self::LISTING_DELAY_MAX), $speed));
+
+        return $now + $delay;
+    }
+
+    private function visibleAuctionSql(string $alias = ''): string
+    {
+        $column = ($alias === '' ? 'visible' : $alias . '.visible');
+
+        return ' AND (' . $column . '=0 OR ' . $column . '<=' . time() . ')';
     }
 
     /** @var list<int> players already given a spread-out auction item in this run */
@@ -372,7 +399,7 @@ class AuctionModel
     public function getTotalBuyAuction(int $uid, int|string $filter): int
     {
         //TODO: ip tables!
-        $where = 'finish=0 AND uid!=' . $uid . $this->auctionFilterClause($filter);
+        $where = 'finish=0 AND uid!=' . $uid . $this->visibleAuctionSql() . $this->auctionFilterClause($filter);
 
         return (int) DB::getInstance()->fetchScalar("SELECT COUNT(id) FROM auction WHERE {$where}");
     }
@@ -380,7 +407,7 @@ class AuctionModel
     public function getBuyAuction(int $uid, int $page, int $pageSize, int|string $filter): mysqli_result|bool
     {
         //TODO: ip tables!
-        $where = 'finish=0 AND uid!=' . $uid . $this->auctionFilterClause($filter);
+        $where = 'finish=0 AND uid!=' . $uid . $this->visibleAuctionSql() . $this->auctionFilterClause($filter);
 
         return DB::getInstance()->query('SELECT * FROM auction WHERE ' . $where . ' ORDER BY time ASC LIMIT ' . (($page - 1) * $pageSize) . ', ' . $pageSize);
     }
@@ -391,7 +418,7 @@ class AuctionModel
      */
     public function getAllBuyAuctionGroups(int $uid, int|string $filter): mysqli_result|bool
     {
-        $where = 'finish=0 AND uid!=' . $uid . $this->auctionFilterClause($filter);
+        $where = 'finish=0 AND uid!=' . $uid . $this->visibleAuctionSql() . $this->auctionFilterClause($filter);
 
         return DB::getInstance()->query(
             'SELECT btype, type, COUNT(*) AS auction_count, MIN(time) AS next_finish, MIN(silver) AS next_price, '
@@ -413,6 +440,7 @@ class AuctionModel
             'SELECT auction.*, users.name AS active_bidder_name FROM auction '
             . 'LEFT JOIN users ON users.id=auction.activeUid '
             . 'WHERE auction.finish=0 AND auction.uid!=' . $uid
+            . $this->visibleAuctionSql('auction')
             . ' AND auction.type=' . $type
             . ' ORDER BY auction.time ASC, auction.id ASC LIMIT ' . $offset . ', ' . max(1, $pageSize)
         );
@@ -422,6 +450,7 @@ class AuctionModel
     {
         return (int)DB::getInstance()->fetchScalar(
             'SELECT COUNT(*) FROM auction WHERE finish=0 AND uid!=' . $uid
+            . $this->visibleAuctionSql()
             . ' AND type=' . $type
         );
     }
@@ -434,6 +463,7 @@ class AuctionModel
         $result = DB::getInstance()->query(
             'SELECT MIN(silver) AS lowest, AVG(silver) AS average, MAX(silver) AS highest '
             . 'FROM auction WHERE finish=0 AND uid!=' . $uid
+            . $this->visibleAuctionSql()
             . ' AND type=' . $type
         );
         $prices = $result instanceof mysqli_result ? $result->fetch_assoc() : null;
@@ -478,6 +508,7 @@ class AuctionModel
         $result = DB::getInstance()->query(
             'SELECT btype, type, COUNT(*) AS auction_count FROM auction'
             . ' WHERE finish=0 AND uid!=' . $uid
+            . $this->visibleAuctionSql()
             . ' GROUP BY btype, type'
         );
         $counts = [];
@@ -498,17 +529,34 @@ class AuctionModel
     }
 
     /** Records (or reopens) the player's bid on an auction; returns the bid id. */
+    public function isBidLocked(int $uid, int $auctionId): bool
+    {
+        return (int) DB::getInstance()->fetchScalar("SELECT COUNT(id) FROM bids WHERE uid=$uid AND auctionId=$auctionId AND locked=1") > 0;
+    }
+
+    public function lockOutBidder(int $uid, int $auctionId): void
+    {
+        $db = DB::getInstance();
+        $db->query("UPDATE bids SET locked=1, outbid=1 WHERE uid=$uid AND auctionId=$auctionId");
+        if (!$db->affectedRows()) {
+            $db->query("INSERT INTO bids (uid, auctionId, outbid, locked) VALUES ($uid, $auctionId, 1, 1)");
+        }
+    }
+
     public function addBid(int $uid, int $auctionId): int
     {
         $db = DB::getInstance();
-        $db->query("UPDATE bids SET outbid=0 WHERE uid=$uid AND auctionId=$auctionId");
+        if ($this->isBidLocked($uid, $auctionId)) {
+            return 0;
+        }
+        $db->query("UPDATE bids SET outbid=0 WHERE uid=$uid AND auctionId=$auctionId AND locked=0");
         if (!$db->affectedRows()) {
             $db->query("INSERT INTO bids (uid, auctionId) VALUES ($uid, $auctionId)");
 
             return (int) $db->lastInsertId();
         }
 
-        return (int) $db->fetchScalar("SELECT id FROM bids WHERE uid=$uid AND auctionId=$auctionId AND outbid=0");
+        return (int) $db->fetchScalar("SELECT id FROM bids WHERE uid=$uid AND auctionId=$auctionId AND outbid=0 AND locked=0");
     }
 
     public function setAsOutBid(int $activeId): void
@@ -597,9 +645,13 @@ class AuctionModel
             }
         }
 
+        $now = time();
+        // System listings are visible at once. Player sales wait out the random delay.
+        $visible = ($isSystem || $uid === 0) ? 0 : self::listingVisibleAt($now);
+
         return (bool) DB::getInstance()->run(
-            'INSERT INTO auction (uid, btype, type, num, silver, maxSilver, secure_id, time, created) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)',
-            [$uid, $btype, $type, $num, $silver, sha1(microtime()), $time, time()]
+            'INSERT INTO auction (uid, btype, type, num, silver, maxSilver, secure_id, time, created, visible) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)',
+            [$uid, $btype, $type, $num, $silver, sha1(microtime()), $time, $now, $visible]
         );
     }
 

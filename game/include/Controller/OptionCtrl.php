@@ -356,7 +356,9 @@ class OptionCtrl extends GameCtrl
             if (!empty($sitter1['name'])) {
                 $uid = $m->getUserByName($sitter1['name']);
                 if ($uid && ($uid != $this->session->getPlayerId()) && ($uid != $this->session->getSittersId(2) || $this->session->getSittersId(2) == 0)) {
-                    if ($this->getTotalSitterCount($uid, $this->session->getPlayerId()) < 2) {
+                    if (!$this->sitterSharesAlliance((int) $uid)) {
+                        $view->vars['error'] = T("Options", "Sitter must share an alliance", "A sitter must be in your alliance or a confederacy.");
+                    } elseif ($this->getTotalSitterCount($uid, $this->session->getPlayerId()) < 2) {
                         $db->query("UPDATE users SET sit1Uid=$uid, sit1Permissions='{$sitter1['perm']}' WHERE id=" . $this->session->getPlayerId());
                         $this->session->setSittersId(1, $uid);
                         $this->session->setSittersPermissions(1, $sitter1['perm']);
@@ -368,7 +370,9 @@ class OptionCtrl extends GameCtrl
             if (!empty($sitter2['name'])) {
                 $uid = $m->getUserByName($sitter2['name']);
                 if ($uid && ($uid != $this->session->getPlayerId()) && ($uid != $this->session->getSittersId(1) || $this->session->getSittersId(1) == 0)) {
-                    if ($this->getTotalSitterCount($uid, $this->session->getPlayerId()) < 2) {
+                    if (!$this->sitterSharesAlliance((int) $uid)) {
+                        $view->vars['error'] = T("Options", "Sitter must share an alliance", "A sitter must be in your alliance or a confederacy.");
+                    } elseif ($this->getTotalSitterCount($uid, $this->session->getPlayerId()) < 2) {
                         $db->query("UPDATE users SET sit2Uid=$uid, sit2Permissions='{$sitter2['perm']}' WHERE id=" . $this->session->getPlayerId());
                         $this->session->setSittersId(2, $uid);
                         $this->session->setSittersPermissions(2, $sitter2['perm']);
@@ -431,6 +435,24 @@ class OptionCtrl extends GameCtrl
             }
         }
         return ['name' => $name, 'perm' => $perm];
+    }
+
+    /** A sitter has to belong to the owner's alliance or to a confederated alliance. */
+    private function sitterSharesAlliance(int $sitterUid): bool
+    {
+        $db = DB::getInstance();
+        $ownerAid = (int) $db->fetchScalar('SELECT aid FROM users WHERE id=' . (int) $this->session->getPlayerId());
+        $sitterAid = (int) $db->fetchScalar('SELECT aid FROM users WHERE id=' . $sitterUid);
+        if ($ownerAid <= 0 || $sitterAid <= 0) {
+            return false;
+        }
+        if ($ownerAid === $sitterAid) {
+            return true;
+        }
+
+        return (int) $db->fetchScalar(
+            "SELECT COUNT(id) FROM diplomacy WHERE accepted=1 AND type=1 AND ((aid1=$ownerAid AND aid2=$sitterAid) OR (aid1=$sitterAid AND aid2=$ownerAid))"
+        ) > 0;
     }
 
     /**

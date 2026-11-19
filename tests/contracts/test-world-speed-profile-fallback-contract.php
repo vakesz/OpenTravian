@@ -51,8 +51,13 @@ foreach ($profileFields as $field) {
             && str_contains($connectionLine, 'max(0,'),
         sprintf('Explicit zero %s values must reach the world-speed fallback profile.', $field)
     );
+    // protection_time and oasisAnimalCap also replace the pre-Legends stored
+    // default so an unedited world picks up the new schedule.
+    $zeroGuard = str_contains($fallbacks, "\$config->game->$field <= 0")
+        || ($field === 'protection_time' && str_contains($fallbacks, '$storedProtection <= 0'))
+        || ($field === 'oasisAnimalCap' && str_contains($fallbacks, '$storedAnimals <= 0'));
     assertWorldSpeedProfileFallback(
-        str_contains($fallbacks, "\$config->game->$field <= 0"),
+        $zeroGuard,
         sprintf('The world-speed fallback must handle zero %s values.', $field)
     );
 }

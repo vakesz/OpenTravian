@@ -32,7 +32,7 @@ final class HeroItemTooltip
             1 => 1,
             2 => 82,
             3 => 61,
-            4 => $type <= 60 ? 16 : ($type <= 144 ? 115 : 149),
+            4 => $type <= 60 ? 16 : ($type <= 144 ? 115 : ($type <= 163 ? 149 : 164)),
             5 => 94,
             6 => 103,
             default => 1,
@@ -86,7 +86,7 @@ final class HeroItemTooltip
                 } elseif ($type <= 6) {
                     $stats[] = self::stat('regeneration', [$plus($item['reg'])]);
                 } elseif ($type <= 9) {
-                    $stats[] = self::stat('culturePoints', [$plus($item['cp'])]);
+                    $stats[] = self::stat('culturePoints', [$plus($item['cp'] * max(1, (int)getGameSpeed()))]);
                 } elseif ($type <= 12) {
                     $stats[] = self::stat('trainingStable', [self::number($item['cav'], '', '%')]);
                 } else {
@@ -131,11 +131,13 @@ final class HeroItemTooltip
                 } elseif (isset($item['speed_distance'])) {
                     $stats[] = self::stat('speedArmies', [$plus($item['speed_distance'], '%')], 'speedArmiesDetails', [self::plain($item['min_distance'])]);
                 } elseif (isset($item['hero_cav_speed'])) {
-                    $stats[] = self::stat('speedMounted', [$plus($item['hero_cav_speed'])]);
+                    $movement = max(1.0, (float)getGame('movement_speed_increase'));
+                    $stats[] = self::stat('speedMounted', [$plus($item['hero_cav_speed'] * $movement)]);
                 }
                 break;
             case 6:
-                $stats[] = self::stat('speedMounted', [$plus($item['speed_horse'])]);
+                $movement = max(1.0, (float)getGame('movement_speed_increase'));
+                $stats[] = self::stat('speedMounted', [$plus($item['speed_horse'] * $movement)]);
                 break;
             case 7:
             case 8:

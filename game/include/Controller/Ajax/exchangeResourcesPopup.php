@@ -31,9 +31,6 @@ class exchangeResourcesPopup extends AjaxBase
         if ($village->isWW()) {
             return $this->error(T('npc', 'disabled_in_ww'));
         }
-        if ($session->getTotalPopulation() < 40) {
-            return $this->error(T('GoldHelper', 'exchangeResources.error_low_pop'));
-        }
         if (!$village->hasMarketPlace()) {
             return $this->error(T('GoldHelper', 'exchangeResources.error_no_marketplace'));
         }

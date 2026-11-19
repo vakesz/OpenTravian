@@ -917,6 +917,10 @@ class AllianceCtrl extends GameCtrl
                 ");
                 if ($count > 0) {
                     $view->vars['error'] = sprintf(T("Alliance", "There is already an offer"), $aTag);
+                } elseif ($dipl !== 3 && $this->peacefulPactCount((int) $this->selectedAllianceID) >= 3) {
+                    $view->vars['error'] = T("Alliance", "Too many pacts", "An alliance can have at most 3 non-aggression pacts and confederacies.");
+                } elseif ($dipl === 1 && $this->confederacyWouldExceedThree((int) $this->selectedAllianceID, $aid)) {
+                    $view->vars['error'] = T("Alliance", "Confederacy too large", "A confederacy can include at most 3 alliances.");
                 } else {
                     $db->query("INSERT INTO diplomacy (aid1, aid2, type, accepted) VALUES ({$this->selectedAllianceID}, {$aid}, $dipl, 0)");
                     $type = $dipl == 1 ? AllianceModel::LOG_DIPLOMACY_CONF : ($dipl == 2 ? AllianceModel::LOG_DIPLOMACY_NAP : AllianceModel::LOG_DIPLOMACY_WAR);
@@ -932,18 +936,43 @@ class AllianceCtrl extends GameCtrl
             if ($find->num_rows) {
                 //yes! accept it
                 $row = $find->fetch_assoc();
-                $db->query("UPDATE diplomacy SET accepted=1 WHERE id=" . (int)$_GET['a']);
-                $m = new AllianceModel();
-                $dipl = $row['type'];
-                $type = $dipl == 1 ? AllianceModel::LOG_DIPLOMACY_CONF_ACCEPTED : ($dipl == 2 ? AllianceModel::LOG_DIPLOMACY_NAP_ACCEPTED : AllianceModel::LOG_DIPLOMACY_WAR_ACCEPTED);
-                $m->addLog($row['aid1'], [$type, $row['aid1'], $row['aid2'],], time());
-                $m->addLog($row['aid2'], [$type, $row['aid1'], $row['aid2'],], time());
-                Map::allianceDiplomacyCacheUpdate($row['aid1'], $row['aid2']);
+                if ((int) $row['type'] !== 3 && ($this->peacefulPactCount((int) $row['aid1']) >= 3 || $this->peacefulPactCount((int) $row['aid2']) >= 3)) {
+                    $view->vars['error'] = T("Alliance", "Too many pacts", "An alliance can have at most 3 non-aggression pacts and confederacies.");
+                } elseif ((int) $row['type'] === 1 && $this->confederacyWouldExceedThree((int) $row['aid1'], (int) $row['aid2'])) {
+                    $view->vars['error'] = T("Alliance", "Confederacy too large", "A confederacy can include at most 3 alliances.");
+                } elseif ((int) $row['type'] === 1 && ($approver = $this->confederacyApprover((int) $row['aid1'], (int) $row['aid2'])) > 0) {
+                    $db->query("UPDATE diplomacy SET accepted=2, approver=$approver WHERE id=" . (int) $_GET['a']);
+                    $view->vars['error'] = T("Alliance", "Confederacy needs approval", "The existing confederacy partner must approve this.");
+                } else {
+                    $db->query("UPDATE diplomacy SET accepted=1, approver=0 WHERE id=" . (int)$_GET['a']);
+                    $m = new AllianceModel();
+                    $dipl = $row['type'];
+                    $type = $dipl == 1 ? AllianceModel::LOG_DIPLOMACY_CONF_ACCEPTED : ($dipl == 2 ? AllianceModel::LOG_DIPLOMACY_NAP_ACCEPTED : AllianceModel::LOG_DIPLOMACY_WAR_ACCEPTED);
+                    $m->addLog($row['aid1'], [$type, $row['aid1'], $row['aid2'],], time());
+                    $m->addLog($row['aid2'], [$type, $row['aid1'], $row['aid2'],], time());
+                    Map::allianceDiplomacyCacheUpdate($row['aid1'], $row['aid2']);
+                }
+            }
+        }
+        if (isset($_GET['p'])) {
+            $find = $db->query("SELECT * FROM diplomacy WHERE accepted=2 AND approver={$this->selectedAllianceID} AND id=" . (int) $_GET['p']);
+            if ($find->num_rows) {
+                $row = $find->fetch_assoc();
+                if ($this->confederacyWouldExceedThree((int) $row['aid1'], (int) $row['aid2'])) {
+                    $view->vars['error'] = T("Alliance", "Confederacy too large", "A confederacy can include at most 3 alliances.");
+                } else {
+                    $db->query("UPDATE diplomacy SET accepted=1, approver=0 WHERE id=" . (int) $_GET['p']);
+                    $m = new AllianceModel();
+                    $m->addLog($row['aid1'], [AllianceModel::LOG_DIPLOMACY_CONF_ACCEPTED, $row['aid1'], $row['aid2']], time());
+                    $m->addLog($row['aid2'], [AllianceModel::LOG_DIPLOMACY_CONF_ACCEPTED, $row['aid1'], $row['aid2']], time());
+                    $m->addLog((int) $this->selectedAllianceID, [AllianceModel::LOG_DIPLOMACY_CONF_ACCEPTED, $row['aid1'], $row['aid2']], time());
+                    Map::allianceDiplomacyCacheUpdate($row['aid1'], $row['aid2']);
+                }
             }
         }
         if (isset($_GET['d'])) {
             //accept
-            $find = $db->query("SELECT * FROM diplomacy WHERE accepted=0 AND aid1={$this->selectedAllianceID} AND id=" . (int)$_GET['d']);
+            $find = $db->query("SELECT * FROM diplomacy WHERE ((accepted=0 AND aid1={$this->selectedAllianceID}) OR (accepted=2 AND (aid1={$this->selectedAllianceID} OR aid2={$this->selectedAllianceID} OR approver={$this->selectedAllianceID}))) AND id=" . (int)$_GET['d']);
             if ($find->num_rows) {
                 //yes! accept it
                 $row = $find->fetch_assoc();
@@ -953,6 +982,9 @@ class AllianceCtrl extends GameCtrl
                 $type = $dipl == 1 ? AllianceModel::LOG_DIPLOMACY_CONF_REFUSE : ($dipl == 2 ? AllianceModel::LOG_DIPLOMACY_NAP_REFUSE : AllianceModel::LOG_DIPLOMACY_WAR_REFUSE);
                 $m->addLog($row['aid1'], [$type, $row['aid1'], $row['aid2'],], time());
                 $m->addLog($row['aid2'], [$type, $row['aid1'], $row['aid2'],], time());
+                if ((int) $row['accepted'] === 2 && (int) $row['approver'] === (int) $this->selectedAllianceID) {
+                    $m->addLog((int) $this->selectedAllianceID, [$type, $row['aid1'], $row['aid2']], time());
+                }
                 Map::allianceDiplomacyCacheUpdate($row['aid1'], $row['aid2']);
             }
         }
@@ -967,7 +999,7 @@ class AllianceCtrl extends GameCtrl
             }
         }
         $view->vars['ownOffers'] = '';
-        $ownOffers = $db->query("SELECT d.*, a.tag FROM diplomacy d LEFT JOIN alidata a ON a.id=d.aid2 WHERE d.accepted=0 AND d.aid1={$this->selectedAllianceID}");
+        $ownOffers = $db->query("SELECT d.*, IF(d.aid1={$this->selectedAllianceID}, d.aid2, d.aid1) AS partner, a.tag FROM diplomacy d LEFT JOIN alidata a ON a.id=IF(d.aid1={$this->selectedAllianceID}, d.aid2, d.aid1) WHERE (d.accepted=0 AND d.aid1={$this->selectedAllianceID}) OR (d.accepted=2 AND (d.aid1={$this->selectedAllianceID} OR d.aid2={$this->selectedAllianceID}))");
         while ($row = $ownOffers->fetch_assoc()) {
             if ($row['type'] == 1) {
                 $text = T("Alliance", "confederacy with x");
@@ -988,11 +1020,33 @@ class AllianceCtrl extends GameCtrl
             ) . '" onclick="window.location.href = \'' . $drawHref . '\'; return false;"><img src="img/spacer.gif" class="del" alt="del" /></button>
         </td>
         <td>
-            <a href="/alliance/' . $row['aid2'] . '">' . htmlspecialchars(sprintf($text, (string) $tag), ENT_QUOTES, 'UTF-8') . '</a>
+            <a href="/alliance/' . (int) $row['partner'] . '">' . htmlspecialchars(sprintf($text, (string) $tag), ENT_QUOTES, 'UTF-8') . '</a>
         </td>
     </tr>';
         }
         $view->vars['foreign'] = '';
+        $approvals = $db->query("SELECT d.*, a1.tag AS tag1, a2.tag AS tag2 FROM diplomacy d LEFT JOIN alidata a1 ON a1.id=d.aid1 LEFT JOIN alidata a2 ON a2.id=d.aid2 WHERE d.accepted=2 AND d.type=1 AND d.approver={$this->selectedAllianceID}");
+        while ($approvals && ($row = $approvals->fetch_assoc())) {
+            $approveHref = $this->isOwnAllianceRoute()
+                ? ($diplBase . '?p=' . (int) $row['id'])
+                : ($diplBase . '&p=' . (int) $row['id']);
+            $refuseHref = $this->isOwnAllianceRoute()
+                ? ($diplBase . '?d=' . (int) $row['id'])
+                : ($diplBase . '&d=' . (int) $row['id']);
+            $label = sprintf(
+                T("Alliance", "Approve confederacy between x and y", "Approve the confederacy between %s and %s"),
+                (string) $row['tag1'],
+                (string) $row['tag2']
+            );
+            $view->vars['foreign'] .= '<tr>
+        <td class="abo">
+            <button type="button" class="icon " title="' . T("Alliance", "draw back") . '" onclick="window.location.href = \'' . $refuseHref . '\'; return false;"><img src="img/spacer.gif" class="del" alt="del" /></button>
+                    &nbsp;
+                    <button type="button" class="icon " title="' . T("Alliance", "accept") . '" onclick="window.location.href = \'' . $approveHref . '\'; return false;"><img src="img/spacer.gif" class="accept" alt="accept" /></button>
+        </td>
+        <td>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</td>
+    </tr>';
+        }
         $ownOffers = $db->query("SELECT d.*, a.tag FROM diplomacy d LEFT JOIN alidata a ON a.id=d.aid1 WHERE d.accepted=0 AND d.aid2={$this->selectedAllianceID}");
         while ($row = $ownOffers->fetch_assoc()) {
             if ($row['type'] == 1) {
@@ -1109,6 +1163,62 @@ class AllianceCtrl extends GameCtrl
             $view->vars['members'] .= '<option value="' . (int) $row['id'] . '">' . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . '</option>';
         }
         $this->view->vars['content'] .= $view->output();
+    }
+
+    /**
+     * Alliances already joined to $aid by an accepted confederacy, including $aid.
+     *
+     * @return list<int>
+     */
+    private function confederacyMembers(int $aid): array
+    {
+        $seen = [$aid => true];
+        $queue = [$aid];
+        $db = DB::getInstance();
+        while ($queue !== []) {
+            $current = array_shift($queue);
+            $rows = $db->query("SELECT aid1, aid2 FROM diplomacy WHERE accepted=1 AND type=1 AND (aid1=$current OR aid2=$current)");
+            while ($rows && ($row = $rows->fetch_assoc())) {
+                $other = (int) $row['aid1'] === $current ? (int) $row['aid2'] : (int) $row['aid1'];
+                if (!isset($seen[$other])) {
+                    $seen[$other] = true;
+                    $queue[] = $other;
+                }
+            }
+        }
+
+        return array_map('intval', array_keys($seen));
+    }
+
+    private function confederacyWouldExceedThree(int $aid1, int $aid2): bool
+    {
+        $members = array_unique(array_merge($this->confederacyMembers($aid1), $this->confederacyMembers($aid2)));
+
+        return count($members) > 3;
+    }
+
+    /** The existing partner who must agree before a third alliance joins. 0 when the two parties are enough. */
+    private function confederacyApprover(int $aid1, int $aid2): int
+    {
+        $members = array_unique(array_merge($this->confederacyMembers($aid1), $this->confederacyMembers($aid2)));
+        if (count($members) !== 3) {
+            return 0;
+        }
+        foreach ($members as $member) {
+            if ($member !== $aid1 && $member !== $aid2) {
+                return $member;
+            }
+        }
+
+        return 0;
+    }
+
+    /** Accepted non-aggression pacts and confederacies. Wars are not counted. */
+    private function peacefulPactCount(int $aid): int
+    {
+        return (int) DB::getInstance()->fetchScalar(
+            "SELECT COUNT(id) FROM diplomacy WHERE accepted=1 AND type IN (1,2) AND (aid1=$aid OR aid2=$aid)"
+        );
     }
 
     private function quitAlliance(): void

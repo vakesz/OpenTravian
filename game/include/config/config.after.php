@@ -37,7 +37,8 @@ if ((int)$config->game->trap_multiplier <= 0) {
 if ((int)$config->game->cranny_multiplier <= 0) {
     $config->game->cranny_multiplier = WorldSpeedProfile::crannyMultiplier($worldSpeed);
 }
-if ((int)$config->game->protection_time <= 0) {
+$storedProtection = (int)$config->game->protection_time;
+if ($storedProtection <= 0 || $storedProtection === WorldSpeedProfile::legacyProtectionTime($worldSpeed)) {
     $config->game->protection_time = WorldSpeedProfile::protectionTime($worldSpeed);
 }
 if ((int)$config->game->oasisInitialProtectionTime <= 0) {
@@ -49,11 +50,10 @@ if ((int)$config->game->dailyQuestInterval <= 0) {
 if ((float)$config->game->heroRegenerationMultiplier <= 0) {
     $config->game->heroRegenerationMultiplier = WorldSpeedProfile::heroRegenerationMultiplier($worldSpeed);
 }
-if ((int)$config->game->oasisAnimalCap <= 0) {
-    $config->game->oasisAnimalCap = WorldSpeedProfile::oasisAnimalCap(
-        $worldSpeed,
-        (float)$config->game->movement_speed_increase
-    );
+$storedAnimals = (int)$config->game->oasisAnimalCap;
+$movementForAnimals = (float)$config->game->movement_speed_increase;
+if ($storedAnimals <= 0 || $storedAnimals === WorldSpeedProfile::legacyOasisAnimalCap($worldSpeed, $movementForAnimals)) {
+    $config->game->oasisAnimalCap = WorldSpeedProfile::oasisAnimalCap($worldSpeed, $movementForAnimals);
 }
 if ((int)$config->game->oasisRespawnInterval <= 0) {
     $config->game->oasisRespawnInterval = WorldSpeedProfile::oasisRespawnInterval(
@@ -164,3 +164,5 @@ $config->gold->productionBoostDurationSeconds = \Game\PremiumDuration::configure
     (int)($config->dynamic->productionBoostDurationSeconds ?? 0),
     (int)$config->gold->productionBoostDurationLocalDefaultSeconds
 );
+// Buying animals is a world rule, off unless the operator turns it on.
+$config->extraSettings->buyAnimal['enabled'] = (bool)($config->custom->buyAnimals ?? false);

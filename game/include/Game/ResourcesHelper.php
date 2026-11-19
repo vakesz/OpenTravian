@@ -104,8 +104,13 @@ class ResourcesHelper
         $upkeep = 0;
         if (getGame("starvation")) {
             $units = $db->query("SELECT * FROM units WHERE kid=$kid")->fetch_assoc();
+            $heroHealth = (int)$db->fetchScalar("SELECT health FROM hero WHERE uid=$uid AND kid=$kid");
             for ($i = 1; $i <= 11; ++$i) {
                 if (!$units['u' . $i]) {
+                    continue;
+                }
+                // A dead hero keeps the flat 6 crop production and does not eat.
+                if ($i === 11 && $heroHealth <= 0) {
                     continue;
                 }
                 $upkeep += Formulas::uUpkeep(nrToUnitId($i, $units['race']), $hdp) * $units['u' . $i];
@@ -154,6 +159,42 @@ class ResourcesHelper
         }
         $db->query("UPDATE vdata SET upkeep=$upkeep WHERE kid=$kid");
         return $upkeep;
+    }
+
+    /**
+     * Crop figure used by the building gate. Base crop is fields, oases, the
+     * mill and the bakery. Free crop subtracts population and queued building
+     * upkeep. Hero production and the +25% crop bonus are left out.
+     *
+     * @return array{base: float, free: float}
+     */
+    public static function legendsCropGate(int $kid, float $queuedBuildingCrop = 0): array
+    {
+        $db = DB::getInstance();
+        $row = $db->query("SELECT owner, cropp, pop FROM vdata WHERE kid=$kid")->fetch_assoc();
+        if (!$row) {
+            return ['base' => 0.0, 'free' => 0.0];
+        }
+        $owner = (int)$row['owner'];
+        $bonusOn = (int)$db->fetchScalar("SELECT b4 FROM users WHERE id=$owner") > time();
+        $beforeBonus = $bonusOn ? ((float)$row['cropp'] / 1.25) : (float)$row['cropp'];
+        $hero = $db->query("SELECT production, productionType, health FROM hero WHERE uid=$owner AND kid=$kid")->fetch_assoc();
+        $heroCrop = 0.0;
+        if ($hero) {
+            $heroCrop = 6.0;
+            if ((int)$hero['health'] > 0) {
+                $tribe = (int)$db->fetchScalar("SELECT race FROM users WHERE id=$owner");
+                if ((int)$hero['productionType'] === 0) {
+                    $heroCrop += (float)$hero['production'] * Formulas::heroProductionPerPoint($tribe, false);
+                } elseif ((int)$hero['productionType'] === 4) {
+                    $heroCrop += (float)$hero['production'] * Formulas::heroProductionPerPoint($tribe, true);
+                }
+            }
+        }
+        $base = $beforeBonus - $heroCrop;
+        $free = $base - (float)$row['pop'] - $queuedBuildingCrop;
+
+        return ['base' => $base, 'free' => $free];
     }
 
     /**

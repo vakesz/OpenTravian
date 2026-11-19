@@ -26,14 +26,16 @@ expectPremiumDuration(
     PremiumDuration::officialDefault(1, 10800) === 7 * $day,
     'Published x1 worlds must use the official seven-day duration.'
 );
-foreach ([4, 6, 9, 11, 20, 100] as $speed) {
+foreach ([4, 6, 9] as $speed) {
     expectPremiumDuration(
-        PremiumDuration::officialDefault($speed, 10800) === $day,
-        "Unlisted x{$speed} worlds use their local duration, never under one day."
+        PremiumDuration::officialDefault($speed, 10800) === 3 * $day,
+        "x{$speed} production bonus follows the three-day band through x10."
     );
+}
+foreach ([11 => 235636, 20 => 129600, 100 => $day] as $speed => $seconds) {
     expectPremiumDuration(
-        PremiumDuration::officialDefault($speed, 2 * $day) === 2 * $day,
-        "Unlisted x{$speed} worlds retain a local duration above one day."
+        PremiumDuration::officialDefault($speed, 2 * $day) === $seconds,
+        "x{$speed} production bonus follows the Plus curve ({$seconds} seconds), not a stored local default."
     );
 }
 // OpenTravian Plus: 7 days at x1, 3 days from x2 through x10 (also the unpublished speeds in between), then
@@ -54,8 +56,8 @@ expectPremiumDuration(
     'An explicit duration override must take precedence over the official default.'
 );
 expectPremiumDuration(PremiumDuration::configuredDuration(2, 3600, 10800) === $day, 'A resource bonus override below one day is clamped to one day.');
-expectPremiumDuration(PremiumDuration::configuredDuration(100, 0, 3600) === $day, 'A local default below one day is clamped to one day.');
-expectPremiumDuration(PremiumDuration::configuredDuration(100, 0, 3 * $day) === 3 * $day, 'A local default above one day is kept.');
+expectPremiumDuration(PremiumDuration::configuredDuration(100, 0, 3600) === $day, 'With no override, x100 uses the one-day speed curve.');
+expectPremiumDuration(PremiumDuration::configuredDuration(100, 0, 3 * $day) === $day, 'With no override, the speed curve wins over a longer local default.');
 expectPremiumDuration(
     PremiumDuration::atLeastOneDay(1) === $day && PremiumDuration::atLeastOneDay(0) === $day
         && PremiumDuration::atLeastOneDay(2 * $day + 0.4) === 2 * $day + 1,

@@ -319,6 +319,7 @@ CREATE TABLE `auction` (
   `secure_id` VARCHAR(100) NOT NULL DEFAULT '',
   `time` INT(10) UNSIGNED NOT NULL,
   `created` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `visible` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   `finish` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   `cancel` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -338,6 +339,7 @@ CREATE TABLE IF NOT EXISTS `bids` (
   `uid` INT(11) UNSIGNED NOT NULL,
   `auctionId` INT(11) UNSIGNED NOT NULL,
   `outbid` TINYINT(1) NOT NULL DEFAULT '0',
+  `locked` TINYINT(1) NOT NULL DEFAULT '0',
   `del` TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `uid` (`uid`, `auctionId`, `outbid`, `del`)
@@ -455,6 +457,7 @@ CREATE TABLE `diplomacy` (
   `aid2` INT(10) UNSIGNED NOT NULL,
   `type` TINYINT(1) UNSIGNED NOT NULL,
   `accepted` INT(1) NOT NULL DEFAULT '0',
+  `approver` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY (`aid1`, `aid2`, `type`, `accepted`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
@@ -1598,8 +1601,10 @@ CREATE TABLE `vdata` (
   `pop` INT(10) NOT NULL,
   `cp` INT(10) NOT NULL,
   `celebration` INT(11) NOT NULL DEFAULT '0',
+  `celebration2` INT(11) NOT NULL DEFAULT '0',
   `festival` INT(11) NOT NULL DEFAULT '0',
   `type` TINYINT(2) NOT NULL DEFAULT '0',
+  `type2` TINYINT(2) NOT NULL DEFAULT '0',
   `wood` DOUBLE(50, 4) NOT NULL DEFAULT '0',
   `clay` DOUBLE(50, 4) NOT NULL DEFAULT '0',
   `iron` DOUBLE(50, 4) NOT NULL DEFAULT '0',

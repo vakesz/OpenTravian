@@ -30,6 +30,7 @@ final class WorldOverrides
         'fakeAuctions' => ['auction.fakeAuction.enabled', 'bool', 0, 1, 'System-generated auctions'],
         'starvation' => ['game.starvation', 'bool', 0, 1, 'Troops starve without crop'],
         'speedShortcuts' => ['custom.speedShortcuts', 'bool', 0, 1, 'Speed-world shortcuts (suggested from x100): gold upgrade to max, train maximum, Smithy gold max'],
+        'buyAnimals' => ['custom.buyAnimals', 'bool', 0, 1, 'Buy oasis animals with gold (the herd grows with world speed)'],
         'upgradeToMaxLevelGold' => ['extraSettings.upgradeToMaxLevel.coins', 'int', 1, 10000, 'Building: gold to upgrade instantly to max level'],
         'smithyMaxLevelGold' => ['extraSettings.smithyMaxLevel.coins', 'int', 1, 10000, 'Smithy: gold to upgrade one unit to max level'],
         'smithyUpgradeAllToMaxGold' => ['extraSettings.generalOptions.smithyUpgradeAllToMax.coins', 'int', 1, 10000, 'Smithy: gold to upgrade all units to max level'],

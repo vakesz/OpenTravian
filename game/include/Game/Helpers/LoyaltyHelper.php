@@ -8,6 +8,12 @@ class LoyaltyHelper
 {
     const UPDATE_DELAY = 600;
 
+    /** Village loyalty: 2 points per building level every 3 hours. */
+    public static function pointsPerHour(int $level): float
+    {
+        return $level * 2 / 3;
+    }
+
     /**
      * @param mixed $kid
      */
@@ -17,9 +23,7 @@ class LoyaltyHelper
         $result = $db->query("SELECT kid, loyalty, last_loyalty_update FROM vdata WHERE kid=$kid");
         while ($row = $result->fetch_assoc()) {
             if ($row['loyalty'] < 100) {
-                //points per hour
-                $points = self::getVillageExpansionBuildings($row['kid']);
-                //points per second
+                $points = self::pointsPerHour(self::getVillageExpansionBuildings($row['kid']));
                 $points /= 3600;
                 $elapsedSeconds = time() - $row['last_loyalty_update'];
                 $points *= $elapsedSeconds;
@@ -54,9 +58,7 @@ class LoyaltyHelper
         while ($row = $result->fetch_assoc()) {
             $loyalty = $row['loyalty'];
             if ($loyalty < 100) {
-                //points per hour
-                $points = self::getVillageExpansionBuildings($row['kid']);
-                //points per second
+                $points = self::pointsPerHour(self::getVillageExpansionBuildings($row['kid']));
                 $points /= 3600;
                 $elapsedSeconds = time() - $row['last_loyalty_update'];
                 $points *= $elapsedSeconds;
@@ -76,10 +78,7 @@ class LoyaltyHelper
         while ($row = $result->fetch_assoc()) {
             $loyalty = $row['loyalty'];
             if ($loyalty < 100) {
-                //points per hour
-                $points = self::getVillageExpansionBuildings($row['did']);
-                //points per second
-                $points /= 3600;
+                $points = 2 / 3600;
                 $elapsedSeconds = time() - $row['last_loyalty_update'];
                 $points *= $elapsedSeconds;
                 $loyalty = min(100, $row['loyalty'] + $points);
@@ -96,10 +95,7 @@ class LoyaltyHelper
         $db = DB::getInstance();
         $result = $db->query("SELECT kid, did, loyalty, last_loyalty_update FROM odata WHERE owner>0 AND kid=$kid");
         while ($row = $result->fetch_assoc()) {
-            //points per hour
-            $points = self::getVillageExpansionBuildings($row['did']);
-            //points per second
-            $points /= 3600;
+            $points = 2 / 3600;
             $elapsedSeconds = time() - $row['last_loyalty_update'];
             $points *= $elapsedSeconds;
             $loyalty = min(100, $row['loyalty'] + $points);

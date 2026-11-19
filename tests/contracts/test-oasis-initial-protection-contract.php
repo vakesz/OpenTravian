@@ -13,8 +13,8 @@ if (WorldSpeedProfile::oasisInitialProtectionTime(1) !== 5 * 24 * 3600
     || WorldSpeedProfile::oasisInitialProtectionTime(3) !== 3 * 24 * 3600
     || WorldSpeedProfile::oasisInitialProtectionTime(5) !== 2 * 24 * 3600
     || WorldSpeedProfile::oasisInitialProtectionTime(10) !== 24 * 3600
-    || WorldSpeedProfile::oasisInitialProtectionTime(100) !== 72 * 3600
-    || WorldSpeedProfile::oasisInitialProtectionTime(1000) !== 16 * 3600) {
+    || WorldSpeedProfile::oasisInitialProtectionTime(100) !== 8640
+    || WorldSpeedProfile::oasisInitialProtectionTime(1000) !== 864) {
     fwrite(STDERR, "Initial oasis protection must follow the world-speed profile.\n");
     exit(1);
 }

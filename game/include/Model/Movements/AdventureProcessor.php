@@ -82,10 +82,10 @@ class AdventureProcessor
         if ($expMul > 1) {
             $exp = (int) round($exp * mt_rand((int) floor($expMul / 2), (int) $expMul));
         }
-        $total_power *= 1 + $helper->calcOffBonus($hero['offBonus']) / 100;
         $sgh *= 1 + ($total_power / 500);
         $resist = $helper->calcResist($inventory['body']);
-        $damage = max(0, (int) round($rate * $sgh / $total_power - $resist));
+        $early = $success_adventures < 20 ? (0.25 + 0.75 * ($success_adventures / 20)) : 1;
+        $damage = max(0, (int) round(($rate * $sgh / max(1, $total_power) - $resist) * $early));
         $report = [
             "kid" => (int) $row['kid'],
             "uid" => $owner,
@@ -118,19 +118,10 @@ class AdventureProcessor
         // Damage first so a lethal hit is already health 0 before the level-up heal can run.
         $db->query("UPDATE hero SET health=health-$damage WHERE uid=$owner");
         HeroExperience::add($owner, $exp);
-        if ($success_adventures < 9) {
-            $randGive = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512];
-            foreach ($randGive as $giveKey => $give) {
-                if ($success_adventures_hex & $give) {
-                    unset($randGive[$giveKey]);
-                }
-            }
-            shuffle($randGive);
-            sort($randGive);
-            $randP = $randGive[mt_rand(0, count($randGive) - 1)];
-            if($success_adventures == 2 && in_array(4, $randGive)){
-                $randP = 4;
-            }
+        if ($success_adventures < 10) {
+            // Legends article 46: horse, resources, troops, silver, ointment,
+            // Book of Wisdom, resources, silver, cages, then experience only.
+            $randP = [4, 16, 2, 128, 1, 512, 32, 256, 8, 64][$success_adventures];
             switch ($randP) {
                 case 1://pomad
                     $num = mt_rand(20, 25);
@@ -222,8 +213,8 @@ class AdventureProcessor
                         $report,
                         $row['end_time_seconds']);
                     break;
-                case 64://none or resources
-                    if (mt_rand(1, 3) == 2) {
+                case 64://experience only on the tenth adventure; later rolls may pay resources
+                    if ($success_adventures >= 10 && mt_rand(1, 3) == 2) {
                         $rPerType = $this->calculateResourcesPerType();
                         $this->grantAdventureResources($owner, $rPerType);
                         NoticeHelper::addNotice(0,
@@ -314,6 +305,7 @@ class AdventureProcessor
                     break;
                 }
             } while($bonus == 6);
+            $bonus = self::ungatedAdventureBonus((int)$bonus, $success_adventures);
             switch ($bonus) {
                 case 1:
                     $rand = [
@@ -368,8 +360,12 @@ class AdventureProcessor
                             2 => [1 => 150, 153, 156, 159, 162],
                             3 => [1 => 151, 154, 157, 160, 163],
                         ],
+                        9 => [
+                            1 => [1 => 164, 167, 170, 173, 176],
+                            2 => [1 => 165, 168, 171, 174, 177],
+                            3 => [1 => 166, 169, 172, 175, 178],
+                        ],
                     ];
-                    // Tribes without a weapon set (Vikings) get no item and still come home.
                     $rand = $weapons[(int) $row['race']][$tearNum] ?? 0;
                     break;
                 case 5:
@@ -647,5 +643,32 @@ class AdventureProcessor
         if (!$granted) {
             throw new \RuntimeException('Could not add adventure resources to the hero inventory.');
         }
+    }
+
+    /**
+     * Scrolls and bandages stay out of the early random table. A gated roll is
+     * replaced with another drop instead of paying nothing.
+     */
+    private static function ungatedAdventureBonus(int $bonus, int $successes): int
+    {
+        $tries = 0;
+        while (self::adventureBonusGated($bonus, $successes) && $tries < 20) {
+            $bonus = mt_rand(1, 14);
+            if ($bonus === 6) {
+                $bonus = 1;
+            }
+            ++$tries;
+        }
+
+        return self::adventureBonusGated($bonus, $successes) ? 11 : $bonus;
+    }
+
+    private static function adventureBonusGated(int $bonus, int $successes): bool
+    {
+        if ($successes < 31 && in_array($bonus, [7, 8, 10], true)) {
+            return true;
+        }
+
+        return $successes < 61 && $bonus === 8;
     }
 }

@@ -33,12 +33,15 @@ try {
     $attacker = fixtureVillageCreate();
     $pdo->run('UPDATE users SET name=? WHERE id=?', ['zzfxa' . getmypid(), $attacker['id']]);
     $defender = fixtureVillageCreate();
+    // A player's last village cannot be conquered; give the defender a spare.
+    $defenderSpare = fixtureVillageCreate();
+    $pdo->run('UPDATE vdata SET owner=?, capital=0 WHERE kid=?', [$defender['id'], $defenderSpare['kid']]);
 } catch (RuntimeException $exception) {
     echo "Battle scenarios runtime passed (no fixture village: {$exception->getMessage()}).\n";
     exit(0);
 }
 // The fixture villages are not on the map yet: occupy their tiles, and free them again however the test ends.
-foreach ([$attacker, $defender] as $fixture) {
+foreach ([$attacker, $defender, $defenderSpare] as $fixture) {
     $pdo->run('UPDATE wdata SET occupied=1 WHERE id=?', [$fixture['kid']]);
     register_shutdown_function(static fn () => DBI::getInstance()->run('UPDATE wdata SET occupied=0 WHERE id=?', [$fixture['kid']]));
 }
@@ -47,25 +50,48 @@ $race = (int)$pdo->fetchScalar('SELECT race FROM users WHERE id=?', [$attacker['
 $defenderRace = (int)$pdo->fetchScalar('SELECT race FROM users WHERE id=?', [$defender['id']]);
 $scout = (int)Formulas::getSpyId($race);
 
-// What a scenario may change, put back before the next one starts: both villages' buildings, the player and
-// troop rows, and the artifact switch of the world.
+// What a scenario may change, put back before the next one starts: both villages'
+// buildings and rows, and the artifact switch of the world. Unnerfed catapults can
+// delete a village; reset must put vdata/units/fdata back from these snapshots.
 $buildings = [];
+$villageRows = [];
+$unitRows = [];
 foreach ([$attacker, $defender] as $fixture) {
     $buildings[$fixture['kid']] = $pdo->fetchSingleRow('SELECT * FROM fdata WHERE kid=?', [$fixture['kid']]);
+    $villageRows[$fixture['kid']] = $pdo->fetchSingleRow('SELECT * FROM vdata WHERE kid=?', [$fixture['kid']]);
+    $unitRows[$fixture['kid']] = $pdo->fetchSingleRow('SELECT * FROM units WHERE kid=?', [$fixture['kid']]);
 }
 $artifactsReleased = (int)$pdo->fetchScalar('SELECT ArtifactsReleased FROM config LIMIT 1');
 register_shutdown_function(static fn () => DBI::getInstance()->run('UPDATE config SET ArtifactsReleased=?', [$artifactsReleased]));
-$restoreBuildings = static function () use ($pdo, $buildings): void {
-    foreach ($buildings as $kid => $row) {
-        $sets = [];
-        $values = [];
-        foreach ($row as $column => $value) {
-            if ($column !== 'kid') {
-                $sets[] = "`$column`=?";
-                $values[] = $value;
-            }
+$restoreRow = static function (string $table, string $key, int $kid, ?array $row) use ($pdo): void {
+    if ($row === null) {
+        return;
+    }
+    if ((int)$pdo->fetchScalar("SELECT COUNT(*) FROM `$table` WHERE `$key`=?", [$kid]) === 0) {
+        $columns = array_keys($row);
+        $placeholders = implode(',', array_fill(0, count($columns), '?'));
+        $pdo->run(
+            "INSERT INTO `$table` (`" . implode('`,`', $columns) . '`) VALUES (' . $placeholders . ')',
+            array_values($row)
+        );
+
+        return;
+    }
+    $sets = [];
+    $values = [];
+    foreach ($row as $column => $value) {
+        if ($column !== $key) {
+            $sets[] = "`$column`=?";
+            $values[] = $value;
         }
-        $pdo->run('UPDATE fdata SET ' . implode(',', $sets) . ' WHERE kid=?', [...$values, $kid]);
+    }
+    $pdo->run("UPDATE `$table` SET " . implode(',', $sets) . " WHERE `$key`=?", [...$values, $kid]);
+};
+$restoreBuildings = static function () use ($restoreRow, $buildings, $villageRows, $unitRows): void {
+    foreach ($buildings as $kid => $row) {
+        $restoreRow('fdata', 'kid', (int)$kid, $row);
+        $restoreRow('vdata', 'kid', (int)$kid, $villageRows[$kid] ?? null);
+        $restoreRow('units', 'kid', (int)$kid, $unitRows[$kid] ?? null);
     }
 };
 /** Puts a building of the given type and level on a village slot. */
@@ -80,6 +106,8 @@ $demolish = static function (array $village, array $gids) use ($pdo): void {
 };
 $reset = static function () use ($pdo, $attacker, $defender, $defenderRace, $restoreBuildings): void {
     $restoreBuildings();
+    // Catapults can clear the map tile when they flatten a village.
+    $pdo->run('UPDATE wdata SET occupied=1 WHERE id IN (?, ?)', [$attacker['kid'], $defender['kid']]);
     $pdo->run('DELETE FROM ndata WHERE uid IN (?, ?)', [$attacker['id'], $defender['id']]);
     $pdo->run('UPDATE units SET u1=40, u2=0, u3=0, u4=0, u5=0, u6=0, u7=0, u8=0, u9=0, u10=0, u11=0, u99=0 WHERE kid=?', [$defender['kid']]);
     $pdo->run('UPDATE units SET race=? WHERE kid=?', [$defenderRace, $defender['kid']]);
@@ -165,26 +193,39 @@ if ($scout > 0) {
 // --- Spartan hero weapon ---------------------------------------------------------------------------------------
 // A Spartan hero's weapon adds its unit bonus and fighting strength to the battle: the same attack with the Lance of
 // the Hoplite equipped must cost the defender more troops than without it.
-$spartanBattle = static function (bool $armed) use ($pdo, $attacker, $defender, $reset, $send, $scalar): int {
+$spartanBattle = static function (bool $armed) use ($pdo, $attacker, $defender, $reset, $send, $scalar, $demolish): int {
     $reset();
     $pdo->run('UPDATE users SET race=8 WHERE id=?', [$attacker['id']]);
-    $pdo->run('UPDATE units SET u1=800 WHERE kid=?', [$defender['kid']]);
+    // Moral points are ignored on this world, so a 400-vs-800 fight wipes both
+    // ways. Keep enough defenders that the Hoplite bonus still shows, clear the
+    // wall so a small wave can wound them, and stock crop against starvation.
+    $demolish($defender, Formulas::WALL_BUILDINGS);
+    $pdo->run(
+        'UPDATE vdata SET wood=1000000, clay=1000000, iron=1000000, crop=1000000, cropp=pop+10000, upkeep=0, lastmupdate=? WHERE kid=?',
+        [miliseconds(), $defender['kid']]
+    );
+    $pdo->run('UPDATE units SET u1=2000 WHERE kid=?', [$defender['kid']]);
     $pdo->run('UPDATE inventory SET rightHand=0 WHERE uid=?', [$attacker['id']]);
     $pdo->run('DELETE FROM items WHERE uid=? AND btype=4', [$attacker['id']]);
     if ($armed) {
         $pdo->run('INSERT INTO items (uid, btype, type, num, placeId, proc) VALUES (?, 4, 151, 1, 0, 1)', [$attacker['id']]);
         $pdo->run('UPDATE inventory SET rightHand=? WHERE uid=?', [(int)$pdo->fetchScalar('SELECT LAST_INSERT_ID()'), $attacker['id']]);
     }
-    $send($armed ? 'Spartan hero with a weapon' : 'Spartan hero without a weapon', MovementsModel::ATTACKTYPE_NORMAL, [1 => 400, 11 => 1], ['race' => 8]);
+    $send($armed ? 'Spartan hero with a weapon' : 'Spartan hero without a weapon', MovementsModel::ATTACKTYPE_NORMAL, [1 => 100, 11 => 1], ['race' => 8]);
     $left = (int)$scalar('SELECT u1 FROM units WHERE kid=?', [$defender['kid']]);
     $pdo->run('UPDATE inventory SET rightHand=0 WHERE uid=?', [$attacker['id']]);
     $pdo->run('DELETE FROM items WHERE uid=? AND btype=4', [$attacker['id']]);
 
     return $left;
 };
-// The hero may fall in these battles: put its row and the village units back afterwards.
+// Earlier scenarios may have killed the hero. Revive it for both fights, then
+// put the original row back afterwards.
 $heroRow = $pdo->fetchSingleRow('SELECT * FROM hero WHERE uid=?', [$attacker['id']]);
+$pdo->run('UPDATE hero SET health=100 WHERE uid=?', [$attacker['id']]);
+$pdo->run('UPDATE units SET u11=1 WHERE kid=?', [$attacker['kid']]);
 $unarmed = $spartanBattle(false);
+$pdo->run('UPDATE hero SET health=100 WHERE uid=?', [$attacker['id']]);
+$pdo->run('UPDATE units SET u11=1 WHERE kid=?', [$attacker['kid']]);
 $armed = $spartanBattle(true);
 if (is_array($heroRow)) {
     $sets = [];
@@ -244,10 +285,10 @@ $expect('small cranny artefact', (int)$scalar('SELECT f30 FROM fdata WHERE kid=?
 $pdo->run('UPDATE config SET ArtifactsReleased=?', [$artifactsReleased]);
 
 // --- oases -----------------------------------------------------------------------------------------------------
-// One neutral oasis close to the attacker is borrowed for the capture scenarios and put back afterwards.
+// One neutral oasis within the Legends capture range (3 fields) is borrowed and put back afterwards.
 $oasis = null;
 foreach ($pdo->run('SELECT kid FROM odata WHERE owner=0 AND did=0')->fetchAll(PDO::FETCH_COLUMN) as $candidate) {
-    if (Formulas::getDistance($attacker['kid'], (int)$candidate) < 4.9) {
+    if (Formulas::getDistance($attacker['kid'], (int)$candidate) <= 3) {
         $oasis = (int)$candidate;
         break;
     }
@@ -273,13 +314,15 @@ if ($oasis === null) {
         $pdo->run('UPDATE units SET u1=0, u2=0, u3=0, u4=0, u5=0, u6=0, u7=0, u8=0, u9=0, u10=0 WHERE kid=?', [$oasis]);
     };
 
-    // The Hero's Mansion decides how many oases a village may hold.
+    // The Hero's Mansion decides how many oases a village may hold. Raids no
+    // longer capture; a normal attack takes an empty oasis when loyalty is low
+    // enough for the one-third loyalty step to finish it.
     $oasisOwner = static fn (): int => (int)$scalar('SELECT did FROM odata WHERE kid=?', [$oasis]);
     $reset();
     $build($attacker, 31, 37, 10);
-    $emptyOasis(0, 0, 100.0);
-    $send('oasis capture by raid', MovementsModel::ATTACKTYPE_RAID, [1 => 400, 11 => 1], ['target' => $oasis]);
-    $expect('oasis capture by raid', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured.');
+    $emptyOasis(0, 0, 30.0);
+    $send('oasis capture by attack', MovementsModel::ATTACKTYPE_NORMAL, [1 => 400, 11 => 1], ['target' => $oasis]);
+    $expect('oasis capture by attack', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured.');
 
     $reset();
     $build($attacker, 31, 37, 10);

@@ -31,7 +31,7 @@ class VillageModel
             if ($item_id === 0) {
                 continue;
             }
-            list($pop, $cp) = Formulas::buildingCpPop($item_id, 0, $level, $isWW || Formulas::isGrayArea($kid));
+            list($pop, $cp) = Formulas::buildingCpPop($item_id, 0, $level, $isWW);
             $total_cp += $cp;
             $total_pop += $pop;
         }
@@ -274,17 +274,21 @@ class VillageModel
         $db->query("DELETE FROM demolition WHERE kid=$kid");
         $db->run('DELETE FROM village_group_villages WHERE uid=? AND kid=?', [$uid, $kid]);
         $db->query("DELETE FROM send WHERE kid=$kid OR (to_kid=$kid AND mode=1)");
-        $db->query("UPDATE odata SET owner=$newUid WHERE did=$kid");
+        $ownedOases = $db->query("SELECT kid FROM odata WHERE did=$kid");
+        while ($ownedOases && ($oasis = $ownedOases->fetch_assoc())) {
+            \Model\OasesModel::releaseOasis((int)$oasis['kid'], $kid);
+        }
         $traps = $db->query("SELECT * FROM trapped WHERE to_kid=$kid");
         while ($trapped = $traps->fetch_assoc()) {
             $helper->returnTrappedOrEnforcementRow($trapped, FALSE);
         }
-        //removing tribe specific buildings.
+        // Tribe buildings stay when the conqueror is the same tribe.
         $buildings = $this->getBuildingsAssoc($kid);
         if (sizeof($buildings) == 0) {
             logError("No building. while capture village");
         }
-        $tribeSpecificArray = \Game\Formulas::TRIBE_SPECIFIC_BUILDINGS;
+        $oldRace = (int)$db->fetchScalar("SELECT race FROM users WHERE id=$uid");
+        $tribeSpecificArray = $oldRace === (int)$newRace ? [] : \Game\Formulas::TRIBE_SPECIFIC_BUILDINGS;
         for ($i = 19; $i <= 40; ++$i) {
             if (!isset($buildings[$i])) {
                 continue;
@@ -325,7 +329,7 @@ class VillageModel
         }
         $db->query("UPDATE users SET total_pop=total_pop-{$village['pop']}, cp_prod=cp_prod-{$village['cp']}, total_villages=total_villages-1 WHERE id=$uid");
         $db->query("UPDATE users SET total_pop=total_pop+{$village['pop']}, cp_prod=cp_prod+{$village['cp']}, total_villages=total_villages+1 WHERE id=$newUid");
-        $db->query("UPDATE vdata SET allowLoyaltyDecrease=0, isFarm=0, extraMaxstore=0, extraMaxcrop=0, maxstore=$maxstore, maxcrop=$maxcrop, owner=$newUid, expandedfrom=$expandedFrom WHERE kid=$kid");
+        $db->query("UPDATE vdata SET allowLoyaltyDecrease=0, isFarm=0, d1TroopsVersion=1, extraMaxstore=0, extraMaxcrop=0, maxstore=$maxstore, maxcrop=$maxcrop, owner=$newUid, expandedfrom=$expandedFrom WHERE kid=$kid");
 
 
         $aid = $db->fetchScalar("SELECT aid FROM users WHERE id=$uid");

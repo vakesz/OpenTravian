@@ -55,7 +55,7 @@ class BuildingAction
         if ($item_id <= 4) {
             $dailyQuest->setQuestAsCompleted($villageRow['owner'], 7);
         }
-        list($pop, $cp) = Formulas::buildingCpPop($item_id, $level, $level + $levels, $isWW || Formulas::isGrayArea($kid));
+        list($pop, $cp) = Formulas::buildingCpPop($item_id, $level, $level + $levels, $isWW);
         if ($modifyPopCP) {
             self::updateVillagePopCP($villageRow['owner'], $kid, $pop, $cp);
         }
@@ -213,7 +213,7 @@ class BuildingAction
         }
         $villageRow = $m->getVillage($kid, 'kid, owner, isWW, pop, maxcrop, maxstore, extraMaxstore, extraMaxcrop');
         $isWW = $villageRow['isWW'] == 1;
-        list($pop, $cp) = Formulas::buildingCpPop($item_id, $level, $complete ? 0 : $level - $levels, $isWW || Formulas::isGrayArea($kid));
+        list($pop, $cp) = Formulas::buildingCpPop($item_id, $level, $complete ? 0 : $level - $levels, $isWW);
         self::updateVillagePopCP($villageRow['owner'], $kid, $pop, $cp, 1);
         if (!$complete) {
             $db->query("UPDATE fdata SET f{$building_field}=f{$building_field}-$levels WHERE kid = " . $kid);

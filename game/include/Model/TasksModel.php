@@ -152,7 +152,7 @@ class TasksModel
     {
         $db = DB::getInstance();
         $village = $this->fetchOne(
-            'SELECT v.kid, v.owner, v.name, v.pop, v.cp, v.created, u.race AS player_race, f.* FROM vdata v JOIN fdata f ON f.kid=v.kid JOIN users u ON u.id=v.owner WHERE v.kid=? AND v.owner=?',
+            'SELECT v.kid, v.owner, v.name, v.pop, v.cp, v.created, v.capital, v.expandedfrom, v.celebration, v.loyalty, v.d1TroopsVersion, u.race AS player_race, f.* FROM vdata v JOIN fdata f ON f.kid=v.kid JOIN users u ON u.id=v.owner WHERE v.kid=? AND v.owner=?',
             [$kid, $uid]
         );
         if ($village === null) {
@@ -163,17 +163,37 @@ class TasksModel
         $buildings = $this->readBuildings($village);
         $tasks = [];
 
+        $kind = (int)$village['d1TroopsVersion'] > 0 ? 'conquered' : ((int)$village['expandedfrom'] === 0 ? 'spawn' : 'settled');
         $this->appendMilestoneTasks($tasks, 'population', 'Population', (int)$village['pop'], [50, 100, 150, 250, 350, 500, 750, 1000], 'populationProgressInVillage', 100, 5);
         $this->appendMilestoneTasks($tasks, 'culture', 'Culture point production', (int)$village['cp'], [50, 100, 150, 250, 350, 500], 'culturePointsProductionProgressInVillage', 100, 5);
+        if ($kind === 'conquered') {
+            $this->appendMilestoneTasks($tasks, 'loyalty', 'Loyalty', (int)min(100, round((float)$village['loyalty'])), [100], 'populationProgressInVillage', 150, 10);
+        }
 
         /** @var list<array{list<int>, string, list<int>}> $buildingCatalog */
-        $buildingCatalog = [
-            [[10], 'Warehouse', [1, 3, 7, 12, 20]], [[11], 'Granary', [1, 3, 7, 12, 20]],
-            [[15], 'Main Building', [1, 3, 7, 12, 20]], [[16], 'Rally Point', [1, 10, 20]],
-            [[17], 'Marketplace', [1]], [[18], 'Embassy', [1]], [[19], 'Barracks', [1]],
-            [[23], 'Cranny', [1, 3, 6, 10]], [[25], 'Residence', [1]], [[8], 'Grain Mill', [1, 5]],
-            [[31, 32, 33, 42, 43, 47, 50], 'City Wall', [1, 3, 7, 12, 20]],
-        ];
+        if ($kind === 'spawn') {
+            $buildingCatalog = [
+                [[10], 'Warehouse', [1, 10, 20]], [[11], 'Granary', [1, 10, 20]],
+                [[15], 'Main Building', [1, 3, 7, 12, 20]], [[16], 'Rally Point', [1, 10, 20]],
+                [[17], 'Marketplace', [1, 3, 7, 12, 20]], [[19], 'Barracks', [1, 3, 7, 12, 20]],
+                [[20], 'Stable', [1]], [[22], 'Academy', [1]], [[13], 'Smithy', [1]],
+                [[24], 'Town Hall', [1]], [[21], 'Workshop', [1]],
+                [[25, 26, 44], 'Residence', [1, 3, 7, 10, 20]],
+                [[5], 'Sawmill', [1, 5]], [[6], 'Brickyard', [1, 5]], [[7], 'Iron Foundry', [1, 5]],
+                [[8, 9], 'Bakery', [1, 5]], [[23], 'Cranny', [1, 10]],
+                [[31, 32, 33, 42, 43, 47, 50], 'City Wall', [1, 3, 7, 12, 20]],
+            ];
+        } else {
+            $buildingCatalog = [
+                [[10], 'Warehouse', [1, 10, 20]], [[11], 'Granary', [1, 10, 20]],
+                [[15], 'Main Building', [1, 10, 20]], [[16], 'Rally Point', [1, 10]],
+                [[23], 'Cranny', [1, 10]],
+            ];
+            if ($kind !== 'conquered') {
+                $buildingCatalog[] = [[25, 26, 44], 'Residence', [1, 10]];
+                $buildingCatalog[] = [[31, 32, 33, 42, 43, 47, 50], 'City Wall', [1]];
+            }
+        }
         foreach ($buildingCatalog as [$gids, $fallbackLabel, $levels]) {
             $level = 0;
             foreach ($buildings as $building) {
@@ -183,9 +203,9 @@ class TasksModel
             }
             // The current tribe determines a wall's title before it has been
             // built. Once present, use the actual structure in the field.
-            $imageGid = count($gids) === 1
-                ? $gids[0]
-                : (self::WALL_GID_BY_RACE[(int)$village['player_race']] ?? $gids[0]);
+            $imageGid = in_array(31, $gids, true)
+                ? (self::WALL_GID_BY_RACE[(int)$village['player_race']] ?? $gids[0])
+                : $gids[0];
             foreach ($buildings as $building) {
                 $presentGids = array_intersect($gids, $building['types']);
                 if ($presentGids) {
@@ -195,9 +215,12 @@ class TasksModel
             }
             // Keep the pre-existing key for wall claims. It is persistence,
             // whereas the label is player-facing and tribe-specific.
-            $key = count($gids) === 1 ? 'building-' . $gids[0] : 'building-city-wall';
+            $key = count($gids) === 1 || !in_array(31, $gids, true) ? 'building-' . $gids[0] : 'building-city-wall';
             $label = T('Buildings', $imageGid . '.title', $fallbackLabel);
             $this->appendMilestoneTasks($tasks, $key, $label, $level, $levels, 'building', 150, 10, 'g' . $imageGid);
+        }
+        if ($kind === 'spawn') {
+            $this->appendOneTask($tasks, 'celebration', 'Hold a celebration', (int)$village['celebration'] > 0 ? 1 : 0, 1, 1, 'celebration', 200, 10, 1, 'g24');
         }
 
         $fieldCatalog = [1 => ['Woodcutters', [2, 4, 7, 10]], 2 => ['Clay Pits', [2, 4, 7, 10]], 3 => ['Iron Mines', [2, 4, 7, 10]], 4 => ['Croplands', [2, 4, 7, 10]]];
@@ -211,7 +234,8 @@ class TasksModel
             $this->appendMilestoneTasks($tasks, 'field-' . $type, $label, $maxLevel, $levels, 'resourceBuildingsLevelOfOneOfTheBuildings', 150, 10, 'g' . $type);
         }
 
-        $allFieldLevels = [1 => [2, 3, 4, 5, 8, 10], 2 => [2, 3, 4, 5, 8, 10], 3 => [2, 3, 4, 5, 8, 10], 4 => [2, 3, 4, 5, 8, 10]];
+        $fieldTargets = $kind === 'spawn' ? [2, 3, 5, 8, 10] : [2, 5, 10];
+        $allFieldLevels = [1 => $fieldTargets, 2 => $fieldTargets, 3 => $fieldTargets, 4 => $fieldTargets];
         foreach ($allFieldLevels as $type => $levels) {
             $typeFields = array_values(array_filter($fields, static fn (array $field): bool => $field['type'] === $type));
             $count = count($typeFields);
@@ -419,7 +443,7 @@ class TasksModel
             $this->rewardState[$uid] = [
                 'level' => $level,
                 'heroMultiplier' => 1 + (max(0, $level - 1) * 0.02),
-                'resourceMultiplier' => max(1, (int)floor(max(1, (int)getGameSpeed()) / 5)),
+                'resourceMultiplier' => max(1, (int)getGameSpeed()),
                 'experienceMultiplier' => max(1, (int)Formulas::getHeroExpLevelMultiplier()),
             ];
         }

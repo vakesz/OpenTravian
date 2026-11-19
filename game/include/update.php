@@ -393,6 +393,19 @@ if ($currentVersion < 110) {
     // the request action, independent of this stored value.
     $db->query("ALTER TABLE `config` ADD COLUMN IF NOT EXISTS `finishConstruction` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'");
 }
+if ($currentVersion < 111) {
+    // Existing listings stay visible. New ones wait out the random delay.
+    // locked marks a player who was refused for a bid above twice the price.
+    $db->query("ALTER TABLE `auction` ADD COLUMN IF NOT EXISTS `visible` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `created`");
+    $db->query("ALTER TABLE `bids` ADD COLUMN IF NOT EXISTS `locked` TINYINT(1) NOT NULL DEFAULT '0' AFTER `outbid`");
+}
+if ($currentVersion < 112) {
+    // approver is the confederacy partner who must agree before a third alliance joins.
+    // celebration2 is the end time of a celebration ordered while another is running.
+    $db->query("ALTER TABLE `diplomacy` ADD COLUMN IF NOT EXISTS `approver` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `accepted`");
+    $db->query("ALTER TABLE `vdata` ADD COLUMN IF NOT EXISTS `celebration2` INT(11) NOT NULL DEFAULT '0' AFTER `celebration`");
+    $db->query("ALTER TABLE `vdata` ADD COLUMN IF NOT EXISTS `type2` TINYINT(2) NOT NULL DEFAULT '0' AFTER `type`");
+}
 //ALTER TABLE `ndata` ADD INDEX( `uid`, `to_kid`, `type`);
 /***************************** PATCHES END **********************************/
 patchDone:

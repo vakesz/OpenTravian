@@ -74,8 +74,9 @@ $resources = static fn (): array => array_map('intval', array_values($pdo->fetch
 $pdo->run('DELETE FROM building_upgrade WHERE kid=?', [$kid]);
 $pdo->run('DELETE FROM demolition WHERE kid=?', [$kid]);
 $pdo->run("UPDATE fdata SET f{$field}=?, f{$field}t=? WHERE kid=?", [$before, $gid, $kid]);
+// legendsCropGate subtracts hero crop from cropp, so leave plenty of free crop after that.
 $pdo->run(
-    'UPDATE vdata SET wood=1000000, clay=1000000, iron=1000000, crop=1000000, woodp=0, clayp=0, ironp=0, cropp=pop+10,
+    'UPDATE vdata SET wood=1000000, clay=1000000, iron=1000000, crop=1000000, woodp=0, clayp=0, ironp=0, cropp=pop+10000,
      upkeep=0, maxstore=2000000, maxcrop=2000000, lastmupdate=? WHERE kid=?',
     [miliseconds(), $kid]
 );

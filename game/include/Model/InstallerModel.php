@@ -10,6 +10,7 @@ use Game\Formulas;
 use Game\Map\WaterGenerator;
 use const INCLUDE_PATH;
 use const MAP_SIZE;
+use function getGameSpeed;
 use function json_decode;
 
 class InstallerModel
@@ -392,8 +393,7 @@ class InstallerModel
                 $queryBatch = [];
             }
             if ($values['oasistype']) {
-                $maxStore = Formulas::getOasisStorage($values['oasistype']);
-                $min = ceil($maxStore * 0.9375);
+                $min = 0;
                 ++$oasisId;
                 //We switch type of oasis and instert record with apropriate infomation.
                 $queryBatchOases[] = vsprintf("(%s, %s, %s, %s, %s, %s, %s)",
@@ -406,10 +406,10 @@ class InstallerModel
                         $min,
                         miliseconds(),
                     ]);
-                $queryBatchUnits[] = "({$id}, 4)";
+                $queryBatchUnits[] = "({$id}, 4, " . $this->initialOasisAnimals((int)$values['oasistype']) . ")";
             }
             if ($oasisId >= $oh2) {
-                $db->query("INSERT INTO units (kid, race) VALUES " . implode(",", $queryBatchUnits));
+                $db->query("INSERT INTO units (kid, race, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10) VALUES " . implode(",", $queryBatchUnits));
                 $db->query("INSERT INTO odata (`kid`, `type`, `wood`, `iron`, `clay`, `crop`, `lastmupdate`) VALUES " . implode(",",
                         $queryBatchOases));
                 $queryBatchOases = $queryBatchUnits = [];
@@ -421,7 +421,7 @@ class InstallerModel
                     $queryBatch));
         }
         if (sizeof($queryBatchUnits)) {
-            $db->query("INSERT INTO units (kid, race) VALUES " . implode(",", $queryBatchUnits));
+            $db->query("INSERT INTO units (kid, race, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10) VALUES " . implode(",", $queryBatchUnits));
         }
         if (sizeof($queryBatchOases)) {
             $db->query("INSERT INTO odata (`kid`, `type`, `wood`, `iron`, `clay`, `crop`, `lastmupdate`) VALUES " . implode(",",
@@ -431,6 +431,31 @@ class InstallerModel
             $db->query("INSERT INTO available_villages (kid, fieldtype, r, angle, rand) VALUES " . implode(",",
                     $queryBatchVillages));
         }
+    }
+
+    /**
+     * A newly placed oasis starts with a few of its weakest animals. The count
+     * grows with world speed and never passes the oasis animal cap. Later
+     * respawns still wait until oasis protection ends.
+     */
+    private function initialOasisAnimals(int $type): string
+    {
+        $counts = array_fill(1, 10, 0);
+        $troops = OasesModel::ANIMALS_BY_TYPE[$type] ?? [];
+        if ($troops !== []) {
+            $speed = max(1, (int)getGameSpeed());
+            $left = max(1, OasesModel::getOasisAnimalCap());
+            foreach (array_slice($troops, 0, 2) as $index => $unitId) {
+                $amount = min($left, ($index === 0 ? mt_rand(1, 3) : 1) * $speed);
+                $counts[$unitId] = $amount;
+                $left -= $amount;
+                if ($left <= 0) {
+                    break;
+                }
+            }
+        }
+
+        return implode(',', $counts);
     }
 
     public function getFieldType(int $kid, int &$fieldtype): void
@@ -527,7 +552,12 @@ class InstallerModel
     {
         $crops = json_decode((string) file_get_contents(dirname(INCLUDE_PATH, 2) . '/database/seed/crops.json'), true) ?: [];
         foreach ($crops as $crop) {
-            $kid = Formulas::xy2kid($crop['coordinates']['x'], $crop['coordinates']['y']);
+            $x = (int)$crop['coordinates']['x'];
+            $y = (int)$crop['coordinates']['y'];
+            if (abs($x) > $this->mapSize || abs($y) > $this->mapSize) {
+                continue;
+            }
+            $kid = Formulas::xy2kid($x, $y);
             $this->crops[$kid] = $crop;
         }
         $map = $this->explodeParams('||=||');
@@ -1239,7 +1269,7 @@ class InstallerModel
             case 1:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = mt_rand(3, 4);
+                        $this->map[$kid]['oasistype'] = 4;
                     } else {
                         $this->map[$kid]['landscape'] = 1;
                     }
@@ -1256,7 +1286,7 @@ class InstallerModel
             case 2:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = mt_rand(7, 8);
+                        $this->map[$kid]['oasistype'] = 8;
                     } else {
                         $this->map[$kid]['landscape'] = 2;
                     }
@@ -1273,7 +1303,7 @@ class InstallerModel
             case 3:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = mt_rand(11, 12);
+                        $this->map[$kid]['oasistype'] = 12;
                     } else {
                         $this->map[$kid]['landscape'] = 3;
                     }

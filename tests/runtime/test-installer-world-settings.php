@@ -26,20 +26,20 @@ assertInstallerValue(50, \Game\WorldSpeedProfile::movementSpeedMultiplier(250), 
 assertInstallerValue(50, \Game\WorldSpeedProfile::movementSpeedMultiplier(251), '251x movement must not drop below the 250x band.');
 assertInstallerValue(3000, \Game\WorldSpeedProfile::movementSpeedMultiplier(100000), 'Movement speed must stay capped at the supported high-speed limit.');
 assertInstallerValue(3000, \Game\WorldSpeedProfile::movementSpeedMultiplier(1000000), 'One-million-speed worlds must retain the bounded movement profile.');
-assertInstallerValue(3 * 3600, \Game\WorldSpeedProfile::protectionTime(1000000), 'Extreme speeds must keep at least a 3-hour beginner-protection window.');
+assertInstallerValue(6 * 3600, \Game\WorldSpeedProfile::protectionTime(1000000), 'Extreme speeds must keep a 3-hour basic window and a 3-hour extension.');
 assertInstallerValue(1000000, \Game\WorldSpeedProfile::storageMultiplier(1000000), 'One-million-speed worlds must retain enough warehouse and granary capacity for their economic profile.');
-assertInstallerValue(825, \Game\Installer\InstallInput::effectiveProfile(['speed' => 1000000])['oasisAnimalCap'], 'One-million-speed worlds must retain the bounded oasis-animal cap.');
+assertInstallerValue(100000, \Game\Installer\InstallInput::effectiveProfile(['speed' => 1000000])['oasisAnimalCap'], 'One-million-speed worlds must keep the oasis-animal cap at its ceiling.');
 assertInstallerValue(50, \Game\WorldSpeedProfile::storageMultiplier(100), '100x worlds must scale warehouse and granary capacity by the high-speed profile.');
 assertInstallerValue(13, \Game\WorldSpeedProfile::crannyMultiplier(100), '100x worlds must scale cranny capacity by the high-speed profile.');
 assertInstallerValue(25, \Game\WorldSpeedProfile::trapMultiplier(100), '100x worlds must scale traps by the high-speed profile.');
 assertInstallerValue(25, \Game\WorldSpeedProfile::cageMultiplier(100), '100x worlds must scale cages by the high-speed profile.');
-assertInstallerValue(72 * 3600, \Game\WorldSpeedProfile::protectionTime(100), '100x worlds must use the high-speed beginner-protection window.');
-assertInstallerValue(72 * 3600, \Game\WorldSpeedProfile::oasisInitialProtectionTime(100), '100x worlds must protect neutral oasis animals during the initial world window.');
+assertInstallerValue(6 * 3600, \Game\WorldSpeedProfile::protectionTime(100), '100x worlds must use the scaled beginner-protection window, floored at 3 hours per part.');
+assertInstallerValue(8640, \Game\WorldSpeedProfile::oasisInitialProtectionTime(100), '100x worlds must scale the one-day oasis-protection window.');
 assertInstallerValue(86400, \Game\WorldSpeedProfile::dailyQuestInterval(1), '1x worlds must keep the daily quest cycle.');
 assertInstallerValue(43200, \Game\WorldSpeedProfile::dailyQuestInterval(100), '100x worlds must use the shortened high-speed quest cycle.');
 assertInstallerValue(21600, \Game\WorldSpeedProfile::dailyQuestInterval(5000), '5000x worlds must use the six-hour quest cycle.');
 assertInstallerValue(1.5, \Game\WorldSpeedProfile::heroRegenerationMultiplier(100), '100x worlds must use the continuous hero regeneration curve.');
-assertInstallerValue(75, \Game\Installer\InstallInput::effectiveProfile(['speed' => 100])['oasisAnimalCap'], '100x worlds must use the bounded oasis-animal cap.');
+assertInstallerValue(1500, \Game\Installer\InstallInput::effectiveProfile(['speed' => 100])['oasisAnimalCap'], '100x worlds must hold 1,500 animals in an oasis.');
 assertInstallerValue(900, \Game\Installer\InstallInput::effectiveProfile(['speed' => 100])['oasisRespawnInterval'], '100x worlds must retain the oasis respawn floor.');
 
 $installerSource = file_get_contents(dirname(__DIR__, 2) . '/game/include/Game/Installer/InstallInput.php')
@@ -66,10 +66,10 @@ assertInstallerValue(true, str_contains($connection, "'storage_multiplier' => 50
 assertInstallerValue(true, str_contains($connection, "'cranny_multiplier' => 125"), 'The derived cranny multiplier must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'trap_multiplier' => 250"), 'The derived trap multiplier must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'cage_multiplier' => 250"), 'The derived cage multiplier must be written to the world connection.');
-assertInstallerValue(true, str_contains($connection, "'oasisInitialProtectionTime' => 57600"), 'The derived oasis-protection time must be written to the world connection.');
+assertInstallerValue(true, str_contains($connection, "'oasisInitialProtectionTime' => 864"), 'The derived oasis-protection time must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'dailyQuestInterval' => 43200"), 'The derived daily quest interval must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'heroRegenerationMultiplier' => 2.66"), 'The derived hero regeneration multiplier must be written to the world connection.');
-assertInstallerValue(true, str_contains($connection, "'oasisAnimalCap' => 135"), 'The derived oasis cap must be written to the world connection.');
+assertInstallerValue(true, str_contains($connection, "'oasisAnimalCap' => 4743"), 'The derived oasis cap must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'oasisRespawnInterval' => 900"), 'The derived oasis interval must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'round_length' => 1"), 'The calculated round length must be written to the world connection.');
 assertInstallerValue(true, str_contains($connection, "'startGold' => 250"), 'The selected starting gold must be written to the world connection.');
@@ -92,10 +92,10 @@ foreach ([
     "'cranny_multiplier' => 125000",
     "'trap_multiplier' => 250000",
     "'cage_multiplier' => 250000",
-    "'protection_time' => 10800",
+    "'protection_time' => 21600",
     "'dailyQuestInterval' => 21600",
     "'heroRegenerationMultiplier' => 14.95",
-    "'oasisAnimalCap' => 825",
+    "'oasisAnimalCap' => 100000",
     "'oasisRespawnInterval' => 900",
     "'round_length' => 1",
 ] as $expectedProfileValue) {

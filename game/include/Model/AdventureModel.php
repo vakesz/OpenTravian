@@ -115,26 +115,26 @@ class AdventureModel
      */
     private function getAdventureIntervals(): array
     {
-        // Travian Wiki "Adventure": 3 per day on days 0-3, 2 on days 4-16, 1.5 on days 17-62, 1 from day 63. Day counts
-        // are 1x days; per-day rates scale with speed through x20, and so do the stage lengths.
-        $speed = (int)getGameSpeed();
-        $scale = min($speed, 20);
-        $base = $scale * WorldSpeedProfile::adventureSpawnMultiplier($speed);
+        // Legends article 46: 3 per day on days 0-2, 2 per day on days 3-16,
+        // 1.5 per day on days 17-62, then 1 per day. Stage ends are 3, 16 and
+        // 63 days at ×1. Rates multiply by speed and stage lengths divide by
+        // it, then the high-speed spawn multiplier applies above ×20.
+        $speed = max(1, (int)getGameSpeed());
+        $scale = $speed * WorldSpeedProfile::adventureSpawnMultiplier($speed);
         return [
-            1 => ['time' => 4 * 86400 / $scale, 'rate' => 3 * $base],
-            2 => ['time' => 17 * 86400 / $scale, 'rate' => 2 * $base],
-            3 => ['time' => 63 * 86400 / $scale, 'rate' => 1.5 * $base],
-            4 => ['time' => 1000 * 86400, 'rate' => 1 * $base],
+            1 => ['time' => 3 * 86400 / $scale, 'rate' => 3 * $scale],
+            2 => ['time' => 16 * 86400 / $scale, 'rate' => 2 * $scale],
+            3 => ['time' => 63 * 86400 / $scale, 'rate' => 1.5 * $scale],
+            4 => ['time' => 1000 * 86400, 'rate' => 1 * $scale],
         ];
     }
 
     public function addAdventure(int $uid, int &$adventure_id, int $created, bool $bought = false, ?bool $hard = null): bool
     {
         $db = DB::getInstance();
-        $mainKid = (int) $db->fetchScalar("SELECT kid FROM hero WHERE uid=$uid");
-        if ((int) $db->fetchScalar("SELECT heroMansion FROM fdata WHERE kid=$mainKid") <= 0) {
-            $mainKid = (int) $db->fetchScalar("SELECT kid FROM vdata WHERE owner=$uid AND (capital=1 OR ((SELECT heroMansion FROM fdata WHERE kid=vdata.kid) > 0)) ORDER BY RAND() LIMIT 1");
-        }
+        $mainKid = (int) $db->fetchScalar(
+            "SELECT v.kid FROM vdata v INNER JOIN fdata f ON f.kid=v.kid WHERE v.owner=$uid AND (v.capital=1 OR f.heroMansion>0) ORDER BY RAND() LIMIT 1"
+        );
         if (!$mainKid) {
             return false;
         }

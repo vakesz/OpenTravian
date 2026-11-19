@@ -19,6 +19,7 @@ final class FinishConstruction
 {
     private const RESIDENCE_GID = 25;
     private const PALACE_GID = 26;
+    private const COMMAND_CENTER_GID = 44;
 
     private function __construct()
     {
@@ -40,7 +41,7 @@ final class FinishConstruction
 
     public static function canFinishWithGold(int $buildingGid, bool $isWorldWonder): bool
     {
-        if ($isWorldWonder || $buildingGid === 40) {
+        if ($isWorldWonder || $buildingGid === 40 || $buildingGid === self::COMMAND_CENTER_GID) {
             return false;
         }
         if (!in_array($buildingGid, [self::RESIDENCE_GID, self::PALACE_GID], true)) {
@@ -64,7 +65,8 @@ final class FinishConstruction
         if ($isWorldWonder) {
             return false;
         }
-        if ($hasResearch || $hasDemolition) {
+        // Article 36: Finish now is construction and research. A demolition keeps its own timer.
+        if ($hasResearch) {
             return true;
         }
         foreach ($buildingGids as $buildingGid) {

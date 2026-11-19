@@ -24,8 +24,8 @@ foreach ([7 => 100, 8 => 400, 9 => 1600] as $type => $expected) {
     }
 }
 
-// Gelding, Thoroughbred and Warhorse: 14, 20 and 26 speed, a step of 6 per tier.
-foreach ([103 => 14, 104 => 20, 105 => 26] as $type => $expected) {
+// Gelding, Thoroughbred and Warhorse: 14, 17 and 20 fields per hour at x1.
+foreach ([103 => 14, 104 => 17, 105 => 20] as $type => $expected) {
     $speed = $items->getHeroItemProperties(6, $type)['speed_horse'] ?? null;
     if ($speed !== $expected) {
         failHeroItemValuesContract("Horse item {$type} must give {$expected} speed, got " . var_export($speed, true) . '.');

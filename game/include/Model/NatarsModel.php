@@ -87,9 +87,6 @@ class NatarsModel
             14 => [1 => 25, 197, 46, 0, 138, 143, 60, 18, 0, 0, 0],
         ];
         foreach ($wave_arr as $waveNumber => $units) {
-            if ($waveNumber > 11) {
-                continue;
-            }
             $units = array_map(static fn (int $x): int => (int) round($x * $multiplier), $units);
             $time = WorldSpeedProfile::natarNewVillageTravelTime((int) getGameSpeed());
             $increase = intdiv($waveNumber - 1, 3);

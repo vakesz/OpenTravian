@@ -199,11 +199,73 @@ final class WorldSpeedProfile
         return $speed >= 5000 ? 6 * 3600 : 12 * 3600;
     }
 
-    public static function protectionTime(int $speed): int
+    /**
+     * Beginner protection, basic window then the one optional extension.
+     *
+     * Legends articles 12 and 20: 5+3, 3+3, 3+3, 2+2 and 1+1 days at ×1, ×2,
+     * ×3, ×5 and ×10. Speeds between those marks are interpolated. Above ×10
+     * both parts shrink from the ×10 length of one day (1 day × 10 / speed).
+     * The 3-hour floor applies only once that scaling would go shorter, so
+     * ordinary speeds keep the published lengths.
+     *
+     * @return array{0:int,1:int}
+     */
+    public static function protectionParts(int $speed): array
     {
         $speed = self::speed($speed);
-        // Product decision 2026-11-04: never shorter than 3 hours, including
-        // extreme configured speeds (1_000_000×).
+        $day = 86400;
+        $floor = 3 * 3600;
+        $anchors = [
+            1 => [5 * $day, 3 * $day],
+            2 => [3 * $day, 3 * $day],
+            3 => [3 * $day, 3 * $day],
+            5 => [2 * $day, 2 * $day],
+            10 => [$day, $day],
+        ];
+        if (isset($anchors[$speed])) {
+            return $anchors[$speed];
+        }
+        if ($speed < 10) {
+            $previous = 1;
+            $next = 10;
+            foreach (array_keys($anchors) as $mark) {
+                if ($mark <= $speed) {
+                    $previous = $mark;
+                }
+                if ($mark >= $speed) {
+                    $next = $mark;
+                    break;
+                }
+            }
+            $span = $next - $previous;
+            $weight = $span === 0 ? 0.0 : ($speed - $previous) / $span;
+            $basic = (int)round($anchors[$previous][0] + ($anchors[$next][0] - $anchors[$previous][0]) * $weight);
+            $extend = (int)round($anchors[$previous][1] + ($anchors[$next][1] - $anchors[$previous][1]) * $weight);
+
+            return [$basic, $extend];
+        }
+
+        $scaled = (int)round($day * 10 / $speed);
+
+        return [max($scaled, $floor), max($scaled, $floor)];
+    }
+
+    /** Basic protection plus the one optional extension, in seconds. */
+    public static function protectionTime(int $speed): int
+    {
+        [$basic, $extend] = self::protectionParts($speed);
+
+        return $basic + $extend;
+    }
+
+    /**
+     * The protection total written before the Legends schedule. Boot replaces
+     * this exact value so an unedited world picks up the new lengths, and a
+     * different saved value stays an operator override.
+     */
+    public static function legacyProtectionTime(int $speed): int
+    {
+        $speed = self::speed($speed);
         $minimum = 3 * 3600;
         if ($speed <= 20) {
             return $minimum;
@@ -246,7 +308,9 @@ final class WorldSpeedProfile
             return 24 * 3600;
         }
 
-        return self::protectionTime($speed);
+        // The ×10 window is one day. Faster worlds shrink it with speed and
+        // never spawn the first animals in under ten minutes.
+        return max((int)round(86400 * 10 / $speed), 10 * 60);
     }
 
     /**
@@ -262,10 +326,26 @@ final class WorldSpeedProfile
     }
 
     /**
-     * Neutral oases remain bounded. The 100x local profile reaches 75 animals,
-     * rather than the old fixed cap of 15 or an unbounded speed-derived value.
+     * How many animals a neutral oasis may hold. A 1× oasis keeps a small
+     * group of 15. The group then grows with economic speed (30 at 2×, 150 at
+     * 10×, 1_500 at 100×). Above 100× it keeps rising with the square root
+     * and stops at 100_000, so an extreme world is still larger.
      */
     public static function oasisAnimalCap(int $speed, float $movementSpeed): int
+    {
+        $speed = self::speed($speed);
+        if ($speed <= 100) {
+            return 15 * $speed;
+        }
+
+        return min(100_000, (int)round(1500 * sqrt($speed / 100)));
+    }
+
+    /**
+     * The oasis cap written before the speed-scaled schedule. Boot replaces
+     * this exact value. A different saved cap stays an operator override.
+     */
+    public static function legacyOasisAnimalCap(int $speed, float $movementSpeed): int
     {
         if (self::speed($speed) <= 20) {
             return 15;

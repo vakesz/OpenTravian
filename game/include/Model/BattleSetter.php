@@ -84,6 +84,7 @@ class BattleSetter
     public function is_great_celebration_running(int|string $kid): bool
     {
         $kid = (int) $kid;
+        \Core\Village::promoteStoredCelebration((int) $kid);
         $village = $this->fetchRow("SELECT celebration, type FROM vdata WHERE kid=$kid");
 
         return $village !== null && (int) $village['celebration'] > time() && (int) $village['type'] === 2;
@@ -308,32 +309,11 @@ class BattleSetter
     }
 
     /**
-     * Local siege rule above 50x (docs/world-speed.md): rams and catapults do nothing when under 33% of the
-     * defenders die, and a lost attack keeps 0.3-1.5% of its damage. Battles and the Rally Point simulator apply it.
+     * Rams and catapults keep their Legends damage at every world speed.
+     * The parameters stay so battles and the simulator share one call.
      */
     public function fixSpeedCataRamEffect(int|float $value, int|float $off_losses, int|float $def_losses): int|float
     {
-        if (getGameSpeed() <= 50) {
-            return $value;
-        }
-        if ($def_losses > 0) {
-            if ($off_losses == 1) {
-                if ($def_losses < 0.5) {
-                    $value *= 0.003;
-                } else if ($def_losses < 0.6) {
-                    $value *= 0.005;
-                } else if ($def_losses < 0.7) {
-                    $value *= 0.008;
-                } else if ($def_losses < 0.8) {
-                    $value *= 0.01;
-                } else if ($def_losses < 0.9) {
-                    $value *= 0.015;
-                }
-            }
-            if ($def_losses < 0.33) {
-                $value = 0;
-            }
-        }
         return $value;
     }
 

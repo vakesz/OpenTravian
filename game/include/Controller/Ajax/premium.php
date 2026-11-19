@@ -405,6 +405,7 @@ class premium extends AjaxBase
             return;
         }
 
+        $speed = max(1, (int)getGameSpeed());
         $modifier = $config->extraSettings->buyAnimal['packages'][$packageId]['modifier'];
         $rate = Config::getProperty("game", "useNanoseconds") ? 1e9 : (Config::getProperty("game", "useMilSeconds") ? 1e3 : 1);
         $model = new BattleSetter();
@@ -412,7 +413,14 @@ class premium extends AjaxBase
 
         $legionaire = Formulas::$data['units'][0][0];
         $legionaire_id = nrToUnitId(1, 1);
-        $legionaire_train =  round(($modifier * 3600 * $rate) / Formulas::uTrainingTime($legionaire_id, 20));
+        $train = (int)Formulas::uTrainingTime($legionaire_id, 20);
+        $oneSecond = (int)$rate;
+        // Training time already divides by speed, so the herd grows with the world.
+        // Once that time is floored at one second, keep multiplying by speed.
+        $legionaire_train = (int)round(($modifier * 3600 * $rate) / max(1, $train));
+        if ($train <= $oneSecond) {
+            $legionaire_train *= $speed;
+        }
         $legionaire_def = $model->stat_with_upg($legionaire['def_i'], $legionaire['cu'], 1) + $model->stat_with_upg($legionaire['def_c'], $legionaire['cu'], 1);
         $baseLineDef = ($legionaire_train * $legionaire_def) / 10;
 
@@ -725,13 +733,11 @@ class premium extends AjaxBase
             $this->response['message'] = T('inGame', 'bannedSmallPage');
             return;
         }
-        if ($session->getTotalPopulation() < 40 || !$village->hasMarketPlace() || $village->isWW()) {
+        if (!$village->hasMarketPlace() || $village->isWW()) {
             $this->response['error'] = true;
             $this->response['message'] = $village->isWW()
                 ? T('npc', 'disabled_in_ww')
-                : T('GoldHelper', $session->getTotalPopulation() < 40
-                    ? 'exchangeResources.error_low_pop'
-                    : 'exchangeResources.error_no_marketplace');
+                : T('GoldHelper', 'exchangeResources.error_no_marketplace');
             return;
         }
 

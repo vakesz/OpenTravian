@@ -620,6 +620,6 @@ class Simulator
      */
     private function lone_dies($offense, $pop_ratio): bool
     {
-        return round($offense['t'] * $this->battle->common_morale($pop_ratio)) <= BattleModel::LONE_ATTACKER_THRESHOLD;
+        return $offense['t'] < BattleModel::LONE_ATTACKER_THRESHOLD;
     }
 }

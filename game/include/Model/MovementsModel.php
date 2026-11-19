@@ -20,6 +20,19 @@ class MovementsModel
     public const ATTACKTYPE_SETTLERS = 5;
     public const ATTACKTYPE_EVASION = 6;
     public const ATTACKTYPE_ADVENTURE = 7;
+    public const OUTGOING_CAP = 20000;
+
+    /** Attacks, raids, adventures and reinforcements already outside this account. */
+    public static function accountOutgoingTroops(int $uid): int
+    {
+        $sum = DB::getInstance()->fetchScalar(
+            "SELECT COALESCE(SUM(m.u1+m.u2+m.u3+m.u4+m.u5+m.u6+m.u7+m.u8+m.u9+m.u10+m.u11),0)
+             FROM movement m INNER JOIN vdata v ON v.kid=m.kid
+             WHERE v.owner=$uid AND m.mode=0"
+        );
+
+        return (int)$sum;
+    }
 
     /**
      * Queues a movement and returns its id (0 when the insert failed).

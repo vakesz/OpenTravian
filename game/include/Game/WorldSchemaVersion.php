@@ -10,5 +10,5 @@ namespace Game;
  */
 final class WorldSchemaVersion
 {
-    public const CURRENT = 110;
+    public const CURRENT = 112;
 }

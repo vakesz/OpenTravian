@@ -51,13 +51,13 @@ final class PremiumDuration
             throw new InvalidArgumentException('World speed must be at least 1.');
         }
 
-        if ($speed === 1) {
-            return 7 * self::DAY_SECONDS;
+        // The same curve as Plus, at every speed. The local default remains
+        // available to callers that still pass one; the speed curve wins.
+        if ($localDefaultSeconds < 0) {
+            throw new InvalidArgumentException('A local duration cannot be negative.');
         }
 
-        return WorldSpeedProfile::isOfficialLegendsSpeed($speed)
-            ? 3 * self::DAY_SECONDS
-            : self::atLeastOneDay($localDefaultSeconds);
+        return self::plusDefault($speed);
     }
 
     public static function configuredDuration(int $speed, int $overrideSeconds, int $localDefaultSeconds): int

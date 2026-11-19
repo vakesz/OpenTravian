@@ -844,10 +844,13 @@ HTML;
                 $this->redirect("/options/vacation");
             }
             $auction = $m->getAuctionBySecureId($_REQUEST['a']);
-            if ($auction === false || $auction['uid'] == $session->getPlayerId()) {
+            $visibleAt = is_array($auction) ? (int) ($auction['visible'] ?? 0) : 0;
+            if ($auction === false || $auction['uid'] == $session->getPlayerId() || ($visibleAt > 0 && $visibleAt > time())) {
                 $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionNotFound") . '</div>';
             } elseif ($auction['finish'] || $auction['time'] < time()) {
                 $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionFinished") . '</div>';
+            } elseif ($m->isBidLocked((int) $session->getPlayerId(), (int) $auction['id'])) {
+                $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
             } else {
                 $quest = Quest::getInstance();
                 $quest->setQuestBitwise("battle", 9, 1);
@@ -858,7 +861,13 @@ HTML;
                 }
                 $max = $auction['activeUid'] == $session->getPlayerId() ? $auction['silver'] : max($auction['maxSilver'], $auction['silver']);
                 $bidSilver = abs((int)($_REQUEST['bidAmount'] ?? 0));
-                if ($current_silver < $bidSilver && $auction['activeUid'] != $session->getPlayerId()) {
+                $currentPrice = max(1, (int) $auction['silver']);
+                if ((int) $auction['activeUid'] !== 0
+                    && (int) $auction['activeUid'] !== (int) $session->getPlayerId()
+                    && $bidSilver > $currentPrice * AuctionModel::LARGE_BID_MULTIPLE) {
+                    $m->lockOutBidder((int) $session->getPlayerId(), (int) $auction['id']);
+                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
+                } elseif ($current_silver < $bidSilver && $auction['activeUid'] != $session->getPlayerId()) {
                     $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
                 } elseif ($auction['activeUid'] == $session->getPlayerId() && ($current_silver + $auction['maxSilver']) < $bidSilver) {
                     $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
@@ -1028,6 +1037,30 @@ HTML;
         $packages = heroAuction::getPackagesForItem((int)$item['btype'], (int)$item['type']);
         if (!in_array($amount, $packages, true) || $amount > (int)$item['num']) {
             return str_replace('[MIN_AMOUNT]', (string)min($packages), (string)T('Auction', 'Not enough items available for auction ([MIN_AMOUNT] items)'));
+        }
+        if ((int)$item['btype'] === 6) {
+            $horses = (int)$db->fetchScalar('SELECT COALESCE(SUM(num),0) FROM items WHERE uid=' . (int)$session->getPlayerId() . ' AND btype=6');
+            if ($horses - $amount < 1) {
+                return (string)T('Auction', 'You cannot sell your last horse.', 'You cannot sell your last horse.');
+            }
+            if ((int)$item['type'] === 103) {
+                $silver = 100 * $amount;
+                if (!$db->begin_transaction()) {
+                    return (string)T('Auction', 'AuctionNotFound');
+                }
+                $sold = $m->getItemFromUser($item['id'], $item['num'], $amount)
+                    && $db->run('UPDATE users SET silver=silver+? WHERE id=?', [$silver, $session->getPlayerId()]);
+                if ($sold && $db->commit()) {
+                    Quest::getInstance()->setQuestBitwise('battle', 9, 1);
+
+                    return null;
+                }
+                if ($db->inTransaction()) {
+                    $db->rollback();
+                }
+
+                return (string)T('Auction', 'AuctionNotFound');
+            }
         }
         if (!$db->begin_transaction()) {
             return (string)T('Auction', 'AuctionNotFound');
