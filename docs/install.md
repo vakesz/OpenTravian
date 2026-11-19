@@ -78,6 +78,7 @@ Every option of the wizard's Advanced install has a variable, so a headless inst
 | `TRAVIAN_INSTALL_RULE_FAKE_AUCTIONS` | System-generated auctions | `1` or `0` |
 | `TRAVIAN_INSTALL_RULE_STARVATION` | Troops starve without crop | `1` or `0` |
 | `TRAVIAN_INSTALL_RULE_SPEED_SHORTCUTS` | Speed-world shortcuts (suggested from x100): upgrade to max level, train maximum, Smithy gold max | `1` or `0` |
+| `TRAVIAN_INSTALL_RULE_BUY_ANIMALS` | Buy oasis animals with gold (the herd grows with world speed) | `1` or `0` |
 | `TRAVIAN_INSTALL_RULE_UPGRADE_TO_MAX_LEVEL_GOLD` | Building: gold to upgrade instantly to max level | 1 to 10000 |
 | `TRAVIAN_INSTALL_RULE_SMITHY_MAX_LEVEL_GOLD` | Smithy: gold to upgrade one unit to max level | 1 to 10000 |
 | `TRAVIAN_INSTALL_RULE_SMITHY_UPGRADE_ALL_TO_MAX_GOLD` | Smithy: gold to upgrade all units to max level | 1 to 10000 |

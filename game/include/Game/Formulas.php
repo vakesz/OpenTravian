@@ -3313,7 +3313,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
                             'time' => 77550,
                             'cap' => 0,
                             'type' => 'i',
-                            'loyality' => [15, 30],
+                            'loyality' => [20, 25],
                             'race' => 7,
                             'breq' => [16 => 10, 22 => 20],
                         ],
@@ -4424,7 +4424,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         // Main Building scaling. This mirrors the official building calculator,
         // including the two ten-second rounding steps at every published speed.
         if ($gid == 40) {
-            return max(1, $rate <= 10 ? round10($time) : round($time));
+            return max(1, round10(round10($time) / 2));
         }
 
         // The official calculator displays ordinary construction rounded to

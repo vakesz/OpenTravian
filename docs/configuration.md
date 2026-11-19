@@ -54,6 +54,7 @@ Set these in `.env` (Compose reads it automatically); `config/bootstrap-env.sh` 
 | `TRAVIAN_INSTALL_RULE_FAKE_AUCTIONS` | Advanced | unset | Headless install: System-generated auctions; accepted values in [install.md](install.md#world-rules-and-speed-profile) |
 | `TRAVIAN_INSTALL_RULE_STARVATION` | Advanced | unset | Headless install: Troops starve without crop; accepted values in [install.md](install.md#world-rules-and-speed-profile) |
 | `TRAVIAN_INSTALL_RULE_SPEED_SHORTCUTS` | Advanced | unset | Headless install: Speed-world shortcuts (suggested from x100): upgrade to max level, train maximum, Smithy gold max; accepted values in [install.md](install.md#world-rules-and-speed-profile) |
+| `TRAVIAN_INSTALL_RULE_BUY_ANIMALS` | Advanced | unset | Headless install: Buy oasis animals with gold (the herd grows with world speed); accepted values in [install.md](install.md#world-rules-and-speed-profile) |
 | `TRAVIAN_INSTALL_RULE_UPGRADE_TO_MAX_LEVEL_GOLD` | Advanced | unset | Headless install: Building: gold to upgrade instantly to max level; accepted values in [install.md](install.md#world-rules-and-speed-profile) |
 | `TRAVIAN_INSTALL_RULE_SMITHY_MAX_LEVEL_GOLD` | Advanced | unset | Headless install: Smithy: gold to upgrade one unit to max level; accepted values in [install.md](install.md#world-rules-and-speed-profile) |
 | `TRAVIAN_INSTALL_RULE_SMITHY_UPGRADE_ALL_TO_MAX_GOLD` | Advanced | unset | Headless install: Smithy: gold to upgrade all units to max level; accepted values in [install.md](install.md#world-rules-and-speed-profile) |

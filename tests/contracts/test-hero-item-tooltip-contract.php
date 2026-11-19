@@ -43,8 +43,8 @@ foreach (['heroItemTooltip tier3 heroItemTooltipV1', 'Tier 3 Weapon', ' attack a
         failHeroItemTooltipContract("The Spartan weapon tooltip is missing: {$needle}");
     }
 }
-if (!str_contains($spartan, $isolate('+', '15', '')) || !str_contains($spartan, $isolate('+', '4000', ''))) {
-    failHeroItemTooltipContract('The Spartan weapon tooltip must list +15 and +4000.');
+if (!str_contains($spartan, $isolate('+', '24', '')) || !str_contains($spartan, $isolate('+', '6000', ''))) {
+    failHeroItemTooltipContract('The Spartan weapon tooltip must list +24 and +6000.');
 }
 
 // Consumables use the consumable tier, keep the reference's trailing space and add the equip and stack notes.

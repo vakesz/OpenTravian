@@ -91,10 +91,11 @@ try {
     $config->dynamic->serverFinished = 0;
     $now = miliseconds();
     $db->run('UPDATE users SET plus=?, last_login_time=?, last_owner_login_time=? WHERE id=?', [time() + 3600, time(), time(), $player['id']]);
+    // legendsCropGate subtracts hero crop from cropp, so leave plenty of free crop after that.
     $db->run(
         'UPDATE vdata
          SET wood=100000000, clay=100000000, iron=100000000, crop=100000000,
-             woodp=0, clayp=0, ironp=0, cropp=pop+10, upkeep=0,
+             woodp=0, clayp=0, ironp=0, cropp=pop+10000, upkeep=0,
              maxstore=200000000, maxcrop=200000000, lastmupdate=?, capital=1
          WHERE kid=?',
         [$now, $kid]

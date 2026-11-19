@@ -30,11 +30,14 @@ try {
     $attacker = fixtureVillageCreate();
     $pdo->run('UPDATE users SET name=? WHERE id=?', ['zzfxa' . getmypid(), $attacker['id']]);
     $defender = fixtureVillageCreate();
+    // A player's last village cannot be conquered; give the defender a spare.
+    $defenderSpare = fixtureVillageCreate();
+    $pdo->run('UPDATE vdata SET owner=?, capital=0 WHERE kid=?', [$defender['id'], $defenderSpare['kid']]);
 } catch (RuntimeException $exception) {
     echo "Conquer loyalty protection runtime passed (no fixture village: {$exception->getMessage()}).\n";
     exit(0);
 }
-foreach ([$attacker, $defender] as $fixture) {
+foreach ([$attacker, $defender, $defenderSpare] as $fixture) {
     $pdo->run('UPDATE wdata SET occupied=1 WHERE id=?', [$fixture['kid']]);
     register_shutdown_function(static fn () => DBI::getInstance()->run('UPDATE wdata SET occupied=0 WHERE id=?', [$fixture['kid']]));
 }

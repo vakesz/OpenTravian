@@ -37,15 +37,18 @@ $wave = static function (int $race, int $type, int $heroes = 1): array {
     ];
 };
 
-// Weapon set => [unit slot, bonus at each tier, unit id].
-$sets = [149 => [1, [3, 4, 5], 71], 152 => [3, [3, 4, 5], 73], 155 => [4, [3, 4, 5], 74], 158 => [5, [6, 8, 10], 75], 161 => [6, [9, 12, 15], 76]];
+// Weapon set => [unit slot, bonus at each tier, unit id]. Legends: +4/+6/+8 for
+// Hoplite, Shieldsman and Twinsteel; +8/+12/+16 and +12/+18/+24 for the cavalry
+// and crusher, with fighting strength 375 / 1500 / 6000.
+$sets = [149 => [1, [4, 6, 8], 71], 152 => [3, [4, 6, 8], 73], 155 => [4, [4, 6, 8], 74], 158 => [5, [8, 12, 16], 75], 161 => [6, [12, 18, 24], 76]];
+$heroPower = [375, 1500, 6000];
 foreach ($sets as $first => [$slot, $perTier, $unitId]) {
     foreach ($perTier as $tier => $expected) {
         $type = $first + $tier;
         $properties = (new HeroItems())->getHeroItemProperties(4, $type);
         if (($properties['unitId'] ?? null) !== $unitId || ($properties['unit_power'] ?? null) !== $expected
-            || ($properties['hero_power'] ?? null) !== [250, 1000, 4000][$tier]) {
-            $fail("Item {$type} must carry unit {$unitId}, bonus {$expected} and fighting strength " . [250, 1000, 4000][$tier] . '.');
+            || ($properties['hero_power'] ?? null) !== $heroPower[$tier]) {
+            $fail("Item {$type} must carry unit {$unitId}, bonus {$expected} and fighting strength {$heroPower[$tier]}.");
         }
         $spartan = $bonus->invoke($battle, $wave(8, $type));
         if ($spartan[$slot] !== $expected || array_sum($spartan) !== $expected) {
@@ -55,7 +58,7 @@ foreach ($sets as $first => [$slot, $perTier, $unitId]) {
         if (array_sum($bonus->invoke($battle, $wave(1, $type))) !== 0 || array_sum($bonus->invoke($battle, $wave(8, $type, 0))) !== 0) {
             $fail("Item {$type} must not add a unit bonus for another tribe or a missing hero.");
         }
-        if ((new HeroHelper())->calcItemPower(['btype' => 4, 'type' => $type], null, null) !== [250, 1000, 4000][$tier]) {
+        if ((new HeroHelper())->calcItemPower(['btype' => 4, 'type' => $type], null, null) !== $heroPower[$tier]) {
             $fail("Item {$type} must add its fighting strength to the hero.");
         }
     }

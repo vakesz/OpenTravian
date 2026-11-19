@@ -646,10 +646,12 @@ class AuctionModel
         }
 
         $now = time();
+        // System listings are visible at once. Player sales wait out the random delay.
+        $visible = ($isSystem || $uid === 0) ? 0 : self::listingVisibleAt($now);
 
         return (bool) DB::getInstance()->run(
             'INSERT INTO auction (uid, btype, type, num, silver, maxSilver, secure_id, time, created, visible) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)',
-            [$uid, $btype, $type, $num, $silver, sha1(microtime()), $time, $now, self::listingVisibleAt($now)]
+            [$uid, $btype, $type, $num, $silver, sha1(microtime()), $time, $now, $visible]
         );
     }
 

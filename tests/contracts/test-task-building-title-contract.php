@@ -24,7 +24,7 @@ foreach ([
     '9 => 50,',
     'u.race AS player_race',
     "T('Buildings', \$imageGid . '.title', \$fallbackLabel)",
-    "count(\$gids) === 1 ? 'building-' . \$gids[0] : 'building-city-wall'",
+    "count(\$gids) === 1 || !in_array(31, \$gids, true) ? 'building-' . \$gids[0] : 'building-city-wall'",
 ] as $needle) {
     if (!str_contains($source, $needle)) {
         failTaskBuildingTitleContract('Task building labels must use each tribe\'s actual defensive building without changing existing claim keys.');

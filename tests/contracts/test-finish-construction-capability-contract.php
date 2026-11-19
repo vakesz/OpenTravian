@@ -172,7 +172,7 @@ $eligibleMutationSkip = $eligibleMutationGuard === false
     : strpos($goldHelper, 'continue;', $eligibleMutationGuard);
 $noEligibleOrders = $finishStart === false
     ? false
-    : strpos($goldHelper, 'if ($buildings === [] && $researchRows === [] && $demolitionRows === [])', $finishStart);
+    : strpos($goldHelper, 'if ($buildings === [] && $researchRows === [])', $finishStart);
 $goldDebit = $finishStart === false
     ? false
     : strpos($goldHelper, 'self::decreaseGold($uid, $cost, true)', $finishStart);
@@ -187,7 +187,8 @@ expectFinishConstructionCapability(
         && $goldDebit !== false
         && $eligibleMutationGuard < $eligibleMutationSkip
         && $eligibleMutationSkip < $noEligibleOrders
-        && $noEligibleOrders < $goldDebit,
+        && $noEligibleOrders < $goldDebit
+        && !str_contains(substr($goldHelper, $finishStart, $goldDebit - $finishStart), '$demolitionRows'),
     'The gold mutation must skip disabled Palace/Residence orders and return noOrders before any debit.'
 );
 expectFinishConstructionCapability(
