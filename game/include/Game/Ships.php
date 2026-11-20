@@ -29,7 +29,7 @@ final class Ships
     public const TRAINING_NR_OFFSET = 100;
 
     /** Harbor building gid. */
-    public const HARBOR_GID = 49;
+    public const HARBOR_GID = Gid::HARBOR;
 
     /** Ships allowed by Harbor level 1..20 (Knowledge Base building data). */
     private const CAP_BY_LEVEL = [

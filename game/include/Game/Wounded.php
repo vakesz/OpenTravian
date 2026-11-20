@@ -25,8 +25,8 @@ use Core\Database\DB;
  */
 final class Wounded
 {
-    public const HOSPITAL = 46;
-    public const ASCLEPEION = 48;
+    public const HOSPITAL = Gid::HOSPITAL;
+    public const ASCLEPEION = Gid::ASCLEPEION;
     public const HOSPITAL_SHARE = 0.4;
     public const ASCLEPEION_SHARE = 0.6;
     public const DECAY_PER_DAY = 0.9;

@@ -26,7 +26,7 @@ foreach ([$inventory, $model, $ctrl, $template, $heroItems] as $source) {
     }
 }
 
-if (!str_contains($inventory, 'ITEM_BTYPE = 16')
+if (!str_contains($inventory, 'ITEM_BTYPE = ItemBtype::RESOURCES')
     || !str_contains($inventory, '145')
     || !str_contains($inventory, 'function syncInventoryItems')) {
     failHeroResourceItemsContract('HeroResourceInventory must define btype 16 item145–148 sync.');

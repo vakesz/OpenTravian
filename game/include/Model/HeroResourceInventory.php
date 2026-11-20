@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\Hero\ItemBtype;
 use Game\ResourcesHelper;
 
 /**
@@ -30,7 +31,7 @@ final class HeroResourceInventory
     ];
 
     /** Dedicated btype so use/move treat stacks as bag consumables (btype ≥ 10). */
-    public const ITEM_BTYPE = 16;
+    public const ITEM_BTYPE = ItemBtype::RESOURCES;
 
     /**
      * @param array<string, int|float|string> $resources

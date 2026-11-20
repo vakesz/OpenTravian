@@ -14,7 +14,7 @@ class Formulas
 {
     /** Buildings lost when a village changes hands: walls, trapper, brewery, trough, command center, waterworks, hospital and asclepeion. */
     /** City wall equivalents, one per tribe (Natars use the Roman wall). */
-    const WALL_BUILDINGS = [31, 32, 33, 42, 43, 47, 50];
+    const WALL_BUILDINGS = Gid::WALLS;
     /** Defence bonus per wall level by tribe id: the battle engine, the simulator and the wall benefit all read this. */
     const WALL_BASE = [1 => 1.03, 2 => 1.02, 3 => 1.025, 4 => 1, 5 => 1.03, 6 => 1.025, 7 => 1.015, 8 => 1.02, 9 => 1.015];
     const TRIBE_SPECIFIC_BUILDINGS = [31, 32, 33, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 50];
