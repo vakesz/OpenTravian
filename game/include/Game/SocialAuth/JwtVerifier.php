@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Game\SocialAuth;
 
+use Core\Time;
+
 /**
  * Verifies RS256 OpenID Connect id_tokens against a provider JWKS: signature,
  * issuer, audience, expiry, issued-at and nonce. Any other algorithm
@@ -11,7 +13,7 @@ namespace Game\SocialAuth;
  */
 final class JwtVerifier
 {
-    private const LEEWAY = 60;
+    private const LEEWAY = Time::MINUTE;
     private const MAX_TOKEN_LENGTH = 16384;
 
     public function __construct(private readonly JwksCache $jwks, private readonly \Closure $clock)

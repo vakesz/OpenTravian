@@ -7,6 +7,7 @@ namespace Core\Jobs;
 use Core\Automation;
 use Core\Database\DB;
 use Core\Mail\QueueWorker;
+use Core\Time;
 use Game\Mail\Reminders;
 use Game\Webhook\QueueWorker as WebhookQueueWorker;
 use Model\AdventureModel;
@@ -102,7 +103,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'setUpNewServer'];
-            $jobs[] = new Job('gameProgress:setUpNewServer', 60, $job);
+            $jobs[] = new Job('gameProgress:setUpNewServer', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'boughtGoldMessage'];
@@ -141,7 +142,7 @@ class Launcher
         }
         {
             $job = [new AutoExtendModel(), 'processAutoExtend'];
-            $jobs[] = new Job('generalProgress:autoExtend', 60, $job);
+            $jobs[] = new Job('generalProgress:autoExtend', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'updateFoolArtifact'];
@@ -157,11 +158,11 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'deleteOasisComplete'];
-            $jobs[] = new Job('loyaltyAndCulturePoint:deleteOasisComplete', 60, $job);
+            $jobs[] = new Job('loyaltyAndCulturePoint:deleteOasisComplete', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'handleAllianceBonusTasks'];
-            $jobs[] = new Job('gameProgress:allianceBonus', 60, $job);
+            $jobs[] = new Job('gameProgress:allianceBonus', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'zeroPopVillages'];
@@ -207,7 +208,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'pruneAuditLog'];
-            $jobs[] = new Job('mayExitJobs:pruneAuditLog', 3600, $job);
+            $jobs[] = new Job('mayExitJobs:pruneAuditLog', Time::HOUR, $job);
         }
         {
             $job = static function () {

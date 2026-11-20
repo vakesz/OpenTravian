@@ -5,8 +5,12 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Database\GlobalDB;
 use Core\Helper\TimezoneHelper;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\PremiumDuration;
+use Game\Unit;
+use Game\UserId;
 use Model\ArtefactsModel;
 use Model\SummaryModel;
 use Model\WonderOfTheWorldModel;
@@ -64,8 +68,8 @@ class ConfigurationDetailsCtrl
             TimezoneHelper::autoDateString($config->game->start_time, true));
         $this->addInfo($params['content'],
             'Round age/length',
-            round(getGameElapsedSeconds() / 86400,
-                1) . '/' . round(($config->timers->wwPlansReleaseTime - $config->game->start_time) / 86400,
+            round(getGameElapsedSeconds() / Time::DAY,
+                1) . '/' . round(($config->timers->wwPlansReleaseTime - $config->game->start_time) / Time::DAY,
                 1) . ' day(s)');
         $this->addInfo($params['content'], 'Round length (by natars)', round(getGame("round_length"), 2) . ' day(s)');
         $this->addInfo($params['content'],
@@ -89,7 +93,7 @@ class ConfigurationDetailsCtrl
 
         $this->addInfo($params['content'], 'Daily quest interval', $config->game->dailyQuestInterval);
 
-        $this->addInfo($params['content'], 'Protection hours', getGame("protection_time") / 3600);
+        $this->addInfo($params['content'], 'Protection hours', getGame("protection_time") / Time::HOUR);
         if (!ArtefactsModel::artifactsReleased()) {
             $this->addInfo($params['content'],
                 'Artifacts Release',
@@ -216,7 +220,7 @@ class ConfigurationDetailsCtrl
         }
         $this->addInfo($params['content'],
             'Gift/Bought gold',
-            $db->fetchScalar('SELECT CONCAT((SELECT COALESCE(SUM(gift_gold), 0) FROM users WHERE access!=3 AND id>2), "/", (SELECT COALESCE(SUM(bought_gold), 0) FROM users WHERE access!=3 AND id>2))'));
+            $db->fetchScalar('SELECT CONCAT((SELECT COALESCE(SUM(gift_gold), 0) FROM users WHERE access!=' . AccessLevel::FAKE_USER . ' AND id>' . UserId::LAST_SYSTEM . '), "/", (SELECT COALESCE(SUM(bought_gold), 0) FROM users WHERE access!=' . AccessLevel::FAKE_USER . ' AND id>' . UserId::LAST_SYSTEM . '))'));
 
         $status = \Core\Jobs\EngineHeartbeat::status()['text'];
         $this->addInfo($params['content'], 'Engine status', $status);
@@ -543,10 +547,10 @@ class ConfigurationDetailsCtrl
         $boostOverride = (int)($config->dynamic->productionBoostDurationSeconds ?? 0);
         $plusHours = is_string($_POST['plusDurationHours'] ?? null)
             ? $_POST['plusDurationHours']
-            : (string)(int)ceil($plusOverride / 3600);
+            : (string)(int)ceil($plusOverride / Time::HOUR);
         $boostHours = is_string($_POST['productionBoostDurationHours'] ?? null)
             ? $_POST['productionBoostDurationHours']
-            : (string)(int)ceil($boostOverride / 3600);
+            : (string)(int)ceil($boostOverride / Time::HOUR);
         $html = '<form method="post" action="admin.php?action=configurationDetails" class="adminInline">'
             . \Core\Session::getCheckerInput()
             . '<label>OpenTravian Plus (hours) <input type="number" name="plusDurationHours" min="0" max="8760" step="1" value="'
@@ -555,8 +559,8 @@ class ConfigurationDetailsCtrl
             . \Game\AdminUi::esc($boostHours) . '"></label> '
             . \Game\AdminUi::button('Save', 'green', ['name' => 'savePremiumDurations', 'value' => '1'])
             . '</form><small>0 uses the speed-based default: Plus lasts 7 days at x1, 3 days from x2 through x10 and 3 days x 10 / speed above x10; the resource bonus keeps 3 days at x2, x3, x5 and x10 and its local duration at other speeds. A bonus never lasts less than one day: an override of 1 to 23 hours is saved as 24 hours, and so are quest rewards. Current effective durations: Plus '
-            . (int)ceil($config->gold->plusAccountDurationSeconds / 3600) . ' hours; resource bonus '
-            . (int)ceil($config->gold->productionBoostDurationSeconds / 3600) . ' hours.</small>';
+            . (int)ceil($config->gold->plusAccountDurationSeconds / Time::HOUR) . ' hours; resource bonus '
+            . (int)ceil($config->gold->productionBoostDurationSeconds / Time::HOUR) . ' hours.</small>';
         if ($this->premiumDurationError !== null) {
             $html .= \Game\AdminUi::notice($this->premiumDurationError, 'error');
         }
@@ -602,11 +606,11 @@ class ConfigurationDetailsCtrl
             $result = $db->query($this->getTroopsStatisticsQuery())->fetch_assoc();
             $Troops = [];
             for ($race = 1; $race <= $maxRace; ++$race) {
-                for ($nr = 1; $nr <= 11; ++$nr) {
+                for ($nr = 1; $nr <= Unit::LAST; ++$nr) {
                     $Troops[$race][$nr] = $result["u{$race}_{$nr}"];
                 }
             }
-            $cache->set("TroopsSummary", $Troops, 6 * 3600);
+            $cache->set("TroopsSummary", $Troops, 6 * Time::HOUR);
         }
         $dispatcher = Dispatcher::getInstance();
         $dispatcher->appendContent('<br/><br/><div class="center"><div>');

@@ -41,7 +41,7 @@ if (!preg_match('/CREATE TABLE `player_accusation` \((.*?)\) ENGINE/s', $schema,
 }
 
 $ajax = $read('game/include/Controller/Ajax/player/accuse.php');
-foreach (['isSitter()', 'banned()', 'remainingToday($reporter) === 0', '->file($reporter, $uid, $reason, $message)', '$uid <= 2', '$uid === $reporter'] as $needle) {
+foreach (['isSitter()', 'banned()', 'remainingToday($reporter) === 0', '->file($reporter, $uid, $reason, $message)', '$uid <= UserId::LAST_SYSTEM', '$uid === $reporter'] as $needle) {
     if (!str_contains($ajax, $needle)) {
         failPlayerAccusationContract("The report endpoint must guard {$needle}.");
     }

@@ -11,6 +11,7 @@ if ($source === false) {
     fwrite(STDERR, "Cannot read EngineHeartbeat.\n");
     exit(1);
 }
+require_once $root . '/game/include/Core/Time.php';
 require_once $root . '/game/include/Core/Jobs/EngineHeartbeat.php';
 
 use Core\Jobs\EngineHeartbeat;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Core\Database;
 
+use Core\Time;
+
 /**
  * The backups in a directory. A backup is a set of files sharing one stamp: the world dump
  * backup-<ms>-<random>.sql.gz, its -account sibling and, when a state passphrase is set, the
@@ -109,7 +111,7 @@ final class BackupSets
 
         return [
             'name' => $name,
-            'time' => intdiv((int) $match[1], 1000),
+            'time' => intdiv((int) $match[1], Time::SECOND_MS),
             'world' => $world,
             'account' => is_file($account) ? $account : null,
             'state' => is_file($state) ? $state : null,

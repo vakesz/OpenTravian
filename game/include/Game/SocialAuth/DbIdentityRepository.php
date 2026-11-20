@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\SocialAuth;
 
 use Core\Database\DBI;
+use Game\AccessLevel;
 
 /** Backed by the world database table account_oauth_identity (see database/world.sql, phase B). */
 final class DbIdentityRepository implements IdentityRepository
@@ -58,7 +59,7 @@ final class DbIdentityRepository implements IdentityRepository
         $db = DBI::getInstance();
         $row = $db->fetchSingleRow('SELECT id, name, password, access FROM users WHERE id=? LIMIT 1', [$userId]);
         // access=0 is a banned account (Session::banned()); a queued deletion must not log in either.
-        if (!is_array($row) || (int) $row['access'] === 0
+        if (!is_array($row) || (int) $row['access'] === AccessLevel::BANNED
             || (int) $db->fetchScalar('SELECT COUNT(uid) FROM deleting WHERE uid=?', [$userId], 0) > 0) {
             return null;
         }

@@ -2,6 +2,7 @@
 
 use Core\Database\DB;
 use Core\Helper\WebService;
+use Game\Hero\ItemBtype;
 use Model\AuctionModel;
 
 class HeroAddItemCtrl
@@ -138,7 +139,7 @@ class HeroAddItemCtrl
         ];
         if (!isServerFinished() && WebService::isPost()) {
             [$btype, $type] = array_map('intval', array_pad(explode(':', (string)$params['item']), 2, '0'));
-            if (!($btype >= 7 && $btype != 12 && $btype != 13)) {
+            if (!($btype >= ItemBtype::FIRST_CONSUMABLE && $btype != ItemBtype::BUCKET && $btype != ItemBtype::BOOK_OF_WISDOM)) {
                 $params['amount'] = 1;
             }
             $db = DB::getInstance();

@@ -10,6 +10,7 @@ use Core\Database\BackupSets;
 use Core\Database\DB;
 use Core\Database\GlobalDB;
 use Core\Jobs\EngineHeartbeat;
+use Core\Time;
 use Game\Installer\AppDatabaseGrants;
 use Game\SmtpConfig;
 
@@ -238,9 +239,9 @@ final class Preflight
     private static function age(int $seconds): string
     {
         return match (true) {
-            $seconds < 3600 => intdiv($seconds, 60) . ' min',
-            $seconds < 172800 => intdiv($seconds, 3600) . ' h',
-            default => intdiv($seconds, 86400) . ' days',
+            $seconds < Time::HOUR => intdiv($seconds, 60) . ' min',
+            $seconds < 172800 => intdiv($seconds, Time::HOUR) . ' h',
+            default => intdiv($seconds, Time::DAY) . ' days',
         };
     }
 

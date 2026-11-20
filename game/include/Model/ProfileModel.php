@@ -9,6 +9,7 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\StringChecker;
 use Core\Session;
+use Core\Time;
 use Game\Formulas;
 use Game\NoticeHelper;
 use function clean_string_from_white;
@@ -66,7 +67,7 @@ class ProfileModel
     public function getDaysPlaying(int $uid): int
     {
         $signedUp = (int)DB::getInstance()->fetchScalar("SELECT signupTime FROM users WHERE id=$uid");
-        return $signedUp > 0 ? max(0, (int)floor((time() - $signedUp) / 86400)) : 0;
+        return $signedUp > 0 ? max(0, (int)floor((time() - $signedUp) / Time::DAY)) : 0;
     }
 
     public function getPlayerVillages(int $uid, bool $byName = false): \mysqli_result|bool
@@ -131,7 +132,7 @@ class ProfileModel
         $row = $db->query("SELECT name, owner FROM vdata WHERE kid=$kid")->fetch_assoc();
         if ($row !== null) {
             if ($row['owner'] == Session::getInstance()->getPlayerId() && $row['name'] != $name) {
-                Quest::getInstance()->setQuestBitwise('world', 2, 1);
+                Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_RENAME_VILLAGE, 1);
                 $name = $db->real_escape_string(htmlspecialchars($name, ENT_QUOTES));
                 $db->query("UPDATE vdata SET name='$name' WHERE kid=$kid");
                 $xy = Formulas::kid2xy($kid);
@@ -148,7 +149,7 @@ class ProfileModel
                     ],
                     time()
                 );
-                Quest::getInstance()->setQuestBitwise('world', 2, \Model\Quest::QUEST_FINISHED);
+                Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_RENAME_VILLAGE, \Model\Quest::QUEST_FINISHED);
                 Caching::getInstance()->delete("ActiveVillageBox:{$kid}");
             }
         }

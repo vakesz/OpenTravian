@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\Admin;
 
 use Core\Helper\WebService;
+use Core\Time;
 
 /**
  * The second step of an administrator sign-in.
@@ -25,7 +26,7 @@ use Core\Helper\WebService;
 final class TwoFactorGate
 {
     public const PENDING_TTL = 300;
-    public const GRANT_TTL = 60;
+    public const GRANT_TTL = Time::MINUTE;
 
     /** @param array<string, mixed> $session */
     public function __construct(

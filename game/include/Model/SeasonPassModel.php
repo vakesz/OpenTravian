@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\UserId;
 
 use function logError;
 
@@ -83,7 +84,7 @@ final class SeasonPassModel
      */
     public function onPlayerActivity(int $uid): void
     {
-        if ($uid <= 2 || !$this->schemaReady()) {
+        if ($uid <= UserId::LAST_SYSTEM || !$this->schemaReady()) {
             return;
         }
 
@@ -104,7 +105,7 @@ final class SeasonPassModel
     /** Called after a successful task-board reward collection. */
     public function onTaskRewardCollected(int $uid): void
     {
-        if ($uid <= 2 || !$this->schemaReady()) {
+        if ($uid <= UserId::LAST_SYSTEM || !$this->schemaReady()) {
             return;
         }
 
@@ -160,7 +161,7 @@ final class SeasonPassModel
      */
     public function onMissionEvent(int $uid, string $missionKey, int $increment = 1): void
     {
-        if ($uid <= 2 || $missionKey === '' || !$this->schemaReady()) {
+        if ($uid <= UserId::LAST_SYSTEM || $missionKey === '' || !$this->schemaReady()) {
             return;
         }
 

@@ -27,7 +27,7 @@ set_error_handler(static function (int $severity, string $message, string $file,
 $root = dirname(__DIR__, 2);
 spl_autoload_register(static function (string $class) use ($root): void {
     $file = $root . '/game/include/' . str_replace('\\', '/', $class) . '.php';
-    if (str_starts_with($class, 'Game\\SocialAuth\\') && is_file($file)) {
+    if ((str_starts_with($class, 'Game\\SocialAuth\\') || $class === 'Core\\Time') && is_file($file)) {
         require $file;
     }
 });

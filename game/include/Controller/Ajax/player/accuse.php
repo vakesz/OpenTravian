@@ -6,6 +6,7 @@ namespace Controller\Ajax\player;
 
 use Controller\Ajax\AjaxBase;
 use Core\Database\DB;
+use Game\UserId;
 use Model\PlayerAccusationModel;
 use resources\View\PHPBatchView;
 
@@ -17,7 +18,7 @@ class accuse extends AjaxBase
         $uid = is_scalar($_POST['uid'] ?? null) ? (int) $_POST['uid'] : 0;
         $reporter = (int) $this->session->getPlayerId();
         $model = new PlayerAccusationModel();
-        if ($this->session->isSitter() || $uid <= 2 || $uid === $reporter
+        if ($this->session->isSitter() || $uid <= UserId::LAST_SYSTEM || $uid === $reporter
             || (int) DB::getInstance()->fetchScalar('SELECT COUNT(id) FROM users WHERE id=?', [$uid]) === 0) {
             $this->error(T('Profile', 'Report player'));
             return;

@@ -8,10 +8,13 @@ use Core\Helper\Mailer;
 use Core\Helper\Notification;
 use Core\Jobs\TransactionalTask;
 use Exception;
+use Game\AccessLevel;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
 use Game\NoticeHelper;
+use Game\ResearchMode;
+use Game\UserId;
 use Game\WorldSpeedProfile;
 use Model\AccountDeleter;
 use Model\AllianceBonusModel;
@@ -155,14 +158,14 @@ class Automation
     public function attackMovementComplete(): void
     {
         $db = DB::getInstance();
-        $movements = $db->query("SELECT id FROM movement WHERE mode=0 AND end_time <= " . miliseconds() . " ORDER BY end_time ASC, id ASC LIMIT 250");
+        $movements = $db->query("SELECT id FROM movement WHERE mode=" . MovementsModel::MODE_GOING . " AND end_time <= " . miliseconds() . " ORDER BY end_time ASC, id ASC LIMIT 250");
         $this->processMovementComplete($movements);
     }
 
     public function otherMovementComplete(): void
     {
         $db = DB::getInstance();
-        $movements = $db->query("SELECT id FROM movement WHERE mode=1 AND end_time <= " . miliseconds() . " ORDER BY end_time ASC, id ASC LIMIT 250");
+        $movements = $db->query("SELECT id FROM movement WHERE mode=" . MovementsModel::MODE_RETURN . " AND end_time <= " . miliseconds() . " ORDER BY end_time ASC, id ASC LIMIT 250");
         $this->processMovementComplete($movements);
     }
 
@@ -181,7 +184,7 @@ class Automation
         return TransactionalTask::consume('movement', $taskId, function (array $row): void {
             $row = MovementsModel::typedRow($row);
             \Game\Ships::dockOnArrival($row);
-            if ($row['mode'] == 1) {
+            if ($row['mode'] == MovementsModel::MODE_RETURN) {
                 new ReturnProcessor($row);
 
                 return;
@@ -271,12 +274,12 @@ class Automation
             $kid = (int)$row['kid'];
             $nr = (int)$row['nr'];
             $mode = (int)$row['mode'];
-            if ($mode === 1 && $nr >= 2 && $nr <= 9) {
+            if ($mode === ResearchMode::ACADEMY && $nr >= 2 && $nr <= 9) {
                 $db->query("UPDATE tdata SET u$nr=1 WHERE kid=$kid");
 
                 return;
             }
-            if ($mode === 0 && $nr >= 1 && $nr <= 8) {
+            if ($mode === ResearchMode::SMITHY && $nr >= 1 && $nr <= 8) {
                 $db->query("UPDATE smithy SET u$nr=IF(u$nr+1>20, 20, u$nr+1) WHERE kid=$kid");
 
                 return;
@@ -338,7 +341,7 @@ class Automation
         $db = DB::getInstance();
         $interval = ArtefactsModel::getArtifactActivationTime();
         $time = time() - $interval;
-        $result = $db->query("SELECT * FROM artefacts WHERE active=0 AND IF(uid=1, FALSE, conquered < $time) ORDER BY conquered ASC, id ASC");
+        $result = $db->query("SELECT * FROM artefacts WHERE active=0 AND IF(uid=" . UserId::NATARS . ", FALSE, conquered < $time) ORDER BY conquered ASC, id ASC");
         $art = new ArtefactsModel();
         while ($row = $result->fetch_assoc()) {
             $art->activateArtifact($row);
@@ -377,7 +380,7 @@ class Automation
         $infoBox = new InfoBoxModel();
         while ($row = $result->fetch_assoc()) {
             $db->query("DELETE FROM banQueue WHERE id={$row['id']}");
-            $db->query("UPDATE users SET access=1 WHERE id={$row['uid']}");
+            $db->query("UPDATE users SET access=" . AccessLevel::PLAYER . " WHERE id={$row['uid']}");
             $infoBox->deleteInfoByType($row['uid'], 14);
         }
     }
@@ -425,7 +428,7 @@ class Automation
             while ($enforce = $enforces->fetch_assoc()) {
                 $m->returnTrappedOrEnforcementRow($enforce, true);
             }
-            $find = $db->query("SELECT * FROM movement WHERE to_kid={$row['oid']} AND mode=0");
+            $find = $db->query("SELECT * FROM movement WHERE to_kid={$row['oid']} AND mode=" . MovementsModel::MODE_GOING);
             while ($row = $find->fetch_assoc()) {
                 $m->cancelMovement($row['id'], $row['to_kid'], $row['kid']);
             }
@@ -481,7 +484,7 @@ class Automation
         $row['time'] = (int)$locked;
         // Next run: one period after the planned time, but never in the past, so a route that was
         // overdue (engine stopped) does not replay every missed day.
-        $period = $usePeriodicTradeRoutes ? (int)$row['start_hour'] : 86400;
+        $period = $usePeriodicTradeRoutes ? (int)$row['start_hour'] : Time::DAY;
         $next = $row['time'] + $period;
         if ($next <= time()) {
             $next = time() + max($period, 1);
@@ -572,24 +575,24 @@ class Automation
 
     public function cleanupServer(): void
     {
-        $halfDay = time() - 86400 / 2;
-        $oneHour = time() - 3600;
+        $halfDay = time() - Time::DAY / 2;
+        $oneHour = time() - Time::HOUR;
         $tenMin = time() - 600;
         $db = DB::getInstance();
         $this->deleteBatched("DELETE FROM login_handshake WHERE time < $tenMin");
         $this->deleteBatched("DELETE FROM newproc WHERE time < $halfDay");
         $this->deleteBatched("DELETE FROM adventure WHERE end=1");
-        $this->deleteBatched("DELETE FROM auction WHERE finish=1 AND uid=0 AND time < " . (time() - 2 * 86400));
+        $this->deleteBatched("DELETE FROM auction WHERE finish=1 AND uid=0 AND time < " . (time() - 2 * Time::DAY));
         $this->deleteBatched("DELETE FROM a2b WHERE timestamp < $oneHour");
         $this->deleteBatched("DELETE FROM infobox WHERE showTo<>0 AND showTo < $tenMin AND (type < 7 OR type > 10)");
-        $this->deleteBatched("DELETE FROM casualties WHERE time < " . (time() - 5 * 86400));
-        $this->deleteBatched("DELETE FROM surrounding WHERE time < " . (time() - 3 * 86400));
-        $this->deleteBatched("DELETE FROM log_ip WHERE time < " . (time() - 15 * 86400));
-        $this->deleteBatched("DELETE FROM multiaccount_log WHERE time < " . (time() - 30 * 86400));
-        $this->deleteBatched("DELETE FROM ali_log WHERE time < " . (time() - 90 * 86400));
-        $this->deleteBatched("DELETE FROM ndata WHERE non_deletable=0 AND (uid=1 OR (deleted=1 AND time < ($halfDay)))");
+        $this->deleteBatched("DELETE FROM casualties WHERE time < " . (time() - 5 * Time::DAY));
+        $this->deleteBatched("DELETE FROM surrounding WHERE time < " . (time() - 3 * Time::DAY));
+        $this->deleteBatched("DELETE FROM log_ip WHERE time < " . (time() - 15 * Time::DAY));
+        $this->deleteBatched("DELETE FROM multiaccount_log WHERE time < " . (time() - 30 * Time::DAY));
+        $this->deleteBatched("DELETE FROM ali_log WHERE time < " . (time() - 90 * Time::DAY));
+        $this->deleteBatched("DELETE FROM ndata WHERE non_deletable=0 AND (uid=" . UserId::NATARS . " OR (deleted=1 AND time < ($halfDay)))");
         $this->cleanupReports();
-        $this->deleteBatched("DELETE FROM mdata WHERE viewed=1 AND time < " . (time() - 2 * 86400));
+        $this->deleteBatched("DELETE FROM mdata WHERE viewed=1 AND time < " . (time() - 2 * Time::DAY));
         //if(filesize(INCLUDE_PATH . "error_log.log")) {
         //    Notification::notify("Error log", "There are some errors in error_log.");
         //}
@@ -597,7 +600,7 @@ class Automation
 
     public function cleanupReports(): void
     {
-        $cutoff = time() - 7 * 86400;
+        $cutoff = time() - 7 * Time::DAY;
         $this->deleteBatched(
             "DELETE FROM ndata WHERE non_deletable=0 AND archive=0 AND deleted=0 AND time < $cutoff"
         );
@@ -630,7 +633,7 @@ class Automation
         }
         $conf = Config::getInstance();
         $startEmailsSent = $db->fetchScalar("SELECT startEmailsSent FROM config");
-        if (!$startEmailsSent && time() >= ($conf->game->start_time - 3600)) {
+        if (!$startEmailsSent && time() >= ($conf->game->start_time - Time::HOUR)) {
             $db = DB::getInstance();
             $db->query("UPDATE config SET startEmailsSent=1");
             $conf->dynamic->startEmailsSent = 1;
@@ -664,7 +667,7 @@ class Automation
                 $m->addInfo(0, 1, 15, '', 0, 0);
             }
             if ($conf->timers->AutoFinishTime > 0) {
-                //$m->addInfo(0, 1, 10, '', $conf->timers->AutoFinishTime - 3 * 86400, $conf->timers->AutoFinishTime);
+                //$m->addInfo(0, 1, 10, '', $conf->timers->AutoFinishTime - 3 * Time::DAY, $conf->timers->AutoFinishTime);
             }
             //(new NatarsModel())->createLotsOfNatarsVillages(max(min(2*$conf->game->speed, 600), 300));
             Notification::notify(
@@ -680,9 +683,9 @@ class Automation
     {
         $db = DB::getInstance();
         $time = time() - 7200;
-        $result = $db->query("SELECT id, access, countryFlag FROM users WHERE (access!=3 OR lastCountryFlagCheck=0) AND (lastCountryFlagCheck <= $time) LIMIT 100");
+        $result = $db->query("SELECT id, access, countryFlag FROM users WHERE (access!=" . AccessLevel::FAKE_USER . " OR lastCountryFlagCheck=0) AND (lastCountryFlagCheck <= $time) LIMIT 100");
         while ($row = $result->fetch_assoc()) {
-            if ($row['access'] == 3) {
+            if ($row['access'] == AccessLevel::FAKE_USER) {
                 $countryFlag = AutomationModel::getRandomCountryFlag();
             } else {
                 $countryFlag = $this->getCountryFlag($row['id']);
@@ -760,13 +763,13 @@ class Automation
             $lastDailyGold = Config::getProperty("game", "start_time");
             $db->query("UPDATE config SET lastDailyGold=" . ($lastDailyGold));
         }
-        if ($dailyGold && (time() - $lastDailyGold) >= 86400) {
-            $count = floor((time() - $lastDailyGold) / 86400);
+        if ($dailyGold && (time() - $lastDailyGold) >= Time::DAY) {
+            $count = floor((time() - $lastDailyGold) / Time::DAY);
             for ($i = 1; $i <= $count; ++$i) {
                 $db->query("UPDATE config SET lastDailyGold=" . time());
                 $m = new MessageModel();
-                $db->query("UPDATE users SET gift_gold=gift_gold+$dailyGold WHERE id>2 AND access<>2");
-                $users = $db->query("SELECT id FROM users WHERE id > 2 AND access<>2");
+                $db->query("UPDATE users SET gift_gold=gift_gold+$dailyGold WHERE id>" . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
+                $users = $db->query("SELECT id FROM users WHERE id > " . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
                 while ($row = $users->fetch_assoc()) {
                     $m->sendMessage(0, $row['id'], null, $dailyGold, 4);
                 }
@@ -797,7 +800,7 @@ class Automation
         $automationModel = new AutomationModel();
         $gameWorldDetails = $globalDB->query("SELECT * FROM gameServers WHERE id=$worldId")->fetch_assoc();
         if (Config::getAdvancedProperty("voucherEnabled")) {
-            $users = $db->query("SELECT id, name, email, bought_gold FROM users WHERE email_verified=1 AND id>2 AND bought_gold>0 AND access=1 AND hidden=0");
+            $users = $db->query("SELECT id, name, email, bought_gold FROM users WHERE email_verified=1 AND id>" . UserId::LAST_SYSTEM . " AND bought_gold>0 AND access=" . AccessLevel::PLAYER . " AND hidden=0");
             while ($row = $users->fetch_assoc()) {
                 if ($row['bought_gold'] <= 0) {
                     continue;
@@ -811,13 +814,13 @@ class Automation
             $kid = $db->fetchScalar("SELECT kid FROM fdata WHERE f99=100");
             $wData = $db->query("SELECT name, owner FROM vdata WHERE kid=$kid")->fetch_assoc();
             $uData = $db->query("SELECT id, name, access, email, aid, email_verified FROM users WHERE id={$wData['owner']}")->fetch_assoc();
-            if ($config->bonus->bonusGoldWinner && $uData['access'] == 1 && $uData['email_verified'] == 1) {
+            if ($config->bonus->bonusGoldWinner && $uData['access'] == AccessLevel::PLAYER && $uData['email_verified'] == 1) {
                 $automationModel->addVoucher($uData['email'], $config->bonus->bonusGoldWinner, 'winner', sprintf('[%s] %s', $uData['id'], $uData['name']));
             }
             if ($uData['aid'] && $config->bonus->bonusGoldTopAlliance) {
                 $count = $config->bonus->bonusGoldTopAllianceCount;
                 $minPop = $config->bonus->bonusGoldTopAllianceMinPop;
-                $result = $db->query("SELECT id, name, email, email_verified FROM users WHERE aid={$uData['aid']} AND id!={$uData['id']} AND total_pop >= $minPop AND access=1 ORDER BY total_pop DESC LIMIT $count");
+                $result = $db->query("SELECT id, name, email, email_verified FROM users WHERE aid={$uData['aid']} AND id!={$uData['id']} AND total_pop >= $minPop AND access=" . AccessLevel::PLAYER . " ORDER BY total_pop DESC LIMIT $count");
                 while ($row = $result->fetch_assoc()) {
                     if ($row['email_verified'] == 1) {
                         $automationModel->addVoucher(
@@ -837,7 +840,7 @@ class Automation
                 $wData = $db->query("SELECT name, owner FROM vdata WHERE kid={$a['kid']}");
                 if ($wData->num_rows) {
                     $wData = $wData->fetch_assoc();
-                    $uData = $db->query("SELECT id, name, email, aid, email_verified FROM users WHERE id={$wData['owner']} AND access=1");
+                    $uData = $db->query("SELECT id, name, email, aid, email_verified FROM users WHERE id={$wData['owner']} AND access=" . AccessLevel::PLAYER);
                     if ($uData->num_rows) {
                         $uData = $uData->fetch_assoc();
                         if ($uData['email_verified'] == 1) {
@@ -863,7 +866,7 @@ class Automation
             }
         }
         if ($config->bonus->bonusGoldTopOff) {
-            $topAttacker = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY total_attack_points DESC LIMIT 1");
+            $topAttacker = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_attack_points DESC LIMIT 1");
             if ($topAttacker->num_rows) {
                 $topAttacker = $topAttacker->fetch_assoc();
                 if ($topAttacker['email_verified'] == 1) {
@@ -877,7 +880,7 @@ class Automation
             }
         }
         if ($config->bonus->bonusGoldTopDef) {
-            $topDefender = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY total_defense_points DESC LIMIT 1");
+            $topDefender = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_defense_points DESC LIMIT 1");
             if ($topDefender->num_rows) {
                 $topDefender = $topDefender->fetch_assoc();
                 if ($topDefender['email_verified'] == 1) {
@@ -891,7 +894,7 @@ class Automation
             }
         }
         if ($config->bonus->bonusGoldTopClimber) {
-            $topClimber = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY total_pop DESC LIMIT 1");
+            $topClimber = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_pop DESC LIMIT 1");
             if ($topClimber->num_rows) {
                 $topClimber = $topClimber->fetch_assoc();
                 if ($topClimber['email_verified'] == 1) {
@@ -905,7 +908,7 @@ class Automation
             }
         }
         if ($config->bonus->bonusGoldTopOffHammer) {
-            $topClimber = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY max_off_point DESC LIMIT 1");
+            $topClimber = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY max_off_point DESC LIMIT 1");
             if ($topClimber->num_rows) {
                 $topClimber = $topClimber->fetch_assoc();
                 if ($topClimber['email_verified'] == 1) {
@@ -919,7 +922,7 @@ class Automation
             }
         }
         if ($config->bonus->bonusGoldTopDefHammer) {
-            $topClimber = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY max_def_point DESC LIMIT 1");
+            $topClimber = $db->query("SELECT id, name, email, email_verified FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY max_def_point DESC LIMIT 1");
             if ($topClimber->num_rows) {
                 $topClimber = $topClimber->fetch_assoc();
                 if ($topClimber['email_verified'] == 1) {
@@ -966,7 +969,7 @@ class Automation
             }
         }
         $x = 4 - 1;
-        $result = $db->query("SELECT id, name, email, email_verified, race, total_attack_points, countryFlag FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY total_attack_points DESC LIMIT 3");
+        $result = $db->query("SELECT id, name, email, email_verified, race, total_attack_points, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_attack_points DESC LIMIT 3");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
                 ClubApi::addMedal(
@@ -980,7 +983,7 @@ class Automation
             }
         }
         $x = 8 - 1;
-        $result = $db->query("SELECT id, name, email, email_verified, race, total_defense_points, countryFlag FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY total_defense_points DESC LIMIT 3");
+        $result = $db->query("SELECT id, name, email, email_verified, race, total_defense_points, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_defense_points DESC LIMIT 3");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
 
@@ -995,7 +998,7 @@ class Automation
             }
         }
         $x = 12 - 1;
-        $result = $db->query("SELECT id, name, email, email_verified, race, total_pop, countryFlag FROM users WHERE id>2 AND hidden=0 AND access=1 ORDER BY total_pop DESC LIMIT 3");
+        $result = $db->query("SELECT id, name, email, email_verified, race, total_pop, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_pop DESC LIMIT 3");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
                 ClubApi::addMedal(
@@ -1011,7 +1014,7 @@ class Automation
         //big off hammer 16
         //big def hammer 17
         //winner alliance 18
-        $result = $db->query("SELECT id, name, email, email_verified, race, max_off_point, countryFlag FROM users WHERE id>2 AND hidden=0 AND access=1 AND max_off_point > 0 ORDER BY max_off_point DESC LIMIT 1");
+        $result = $db->query("SELECT id, name, email, email_verified, race, max_off_point, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " AND max_off_point > 0 ORDER BY max_off_point DESC LIMIT 1");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
                 ClubApi::addMedal(
@@ -1024,7 +1027,7 @@ class Automation
                 );
             }
         }
-        $result = $db->query("SELECT id, name, email, email_verified, race, max_def_point, countryFlag FROM users WHERE id>2 AND hidden=0 AND access=1 AND max_def_point > 0 ORDER BY max_def_point DESC LIMIT 1");
+        $result = $db->query("SELECT id, name, email, email_verified, race, max_def_point, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " AND max_def_point > 0 ORDER BY max_def_point DESC LIMIT 1");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
                 ClubApi::addMedal(
@@ -1076,7 +1079,7 @@ class Automation
         if ($timeline !== null) {
             $registrationCloseTime = $config->game->start_time + $timeline['registrationCloseAfter'];
         } else {
-            $registrationCloseTime = $config->game->start_time + (round($config->game->round_length * 0.75, 1) * 86400);
+            $registrationCloseTime = $config->game->start_time + (round($config->game->round_length * 0.75, 1) * Time::DAY);
             $registrationCloseTime = min($registrationCloseTime, $config->timers->wwPlansReleaseTime);
         }
         if (getWorldId() == 'dev') {
@@ -1084,10 +1087,10 @@ class Automation
         }
         $globalDB = GlobalDB::getInstance();
         // Checkouts nobody completed; paid, refunded and disputed orders are the payment record.
-        $globalDB->query("DELETE FROM paymentOrder WHERE status='pending' AND created < " . (time() - 2.5 * 86400));
+        $globalDB->query("DELETE FROM paymentOrder WHERE status='pending' AND created < " . (time() - 2.5 * Time::DAY));
         $globalDB->query("DELETE FROM infobox WHERE showTo < " . time());
         $globalDB->query("DELETE FROM banIP WHERE blockTill > 0 AND blockTill < " . time());
-        $time = time() - Config::getProperty("gold", "voucherExpireDays") * 86400;
+        $time = time() - Config::getProperty("gold", "voucherExpireDays") * Time::DAY;
         $globalDB->query("UPDATE paymentVoucher SET used=1, usedWorldId='system', usedPlayer='system', usedEmail='system', usedTime=" . time() . " WHERE used=0 AND time < $time");
         if ($registrationCloseTime > 0 && time() > $registrationCloseTime && Config::getAdvancedProperty("registerAutoClose")) {
             $globalDB->query("UPDATE gameServers SET registerClosed=1 WHERE id=" . getWorldUniqueId());
@@ -1121,7 +1124,7 @@ class Automation
         }
         $db = DB::getInstance();
         $lastBackup = $db->fetchScalar("SELECT lastBackup FROM config");
-        if ((time() - $lastBackup) > 6 * 3600) {
+        if ((time() - $lastBackup) > 6 * Time::HOUR) {
             $db->backup_tables();
         }
     }

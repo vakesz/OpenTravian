@@ -3,6 +3,7 @@
 use Core\Caching\Caching;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 
 class FilteredUrlsCtrl
 {
@@ -53,7 +54,7 @@ class FilteredUrlsCtrl
         $cache = Caching::getInstance();
         if(!($cached = $cache->get($this->cacheKey))){
             $cached = explode(",", file_get_contents(FILTERING_PATH . $this->fileName));
-            $cache->set($this->cacheKey, $cached, 2*86400);
+            $cache->set($this->cacheKey, $cached, 2*Time::DAY);
         }
         return $cached;
     }

@@ -8,6 +8,7 @@ use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Locale;
 use Core\Session;
+use Core\Time;
 
 class BannedCtrl
 {
@@ -26,7 +27,7 @@ class BannedCtrl
         $db = DB::getInstance();
         if ($click) {
             if (WebService::isPost()) {
-                if (throttle_public_form('clickunblock', 5, 3600)) {
+                if (throttle_public_form('clickunblock', 5, Time::HOUR)) {
                     SessionVar::timeoutNow("sessionClicks");
                     SessionVar::timeoutNow("clickBlocked");
                     WebService::redirect("/dorf1.php");

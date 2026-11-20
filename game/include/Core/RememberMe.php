@@ -20,8 +20,8 @@ use Core\Database\DBI;
 final class RememberMe
 {
     public const COOKIE = 'travian_remember';
-    public const LIFETIME = 30 * 86400;
-    public const ROTATION_GRACE = 60;
+    public const LIFETIME = 30 * Time::DAY;
+    public const ROTATION_GRACE = Time::MINUTE;
 
     public static function fingerprint(string $passwordHash): string
     {

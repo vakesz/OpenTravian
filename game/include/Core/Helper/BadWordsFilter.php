@@ -6,6 +6,7 @@ namespace Core\Helper;
 
 use Core\Caching\Caching;
 use Core\Session;
+use Core\Time;
 
 class BadWordsFilter
 {
@@ -25,7 +26,7 @@ class BadWordsFilter
                 array_map('trim', explode(',', $raw)),
                 static fn (string $token): bool => $token !== ''
             ));
-            $cache->set("badWordsFilterCache", $this->badWords, 2 * 86400);
+            $cache->set("badWordsFilterCache", $this->badWords, 2 * Time::DAY);
         }
     }
 

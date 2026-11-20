@@ -4,6 +4,8 @@ use Core\Database\DB;
 use Core\Helper\WebService;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Slot;
+use Game\UserId;
 use Model\RegisterModel;
 use resources\View\PHPBatchView;
 
@@ -60,7 +62,7 @@ class AddNatarsFarmCtrl
                     $conditions[] = "(angle >= {$angle[0]} AND angle <= {$angle[1]})";
                     $conditions[] = "(r >= {$r[0]} AND r <= {$r[1]})";
 
-                    $nearbyNatars = '(SELECT COUNT(av2.kid) FROM available_villages av2, vdata v2 WHERE av2.occupied=1 AND av2.r BETWEEN av.r-10 AND av.r+10 AND av2.angle BETWEEN av.angle-8 AND av.angle+8 AND v2.kid=av2.kid AND v2.owner=1 AND v2.isWW=0 AND (SELECT COUNT(id) FROM artefacts WHERE kid=v2.kid)=0)';
+                    $nearbyNatars = '(SELECT COUNT(av2.kid) FROM available_villages av2, vdata v2 WHERE av2.occupied=1 AND av2.r BETWEEN av.r-10 AND av.r+10 AND av2.angle BETWEEN av.angle-8 AND av.angle+8 AND v2.kid=av2.kid AND v2.owner=' . UserId::NATARS . ' AND v2.isWW=0 AND (SELECT COUNT(id) FROM artefacts WHERE kid=v2.kid)=0)';
 
                     $conditions[] = "$nearbyNatars < 3";
 
@@ -69,7 +71,7 @@ class AddNatarsFarmCtrl
                     if ($village->num_rows) {
                         $kid = $village->fetch_row()[0];
                         $register->createNewNatarVillage($kid);
-                        for ($j = 1; $j <= 18; ++$j) {
+                        for ($j = Slot::FIRST_FIELD; $j <= Slot::LAST_FIELD; ++$j) {
                             BuildingAction::upgrade($kid, $j, $vars['resources_level']);
                         }
                         if($vars['extra_storage'] > 0){

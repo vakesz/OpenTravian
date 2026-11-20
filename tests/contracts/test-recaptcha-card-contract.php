@@ -9,7 +9,7 @@ $template = file_get_contents($root . '/game/include/resources/Templates/system/
 if ($controller === false || $template === false
     || !str_contains($controller, "new Securimage(['namespace' => self::CAPTCHA_NAMESPACE])")
     || !str_contains($controller, "Session::validateChecker()")
-    || !str_contains($controller, "throttle_public_form('clickunblock', 5, 3600)")
+    || !str_contains($controller, "throttle_public_form('clickunblock', 5, Time::HOUR)")
     || !str_contains($template, 'id="recaptchaReload"')
     || !str_contains($template, 'id="captchaCode"')
     || !str_contains($template, 'Session::getCheckerInput()') && !str_contains($template, "<?=\$vars['checker'];?>")) {

@@ -4,6 +4,7 @@ namespace Controller;
 
 use Core\Caching\Caching;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\Map\ImageMapCache;
 
@@ -67,7 +68,7 @@ class MinimapCtrl extends AnyCtrl
         ob_start();
         imagejpeg($img, null, 75);
         $content = ob_get_clean();
-        $memcache->set("minimap.jpg", ['content' => $content, 'time' => time(), 'length' => strlen($content)], 3600);
+        $memcache->set("minimap.jpg", ['content' => $content, 'time' => time(), 'length' => strlen($content)], Time::HOUR);
         return true;
     }
 }

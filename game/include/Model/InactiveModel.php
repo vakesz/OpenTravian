@@ -7,6 +7,7 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Game\Map\Map;
+use Game\UserId;
 
 class InactiveModel
 {
@@ -52,7 +53,7 @@ class InactiveModel
     private function clearDeletion(): void
     {
         $db = DB::getInstance();
-        $due = $db->run('SELECT * FROM deleting WHERE uid > 2 AND time <= ? ORDER BY time ASC LIMIT 100', [time()]);
+        $due = $db->run('SELECT * FROM deleting WHERE uid > ' . UserId::LAST_SYSTEM . ' AND time <= ? ORDER BY time ASC LIMIT 100', [time()]);
         if ($due === false) {
             return;
         }

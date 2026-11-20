@@ -7,6 +7,7 @@ namespace Game\Admin;
 use Core\Database\DB;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 
 /**
  * The administrator audit trail: who (account and name), when, which panel
@@ -182,7 +183,7 @@ final class AuditLog
         if ($retentionDays <= 0) {
             return 0;
         }
-        $statement = DB::getInstance()->run('DELETE FROM admin_log WHERE time < ?', [($now ?? time()) - $retentionDays * 86400]);
+        $statement = DB::getInstance()->run('DELETE FROM admin_log WHERE time < ?', [($now ?? time()) - $retentionDays * Time::DAY]);
 
         return $statement ? max(0, (int) $statement->affected_rows) : 0;
     }

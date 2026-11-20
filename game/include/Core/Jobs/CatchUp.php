@@ -6,6 +6,8 @@ namespace Core\Jobs;
 
 use Core\Automation;
 use Core\Database\DB;
+use Core\Time;
+use Model\MovementsModel;
 
 use function getGame;
 use function make_seed;
@@ -58,16 +60,16 @@ final class CatchUp
     {
         $own = $kid === null ? '' : " AND kid=$kid";
         $either = $kid === null ? '' : " AND (kid=$kid OR to_kid=$kid)";
-        $trainingScale = getGame('useNanoseconds') ? 1000000000 : (getGame('useMilSeconds') ? 1000 : 1);
-        $milliseconds = $cutoff * 1000;
+        $trainingScale = getGame('useNanoseconds') ? 1000000000 : (getGame('useMilSeconds') ? Time::SECOND_MS : 1);
+        $milliseconds = $cutoff * Time::SECOND_MS;
 
         return [
             'building' => ['table' => 'building_upgrade', 'sql' => "SELECT id, isMaster, commence AS due FROM building_upgrade WHERE commence<=$cutoff$own", 'order' => 'commence', 'scale' => 1],
             'demolition' => ['table' => 'demolition', 'sql' => "SELECT id, end_time AS due FROM demolition WHERE end_time<=$cutoff$own", 'order' => 'end_time', 'scale' => 1],
             'research' => ['table' => 'research', 'sql' => "SELECT id, end_time AS due FROM research WHERE end_time<=$cutoff$own", 'order' => 'end_time', 'scale' => 1],
             'market' => ['table' => 'send', 'sql' => "SELECT id, end_time AS due FROM send WHERE end_time<$cutoff$either", 'order' => 'end_time', 'scale' => 1],
-            'attack' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=0 AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => 1000],
-            'return' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=1 AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => 1000],
+            'attack' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=" . MovementsModel::MODE_GOING . " AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => 1000],
+            'return' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=" . MovementsModel::MODE_RETURN . " AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => 1000],
             'training' => ['table' => 'training', 'sql' => 'SELECT id, commence AS due FROM training WHERE commence<' . ($cutoff * $trainingScale) . $own, 'order' => 'commence', 'scale' => $trainingScale],
         ];
     }

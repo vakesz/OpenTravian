@@ -4,6 +4,7 @@ use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Model\InfoBoxModel;
 
 class PrivateInfoboxCtrl
@@ -11,7 +12,7 @@ class PrivateInfoboxCtrl
     public function __construct()
     {
         $params['action'] = 'privateInfobox';
-        $params['expire'] = is_string($_POST['expire'] ?? null) && TimezoneHelper::strtotime($_POST['expire']) ? $_POST['expire'] : TimezoneHelper::date("Y-m-d H:i", time() + 86400);
+        $params['expire'] = is_string($_POST['expire'] ?? null) && TimezoneHelper::strtotime($_POST['expire']) ? $_POST['expire'] : TimezoneHelper::date("Y-m-d H:i", time() + Time::DAY);
         $params['html'] = is_string($_POST['html'] ?? null) ? $_POST['html'] : '';
         $db = DB::getInstance();
         if (($_REQUEST['section'] ?? null) === 'delete' && is_string($_REQUEST['iid'] ?? null)) {

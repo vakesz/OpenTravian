@@ -39,7 +39,7 @@ $check(str_contains($admin, "T('Mail', 'Email delivery is not configured for thi
 $check(!str_contains($admin, 'Mailer::sendBatch') && !str_contains($admin, 'sentTo'), 'The page does not pretend to have sent mail.');
 
 $newsletter = $read('game/include/Game/Mail/Newsletter.php');
-$check(str_contains($newsletter, 'u.newsletter = 1') && str_contains($newsletter, 'u.email_verified = 1') && str_contains($newsletter, 'u.access > 0') && str_contains($newsletter, 'NOT EXISTS (SELECT 1 FROM deleting'), 'Recipients are opted-in, verified, unbanned and not in deletion.');
+$check(str_contains($newsletter, 'u.newsletter = 1') && str_contains($newsletter, 'u.email_verified = 1') && str_contains($newsletter, 'u.access > " . AccessLevel::BANNED') && str_contains($newsletter, 'NOT EXISTS (SELECT 1 FROM deleting'), 'Recipients are opted-in, verified, unbanned and not in deletion.');
 $service = $read('game/include/Game/Mail/MailService.php');
 $check(str_contains($service, 'incrementWithinLimit') && str_contains($service, 'UnsubscribeToken::url') && str_contains($service, "'mail/message'") && str_contains($service, 'deliveryConfigured'), 'Every mail is rate limited and carries an unsubscribe link.');
 $template = $read('game/include/resources/Templates/mail/message.php');

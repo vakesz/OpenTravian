@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\Webhook;
 
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Posts queued events to Discord, at most one per engine tick (the job runs every five seconds, so at most twelve
@@ -17,7 +18,7 @@ final class QueueWorker
     private const LEASE_SECONDS = 30;
     private const MAX_ATTEMPTS = 8;
     private const RETRY_BASE_SECONDS = 30;
-    private const RETRY_MAX_SECONDS = 3600;
+    private const RETRY_MAX_SECONDS = Time::HOUR;
 
     public function __construct(
         private readonly ?WebhookConfig $config = null,

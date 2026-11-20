@@ -6,12 +6,14 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Hero\Artwork;
 use Game\Hero\HeroExperience;
 use Game\Hero\HeroHelper;
 use Game\Hero\HeroItems;
 use Game\Hero\ItemBtype;
 use Game\ResourcesHelper;
+use Game\Unit;
 
 /**
  * Owns the database boundary for hero inventory movement and item use.
@@ -452,7 +454,7 @@ class HeroInventoryModel
             case 12:
                 $now = time();
                 $rate = max(1, (int)Config::getInstance()->heroConfig->waterBucketsPerDay);
-                $nextUse = (int)$inventory['lastWaterBucketUse'] + intdiv(86400, $rate);
+                $nextUse = (int)$inventory['lastWaterBucketUse'] + intdiv(Time::DAY, $rate);
                 if ((float)$hero['health'] > 0) {
                     throw new \DomainException('A water bucket can only revive a dead or reviving hero.');
                 }
@@ -461,7 +463,7 @@ class HeroInventoryModel
                 }
                 $oldKid = (int)$hero['kid'];
                 ResourcesHelper::updateVillageResources($oldKid, true);
-                if (!$db->run('DELETE FROM training WHERE kid=? AND nr=11', [(int)$hero['kid']])
+                if (!$db->run('DELETE FROM training WHERE kid=? AND nr=' . Unit::HERO, [(int)$hero['kid']])
                     || !$db->run('UPDATE hero SET health=100, kid=?, lastupdate=? WHERE uid=?', [$villageId, $now, $uid])
                     || !$db->run('UPDATE units SET u11=1 WHERE kid=?', [$villageId])
                     || !$db->run('UPDATE inventory SET lastWaterBucketUse=? WHERE uid=?', [$now, $uid])
@@ -583,7 +585,7 @@ class HeroInventoryModel
         $elapsed = max(0, time() - (int)$hero['lastupdate']);
         $rate = (new HeroHelper())->calcHealth() + (float)$hero['itemHealth'];
         $rate *= max(1, (float)Config::getProperty('game', 'heroRegenerationMultiplier'));
-        return min(100, (float)$hero['health'] + ($rate / 86400 * $elapsed));
+        return min(100, (float)$hero['health'] + ($rate / Time::DAY * $elapsed));
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\Caching;
 
 use Core\Config;
+use Core\Time;
 use Redis;
 
 use function getWorldUniqueId;
@@ -62,7 +63,7 @@ class Caching
      * required to renew or release it, so an expired holder cannot delete a
      * newer holder's lease.
      */
-    public function lock(string $key, int $ttl = 60): string|false
+    public function lock(string $key, int $ttl = Time::MINUTE): string|false
     {
         $key = 'lock_' . $key;
         $token = bin2hex(random_bytes(16));
@@ -70,7 +71,7 @@ class Caching
         return self::singleton()->set($key, $token, ['nx', 'ex' => max(1, (int)$ttl)]) ? $token : false;
     }
 
-    public function renewLock(string $key, string|false $token, int $ttl = 60): bool
+    public function renewLock(string $key, string|false $token, int $ttl = Time::MINUTE): bool
     {
         $key = 'lock_' . $key;
         if ($token === false || $token === '') {

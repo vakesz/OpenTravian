@@ -170,7 +170,7 @@ assertAuctionFilterExchange(
         && str_contains(auctionFilterExchangeSource('game/include/Game/ButtonPagination.php'), 'class="pageIndex"')
         && str_contains($controller, 'auctionItemMeta((int)$row[\'btype\'], (int)$row[\'type\'])')
         && str_contains($controller, "return 'Consumable';")
-        && str_contains($controller, "2 => 'Armor'")
+        && str_contains($controller, "ItemBtype::BODY => 'Armor'")
         && str_contains($controller, "return 'Tier ' . ((\$type - 1) % 3 + 1)")
         && str_contains($controller, "(\$compact ? 'withIcon' : 'withText')")
         && str_contains($controller, "(\$exchange ? ' gold' : ' green')")
@@ -199,7 +199,7 @@ assertAuctionFilterExchange(
 assertAuctionFilterExchange(
     str_contains($model, 'function auctionFilterClause')
         && str_contains($model, "filter === 'bag'")
-        && str_contains($model, "'helmet' => 1"),
+        && str_contains($model, "'helmet' => ItemBtype::HELMET"),
     'Auction queries must accept native slot keys including bag consumables.'
 );
 

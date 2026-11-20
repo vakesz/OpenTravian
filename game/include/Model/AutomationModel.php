@@ -7,6 +7,7 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Core\Helper\Notification;
+use Core\Time;
 use Core\Voucher;
 
 class AutomationModel
@@ -93,11 +94,11 @@ class AutomationModel
     {
         if ((time() - 600) < $lastOnline) { // 0 Min - 10 Min
             $login_stat = "<img class='online online1' src=img/spacer.gif title='" . T("Alliance", "online now") . "' alt='" . T("Alliance", "online now") . "' />";
-        } else if ((time() - 86400) < $lastOnline && (time() - 600) > $lastOnline) { // 10 Min - 1 Days
+        } else if ((time() - Time::DAY) < $lastOnline && (time() - 600) > $lastOnline) { // 10 Min - 1 Days
             $login_stat = "<img class='online online2' src=img/spacer.gif title='" . T("Alliance", "active players") . "' alt='" . T("Alliance", "active players") . "' />";
-        } else if ((time() - 259200) < $lastOnline && (time() - 86400) > $lastOnline) { // 1-3 Days
+        } else if ((time() - 259200) < $lastOnline && (time() - Time::DAY) > $lastOnline) { // 1-3 Days
             $login_stat = "<img class='online online3' src=img/spacer.gif title='" . T("Alliance", "active 3days") . "' alt='" . T("Alliance", "active 3days") . "' />";
-        } else if ((time() - 604800) < $lastOnline && (time() - 259200) > $lastOnline) { // 3-7 Days
+        } else if ((time() - Time::WEEK) < $lastOnline && (time() - 259200) > $lastOnline) { // 3-7 Days
             $login_stat = "<img class='online online4' src=img/spacer.gif title='" . T("Alliance", "active 7days") . "' alt='" . T("Alliance", "active 7days") . "' />";
         } else {
             $login_stat = '<img class="online online5" src="img/spacer.gif" title="' . T("Alliance", "inactive") . '" alt="' . T("Alliance", "inactive") . '" />';

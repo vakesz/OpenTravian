@@ -4,6 +4,7 @@ namespace Game\Hero;
 
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 
 use function getGameSpeed;
 
@@ -168,7 +169,7 @@ final class HeroItemTooltip
                 $production = (int)DB::getInstance()->fetchScalar(
                     'SELECT COALESCE(SUM(cp), 0) FROM vdata WHERE owner=' . (int)Session::getInstance()->getPlayerId()
                 );
-                $stats[] = self::stat('artwork', [self::plain(Artwork::reward((int)getGameSpeed(), $production))], 'artworkDetails', [(string)intdiv(Artwork::rules((int)getGameSpeed())['cooldown'], 3600)]);
+                $stats[] = self::stat('artwork', [self::plain(Artwork::reward((int)getGameSpeed(), $production))], 'artworkDetails', [(string)intdiv(Artwork::rules((int)getGameSpeed())['cooldown'], Time::HOUR)]);
                 break;
             case ItemBtype::RESOURCES:
                 if ($item['title'] !== '') {

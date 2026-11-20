@@ -4,6 +4,7 @@ namespace Controller\Ajax;
 
 use Controller\Ajax\AjaxBase;
 use Core\Session;
+use Core\Time;
 use Model\MessageModel;
 use resources\View\PHPBatchView;
 
@@ -48,13 +49,13 @@ HTML;
                 if ((time() - 600) < $row['last_login_time']) { // 0 Min - 10 Min
                     $addressbook[$i] .= "<img class='online online1' src=img/spacer.gif title='" . T("Messages",
                             "online now") . "' alt='" . T("Messages", "online now") . "' />";
-                } else if ((time() - 86400) < $row['last_login_time'] && (time() - 600) > $row['last_login_time']) { // 10 Min - 1 Days
+                } else if ((time() - Time::DAY) < $row['last_login_time'] && (time() - 600) > $row['last_login_time']) { // 10 Min - 1 Days
                     $addressbook[$i] .= "<img class='online online2' src=img/spacer.gif title='" . T("Messages",
                             "active players") . "' alt='" . T("Messages", "active players") . "' />";
-                } else if ((time() - 259200) < $row['last_login_time'] && (time() - 86400) > $row['last_login_time']) { // 1-3 Days
+                } else if ((time() - 259200) < $row['last_login_time'] && (time() - Time::DAY) > $row['last_login_time']) { // 1-3 Days
                     $addressbook[$i] .= "<img class='online online3' src=img/spacer.gif title='" . T("Messages",
                             "active 3days") . "' alt='" . T("Messages", "active 3days") . "' />";
-                } else if ((time() - 604800) < $row['last_login_time'] && (time() - 259200) > $row['last_login_time']) { // 3-7 Days
+                } else if ((time() - Time::WEEK) < $row['last_login_time'] && (time() - 259200) > $row['last_login_time']) { // 3-7 Days
                     $addressbook[$i] .= "<img class='online online4' src=img/spacer.gif title='" . T("Messages",
                             "active 7days") . "' alt='" . T("Messages", "active 7days") . "' />";
                 } else {

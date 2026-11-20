@@ -6,6 +6,7 @@ namespace Controller\Ajax;
 
 use Core\Config;
 use Core\Session;
+use Core\Time;
 use Game\GoldHelper;
 use resources\View\PHPBatchView;
 
@@ -24,7 +25,7 @@ class plus extends AjaxBase
     public function dispatch(): void
     {
         $helper = new GoldHelper();
-        $durationDays = round((int) Config::getInstance()->gold->plusAccountDurationSeconds / 86400, 1);
+        $durationDays = round((int) Config::getInstance()->gold->plusAccountDurationSeconds / Time::DAY, 1);
 
         $payload = [
             'title' => $this->label('title', 'OpenTravian Plus'),

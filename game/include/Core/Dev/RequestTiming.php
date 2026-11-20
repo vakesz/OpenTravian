@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\Dev;
 
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Request timing and query count for developers: one fixed-position badge appended to the page
@@ -52,9 +53,9 @@ final class RequestTiming
     public static function filter(string $buffer): string
     {
         $stats = [
-            'ms' => (microtime(true) - (float) ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000,
+            'ms' => (microtime(true) - (float) ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * Time::SECOND_MS,
             'queries' => DB::$queryCount,
-            'queryMs' => DB::$queryTime * 1000,
+            'queryMs' => DB::$queryTime * Time::SECOND_MS,
             'memory' => memory_get_peak_usage(true),
         ];
         if (!headers_sent()) {

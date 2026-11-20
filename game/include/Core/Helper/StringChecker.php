@@ -7,6 +7,8 @@ namespace Core\Helper;
 use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
+use Game\AccessLevel;
 use Model\InfoBoxModel;
 
 class StringChecker
@@ -40,16 +42,16 @@ class StringChecker
             if ($spam_count >= $maxTries) {
                 $uid = (int) Session::getInstance()->getPlayerId();
                 $reason = !$urls ? 'Spam' : 'Bad name';
-                $end = time() + 15 * 60;
+                $end = time() + 15 * Time::MINUTE;
                 $db = DB::getInstance();
                 $exists = $db->fetchScalar("SELECT COUNT(id) FROM banQueue WHERE uid=$uid");
                 if (!$exists) {
-                    $db->query("UPDATE users SET access=0 WHERE id=$uid");
+                    $db->query("UPDATE users SET access=" . AccessLevel::BANNED . " WHERE id=$uid");
                     if ($db->affectedRows()) {
                         $db->query("INSERT INTO `banQueue`(`uid`, `reason`, `time`, `end`) VALUES ($uid, '$reason', " . time() . ", $end)");
                         $db->query("INSERT INTO `banHistory`(`uid`, `reason`, `time`, `end`) VALUES ($uid, '$reason', " . time() . ", $end)");
                         $db->query("DELETE FROM multiaccount_users WHERE uid=$uid");
-                        (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * 86400);
+                        (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * Time::DAY);
                         Notification::notify("Spam blocked",
                             "A player was banned because he reached maximum spam limit.");
                     }
@@ -125,7 +127,7 @@ class StringChecker
                 array_map('trim', explode(',', $raw)),
                 static fn (string $token): bool => $token !== ''
             ));
-            $cache->set("filteredUrlsCache", $invalidPages, 2 * 86400);
+            $cache->set("filteredUrlsCache", $invalidPages, 2 * Time::DAY);
         }
         if ($string === '') {
             return true;

@@ -21,10 +21,10 @@ $check(str_contains($session, '2 => 1,') && str_contains($session, '3 => 2,') &&
 $launcher = $read('game/include/Core/Jobs/Launcher.php');
 $check(str_contains($launcher, "[new Reminders(), 'vacationEnding']") && str_contains($launcher, 'routineJobs:vacationEndingReminders'), 'The ending reminder is an engine job.');
 $reminders = $read('game/include/Game/Mail/Reminders.php');
-$check(str_contains($reminders, 'INSERT IGNORE INTO email_reminder_sent') && str_contains($reminders, 'NOT EXISTS (SELECT 1 FROM email_reminder_sent') && str_contains($reminders, 'p.enabled = 1') && str_contains($reminders, 'ENDING_WITHIN = 86400'), 'Each vacation is reminded once, within a day of its end, for opted-in players.');
+$check(str_contains($reminders, 'INSERT IGNORE INTO email_reminder_sent') && str_contains($reminders, 'NOT EXISTS (SELECT 1 FROM email_reminder_sent') && str_contains($reminders, 'p.enabled = 1') && str_contains($reminders, 'ENDING_WITHIN = Time::DAY'), 'Each vacation is reminded once, within a day of its end, for opted-in players.');
 $check(str_contains($read('database/world.sql'), 'CREATE TABLE `email_reminder_sent`'), 'world.sql has the reminder marker table.');
 $kind = $read('game/include/Game/Mail/EmailKind.php');
-foreach (['self::VacationEnding, self::VacationStarted => [1, 86400]', 'self::SitterSignIn => [1, 86400]'] as $limit) {
+foreach (['self::VacationEnding, self::VacationStarted => [1, Time::DAY]', 'self::SitterSignIn => [1, Time::DAY]'] as $limit) {
     $check(str_contains($kind, $limit), "Rate limit: {$limit}");
 }
 $event = $read('game/include/Game/Mail/EventMail.php');

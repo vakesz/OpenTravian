@@ -9,6 +9,7 @@ use Core\Database\GlobalDB;
 use Core\Helper\IPTracker;
 use Core\Helper\SessionVar;
 use Core\Helper\WebService;
+use Game\AccessLevel;
 use Game\Admin\AdminAccounts;
 use Game\Admin\AuditLog;
 use Game\Admin\TwoFactorGate;
@@ -35,7 +36,7 @@ class Session
     public const CAN_CHANGE_SETTINGS = 123;
     private const ACTION_REPLAY_WINDOW = 3.0;
     /** Seconds between two writes of a player's last-seen time. */
-    private const LAST_SEEN_WRITE_INTERVAL = 60;
+    private const LAST_SEEN_WRITE_INTERVAL = Time::MINUTE;
     /** @var \Core\Session|null */
     private static $_self;
     private static ?string $claimedFingerprint = null;
@@ -217,7 +218,7 @@ class Session
                 redirect("/dorf1.php");
                 return;
             }
-            if ($isSitter && time() - $data['last_owner_login_time'] > 21 * 86400) {
+            if ($isSitter && time() - $data['last_owner_login_time'] > 21 * Time::DAY) {
                 $this->logout();
                 redirect("/dorf1.php"); //TODO: it's causing problem
                 return;
@@ -561,7 +562,7 @@ class Session
 
     public function isReallyAdmin(): bool
     {
-        return (AdminAccounts::isAdmin((int)$this->data['id']) || $this->data['access'] == 2);
+        return (AdminAccounts::isAdmin((int)$this->data['id']) || $this->data['access'] == AccessLevel::ADMIN);
     }
 
     public static function getCheckerInput(): string
@@ -794,7 +795,7 @@ class Session
         if (!headers_sent()) {
             $cookieParams = function_exists('travian_session_cookie_params') ? travian_session_cookie_params() : [];
             setcookie('travian-lang', $Lang, [
-                'expires' => time() + 365 * 86400,
+                'expires' => time() + 365 * Time::DAY,
                 'path' => '/',
                 'secure' => !empty($cookieParams['secure']),
                 'httponly' => true,
@@ -1045,7 +1046,7 @@ class Session
     {
         $this->data['aid'] = $aid;
         $quest = Quest::getInstance();
-        $quest->setQuestBitwise('world', 8, 1);
+        $quest->setQuestBitwise('world', Quest::WORLD_ALLIANCE, 1);
     }
 
     public function hasGoldClub(): bool
@@ -1287,7 +1288,7 @@ class Session
 
     public function getCP(): float
     {
-        return round($this->data['cp'] + ($this->data['cp_prod'] / 86400 * (time() - $this->data['lastupdate'])));
+        return round($this->data['cp'] + ($this->data['cp_prod'] / Time::DAY * (time() - $this->data['lastupdate'])));
     }
 
     public function isInVacationMode(): bool
@@ -1394,7 +1395,7 @@ class Session
             Caching::getInstance()->set(
                 "reportFilters:" . self::reportFiltersCacheKey(),
                 $_SESSION['reportFiltersHex'] = explode(",", '0,0,0,7,31,31,255'),
-                3 * 86400
+                3 * Time::DAY
             );
         }
         return $_SESSION['reportFiltersHex'];
@@ -1413,7 +1414,7 @@ class Session
         $key = WebService::fixSessionPrefix("reportFilters");
         if (!isset($_COOKIE[$key])) {
             $_COOKIE[$key] = mt_rand(11111111, 99999999);
-            setcookie($key, (string) $_COOKIE[$key], time() + 7 * 86400);
+            setcookie($key, (string) $_COOKIE[$key], time() + 7 * Time::DAY);
         }
         $int = (int)$_COOKIE[$key];
         if ($int > 99999999 || $int < 11111111) {
@@ -1462,7 +1463,7 @@ class Session
         Caching::getInstance()->set(
             "reportFilters:" . self::reportFiltersCacheKey(),
             $_COOKIE['reportFiltersHex'],
-            7 * 86400
+            7 * Time::DAY
         );
     }
 
@@ -1674,7 +1675,7 @@ class Session
 
     public function banned(): bool
     {
-        return $this->get("access") == 0;
+        return $this->get("access") == AccessLevel::BANNED;
     }
 
     public function needValidation(): bool

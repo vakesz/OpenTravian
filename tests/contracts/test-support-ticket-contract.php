@@ -46,7 +46,7 @@ assertSupportTicket(str_contains($helpers, "return '/support/ticket';"), 'All pu
 
 foreach ([
     'Session::validateChecker()',
-    "throttle_public_form('support', 5, 3600)",
+    "throttle_public_form('support', 5, Time::HOUR)",
     'SupportContact::email()',
     'SmtpConfig::isConfigured()',
     'Mailer::sendEmail(',

@@ -4,7 +4,9 @@ use Core\Database\DB;
 use Core\Helper\Notification;
 use Core\Helper\WebService;
 use Core\Session;
+use Game\AccessLevel;
 use Game\Formulas;
+use Game\UserId;
 use Model\MessageModel;
 
 class GiftsCtrl
@@ -117,8 +119,8 @@ class GiftsCtrl
         }
 
         $db = DB::getInstance();
-        $db->query("UPDATE users SET gift_gold=gift_gold+$amount WHERE id>2 AND access<>2");
-        $users = $db->query('SELECT id FROM users WHERE id>2 AND access<>2');
+        $db->query("UPDATE users SET gift_gold=gift_gold+$amount WHERE id>" . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
+        $users = $db->query('SELECT id FROM users WHERE id>' . UserId::LAST_SYSTEM . ' AND access<>' . AccessLevel::ADMIN);
         $message = new MessageModel();
         while ($row = $users->fetch_assoc()) {
             $message->sendMessage(0, (int)$row['id'], null, $amount, 4);

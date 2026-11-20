@@ -9,6 +9,7 @@ use Core\Helper\PageNavigator;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Model\AllianceModel;
 use Model\ForumModel;
 use resources\View\PHPBatchView;
@@ -511,7 +512,7 @@ class AllianceForum extends AnyCtrl
         $finish = TimezoneHelper::strtotime(
             TimezoneHelper::date(
                 "Y-m-d H:i:s",
-                $config->game->start_time + $config->game->round_length * 86400
+                $config->game->start_time + $config->game->round_length * Time::DAY
             ),
             'Y-m-d H:i:s'
         );
