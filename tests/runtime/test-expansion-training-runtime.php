@@ -28,6 +28,10 @@ $fail = static function (string $message): never {
     exit(1);
 };
 $pdo = DBI::getInstance();
+// The rows are counted by their amount field: keep the speed-world Train maximum button (its own cta) out, whether the
+// world rule or a dev stack (TRAVIAN_DEV_TOOLS=1 forces the shortcuts on) would show it.
+putenv('TRAVIAN_DEV_TOOLS');
+\Core\Config::getInstance()->custom->speedShortcuts = false;
 try {
     $user = fixtureVillageCreate();
 } catch (RuntimeException $exception) {
