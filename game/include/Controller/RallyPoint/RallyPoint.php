@@ -28,6 +28,9 @@ use resources\View\PHPBatchView;
 
 class RallyPoint extends RallyPointHTML
 {
+    /** Legacy rally-point form code for "found a new village" (`?a=6`); not a movement attack type. */
+    public const NEW_VILLAGE_FORM = 6;
+
     /** @var mixed */
     protected $rallyPointLvl;
     /** @var bool|float|int */
@@ -502,7 +505,7 @@ class RallyPoint extends RallyPointHTML
                 "errorMsg" => NULL,
                 "showSendTroops" => FALSE,
                 "troops_details" => '',
-                "attack_type" => MovementsModel::ATTACKTYPE_EVASION,
+                "attack_type" => self::NEW_VILLAGE_FORM,
                 "timestamp_checksum" => get_random_string(6),
                 "timestamp" => time(),
                 "submitButton" => getButton([
@@ -600,7 +603,7 @@ class RallyPoint extends RallyPointHTML
                 MovementsModel::ATTACKTYPE_SETTLERS,
                 0);
             $view->vars['process'] = $result;
-            $view->vars['extra'] = '&a=6';
+            $view->vars['extra'] = '&a=' . self::NEW_VILLAGE_FORM;
             return $view->output();
         }
     }

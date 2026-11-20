@@ -154,7 +154,7 @@ class RallyPointCtrl extends AnyCtrl
                 $x['content'] .= $view->output();
                 break;
             case 2:
-                if (isset($_GET['a']) && $_GET['a'] == 6) {
+                if (isset($_GET['a']) && $_GET['a'] == RallyPoint::NEW_VILLAGE_FORM) {
                     $x['content'] .= $rallyPoint->procSettlers();
                     break;
                 }
