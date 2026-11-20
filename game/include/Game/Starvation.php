@@ -87,7 +87,17 @@ class Starvation
         $clay = $elapsedTime * ($this->villageRow['clayp'] / 3600000);
         $iron = $elapsedTime * ($this->villageRow['ironp'] / 3600000);
 
-        $this->db->query("UPDATE vdata SET lastmupdate=$now, wood=LEAST(maxstore, wood+$wood), clay=LEAST(maxstore, clay+$clay), iron=LEAST(maxstore, iron+$iron), crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid}");
+        // Guarded by the lastmupdate we read, so the interval is credited once (see ResourcesHelper::updateVillageResources).
+        // On a miss another writer has already accrued it. The crop that the starved troops gave back is
+        // still credited: those troops are gone either way. affected_rows is also 0 when the row matched but
+        // nothing changed. The fallback then adds the same refund, which is zero or capped at maxcrop, so that is harmless.
+        $this->db->query("UPDATE vdata SET lastmupdate=$now, wood=LEAST(maxstore, wood+$wood), clay=LEAST(maxstore, clay+$clay), iron=LEAST(maxstore, iron+$iron), crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid} AND lastmupdate=" . (int)$this->villageRow['lastmupdate']);
+        if ((int)$this->db->affectedRows() === 0) {
+            $starvedRefund = $crop - $elapsedTime * ($cropProduction / 3600000);
+            if ($starvedRefund > 0) {
+                $this->db->query("UPDATE vdata SET crop=LEAST(maxcrop, crop+$starvedRefund) WHERE kid={$this->kid}");
+            }
+        }
 
         $hdp = VillageModel::getHDP($this->kid);
         ResourcesHelper::updateVillageUpkeep($this->villageRow['owner'], $this->kid, $this->villageRow['isWW'] == 1, $hdp);

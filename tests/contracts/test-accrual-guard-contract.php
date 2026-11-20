@@ -5,7 +5,8 @@ declare(strict_types=1);
 /**
  * Source contract: ResourcesHelper::updateVillageResources credits accrual relatively (so a concurrent debit is
  * kept), clamps it to the stores, and guards both of its writes with the lastmupdate it read (so one interval is
- * credited once). When the full-mode guard misses, the recomputed production is still stored.
+ * credited once). When the full-mode guard misses, the recomputed production is still stored. Starvation's own
+ * settlement uses the same guard.
  * The behaviour is exercised in tests/runtime/test-accrual-debit-race-runtime.php; the guard-miss branch needs a
  * concurrent writer, so it is pinned here.
  */
@@ -36,6 +37,23 @@ if (preg_match('/crop=\{\$crop\}/', $body)) {
 }
 if (!preg_match('/affectedRows\(\) === 0\) \{\s*\$db->query\("UPDATE vdata SET woodp=\{\$production\[0\]\}, clayp=\{\$production\[1\]\}, ironp=\{\$production\[2\]\}, cropp=\{\$production\[3\]\} WHERE kid=\$kid"\);/', $body)) {
     failAccrualGuardContract('when the full-mode guard misses, the recomputed production must still be stored.');
+}
+
+// Starvation settles the village's resources itself. It must use the same guard and must not lose the crop that the
+// starved troops gave back when the guard misses.
+$starvation = file_get_contents(dirname(__DIR__, 2) . '/game/include/Game/Starvation.php');
+if ($starvation === false) {
+    failAccrualGuardContract('could not read Starvation.php.');
+}
+if (!str_contains($starvation, 'crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid} AND lastmupdate=" . (int)$this->villageRow[\'lastmupdate\']')) {
+    failAccrualGuardContract('Starvation must credit its accrual relatively, guarded by the lastmupdate it read.');
+}
+if (!preg_match('/affectedRows\(\) === 0\) \{\s*\$starvedRefund = \$crop - \$elapsedTime \* \(\$cropProduction \/ 3600000\);/', $starvation)
+    || !str_contains($starvation, 'UPDATE vdata SET crop=LEAST(maxcrop, crop+$starvedRefund) WHERE kid={$this->kid}')) {
+    failAccrualGuardContract('when the Starvation guard misses, only the crop given back by the starved troops may be credited.');
+}
+if (str_contains($starvation, 'iron=LEAST(maxstore, iron+$iron), crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid}")')) {
+    failAccrualGuardContract('Starvation must not write an unguarded accrual.');
 }
 
 echo "Accrual guard contract passed.\n";
