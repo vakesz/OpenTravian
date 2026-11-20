@@ -62,6 +62,10 @@ function fixtureVillageCreate(?int $race = null): array
         'email' => "''",
         'aid' => '0',
         'alliance_role' => '0',
+        // A fresh login time: a copied stale one trips the Session idle timeout, which redirects and exits 0
+        // part-way through a test that logs in as the fixture player, so the test would pass without running.
+        'last_login_time' => 'UNIX_TIMESTAMP()',
+        'last_owner_login_time' => 'UNIX_TIMESTAMP()',
     ]);
     if ($uid <= 0) {
         throw new RuntimeException('The fixture player could not be created.');
