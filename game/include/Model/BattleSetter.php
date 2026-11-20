@@ -7,6 +7,8 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Gid;
+use Game\Tribes;
 use mysqli_result;
 
 use function array_filter_units;
@@ -466,19 +468,19 @@ class BattleSetter
                 return false;
             }
             $build = $defender['buildings'][$i];
-            if ($build['item_id'] == 34) {
+            if ($build['item_id'] == Gid::STONEMASON) {
                 $defender['stone'] = $build['level'];
-            } elseif (in_array($build['item_id'], [25, 26, 44])) {
+            } elseif (in_array($build['item_id'], Gid::EXPANSION)) {
                 $defender['rp'] = $build['level'];
             } elseif ($i == 40) {
                 $defender['wall'] = $build['level'];
-            } elseif ($race == 3 && $build['item_id'] == 36) {
+            } elseif ($race == Tribes::GAULS && $build['item_id'] == Gid::TRAPPER) {
                 $totalTraps += Formulas::trapperValue($build['level']);
-            } elseif ($build['item_id'] == 23) {
+            } elseif ($build['item_id'] == Gid::CRANNY) {
                 $defender['totalCranny'] += Formulas::crannyCAP($build['level'], $race);
-            } elseif ($build['item_id'] == 41) {
+            } elseif ($build['item_id'] == Gid::HORSE_DRINKING_TROUGH) {
                 $defender['hdp'] = $build['level'];
-            } elseif ($build['item_id'] == 16) {
+            } elseif ($build['item_id'] == Gid::RALLY_POINT) {
                 $defender['rallyPoint'] = $build['level'];
             }
         }
@@ -535,7 +537,7 @@ class BattleSetter
     public function getAttackerNeededBuildings(int|string $kid): array
     {
         $kid = (int) $kid;
-        $result = [14 => 0, 37 => 0, 27 => 0, 41 => 0];
+        $result = [Gid::TOURNAMENT_SQUARE => 0, Gid::HEROS_MANSION => 0, Gid::TREASURY => 0, Gid::HORSE_DRINKING_TROUGH => 0];
         $count = 4;
         $buildings = $this->fetchRow("SELECT * FROM fdata WHERE kid=$kid");
         for ($i = 19; $buildings !== null && $i <= 38; ++$i) {

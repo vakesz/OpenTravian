@@ -10,6 +10,8 @@ use Core\Session;
 use Core\Village;
 use Game\BuildRequest;
 use Game\Formulas;
+use Game\Tribes;
+use Game\Unit;
 use Model\ResourceFieldsModel;
 use PDO;
 use resources\View\GameView;
@@ -189,7 +191,7 @@ class ResourceFieldsCtrl extends GameCtrl
                     continue;
                 }
                 $unitsSummary += $row['u' . $i];
-                if ($row['race'] == 4) {
+                if ($row['race'] == Tribes::NATURE) {
                     if (!isset($animals[nrToUnitId($i, $row['race'])])) {
                         $animals[nrToUnitId($i, $row['race'])] = 0;
                     }
@@ -204,9 +206,9 @@ class ResourceFieldsCtrl extends GameCtrl
         }
         ksort($animals, SORT_NUMERIC);
         ksort($assoc_units, SORT_NUMERIC);
-        if (isset($assoc_units[98])) {
-            $temp = [98 => $assoc_units[98]];
-            unset($assoc_units[98]);
+        if (isset($assoc_units[Unit::HERO_ID])) {
+            $temp = [Unit::HERO_ID => $assoc_units[Unit::HERO_ID]];
+            unset($assoc_units[Unit::HERO_ID]);
             $assoc_units = $temp + $assoc_units;
         }
         $assoc_units = $assoc_units + $animals;

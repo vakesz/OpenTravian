@@ -28,7 +28,7 @@ foreach (['id="expansionTab"', 'class="prerequisites"', 'class="unlockLevel"', '
 if (str_contains($template, '<table')) {
     failResidenceExpansionSlotsContract('The expansion tab must not render the old founded-villages table.');
 }
-if (!str_contains($helper, '[25 => [10, 20], 26 => [10, 15, 20], 44 => [10, 15, 20]]')) {
+if (!str_contains($helper, '[Gid::RESIDENCE => [10, 20], Gid::PALACE => [10, 15, 20], Gid::COMMAND_CENTER => [10, 15, 20]]')) {
     failResidenceExpansionSlotsContract('The expansion slot levels must be defined once in TrainingHelper.');
 }
 if (preg_match_all('/\$(?:residence|palace|commandCenter) (?:>=|==) (?:10|15|20)/', $helper) > 0) {

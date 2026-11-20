@@ -10,6 +10,8 @@ use Game\Hero\HeroHelper;
 use Game\NoticeHelper;
 use Game\ResourcesHelper;
 use Game\SpeedCalculator;
+use Game\Tribes;
+use Game\Unit;
 use Model\AutomationModel;
 use Model\ArtefactsModel;
 use Model\MovementsModel;
@@ -33,7 +35,7 @@ class ReinforcementProcessor
         $m = new AutomationModel();
         $db = DB::getInstance();
         if (!$this->getVillageState($toKid)) {
-            if ($race !== 5) {
+            if ($race !== Tribes::NATARS) {
                 $this->returnTroops($row);
             }
             return;
@@ -41,7 +43,7 @@ class ReinforcementProcessor
         $oasesModel = new OasesModel();
         $isOasis = $oasesModel->isOasis($toKid);
         $redeployHero = false;
-        $uid = $race === 4 ? 0 : (int) $m->getVillage($kid, 'owner')['owner'];
+        $uid = $race === Tribes::NATURE ? 0 : (int) $m->getVillage($kid, 'owner')['owner'];
         $to_uid = (int) ($isOasis
             ? $db->query("SELECT owner FROM odata WHERE kid=$toKid")->fetch_assoc()['owner']
             : $m->getVillage($toKid, 'owner')['owner']);
@@ -57,12 +59,12 @@ class ReinforcementProcessor
         }
         $units = [];
         for ($i = 1; $i <= 11; ++$i) {
-            $units[$i] = $i === 11 && $redeployHero ? 0 : (int) $row['u' . $i];
+            $units[$i] = $i === Unit::HERO && $redeployHero ? 0 : (int) $row['u' . $i];
         }
         if (array_sum($units) > 0) {
             $move = new MovementsModel();
             $enforceId = false;
-            if (!$isOasis && $race === 4) {
+            if (!$isOasis && $race === Tribes::NATURE) {
                 //Oasis troops coming!
                 $enforceId = $db->fetchScalar("SELECT e.id FROM enforcement e WHERE e.race=4 AND e.to_kid=$toKid LIMIT 1");
             }
@@ -99,7 +101,7 @@ class ReinforcementProcessor
             $consumption += $units[$i] * Formulas::uUpkeep(nrToUnitId($i, $race));
             //here consumption doesn't include effect of artefact or horse drinking pool
         }
-        if ($race !== 4) {
+        if ($race !== Tribes::NATURE) {
             // Updating upkeep for receiver
             $targetKid = $isOasis ? $oasesModel->getOasisCaptureKid($toKid) : $toKid;
             $upkeep = ResourcesHelper::getTotalCropConsumption($race, $units, VillageModel::getHDP($targetKid, $race));
@@ -158,14 +160,14 @@ class ReinforcementProcessor
                 continue;
             }
             $units[$i] = $count;
-            if ($i === 11) {
+            if ($i === Unit::HERO) {
                 continue;
             }
             $speeds[] = Formulas::uSpeed(nrToUnitId($i, $race));
             $units_id[] = nrToUnitId($i, $race);
         }
         $uid = (int) $db->fetchScalar("SELECT owner FROM vdata WHERE kid=$kid");
-        if ($units[11] > 0) {
+        if ($units[Unit::HERO] > 0) {
             $calculator->hasHero();
             $heroHelper = new HeroHelper();
             $inventory = $db->query("SELECT * FROM inventory WHERE uid=$uid")->fetch_assoc();

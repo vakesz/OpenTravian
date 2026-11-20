@@ -20,13 +20,13 @@ class TrainingHelper
         $db = DB::getInstance();
         $totalTraps = 0;
         for ($i = 19; $i <= 38; $i++) {
-            if ($village->getField($i)['item_id'] == 36) {
+            if ($village->getField($i)['item_id'] == Gid::TRAPPER) {
                 $totalTraps += Formulas::getTrapperValueByLevel($village->getField($i)['level']);
             }
         }
         $totalTraps -= $db->fetchScalar("SELECT u99 FROM units WHERE kid={$village->getKid()} LIMIT 1");
         $totalTraps -= $db->fetchScalar("SELECT SUM(num) FROM training WHERE kid={$village->getKid()} AND item_id=36");
-        $cost = Formulas::uTrainingCost(99);
+        $cost = Formulas::uTrainingCost(Unit::TRAP);
         $can = [];
         foreach ($village->getCurrentResources(-1, TRUE) as $r => $v) {
             $can[$r] = floor($v / $cost[$r]);
@@ -46,13 +46,13 @@ class TrainingHelper
         $db = DB::getInstance();
         $totalTraps = 0;
         for ($i = 19; $i <= 38; $i++) {
-            if ($village->getField($i)['item_id'] == 36) {
+            if ($village->getField($i)['item_id'] == Gid::TRAPPER) {
                 $totalTraps += Formulas::getTrapperValueByLevel($village->getField($i)['level']);
             }
         }
         $totalTraps -= $db->fetchScalar("SELECT u99 FROM units WHERE kid={$village->getKid()} LIMIT 1");
         $totalTraps -= $db->fetchScalar("SELECT SUM(num) FROM training WHERE kid={$village->getKid()} AND item_id=36");
-        $cost = Formulas::uTrainingCost(99);
+        $cost = Formulas::uTrainingCost(Unit::TRAP);
         $can = floor(array_sum($village->getCurrentResources(-1, TRUE)) / array_sum($cost));
         return min($can, $totalTraps);
     }
@@ -90,7 +90,7 @@ class TrainingHelper
     }
 
     /** Levels at which each expansion slot of a Residence, Palace or Command Center unlocks. */
-    private const SLOT_LEVELS = [25 => [10, 20], 26 => [10, 15, 20], 44 => [10, 15, 20]];
+    private const SLOT_LEVELS = [Gid::RESIDENCE => [10, 20], Gid::PALACE => [10, 15, 20], Gid::COMMAND_CENTER => [10, 15, 20]];
 
     /**
      * Settlers and chiefs queued for training in the Residence, Palace or Command Center of the village.
@@ -130,14 +130,14 @@ class TrainingHelper
     public static function expansionBuilding(): array
     {
         $village = Village::getInstance();
-        foreach ([25, 44] as $gid) {
+        foreach ([Gid::RESIDENCE, Gid::COMMAND_CENTER] as $gid) {
             $level = max($village->getTypeLevel($gid));
             if ($level) {
                 return [$gid, (int)$level];
             }
         }
 
-        return [26, (int)max($village->getTypeLevel(26))];
+        return [Gid::PALACE, (int)max($village->getTypeLevel(Gid::PALACE))];
     }
 
     /**
@@ -188,7 +188,7 @@ class TrainingHelper
         // trapped settlers/chiefs calculation required
         $settlerslots = ($maxslots * 3) - $settlers - ($chiefs * 3);
         $chiefslots = $maxslots - $chiefs - floor(($settlers + 2) / 3);
-        $cost = Formulas::uTrainingCost(nrToUnitId(10, Session::getInstance()->getRace()));
+        $cost = Formulas::uTrainingCost(nrToUnitId(Unit::SETTLER, Session::getInstance()->getRace()));
         $can = [];
         foreach ($village->getCurrentResources(-1, TRUE) as $r => $v) {
             $can[$r] = floor($v / $cost[$r]);
@@ -196,10 +196,10 @@ class TrainingHelper
                 $can[$r] = $settlerslots;
             }
         }
-        if ($nr == 10) {
+        if ($nr == Unit::SETTLER) {
             return $calc ? $settlerslots : min($can);
         }
-        $cost = Formulas::uTrainingCost(nrToUnitId(9, Session::getInstance()->getRace()));
+        $cost = Formulas::uTrainingCost(nrToUnitId(Unit::CHIEF, Session::getInstance()->getRace()));
         $can = [];
         foreach ($village->getCurrentResources(-1, TRUE) as $r => $v) {
             $can[$r] = floor($v / $cost[$r]);
@@ -207,7 +207,7 @@ class TrainingHelper
                 $can[$r] = $chiefslots;
             }
         }
-        if ($nr == 9) {
+        if ($nr == Unit::CHIEF) {
             return $calc ? $chiefslots : min($can);
         }
         if ($nr == 0) {
@@ -247,14 +247,14 @@ class TrainingHelper
         // trapped settlers/chiefs calculation required
         $settlerslots = ($maxslots * 3) - $settlers - ($chiefs * 3);
         $chiefslots = $maxslots - $chiefs - floor(($settlers + 2) / 3);
-        $cost = Formulas::uTrainingCost(nrToUnitId(10, Session::getInstance()->getRace()));
+        $cost = Formulas::uTrainingCost(nrToUnitId(Unit::SETTLER, Session::getInstance()->getRace()));
         $can = min(floor(array_sum($village->getCurrentResources(-1, TRUE)) / array_sum($cost)), $settlerslots);
-        if ($nr == 10) {
+        if ($nr == Unit::SETTLER) {
             return $calc ? $settlerslots : $can;
         }
-        $cost = Formulas::uTrainingCost(nrToUnitId(9, Session::getInstance()->getRace()));
+        $cost = Formulas::uTrainingCost(nrToUnitId(Unit::CHIEF, Session::getInstance()->getRace()));
         $can = min(floor(array_sum($village->getCurrentResources()) / array_sum($cost)), $chiefslots);
-        if ($nr == 9) {
+        if ($nr == Unit::CHIEF) {
             return $calc ? $chiefslots : $can;
         }
         if ($nr == 0) {
@@ -298,7 +298,7 @@ class TrainingHelper
      */
     public function getMaxUnitByNr($nr, $great = FALSE)
     {
-        if ($nr == 99) {
+        if ($nr == Unit::TRAP) {
             return $this->getMaxTraps();
         }
         if ($nr >= 9) {
@@ -314,7 +314,7 @@ class TrainingHelper
      */
     public function getMaxUnitByNr2($nr, $great = FALSE)
     {
-        if ($nr == 99) {
+        if ($nr == Unit::TRAP) {
             return $this->getMaxTraps2();
         }
         if ($nr >= 9) {

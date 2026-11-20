@@ -8,6 +8,7 @@ use Controller\Build\TroopBuilding;
 use Core\Database\DB;
 use Game\Buildings\AutoUpgradeAI;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use function getGameSpeed;
 use function method_exists;
@@ -100,29 +101,29 @@ class AI_MAIN
         for ($i = 19; $i <= 38; ++$i) {
             $build = $this->buildings[$i];
             if (!$build['item_id'] || $build['level'] <= 0) continue;
-            if ($build['item_id'] == 19 || $build['item_id'] == 29) {
+            if ($build['item_id'] == Gid::BARRACKS || $build['item_id'] == Gid::GREAT_BARRACKS) {
                 $this->training_buildings['barracks'][] = $build;
-            } else if ($build['item_id'] == 20 || $build['item_id'] == 30) {
+            } else if ($build['item_id'] == Gid::STABLE || $build['item_id'] == Gid::GREAT_STABLE) {
                 $this->training_buildings['stable'][] = $build;
-            } else if ($build['item_id'] == 21) {
+            } else if ($build['item_id'] == Gid::WORKSHOP) {
                 $this->training_buildings['workshop'][] = $build;
-            } else if ($build['item_id'] == 41) {
+            } else if ($build['item_id'] == Gid::HORSE_DRINKING_TROUGH) {
                 $this->training_buildings['horseDrinking'] = $build['level'];
-            } else if ($build['item_id'] == 13) {
+            } else if ($build['item_id'] == Gid::SMITHY) {
                 $this->training_buildings['smithyLevel'] = $build['level'];
-            } else if ($build['item_id'] == 22) {
+            } else if ($build['item_id'] == Gid::ACADEMY) {
                 $this->training_buildings['academyLevel'] = $build['level'];
             }
         }
         $available = [];
         if (sizeof($this->training_buildings['barracks'])) {
-            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], 19));
+            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], Gid::BARRACKS));
         }
         if (sizeof($this->training_buildings['stable'])) {
-            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], 20));
+            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], Gid::STABLE));
         }
         if (sizeof($this->training_buildings['workshop'])) {
-            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], 21));
+            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], Gid::WORKSHOP));
         }
         $this->training_buildings['available'] = array_map("unitIdToNr", $available);
     }
@@ -151,10 +152,10 @@ class AI_MAIN
         $stable = $this->training_buildings['stable'];
         $workshop = $this->training_buildings['workshop'];
         $arr = [];
-        $barracksUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, 19));
-        $stableUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, 20));
-        $onlyGreatBarracks = sizeof($this->training_buildings['barracks']) == 1 && $this->training_buildings['barracks'][0]['item_id'] == 29;
-        $onlyGreatStable = sizeof($stable) == 1 && $stable[0]['item_id'] == 30;
+        $barracksUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, Gid::BARRACKS));
+        $stableUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, Gid::STABLE));
+        $onlyGreatBarracks = sizeof($this->training_buildings['barracks']) == 1 && $this->training_buildings['barracks'][0]['item_id'] == Gid::GREAT_BARRACKS;
+        $onlyGreatStable = sizeof($stable) == 1 && $stable[0]['item_id'] == Gid::GREAT_STABLE;
         foreach ($this->training_buildings['available'] as $i) {
             $isGreat = false;
             $isBarracks = in_array($i, $barracksUnits);
@@ -309,11 +310,11 @@ class AI_MAIN
     private function getTypeLevel($gid)
     {
         $buildingsAssoc = $this->buildings;
-        if ($gid == 16) {
+        if ($gid == Gid::RALLY_POINT) {
             return [$buildingsAssoc[39]['level']];
         }
         $lvl = [];
-        if ($gid <= 4) {
+        if ($gid <= Gid::LAST_RESOURCE_FIELD) {
             for ($i = 1; $i <= 18; ++$i) {
                 if ($buildingsAssoc[$i]['item_id'] == $gid) {
                     $lvl[] = $buildingsAssoc[$i]['level'];

@@ -40,13 +40,13 @@ final class Wounded
     /** Which building a tribe heals in. */
     public static function buildingFor(int $tribe): int
     {
-        return $tribe === 8 ? self::ASCLEPEION : self::HOSPITAL;
+        return $tribe === Tribes::SPARTANS ? self::ASCLEPEION : self::HOSPITAL;
     }
 
     /** Unit numbers (1-10) that can be wounded: not siege (7, 8), administrators (9) or settlers (10). */
     public static function canBeWounded(int $tribe, int $nr): bool
     {
-        return !in_array($tribe, [4, 5], true) && $nr >= 1 && $nr <= 6;
+        return !in_array($tribe, [Tribes::NATURE, Tribes::NATARS], true) && $nr >= 1 && $nr <= 6;
     }
 
     public static function decayed(float $amount, int $seconds): float
@@ -87,7 +87,7 @@ final class Wounded
      */
     public static function record(int $homeKid, int $tribe, array $dead): array
     {
-        if ($homeKid <= 0 || in_array($tribe, [4, 5], true)) {
+        if ($homeKid <= 0 || in_array($tribe, [Tribes::NATURE, Tribes::NATARS], true)) {
             return [];
         }
         if (self::buildingLevel($homeKid, $tribe) <= 0) {

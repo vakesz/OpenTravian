@@ -4,10 +4,16 @@ namespace Controller\RallyPoint;
 
 use Core\Session;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\NoticeHelper;
+use Game\Tribes;
+use Game\Unit;
 use resources\View\PHPBatchView;
+use Model\MovementsModel;
 use Model\ReportsModel;
 
 class Combat
@@ -21,7 +27,7 @@ class Combat
         $session = Session::getInstance();
         $this->output = [];
         $this->output['uid'] = $session->getPlayerId();
-        $this->output['attack_type'] = 3;
+        $this->output['attack_type'] = MovementsModel::ATTACKTYPE_NORMAL;
         $this->output['attacker'] = [
             'race'                  => $session->getRace(),
             'units'                 => array_fill(0, 10, ["number" => 0, "level" => 0,]),
@@ -148,7 +154,7 @@ class Combat
                     $value['units'][$i - 1]['number'] = isset($_POST['a2_' . nrToUnitId($i,
                             $race)]) ? (int)$_POST['a2_' . nrToUnitId($i, $race)] : 0;
                 }
-                if ($race <> 4 && $i < 8) {
+                if ($race <> Tribes::NATURE && $i < 8) {
                     $value['units'][$i - 1]['level'] = isset($_POST['f2_' . nrToUnitId($i,
                             $race)]) ? (int)$_POST['f2_' . nrToUnitId($i, $race)] : 0;
                 }
@@ -198,11 +204,11 @@ class Combat
             }
             $spyCount = $this->output['attacker']['units'][Formulas::getSpyId($this->output['attacker']['race']) - 1]['number'];
             if ($sum - $spyCount == 0) {
-                $attack_type = 1;
+                $attack_type = MovementsModel::ATTACKTYPE_SPY;
             }
             $race = $this->output['defender']['main'];
             $data = [
-                "R"              => $this->output['attack_type'] == 3,
+                "R"              => $this->output['attack_type'] == MovementsModel::ATTACKTYPE_NORMAL,
                 "trapped2killed" => [],
                 "defender"       => [
                     "r"         => $race - 1,
@@ -251,7 +257,7 @@ class Combat
                 "u"    => [],
                 "U"    => [],
                 "side" => 'off',
-                'h'    => (bool)$this->output['attacker']['hero'] && $attack_type <> 1,
+                'h'    => (bool)$this->output['attacker']['hero'] && $attack_type <> MovementsModel::ATTACKTYPE_SPY,
                 'B'    => $this->output['attacker']['brewery'],
                 'C'    => $this->output['attacker']['celebration'],
                 'M'    => $this->output['attacker']['allianceBonus'],
@@ -286,13 +292,13 @@ class Combat
     /** @return int[] Tribes the attacking side can be set to (order, Natars last). */
     public static function attackerTribes(): array
     {
-        return array_merge(self::playableAscending(), [5]);
+        return array_merge(self::playableAscending(), [Tribes::NATARS]);
     }
 
     /** @return int[] Tribes of the defending village. */
     public static function defenderTribes(): array
     {
-        return array_merge(self::playableAscending(), [4, 5]);
+        return array_merge(self::playableAscending(), [Tribes::NATURE, Tribes::NATARS]);
     }
 
     /** @return int[] Tribes that can add reinforcements to the defence (no Natars). */
@@ -351,18 +357,18 @@ class Combat
             HeroItems::weaponTypes()
         );
         $bodyType = self::simulatorItemType($prefix . '_hero_body', range(82, 93));
-        $bagType = self::simulatorItemType($prefix . '_hero_bag', [112, 113]);
+        $bagType = self::simulatorItemType($prefix . '_hero_bag', [ItemType::SMALL_BANDAGE, ItemType::BANDAGE]);
         $bagAmount = self::boundedPostInt($prefix . '_hero_bag_amount', 0, 0, 100000);
-        $leftHand = $leftHandType === null ? null : ['btype' => 3, 'type' => $leftHandType];
-        $rightHand = $rightHandType === null ? null : ['btype' => 4, 'type' => $rightHandType];
-        $body = $bodyType === null ? null : ['btype' => 2, 'type' => $bodyType];
+        $leftHand = $leftHandType === null ? null : ['btype' => ItemBtype::LEFT_HAND, 'type' => $leftHandType];
+        $rightHand = $rightHandType === null ? null : ['btype' => ItemBtype::RIGHT_HAND, 'type' => $rightHandType];
+        $body = $bodyType === null ? null : ['btype' => ItemBtype::BODY, 'type' => $bodyType];
         $bag = $bagType === null ? null : [
-            'btype' => $bagType === 112 ? 7 : 8,
+            'btype' => $bagType === ItemType::SMALL_BANDAGE ? ItemBtype::SMALL_BANDAGE : ItemBtype::BANDAGE,
             'type' => $bagType,
             'num' => $bagAmount,
         ];
         $heroHelper = new HeroHelper();
-        $baseTotalPower = 100 + $strength * ($race === 1 ? 100 : 80)
+        $baseTotalPower = 100 + $strength * ($race === Tribes::ROMANS ? 100 : 80)
             + $heroHelper->calcItemPower(0, $leftHand, $body);
         $totalPower = self::boundedPostInt(
             $prefix . '_hero_total_power',
@@ -445,7 +451,7 @@ class Combat
         $makeGroup = static function (string $icon, array $types, ?int $titleType = null) use ($heroItems): array {
             $items = [];
             foreach ($types as $type) {
-                $btype = $type >= 112 ? ($type === 112 ? 7 : 8) : ($type >= 76 && $type <= 81 ? 3 : 2);
+                $btype = $type >= ItemType::SMALL_BANDAGE ? ($type === ItemType::SMALL_BANDAGE ? ItemBtype::SMALL_BANDAGE : ItemBtype::BANDAGE) : ($type >= 76 && $type <= 81 ? ItemBtype::LEFT_HAND : ItemBtype::BODY);
                 $properties = $heroItems->getHeroItemProperties($btype, $type);
                 $items[] = [
                     'type' => $type,
@@ -456,7 +462,7 @@ class Combat
 
             $group = ['icon' => $icon, 'items' => $items];
             if ($titleType !== null) {
-                $btype = $titleType >= 76 && $titleType <= 81 ? 3 : 2;
+                $btype = $titleType >= 76 && $titleType <= 81 ? ItemBtype::LEFT_HAND : ItemBtype::BODY;
                 $group['title'] = (string)$heroItems->getHeroItemProperties($btype, $titleType)['name'];
             }
 
@@ -471,7 +477,7 @@ class Combat
         while ($rows && ($row = $rows->fetch_assoc())) {
             $btype = (int)$row['btype'];
             $type = (int)$row['type'];
-            $slot = $btype === 2 ? 'body' : ($btype === 3 ? 'leftHand' : 'bag');
+            $slot = $btype === ItemBtype::BODY ? 'body' : ($btype === ItemBtype::LEFT_HAND ? 'leftHand' : 'bag');
             $owned[$slot][$type] = max((int)($owned[$slot][$type] ?? 0), (int)$row['num']);
         }
 
@@ -487,8 +493,8 @@ class Combat
                 $makeGroup('armourOfHealth', [91, 92, 93], 92),
             ],
             'bag' => [
-                $makeGroup('smallBandage', [112]),
-                $makeGroup('bandage', [113]),
+                $makeGroup('smallBandage', [ItemType::SMALL_BANDAGE]),
+                $makeGroup('bandage', [ItemType::BANDAGE]),
             ],
             'owned' => $owned,
         ];
@@ -551,9 +557,9 @@ class Combat
                 'population' => max(1, (int)$base['pop']),
                 'units' => $units,
                 'smithy' => $smithy,
-                'wall' => self::buildingLevel($fields, [31, 32, 33, 42, 43, 47, 50]),
+                'wall' => self::buildingLevel($fields, Gid::WALLS),
                 'stonemason' => self::buildingLevel($fields, [34]),
-                'palace' => self::buildingLevel($fields, [25, 26]),
+                'palace' => self::buildingLevel($fields, [Gid::RESIDENCE, Gid::PALACE]),
             ];
         }
 
@@ -661,7 +667,7 @@ class Combat
                 $_POST['a1_' . $i] = (int)($units[$i] ?? 0);
                 $_POST['f1_' . $i] = $i <= 8 ? (int)($smithy[$i] ?? 0) : 0;
             }
-            $_POST['a1_hero'] = (int)($units[11] ?? 0);
+            $_POST['a1_hero'] = (int)($units[Unit::HERO] ?? 0);
             $_POST['ew1'] = $pop;
             return;
         }
@@ -831,8 +837,8 @@ class Combat
         $heroInitial = $hasHero ? 1 : 0;
         $heroRemoved = min($heroInitial, max(0, (int)($trapped[10] ?? 0)) + max(0, (int)($captured[10] ?? 0)));
         $heroLoss = min($heroInitial - $heroRemoved, max(0, $deadHero));
-        $supplyBefore += $heroInitial * (int)Formulas::uUpkeep(98, 0, true);
-        $supplyLost += $heroLoss * (int)Formulas::uUpkeep(98, 0, true);
+        $supplyBefore += $heroInitial * (int)Formulas::uUpkeep(Unit::HERO_ID, 0, true);
+        $supplyLost += $heroLoss * (int)Formulas::uUpkeep(Unit::HERO_ID, 0, true);
 
         return [
             'kind' => $kind,

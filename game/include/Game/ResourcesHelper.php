@@ -110,7 +110,7 @@ class ResourcesHelper
                     continue;
                 }
                 // A dead hero keeps the flat 6 crop production and does not eat.
-                if ($i === 11 && $heroHealth <= 0) {
+                if ($i === Unit::HERO && $heroHealth <= 0) {
                     continue;
                 }
                 $upkeep += Formulas::uUpkeep(nrToUnitId($i, $units['race']), $hdp) * $units['u' . $i];
@@ -205,7 +205,7 @@ class ResourcesHelper
      */
     public static function getTotalCropConsumption($race, $units, $hdp)
     {
-        if ($race == 4) {
+        if ($race == Tribes::NATURE) {
             return 0;
         }
         $total = 0;
@@ -213,7 +213,7 @@ class ResourcesHelper
             if ($nr <= 10) {
                 $unitId = nrToUnitId($nr, $race);
             } else {
-                $unitId = 98;
+                $unitId = Unit::HERO_ID;
             }
             $total += $amount * Formulas::uUpkeep($unitId, $hdp);
         }
@@ -324,7 +324,7 @@ class ResourcesHelper
             $i = $field['item_id'] - 1;
             $bonusMultiplier = (($bonusPercent[$i] + ($oasisBonusPercent[$i] * $waterWorksEffect)) / 100);
             $prod = Formulas::fieldProduction($field['level']);
-            if ($row['owner'] == 1 && $field['item_id'] == 4) {
+            if ($row['owner'] == 1 && $field['item_id'] == Gid::CROPLAND) {
                 $prod *= 2;
             }
             $totalProd[$i] += $prod + round5($prod * $bonusMultiplier);

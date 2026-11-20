@@ -12,10 +12,10 @@ use Model\ArtefactsModel;
  */
 final class CatapultTargets
 {
-    private const RESOURCES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    private const INFRASTRUCTURE = [10, 11, 15, 17, 18, 24, 25, 26, 44, 27, 28, 38, 39, 41, 45, 49];
-    private const MILITARY = [13, 14, 16, 19, 20, 21, 22, 29, 30, 35, 37, 46, 48];
-    private const WORLD_WONDER = 40;
+    private const RESOURCES = [Gid::WOODCUTTER, Gid::CLAY_PIT, Gid::IRON_MINE, Gid::CROPLAND, Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::GRAIN_MILL, Gid::BAKERY];
+    private const INFRASTRUCTURE = [Gid::WAREHOUSE, Gid::GRANARY, Gid::MAIN_BUILDING, Gid::MARKETPLACE, Gid::EMBASSY, Gid::TOWN_HALL, Gid::RESIDENCE, Gid::PALACE, Gid::COMMAND_CENTER, Gid::TREASURY, Gid::TRADE_OFFICE, Gid::GREAT_WAREHOUSE, Gid::GREAT_GRANARY, Gid::HORSE_DRINKING_TROUGH, Gid::WATERWORKS, Gid::HARBOR];
+    private const MILITARY = [Gid::SMITHY, Gid::TOURNAMENT_SQUARE, Gid::RALLY_POINT, Gid::BARRACKS, Gid::STABLE, Gid::WORKSHOP, Gid::ACADEMY, Gid::GREAT_BARRACKS, Gid::GREAT_STABLE, Gid::BREWERY, Gid::HEROS_MANSION, Gid::HOSPITAL, Gid::ASCLEPEION];
+    private const WORLD_WONDER = Gid::WONDER_OF_THE_WORLD;
 
     /**
      * Group names are the `Buildings.newBuilding.*` translation suffixes, in display order.
@@ -26,7 +26,7 @@ final class CatapultTargets
     {
         $groups = ['Resources' => [], 'Infrastructure' => [], 'Military' => []];
         if ($rallyPointLevel >= 3) {
-            $groups['Infrastructure'] = [10, 11];
+            $groups['Infrastructure'] = [Gid::WAREHOUSE, Gid::GRANARY];
         }
         if ($rallyPointLevel >= 5) {
             $groups['Resources'] = self::RESOURCES;
@@ -65,7 +65,7 @@ final class CatapultTargets
         if ($crannyArtefactSize === 0) {
             return $requestedGid;
         }
-        $exempt = $crannyArtefactSize < 3 ? [27, self::WORLD_WONDER] : [self::WORLD_WONDER];
+        $exempt = $crannyArtefactSize < 3 ? [Gid::TREASURY, self::WORLD_WONDER] : [self::WORLD_WONDER];
 
         return in_array($requestedGid, $exempt, true) ? $requestedGid : 99;
     }

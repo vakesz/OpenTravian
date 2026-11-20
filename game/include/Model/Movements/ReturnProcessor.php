@@ -6,6 +6,7 @@ namespace Model\Movements;
 
 use Core\Database\DB;
 use Game\ResourcesHelper;
+use Game\Tribes;
 use Model\HeroResourceInventory;
 use Model\MovementsModel;
 
@@ -16,7 +17,7 @@ class ReturnProcessor
      */
     public function __construct(array $row)
     {
-        if ((int) $row['race'] === 5) {
+        if ((int) $row['race'] === Tribes::NATARS) {
             return;
         }
         $db = DB::getInstance();
