@@ -36,6 +36,11 @@ class Quest
     /** The active quest-progress writers use this completed-state marker. */
     public const QUEST_FINISHED = 1;
 
+    /** Number of quests per group: the entries in users.qst_battle, qst_economy and qst_world. */
+    public const QUEST_COUNT_BATTLE = 15;
+    public const QUEST_COUNT_ECONOMY = 12;
+    public const QUEST_COUNT_WORLD = 16;
+
     /*
      * Quest ids for setQuestBitwise()/getQuest(): 1-based positions in users.qst_battle,
      * qst_economy and qst_world. Names follow the en-US Quest.{battle,economy,world}_NN_name texts.
@@ -130,15 +135,21 @@ class Quest
     public function __construct()
     {
         $session = Session::getInstance();
-        $this->qst_battle = explode(',', (string) ($session->isValid() ? $session->getQuestBattle() : '0,0,0,0,0,0,0,0,0,0,0,0,0,0'));
-        $this->qst_economy = explode(',', (string) ($session->isValid() ? $session->getQuestEconomy() : '0,0,0,0,0,0,0,0,0,0,0,0'));
-        $this->qst_world = explode(',', (string) ($session->isValid() ? $session->getQuestWorld() : '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'));
+        $this->qst_battle = explode(',', (string) ($session->isValid() ? $session->getQuestBattle() : self::unstarted(self::QUEST_COUNT_BATTLE)));
+        $this->qst_economy = explode(',', (string) ($session->isValid() ? $session->getQuestEconomy() : self::unstarted(self::QUEST_COUNT_ECONOMY)));
+        $this->qst_world = explode(',', (string) ($session->isValid() ? $session->getQuestWorld() : self::unstarted(self::QUEST_COUNT_WORLD)));
         if ($session->isValid() && $session->getSuccessAdventuresCount() >= 10) {
             $this->setQuestBitwise('battle', self::BATTLE_TEN_ADVENTURES, 1);
         }
         if ($session->isValid() && $session->getSuccessAdventuresCount() >= 5) {
             $this->setQuestBitwise('battle', self::BATTLE_FIVE_ADVENTURES, 1);
         }
+    }
+
+    /** Progress of a player with no quest done: one '0' per quest, as the users.qst_* column defaults in world.sql. */
+    private static function unstarted(int $count): string
+    {
+        return implode(',', array_fill(0, $count, '0'));
     }
 
     public function setQuestBitwise(string $type, int $id, int $x): void

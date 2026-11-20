@@ -178,7 +178,21 @@ assertDomainConstants(array_values($dailyIds) === array_keys($questData) && Dail
 // Battle/economy/world quest bits: each id has an en-US quest name.
 $Definition = [];
 require $root . '/game/include/resources/Translation/en-US.php';
-$groups = ['BATTLE' => 15, 'ECONOMY' => 12, 'WORLD' => 16];
+$groups = ['BATTLE' => Quest::QUEST_COUNT_BATTLE, 'ECONOMY' => Quest::QUEST_COUNT_ECONOMY, 'WORLD' => Quest::QUEST_COUNT_WORLD];
+assertDomainConstants($groups === ['BATTLE' => 15, 'ECONOMY' => 12, 'WORLD' => 16], 'There are 15 battle, 12 economy and 16 world quests.');
+$schema = (string)file_get_contents($root . '/database/world.sql');
+foreach ($groups as $group => $count) {
+    $column = 'qst_' . strtolower($group);
+    $default = implode(',', array_fill(0, $count, '0'));
+    assertDomainConstants(str_contains($schema, "`$column` VARCHAR(50) NOT NULL DEFAULT '$default'"), "users.$column must default to $count zeros.");
+}
+// A guest (no valid session) gets one unstarted entry for every quest id.
+$guestQuest = new Quest();
+foreach ($groups as $group => $count) {
+    for ($id = 1; $id <= $count; ++$id) {
+        assertDomainConstants($guestQuest->getQuest(strtolower($group), $id) === '0', "A guest's $group quest $id must read as unstarted.");
+    }
+}
 foreach ($groups as $group => $count) {
     $ids = array_filter(intConstants(Quest::class), static fn (string $name): bool => str_starts_with($name, $group . '_'), ARRAY_FILTER_USE_KEY);
     assertDomainConstants(array_values($ids) === range(1, $count), "Quest::{$group}_* must be 1..$count.");
