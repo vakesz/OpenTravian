@@ -351,11 +351,12 @@ class MasterBuilder
             (float) $data['woodp'],
             (float) $data['clayp'],
             (float) $data['ironp'],
-            (float) $data['cropp'],
+            // Net crop: population and troops eat from the gross production.
+            (float) $data['cropp'] - (float) $data['pop'] - (float) $data['upkeep'],
         ];
         for ($i = 0; $i < 4; ++$i) {
             if (floor($cur_res[$i]) < $costs[$i]) {
-                if ($i == 3 && $cur_prod[$i] <= 0) {
+                if ($cur_prod[$i] <= 0) {
                     $neededTime = 86400;
                 } else {
                     $neededTime = ($costs[$i] - floor($cur_res[$i])) / $cur_prod[$i] * 3600000;

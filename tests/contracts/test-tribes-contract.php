@@ -178,6 +178,7 @@ foreach (range(0, 8) as $race) {
 
 // ---- buildings (Knowledge Base data, x1) --------------------------------------------
 assertTribes(Formulas::$data['buildings'][36]['breq'] == [15 => 3, 16 => 1], "Hero's Mansion needs Main Building 3 and Rally Point 1 (kirilloid).");
+assertTribes(Formulas::$data['buildings'][7]['breq'] == [4 => 5], 'Grain Mill needs Cropland 5 only (no Main Building).');
 foreach ([1, 2, 3, 4] as $field) {
     assertTribes(!array_key_exists('maxLvl', Formulas::$data['buildings'][$field - 1]), "Resource field $field keeps its maximum in buildingMaxLvl only.");
     assertTribes(Formulas::buildingMaxLvl($field, true, false) === 20 && Formulas::buildingMaxLvl($field, false) === 10, "Resource field $field maximum: 20 in the capital (planning), 10 elsewhere.");

@@ -64,10 +64,13 @@ if (!preg_match(
 
 $persistBody = $persistMatch['body'];
 
-if (!str_contains($persistBody, 'UPDATE vdata SET wood=?, clay=?, iron=?, crop=?, lastmupdate=? WHERE kid=? AND lastmupdate=?')) {
+if (!str_contains($persistBody, 'UPDATE vdata SET wood=LEAST(maxstore, wood+?), clay=LEAST(maxstore, clay+?), iron=LEAST(maxstore, iron+?), crop=LEAST(maxcrop, crop+?), lastmupdate=? WHERE kid=? AND lastmupdate=?')) {
     failVillageLoadAccrualPersistContract(
-        'persistAccruedResources must write absolute accrued stores and guard with AND lastmupdate=? to avoid double accrual.'
+        'persistAccruedResources must add the accrued amounts relatively (so concurrent debits survive), clamp them to the stores, and guard with AND lastmupdate=? to avoid double accrual.'
     );
+}
+if (!str_contains($persistBody, '$this->loadedStock')) {
+    failVillageLoadAccrualPersistContract('persistAccruedResources must write the accrual as the difference from the stock that was read.');
 }
 
 foreach ([

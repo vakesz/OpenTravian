@@ -11,6 +11,8 @@ use Game\Formulas;
 use Game\ResourcesHelper;
 use mysqli_result;
 
+use const MAP_SIZE;
+
 /**
  * Marketplace reads and writes. Only ints are interpolated into SQL (everything else is bound), and rows are read
  * over the text protocol so columns stay strings for the callers and templates.
@@ -418,12 +420,28 @@ class MarketModel
         );
     }
 
-    /** Distance between an offer's village and $kid, as SQL. */
+    /**
+     * Whether a merchant trip of $durationSeconds meets the offer's maximum transport time (`maxtime`, in seconds;
+     * 0 means no limit).
+     *
+     * @param array<string, mixed> $offer
+     */
+    public static function withinMaxTime(array $offer, float $durationSeconds): bool
+    {
+        $maxTime = (float) $offer['maxtime'];
+
+        return $maxTime <= 0 || $durationSeconds <= $maxTime;
+    }
+
+    /** Distance between an offer's village and $kid, as SQL. The map wraps around, as in Formulas::getDistance(). */
     private function distanceTo(int $kid): string
     {
         $xy = Formulas::kid2xy($kid);
+        $x = (int) $xy['x'];
+        $y = (int) $xy['y'];
+        $n = 2 * MAP_SIZE + 1;
 
-        return 'SQRT(POW(x-' . (int) $xy['x'] . ', 2) + POW(y-' . (int) $xy['y'] . ', 2))';
+        return "SQRT(POW(LEAST(ABS(x-$x), $n-ABS(x-$x)), 2) + POW(LEAST(ABS(y-$y), $n-ABS(y-$y)), 2))";
     }
 
     /** WHERE conditions of the offers visible to a village: in merchant range, open to its alliance, and matching the filters. */
@@ -448,7 +466,8 @@ class MarketModel
                 : '1=0';
         }
 
-        return "kid!=$kid AND IF(maxtime>0, IF(ROUND({$dist}/{$speed}) <= maxtime, TRUE, FALSE), TRUE) AND IF(aid>0, IF(aid=$aid, TRUE, FALSE), TRUE)"
+        // maxtime is in seconds, like the travel time the accept check (withinMaxTime) compares it with.
+        return "kid!=$kid AND IF(maxtime>0, ROUND({$dist}/{$speed}*3600) <= maxtime, TRUE) AND IF(aid>0, IF(aid=$aid, TRUE, FALSE), TRUE)"
             . ($cond === [] ? '' : ' AND ' . implode(' AND ', $cond));
     }
 

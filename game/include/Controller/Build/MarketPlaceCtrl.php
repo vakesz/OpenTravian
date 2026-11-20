@@ -125,7 +125,7 @@ class MarketPlaceCtrl extends AnyCtrl
                         $ratio = round($offer['needValue'] / $offer['giveValue'], 1);
                         if ($this->evenTradeReason() !== null && $offer['needValue'] != $offer['giveValue']) {
                             $view->vars['error'] = T('MarketPlace', "During beginner's protection, you can only accept 1:1 trades. The same applies if you have less than 200 population.");
-                        } elseif ($offer['maxtime'] == 0 || $offer['maxtime'] <= $duration) {
+                        } elseif (MarketModel::withinMaxTime($offer, $duration)) {
                             $res = array_fill(0, 4, 0);
                             $res[$offer['needType'] - 1] += $offer['needValue'];
                             if (Village::getInstance()->isResourcesAvailable($res)) {

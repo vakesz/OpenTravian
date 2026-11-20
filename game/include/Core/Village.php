@@ -114,6 +114,12 @@ class Village
         $now = miliseconds();
         $previousLastmupdate = (int)$this->village['lastmupdate'];
         $elapsedTime = $now - $previousLastmupdate;
+        $this->loadedStock = [
+            (float)$this->village['wood'],
+            (float)$this->village['clay'],
+            (float)$this->village['iron'],
+            (float)$this->village['crop'],
+        ];
         $this->village['wood'] = min($this->village['wood'] + $elapsedTime * $this->village['woodp'] / 3600000, $this->village['maxstore']);
         $this->village['clay'] = min($this->village['clay'] + $elapsedTime * $this->village['clayp'] / 3600000, $this->village['maxstore']);
         $this->village['iron'] = min($this->village['iron'] + $elapsedTime * $this->village['ironp'] / 3600000, $this->village['maxstore']);
@@ -342,13 +348,13 @@ class Village
             }
         }
         $minResourceLevel = min($resources_levels);
-        if ($quest->getQuest("economy", 4) == 0 && $minResourceLevel == 1) {
+        if ($quest->getQuest("economy", 4) == 0 && $minResourceLevel >= 1) {
             $quest->setQuestBitwise("economy", 4, 1);
         }
-        if ($quest->getQuest("economy", 8) == 0 && $minResourceLevel == 2) {
+        if ($quest->getQuest("economy", 8) == 0 && $minResourceLevel >= 2) {
             $quest->setQuestBitwise("economy", 8, 1);
         }
-        if ($quest->getQuest("economy", 12) == 0 && $minResourceLevel == 5) {
+        if ($quest->getQuest("economy", 12) == 0 && $minResourceLevel >= 5) {
             $quest->setQuestBitwise("economy", 12, 1);
         }
     }
@@ -1330,18 +1336,27 @@ class Village
     }
 
     /**
+     * Stock as read from vdata, before load-time accrual: persistAccruedResources() writes only the difference.
+     *
+     * @var array<int, float>
+     */
+    private array $loadedStock = [0.0, 0.0, 0.0, 0.0];
+
+    /**
      * Persist load-time accrual with an optimistic lastmupdate guard so a concurrent
      * writer that already advanced the row is not overwritten (avoids double accrual).
+     * The accrual is added as a relative credit, so a debit committed between our read
+     * and this write (Village::debit, a trade route, a battle) is kept, not overwritten.
      */
     private function persistAccruedResources(int $previousLastmupdate): bool
     {
         $stmt = $this->db->run(
-            'UPDATE vdata SET wood=?, clay=?, iron=?, crop=?, lastmupdate=? WHERE kid=? AND lastmupdate=?',
+            'UPDATE vdata SET wood=LEAST(maxstore, wood+?), clay=LEAST(maxstore, clay+?), iron=LEAST(maxstore, iron+?), crop=LEAST(maxcrop, crop+?), lastmupdate=? WHERE kid=? AND lastmupdate=?',
             [
-                $this->village['wood'],
-                $this->village['clay'],
-                $this->village['iron'],
-                $this->village['crop'],
+                $this->village['wood'] - $this->loadedStock[0],
+                $this->village['clay'] - $this->loadedStock[1],
+                $this->village['iron'] - $this->loadedStock[2],
+                $this->village['crop'] - $this->loadedStock[3],
                 $this->village['lastmupdate'],
                 $this->village['kid'],
                 $previousLastmupdate,

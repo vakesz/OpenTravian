@@ -87,7 +87,17 @@ class Starvation
         $clay = $elapsedTime * ($this->villageRow['clayp'] / 3600000);
         $iron = $elapsedTime * ($this->villageRow['ironp'] / 3600000);
 
-        $this->db->query("UPDATE vdata SET lastmupdate=$now, wood=LEAST(maxstore, wood+$wood), clay=LEAST(maxstore, clay+$clay), iron=LEAST(maxstore, iron+$iron), crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid}");
+        // Guarded by the lastmupdate we read, so the interval is credited once (see ResourcesHelper::updateVillageResources).
+        // On a miss another writer has already accrued it. The crop that the starved troops gave back is
+        // still credited: those troops are gone either way. affected_rows is also 0 when the row matched but
+        // nothing changed. The fallback then adds the same refund, which is zero or capped at maxcrop, so that is harmless.
+        $this->db->query("UPDATE vdata SET lastmupdate=$now, wood=LEAST(maxstore, wood+$wood), clay=LEAST(maxstore, clay+$clay), iron=LEAST(maxstore, iron+$iron), crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid} AND lastmupdate=" . (int)$this->villageRow['lastmupdate']);
+        if ((int)$this->db->affectedRows() === 0) {
+            $starvedRefund = $crop - $elapsedTime * ($cropProduction / 3600000);
+            if ($starvedRefund > 0) {
+                $this->db->query("UPDATE vdata SET crop=LEAST(maxcrop, crop+$starvedRefund) WHERE kid={$this->kid}");
+            }
+        }
 
         $hdp = VillageModel::getHDP($this->kid);
         ResourcesHelper::updateVillageUpkeep($this->villageRow['owner'], $this->kid, $this->villageRow['isWW'] == 1, $hdp);
@@ -155,11 +165,12 @@ class Starvation
      * @param bool $isTrapped
      * @param bool $isVillage
      * @param bool $isMovement
+     * @param int|null $onlyNr starve only this unit slot (the caller has already chosen it)
      * @return (float|int)
      */
-    private function starveRow(array $row, $isEnforcement, $isTrapped, $isVillage, $isMovement)
+    private function starveRow(array $row, $isEnforcement, $isTrapped, $isVillage, $isMovement, ?int $onlyNr = null)
     {
-        $order = $this->getUnitKillOrder($row['race'], $row);
+        $order = $onlyNr !== null ? [$onlyNr] : $this->getUnitKillOrder($row['race'], $row);
         $total_killed = 0;
         $sum = 0;
         for ($i = 1; $i <= 11; ++$i) {
@@ -380,28 +391,26 @@ class Starvation
             if ((int)$row['u' . $nr] <= 0) {
                 continue;
             }
+            // The home army is the garrison plus own-oasis troops. Kill from the
+            // first part that has this unit, and keep that part's count in step.
+            $partIndex = null;
             $part = $row;
-            $kind = $row['_kind'];
-            if ($kind === 'home') {
-                foreach ($row['_parts'] as $candidate) {
+            $partKind = $row['_kind'];
+            if ($partKind === 'home') {
+                foreach ($row['_parts'] as $idx => $candidate) {
                     if ((int)$candidate['u' . $nr] > 0) {
                         $part = $candidate;
-                        $kind = $candidate['_kind'];
+                        $partKind = $candidate['_kind'];
+                        $partIndex = $idx;
                         break;
                     }
                 }
             }
-            $killed = $this->starveRow($part, $kind === 'enforcement', $kind === 'trapped', $kind === 'units', $kind === 'movement');
+            $killed = (int)$this->starveRow($part, $partKind === 'enforcement', $partKind === 'trapped', $partKind === 'units', $partKind === 'movement', $nr);
             if ($killed > 0) {
                 $row['u' . $nr] = (int)$row['u' . $nr] - $killed;
-                if ($kind === 'home') {
-                    foreach ($row['_parts'] as &$candidate) {
-                        if ((int)$candidate['id'] === (int)($part['id'] ?? 0) || ($kind === 'units' && $candidate['_kind'] === 'units')) {
-                            $candidate['u' . $nr] = (int)$candidate['u' . $nr] - $killed;
-                            break;
-                        }
-                    }
-                    unset($candidate);
+                if ($partIndex !== null) {
+                    $row['_parts'][$partIndex]['u' . $nr] = (int)$row['_parts'][$partIndex]['u' . $nr] - $killed;
                 }
             }
 
