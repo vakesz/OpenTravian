@@ -56,7 +56,7 @@ if ($fixes === false || !str_contains($fixes, '#content.heroV2Inventory .invento
     failHeroResourceItemsContract('Hero inventory items must remain pointer-interactive for native use and drag handlers.');
 }
 
-if (!str_contains($heroItems, 'btype === 16')
+if (!str_contains($heroItems, 'btype === ItemBtype::RESOURCES')
     || !str_contains($heroItems, '145')
     || !str_contains($heroItems, "['attributes'] = [")) {
     failHeroResourceItemsContract('HeroItems must describe btype 16 resource tiles with attributes as a string array for Inventory JS.');

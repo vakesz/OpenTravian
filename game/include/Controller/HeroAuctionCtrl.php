@@ -19,6 +19,7 @@ use Game\Hero\AuctionSort;
 use Game\Hero\HeroItemTile;
 use Game\Hero\HeroItemTooltip;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
 use Game\Hero\SessionHero;
 use Model\AuctionModel;
 use Model\AutomationModel;
@@ -414,7 +415,7 @@ class HeroAuctionCtrl extends GameCtrl
     /** Tier or consumable class plus the slot class the inventory shows for the item. */
     private function heroItemTileClasses(int $btype, string $slot): string
     {
-        return ($btype >= 7 ? 'consumable' : 'tier1') . ' neutral ' . HeroItems::tileSlot($btype, $slot);
+        return ($btype >= ItemBtype::FIRST_CONSUMABLE ? 'consumable' : 'tier1') . ' neutral ' . HeroItems::tileSlot($btype, $slot);
     }
 
     /** Hero item tiles carry their reference tooltip in the title attribute: an empty tip title and the markup as text. */
@@ -670,7 +671,7 @@ class HeroAuctionCtrl extends GameCtrl
         $item = (new HeroItems())->getHeroItemProperties((int)$row['btype'], (int)$row['type']);
         $name = htmlspecialchars((string)$item['name'], ENT_QUOTES, 'UTF-8');
         // A consumable shows its stack size after the name, as the reference does.
-        $quantityLabel = (int)$row['btype'] >= 7 ? ' (x' . (int)$row['num'] . ')' : '';
+        $quantityLabel = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE ? ' (x' . (int)$row['num'] . ')' : '';
         // The reference prints the start as day.month.year, hh:mm (for example 8.11.2026, 05:44).
         $startedAt = TimezoneHelper::date('j.n.Y, H:i', (int)($row['created'] ?? 0));
         // For the first five minutes the sale can be cancelled: the reference shows the cancel button and the time
@@ -701,7 +702,7 @@ class HeroAuctionCtrl extends GameCtrl
     {
         $item = (new HeroItems())->getHeroItemProperties((int)$row['btype'], (int)$row['type']);
         $itemSlot = htmlspecialchars((string)$item['slot'], ENT_QUOTES, 'UTF-8');
-        $consumable = (int)$row['btype'] >= 7;
+        $consumable = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE;
         $slotClasses = $this->heroItemTileClasses((int)$row['btype'], $itemSlot);
 
         return '<div class="heroItem ' . $slotClasses . ' heroItemV1" id="item_' . (int)$row['id']
@@ -771,7 +772,7 @@ HTML;
      */
     private function auctionItemMeta(int $btype, int $type): string
     {
-        if ($btype >= 7) {
+        if ($btype >= ItemBtype::FIRST_CONSUMABLE) {
             return 'Consumable';
         }
 
@@ -993,7 +994,7 @@ HTML;
         $information = new PHPBatchView('hero/AuctionItemInformation');
         $information->vars = [
             // Only equipment lists its effects; a consumable shows its name and kind (as on the reference).
-            'stats' => $btype <= 6 ? HeroItemTooltip::stats($btype, $type) : [],
+            'stats' => $btype <= ItemBtype::LAST_EQUIPMENT ? HeroItemTooltip::stats($btype, $type) : [],
         ] + $this->itemInformationVars($btype, $type, $properties, $prices);
         $form = new PHPBatchView('hero/AuctionSellDialog');
         $form->vars['information'] = $information->output();
@@ -1038,7 +1039,7 @@ HTML;
         if (!in_array($amount, $packages, true) || $amount > (int)$item['num']) {
             return str_replace('[MIN_AMOUNT]', (string)min($packages), (string)T('Auction', 'Not enough items available for auction ([MIN_AMOUNT] items)'));
         }
-        if ((int)$item['btype'] === 6) {
+        if ((int)$item['btype'] === ItemBtype::HORSE) {
             $horses = (int)$db->fetchScalar('SELECT COALESCE(SUM(num),0) FROM items WHERE uid=' . (int)$session->getPlayerId() . ' AND btype=6');
             if ($horses - $amount < 1) {
                 return (string)T('Auction', 'You cannot sell your last horse.', 'You cannot sell your last horse.');

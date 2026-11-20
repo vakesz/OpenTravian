@@ -24,10 +24,10 @@ foreach ([
     "\$this->addResourceFields(\$kid, true);",
     "\$this->addResourceFields(\$kid, false);",
     "\$queryArr['f26'] = 1;",
-    "\$queryArr['f26t'] = 15;",
+    "\$queryArr['f26t'] = Gid::MAIN_BUILDING;",
     'if ($includeRallyPoint) {',
     "\$queryArr['f39'] = 1;",
-    "\$queryArr['f39t'] = 16;",
+    "\$queryArr['f39t'] = Gid::RALLY_POINT;",
 ] as $needle) {
     if (!str_contains($register, $needle)) {
         failVillageStarterBuildingsContract('RegisterModel missing starter-building seed: ' . $needle);

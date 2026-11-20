@@ -9,6 +9,7 @@ use Core\Config;
 use Core\Database\DB;
 use Game\Formulas;
 use Game\Map\Map;
+use Game\OasisType;
 use Game\ResourcesHelper;
 
 use function miliseconds;
@@ -25,17 +26,17 @@ class OasesModel
      * @var array<int, list<int>>
      */
     public const ANIMALS_BY_TYPE = [
-        2 => [5, 6, 7],
-        3 => [5, 6, 7, 10],
-        4 => [5, 6, 7, 8],
-        6 => [1, 2, 5],
-        7 => [1, 2, 5],
-        8 => [1, 2, 5, 8],
-        10 => [1, 2, 4],
-        11 => [1, 2, 4],
-        12 => [1, 2, 4, 7],
-        14 => [1, 3, 7, 8, 9],
-        15 => [1, 3, 7, 8, 9, 10],
+        OasisType::WOOD_25 => [5, 6, 7],
+        OasisType::WOOD_25_CROP_25 => [5, 6, 7, 10],
+        OasisType::WOOD_50 => [5, 6, 7, 8],
+        OasisType::CLAY_25 => [1, 2, 5],
+        OasisType::CLAY_25_CROP_25 => [1, 2, 5],
+        OasisType::CLAY_50 => [1, 2, 5, 8],
+        OasisType::IRON_25 => [1, 2, 4],
+        OasisType::IRON_25_CROP_25 => [1, 2, 4],
+        OasisType::IRON_50 => [1, 2, 4, 7],
+        OasisType::CROP_25 => [1, 3, 7, 8, 9],
+        OasisType::CROP_50 => [1, 3, 7, 8, 9, 10],
     ];
 
     /**

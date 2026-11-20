@@ -17,7 +17,7 @@ use Core\Database\DB;
  */
 final class BagOintment
 {
-    private const OINTMENT_BASE_TYPE = 11;
+    private const OINTMENT_BASE_TYPE = ItemBtype::OINTMENT;
 
     private function __construct()
     {

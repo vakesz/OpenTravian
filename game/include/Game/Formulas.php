@@ -17,7 +17,10 @@ class Formulas
     const WALL_BUILDINGS = Gid::WALLS;
     /** Defence bonus per wall level by tribe id: the battle engine, the simulator and the wall benefit all read this. */
     const WALL_BASE = [1 => 1.03, 2 => 1.02, 3 => 1.025, 4 => 1, 5 => 1.03, 6 => 1.025, 7 => 1.015, 8 => 1.02, 9 => 1.015];
-    const TRIBE_SPECIFIC_BUILDINGS = [31, 32, 33, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 50];
+    const TRIBE_SPECIFIC_BUILDINGS = [
+        Gid::CITY_WALL, Gid::EARTH_WALL, Gid::PALISADE, Gid::BREWERY, Gid::TRAPPER, Gid::HORSE_DRINKING_TROUGH, Gid::STONE_WALL,
+        Gid::MAKESHIFT_WALL, Gid::COMMAND_CENTER, Gid::WATERWORKS, Gid::HOSPITAL, Gid::DEFENSIVE_WALL, Gid::ASCLEPEION, Gid::BARRICADE,
+    ];
     /** @var array<string, array<int, array<int|string, array<int|string, array<int, int>|bool|float|int|string|null>|float|int|string|null>>>|null */
     public static $data;
     /** @var \Game\Formulas|null */
@@ -3589,7 +3592,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         $ub = getGameSpeed();
         $ub *= getGame('extra_training_time_multiplier');
-        if ($u == 99) {
+        if ($u == Unit::TRAP) {
             $time = 600;
             $race = 2;
         } else {
@@ -3659,10 +3662,10 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     public static function getSpyId($tribe): int
     {
         // Scout slot: Gaul Pathfinder and Hun Spotter are #3, Spartan Sentinel is #2.
-        if ($tribe == 3 || $tribe == 7) {
+        if ($tribe == Tribes::GAULS || $tribe == Tribes::HUNS) {
             return 3;
         }
-        if ($tribe == 8) {
+        if ($tribe == Tribes::SPARTANS) {
             return 2;
         }
 
@@ -3772,10 +3775,10 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function uUpkeep($u, $hdp = 0, $isBattle = FALSE)
     {
-        if ($u == 99) {
+        if ($u == Unit::TRAP) {
             return 0;
         }
-        if ($u == 98) {
+        if ($u == Unit::HERO_ID) {
             return 6;
         }
         $race = unitIdToTribe($u) - 1;
@@ -3916,11 +3919,11 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function uTrainingCost($u, $big = FALSE)
     {
-        if ($u == 99) {
+        if ($u == Unit::TRAP) {
             return [35, 30, 10, 20];
         } //trap
         $race = unitIdToTribe($u);
-        if ($race == 5) $race = 1; // Natars to roman
+        if ($race == Tribes::NATARS) $race = Tribes::ROMANS; // Natars to roman
         $race = $race - 1;
         $u = unitIdToNr($u) - 1;
         $cost = self::$data['units'][$race][$u]['cost'];
@@ -3948,7 +3951,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         // Use the unit's unscaled base duration.  Reversing uTrainingTime()
         // here would be lossy at extreme speed because it deliberately floors
         // training to one second.
-        $trainingTime = $unitId == 99
+        $trainingTime = $unitId == Unit::TRAP
             ? 600
             : self::$data['units'][unitIdToTribe($unitId) - 1][$u]['time'];
         if ($u < 8) { //normal troops
@@ -4086,7 +4089,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function crannyCAP($lvl, $race)
     {
-        $raceEffect = $race == 3 ? 3 / 2 : 1;
+        $raceEffect = $race == Tribes::GAULS ? 3 / 2 : 1;
         $raceEffect *= Config::getProperty("game", "cranny_multiplier");
         return $lvl <= 0 ? 0 : 20 * round(10 * pow(1.2917, $lvl - 1)) * $raceEffect;
     }
@@ -4161,7 +4164,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function heroProductionPerPoint($tribe, $singleResource)
     {
-        $egyptian = (int)$tribe === 6;
+        $egyptian = (int)$tribe === Tribes::EGYPTIANS;
         $perPoint = $singleResource ? ($egyptian ? 40 : 30) : ($egyptian ? 12 : 9);
 
         return $perPoint * Config::getInstance()->heroConfig->resourcesMultiplier;
@@ -4325,7 +4328,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     public static function heroSpeed($race, $isCavalry = false)
     {
         $rate = getGame("movement_speed_increase");
-        if ($race == 3) {
+        if ($race == Tribes::GAULS) {
             return (7 + ($isCavalry ? 5 : 0)) * $rate;
         }
         return 7 * $rate;
@@ -4345,7 +4348,17 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function getWallID($race): int
     {
-        return [1 => 31, 32, 33, 0, 31, 42, 43, 47, 50][$race];
+        return [
+            Tribes::ROMANS => Gid::CITY_WALL,
+            Tribes::TEUTONS => Gid::EARTH_WALL,
+            Tribes::GAULS => Gid::PALISADE,
+            Tribes::NATURE => 0,
+            Tribes::NATARS => Gid::CITY_WALL,
+            Tribes::EGYPTIANS => Gid::STONE_WALL,
+            Tribes::HUNS => Gid::MAKESHIFT_WALL,
+            Tribes::SPARTANS => Gid::DEFENSIVE_WALL,
+            Tribes::VIKINGS => Gid::BARRICADE,
+        ][$race];
     }
 
     /**
@@ -4367,7 +4380,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function TradeOfficeValue($race, $lvl)
     {
-        return 100 + $lvl * ($race == 1 ? 20 : 10);
+        return 100 + $lvl * ($race == Tribes::ROMANS ? 20 : 10);
     }
 
     /**
@@ -4413,7 +4426,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         // closed form of `next = current * 1.014 + 600`. Preserve that
         // published x1-x10 calculation without changing the documented local
         // high-speed path above x10.
-        if ($gid == 40 && $rate <= 10) {
+        if ($gid == Gid::WONDER_OF_THE_WORLD && $rate <= 10) {
             $t = [426000 / 7, 1.014, 300000 / 7];
         }
 
@@ -4423,7 +4436,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         // World Wonders keep their own half-time rule after world-speed and
         // Main Building scaling. This mirrors the official building calculator,
         // including the two ten-second rounding steps at every published speed.
-        if ($gid == 40) {
+        if ($gid == Gid::WONDER_OF_THE_WORLD) {
             return max(1, round10(round10($time) / 2));
         }
 
@@ -4444,19 +4457,19 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
             return [0, 0, 0, 0];
         }
         if ($gid == 99) {
-            $gid = 40;
+            $gid = Gid::WONDER_OF_THE_WORLD;
         }//w :>
         $cost = self::$data['buildings'][$gid - 1]['cost'];
         $k = self::$data['buildings'][$gid - 1]['k'];
         for ($r = 0; $r < 4; ++$r) {
             $cost[$r] = round($cost[$r] * pow($k, $lvl - 1) / 5) * 5;
-            if ($gid == 40) {
+            if ($gid == Gid::WONDER_OF_THE_WORLD) {
                 if ((($lvl == 100) && ($r < 3)) || ($cost[$r] > 1e6)) {
                     $cost[$r] = 1e6;
                 }
             }
         }
-        if ($gid <= 4 && $lvl > 20 && getGameSpeed() > 10) {
+        if ($gid <= Gid::LAST_RESOURCE_FIELD && $lvl > 20 && getGameSpeed() > 10) {
             $rate = 10;
             foreach ($cost as &$r) {
                 $r *= $rate;
@@ -4530,8 +4543,8 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function buildingMaxLvl($gid, $capital, $real = true)
     {
-        if ($gid == 40) return 100;
-        if ($gid <= 4) {
+        if ($gid == Gid::WONDER_OF_THE_WORLD) return 100;
+        if ($gid <= Gid::LAST_RESOURCE_FIELD) {
             if (!$capital) {
                 return 10;
             }

@@ -21,7 +21,7 @@ final class HeroItemTile
 
     public static function standalone(int $btype, int $type, int $amount): string
     {
-        return '<div id="standaloneItem"><div class="heroItem ' . ($btype >= 7 ? 'consumable' : 'tier1') . ' neutral '
+        return '<div id="standaloneItem"><div class="heroItem ' . ($btype >= ItemBtype::FIRST_CONSUMABLE ? 'consumable' : 'tier1') . ' neutral '
             . HeroItems::tileSlot($btype, 'bag') . ' heroItemV1">' . self::ARROWS_SVG
             . '<div class="item item' . $type . ' neutral"></div>'
             . '<div class="count">' . $amount . '</div>'

@@ -17,20 +17,20 @@ use function T;
  */
 final class ConsumableDialog
 {
-    private const OINTMENT = 106;
-    private const SCROLL = 107;
-    private const BUCKET = 108;
-    private const TABLET_OF_LAW = 109;
-    private const BOOK_OF_WISDOM = 110;
-    private const ARTWORK = 111;
-    private const BANDAGES = [112 => 'smallBandagesEquipped', 113 => 'bandagesEquipped', 114 => 'item114_impact'];
+    private const OINTMENT = ItemType::OINTMENT;
+    private const SCROLL = ItemType::SCROLL;
+    private const BUCKET = ItemType::BUCKET;
+    private const TABLET_OF_LAW = ItemType::TABLET_OF_LAW;
+    private const BOOK_OF_WISDOM = ItemType::BOOK_OF_WISDOM;
+    private const ARTWORK = ItemType::ARTWORK;
+    private const BANDAGES = [ItemType::SMALL_BANDAGE => 'smallBandagesEquipped', ItemType::BANDAGE => 'bandagesEquipped', ItemType::CAGE => 'item114_impact'];
     private const AMOUNT_LABEL = [
         self::OINTMENT => 'item106_inputLabel_healPossible',
         self::SCROLL => 'item107_inputLabel',
         self::TABLET_OF_LAW => 'item109_inputLabel',
-        112 => 'item112_inputLabel',
-        113 => 'item113_inputLabel',
-        114 => 'item114_inputLabel',
+        ItemType::SMALL_BANDAGE => 'item112_inputLabel',
+        ItemType::BANDAGE => 'item113_inputLabel',
+        ItemType::CAGE => 'item114_inputLabel',
     ];
 
     private function __construct()

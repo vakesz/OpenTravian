@@ -56,6 +56,9 @@ function assertHeroExperienceReconciliation(int $fromSpeed, int $toSpeed, int $e
     }
 }
 
+require dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
+require dirname(__DIR__, 2) . '/game/include/Game/Tribes.php';
+require dirname(__DIR__, 2) . '/game/include/Game/Unit.php';
 require dirname(__DIR__, 2) . '/game/include/Game/Formulas.php';
 
 assertHeroExperienceSpeed(1, 1);

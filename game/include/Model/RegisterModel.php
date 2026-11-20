@@ -8,6 +8,7 @@ use Core\Config;
 use Core\Database\DB;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Gid;
 use Game\Helpers\CulturePointsHelper;
 use Game\Hero\HeroFace;
 use Game\Map\Map;
@@ -334,10 +335,10 @@ class RegisterModel
         // All villages begin with a Main Building. Only the registration village
         // receives a Rally Point; settled villages must leave that slot empty.
         $queryArr['f26'] = 1;
-        $queryArr['f26t'] = 15;
+        $queryArr['f26t'] = Gid::MAIN_BUILDING;
         if ($includeRallyPoint) {
             $queryArr['f39'] = 1;
-            $queryArr['f39t'] = 16;
+            $queryArr['f39t'] = Gid::RALLY_POINT;
         }
         DB::getInstance()->query("DELETE FROM fdata WHERE kid=$kid");
 
@@ -554,23 +555,23 @@ class RegisterModel
         }
         $queryArr = array_merge($queryArr,
             [
-                'f99t' => 40,
+                'f99t' => Gid::WONDER_OF_THE_WORLD,
                 'f19'  => 20,
-                'f19t' => 10,
+                'f19t' => Gid::WAREHOUSE,
                 'f20'  => 10,
-                'f20t' => 10,
+                'f20t' => Gid::WAREHOUSE,
                 'f22'  => 15,
-                'f22t' => 15,
+                'f22t' => Gid::MAIN_BUILDING,
                 'f23'  => 20,
-                'f23t' => 11,
+                'f23t' => Gid::GRANARY,
                 'f27'  => 10,
-                'f27t' => 11,
+                'f27t' => Gid::GRANARY,
                 'f36'  => 1,
-                'f36t' => 17,
+                'f36t' => Gid::MARKETPLACE,
                 'f38'  => 5,
-                'f38t' => 23,
+                'f38t' => Gid::CRANNY,
                 'f39'  => 20,
-                'f39t' => 16,
+                'f39t' => Gid::RALLY_POINT,
             ]);
         $store = Formulas::storeCAP(20) + Formulas::storeCAP(10);
         $this->insertFdata($queryArr);
@@ -644,21 +645,21 @@ class RegisterModel
                     'f16'  => 1,
                     'f17'  => 3,
                     'f18'  => 1,
-                    'f22t' => 27,
+                    'f22t' => Gid::TREASURY,
                     'f24'  => 10,
-                    'f24t' => 17,
+                    'f24t' => Gid::MARKETPLACE,
                     'f26'  => 10,
-                    'f26t' => 15,
+                    'f26t' => Gid::MAIN_BUILDING,
                     'f27'  => 10,
-                    'f27t' => 23,
+                    'f27t' => Gid::CRANNY,
                     'f28'  => 10,
-                    'f28t' => 23,
+                    'f28t' => Gid::CRANNY,
                     'f30'  => 10,
-                    'f30t' => 11,
+                    'f30t' => Gid::GRANARY,
                     'f31'  => 10,
-                    'f31t' => 10,
+                    'f31t' => Gid::WAREHOUSE,
                     'f39'  => 10,
-                    'f39t' => 16,
+                    'f39t' => Gid::RALLY_POINT,
                 ]);
         } elseif ($size === 2 || $size === 3) {
             $queryArr = array_merge($queryArr,
@@ -681,21 +682,21 @@ class RegisterModel
                     'f16'  => 1, //
                     'f17'  => 3, //
                     'f18'  => 1, //
-                    'f22t' => 27,
+                    'f22t' => Gid::TREASURY,
                     'f24'  => 10,
-                    'f24t' => 17,
+                    'f24t' => Gid::MARKETPLACE,
                     'f26'  => 10,
-                    'f26t' => 15,
+                    'f26t' => Gid::MAIN_BUILDING,
                     'f27'  => 10,
-                    'f27t' => 23,
+                    'f27t' => Gid::CRANNY,
                     'f28'  => 10,
-                    'f28t' => 23,
+                    'f28t' => Gid::CRANNY,
                     'f30'  => 10,
-                    'f30t' => 11,
+                    'f30t' => Gid::GRANARY,
                     'f31'  => 10,
-                    'f31t' => 10,
+                    'f31t' => Gid::WAREHOUSE,
                     'f39'  => 10,
-                    'f39t' => 16,
+                    'f39t' => Gid::RALLY_POINT,
                 ]);
         }
         $this->insertFdata($queryArr);

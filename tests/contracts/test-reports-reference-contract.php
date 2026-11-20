@@ -9,6 +9,7 @@ use Game\Hero\HeroItemTile;
 // adventure report is drawn as the item tile.
 
 $root = dirname(__DIR__, 2);
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
 require_once $root . '/game/include/Game/Hero/HeroItems.php';
 require_once $root . '/game/include/Game/Hero/HeroItemTile.php';
 

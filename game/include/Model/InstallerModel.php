@@ -8,6 +8,7 @@ use Core\Database\DB;
 use Core\Security\Password;
 use Game\Formulas;
 use Game\Map\WaterGenerator;
+use Game\OasisType;
 use const INCLUDE_PATH;
 use const MAP_SIZE;
 use function getGameSpeed;
@@ -1269,16 +1270,16 @@ class InstallerModel
             case 1:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = 4;
+                        $this->map[$kid]['oasistype'] = OasisType::WOOD_50;
                     } else {
                         $this->map[$kid]['landscape'] = 1;
                     }
                     break;
                 }
                 if ($r <= 3) {
-                    $this->map[$kid]['oasistype'] = 2;
+                    $this->map[$kid]['oasistype'] = OasisType::WOOD_25;
                 } else if ($r <= 5) {
-                    $this->map[$kid]['oasistype'] = 3;
+                    $this->map[$kid]['oasistype'] = OasisType::WOOD_25_CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 1;
                 }
@@ -1286,16 +1287,16 @@ class InstallerModel
             case 2:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = 8;
+                        $this->map[$kid]['oasistype'] = OasisType::CLAY_50;
                     } else {
                         $this->map[$kid]['landscape'] = 2;
                     }
                     break;
                 }
                 if ($r <= 3) {
-                    $this->map[$kid]['oasistype'] = 6;
+                    $this->map[$kid]['oasistype'] = OasisType::CLAY_25;
                 } else if ($r <= 5) {
-                    $this->map[$kid]['oasistype'] = 7;
+                    $this->map[$kid]['oasistype'] = OasisType::CLAY_25_CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 2;
                 }
@@ -1303,16 +1304,16 @@ class InstallerModel
             case 3:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = 12;
+                        $this->map[$kid]['oasistype'] = OasisType::IRON_50;
                     } else {
                         $this->map[$kid]['landscape'] = 3;
                     }
                     break;
                 }
                 if ($r <= 3) {
-                    $this->map[$kid]['oasistype'] = 10;
+                    $this->map[$kid]['oasistype'] = OasisType::IRON_25;
                 } else if ($r <= 5) {
-                    $this->map[$kid]['oasistype'] = 11;
+                    $this->map[$kid]['oasistype'] = OasisType::IRON_25_CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 3;
                 }
@@ -1320,16 +1321,16 @@ class InstallerModel
             case 4:
                 if ($isGrayArea) {
                     if ($r <= 10) {
-                        $this->map[$kid]['oasistype'] = 15;
+                        $this->map[$kid]['oasistype'] = OasisType::CROP_50;
                     } else {
                         $this->map[$kid]['landscape'] = 4;
                     }
                     break;
                 }
                 if ($r <= 2.5) {
-                    $this->map[$kid]['oasistype'] = 15;
+                    $this->map[$kid]['oasistype'] = OasisType::CROP_50;
                 } else if ($r <= 7) {
-                    $this->map[$kid]['oasistype'] = 14;
+                    $this->map[$kid]['oasistype'] = OasisType::CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 4;
                 }

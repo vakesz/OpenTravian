@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Database\DB;
 use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\ResourcesHelper;
 
 /**
@@ -24,10 +25,10 @@ final class HeroResourceInventory
 
     /** Inventory item type ids matching Gpack `.item.item145`–`.item.item148`. */
     public const ITEM_TYPES = [
-        'wood' => 145,
-        'clay' => 146,
-        'iron' => 147,
-        'crop' => 148,
+        'wood' => ItemType::RESOURCE_WOOD,
+        'clay' => ItemType::RESOURCE_CLAY,
+        'iron' => ItemType::RESOURCE_IRON,
+        'crop' => ItemType::RESOURCE_CROP,
     ];
 
     /** Dedicated btype so use/move treat stacks as bag consumables (btype ≥ 10). */

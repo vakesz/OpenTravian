@@ -35,6 +35,9 @@ namespace {
     }
 
     require dirname(__DIR__, 2) . '/game/include/Game/WorldSpeedProfile.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Tribes.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Unit.php';
     require dirname(__DIR__, 2) . '/game/include/Game/Formulas.php';
 
     foreach ([1, 2, 3, 5, 10] as $speed) {

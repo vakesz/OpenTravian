@@ -10,6 +10,7 @@ use Game\Hero\Artwork;
 use Game\Hero\HeroExperience;
 use Game\Hero\HeroHelper;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
 use Game\ResourcesHelper;
 
 /**
@@ -23,12 +24,12 @@ class HeroInventoryModel
 
     /** @var array<string, int> */
     private const LEGACY_EQUIPMENT_SLOT_TYPES = [
-        'helmet' => 1,
-        'body' => 2,
-        'leftHand' => 3,
-        'rightHand' => 4,
-        'shoes' => 5,
-        'horse' => 6,
+        'helmet' => ItemBtype::HELMET,
+        'body' => ItemBtype::BODY,
+        'leftHand' => ItemBtype::LEFT_HAND,
+        'rightHand' => ItemBtype::RIGHT_HAND,
+        'shoes' => ItemBtype::SHOES,
+        'horse' => ItemBtype::HORSE,
     ];
 
     /**
@@ -346,7 +347,7 @@ class HeroInventoryModel
         if ($targetItem !== null && $amount === (int)$item['num']
             && (int)$targetItem['btype'] === (int)$item['btype']
             && (int)$targetItem['type'] === (int)$item['type']
-            && (int)$item['btype'] >= 7 && !in_array((int)$item['btype'], [12, 13], true)) {
+            && (int)$item['btype'] >= ItemBtype::FIRST_CONSUMABLE && !in_array((int)$item['btype'], ItemBtype::MATERIALS, true)) {
             $merged = $db->run('UPDATE items SET num=num+? WHERE id=? AND uid=? AND proc=0', [$amount, (int)$targetItem['id'], $uid]);
             $removed = $db->run('DELETE FROM items WHERE id=? AND uid=? AND proc=0 AND num=?', [$itemId, $uid, (int)$item['num']]);
             if (!$merged || !$removed || $db->affectedRows() !== 1) {

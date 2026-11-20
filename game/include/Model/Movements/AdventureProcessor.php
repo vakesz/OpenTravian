@@ -11,9 +11,12 @@ use Game\Hero\Artwork;
 use Game\Hero\HeroExperience;
 use Game\Helpers\HeroHealthHelper;
 use Game\Hero\HeroHelper;
+use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\NoticeHelper;
 use Game\ResourcesHelper;
 use Game\SpeedCalculator;
+use Game\Tribes;
 use Model\AdventureModel;
 use Model\ArtefactsModel;
 use Model\AuctionModel;
@@ -126,7 +129,7 @@ class AdventureProcessor
                 case 1://pomad
                     $num = mt_rand(20, 25);
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 11, 106, $num);
+                    $auction->addItemToUser($owner, ItemBtype::OINTMENT, ItemType::OINTMENT, $num);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -161,7 +164,7 @@ class AdventureProcessor
                     break;
                 case 4://asb
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 6, 103, 1);
+                    $auction->addItemToUser($owner, ItemBtype::HORSE, 103, 1);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -179,7 +182,7 @@ class AdventureProcessor
                 case 8://ghafas
                     $num = 6 * $config->game->cage_multiplier;
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 9, 114, $num);
+                    $auction->addItemToUser($owner, ItemBtype::CAGE, ItemType::CAGE, $num);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -267,7 +270,7 @@ class AdventureProcessor
                 case 512:
                     //ketab
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 13, 110, 1);
+                    $auction->addItemToUser($owner, ItemBtype::BOOK_OF_WISDOM, ItemType::BOOK_OF_WISDOM, 1);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -304,63 +307,63 @@ class AdventureProcessor
                 } else {
                     break;
                 }
-            } while($bonus == 6);
+            } while($bonus == ItemBtype::HORSE);
             $bonus = self::ungatedAdventureBonus((int)$bonus, $success_adventures);
             switch ($bonus) {
-                case 1:
+                case ItemBtype::HELMET:
                     $rand = [
                         1 => [1 => 1, 4, 7, 10, 13],
                         2 => [1 => 2, 5, 8, 11, 14],
                         3 => [1 => 3, 6, 9, 12, 15],
                     ][$tearNum];
                     break;
-                case 2:
+                case ItemBtype::BODY:
                     $rand = [
                         1 => [1 => 82, 85, 88, 91],
                         2 => [1 => 83, 86, 89, 92],
                         3 => [1 => 84, 87, 90, 93],
                     ][$tearNum];
                     break;
-                case 3:
+                case ItemBtype::LEFT_HAND:
                     $rand = [
                         1 => [1 => 61, 64, 67, 73, 79],
                         2 => [1 => 62, 65, 68, 74, 77, 80],
                         3 => [1 => 63, 66, 69, 75, 78, 81],
                     ][$tearNum];
                     break;
-                case 4:
+                case ItemBtype::RIGHT_HAND:
                     $weapons = [
-                        1 => [
+                        Tribes::ROMANS => [
                             1 => [1 => 16, 19, 22, 25, 28],
                             2 => [1 => 17, 20, 23, 26, 29],
                             3 => [1 => 18, 21, 24, 27, 30],
                         ],
-                        2 => [
+                        Tribes::TEUTONS => [
                             1 => [1 => 46, 49, 52, 55, 58],
                             2 => [1 => 47, 50, 53, 56, 59],
                             3 => [1 => 48, 51, 54, 57, 60],
                         ],
-                        3 => [
+                        Tribes::GAULS => [
                             1 => [1 => 31, 34, 37, 40, 43],
                             2 => [1 => 32, 35, 38, 41, 44],
                             3 => [1 => 33, 36, 39, 42, 45],
                         ],
-                        6 => [
+                        Tribes::EGYPTIANS => [
                             1 => [1 => 115, 118, 121, 124, 127],
                             2 => [1 => 116, 119, 122, 125, 128],
                             3 => [1 => 117, 120, 123, 126, 129],
                         ],
-                        7 => [
+                        Tribes::HUNS => [
                             1 => [1 => 130, 133, 136, 139, 142],
                             2 => [1 => 131, 134, 137, 140, 143],
                             3 => [1 => 132, 135, 138, 141, 144],
                         ],
-                        8 => [
+                        Tribes::SPARTANS => [
                             1 => [1 => 149, 152, 155, 158, 161],
                             2 => [1 => 150, 153, 156, 159, 162],
                             3 => [1 => 151, 154, 157, 160, 163],
                         ],
-                        9 => [
+                        Tribes::VIKINGS => [
                             1 => [1 => 164, 167, 170, 173, 176],
                             2 => [1 => 165, 168, 171, 174, 177],
                             3 => [1 => 166, 169, 172, 175, 178],
@@ -368,46 +371,46 @@ class AdventureProcessor
                     ];
                     $rand = $weapons[(int) $row['race']][$tearNum] ?? 0;
                     break;
-                case 5:
+                case ItemBtype::SHOES:
                     $rand = [
                         1 => [1 => 94, 97, 100],
                         2 => [1 => 95, 98, 101],
                         3 => [1 => 96, 99, 102],
                     ][$tearNum];
                     break;
-                case 6:
+                case ItemBtype::HORSE:
                     $rand = [
                         1 => [1 => 103],
                         2 => [1 => 104],
                         3 => [1 => 105],
                     ][$tearNum];
                     break;
-                case 7:
-                    $rand = [1 => 112];
+                case ItemBtype::SMALL_BANDAGE:
+                    $rand = [1 => ItemType::SMALL_BANDAGE];
                     break;
-                case 8:
-                    $rand = [1 => 113];
+                case ItemBtype::BANDAGE:
+                    $rand = [1 => ItemType::BANDAGE];
                     break;
-                case 9:
-                    $rand = [1 => 114];
+                case ItemBtype::CAGE:
+                    $rand = [1 => ItemType::CAGE];
                     break;
-                case 10:
-                    $rand = [1 => 107];
+                case ItemBtype::SCROLL:
+                    $rand = [1 => ItemType::SCROLL];
                     break;
-                case 11:
-                    $rand = [1 => 106];
+                case ItemBtype::OINTMENT:
+                    $rand = [1 => ItemType::OINTMENT];
                     break;
-                case 12:
-                    $rand = [1 => 108];
+                case ItemBtype::BUCKET:
+                    $rand = [1 => ItemType::BUCKET];
                     break;
-                case 13:
-                    $rand = [1 => 110];
+                case ItemBtype::BOOK_OF_WISDOM:
+                    $rand = [1 => ItemType::BOOK_OF_WISDOM];
                     break;
-                case 14:
-                    $rand = [1 => 109];
+                case ItemBtype::TABLET_OF_LAW:
+                    $rand = [1 => ItemType::TABLET_OF_LAW];
                     break;
-                case 15:
-                    $rand = Artwork::canDrop((int)$success_adventures) ? [1 => 111] : 0;
+                case ItemBtype::ARTWORK:
+                    $rand = Artwork::canDrop((int)$success_adventures) ? [1 => ItemType::ARTWORK] : 0;
                     break;
                 default:
                     $rand = 0;

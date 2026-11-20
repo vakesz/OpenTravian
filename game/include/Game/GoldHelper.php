@@ -989,7 +989,7 @@ class GoldHelper
         $config = Config::getInstance();
         $gold = $village->isWW() ? 0 : $config->gold->masterBuilderGold;
         $hasPerm = $session->checkSitterPermission(Session::SITTER_CAN_BUY_OR_SPEND_GOLD);
-        $class = $item_id == 40 ? 'green' : 'gold';
+        $class = $item_id == Gid::WONDER_OF_THE_WORLD ? 'green' : 'gold';
         if (!$hasPerm) {
             return getButton(
                 [
