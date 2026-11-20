@@ -155,7 +155,7 @@ class Starvation
         if ($this->currentCrop >= 0) {
             return;
         }
-        $stmt = $this->db->query("SELECT *, (u1+u2+u3+u4+u5+u6+u7+u8+u9+u10+u11) as `total_sum` FROM enforcement WHERE uid>0 AND uid != {$this->villageRow['owner']} AND to_kid IN(" . implode(",", $this->villageChildren) . ") ORDER BY `total_sum` DESC LIMIT {$this->rowLimit}");
+        $stmt = $this->db->query("SELECT *, (u1+u2+u3+u4+u5+u6+u7+u8+u9+u10+u11) as `total_sum` FROM enforcement WHERE uid>" . UserId::NATURE . " AND uid != {$this->villageRow['owner']} AND to_kid IN(" . implode(",", $this->villageChildren) . ") ORDER BY `total_sum` DESC LIMIT {$this->rowLimit}");
         while ($this->currentCrop < 0 && ($row = $stmt->fetch_assoc())) {
             $this->starveRow($row, true, false, false, false);
         }
@@ -318,8 +318,8 @@ class Starvation
         $rows = [];
         $children = implode(',', $this->villageChildren);
         $queries = [
-            ["SELECT * FROM enforcement WHERE uid>0 AND uid!={$this->villageRow['owner']} AND to_kid IN($children)", 'enforcement'],
-            ["SELECT * FROM enforcement WHERE uid>0 AND uid={$this->villageRow['owner']} AND to_kid IN($children)", 'enforcement'],
+            ["SELECT * FROM enforcement WHERE uid>" . UserId::NATURE . " AND uid!={$this->villageRow['owner']} AND to_kid IN($children)", 'enforcement'],
+            ["SELECT * FROM enforcement WHERE uid>" . UserId::NATURE . " AND uid={$this->villageRow['owner']} AND to_kid IN($children)", 'enforcement'],
             ["SELECT * FROM units WHERE kid={$this->kid}", 'units'],
             ["SELECT * FROM movement WHERE race!=" . Tribes::NATURE . " AND ((kid={$this->kid} AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid={$this->kid} AND mode=" . MovementsModel::MODE_RETURN . "))", 'movement'],
         ];
@@ -432,7 +432,7 @@ class Starvation
         if ($this->currentCrop >= 0) {
             return;
         }
-        $stmt = $this->db->query("SELECT *, (u1+u2+u3+u4+u5+u6+u7+u8+u9+u10+u11) as `total_sum` FROM enforcement WHERE uid>0 AND uid={$this->villageRow['owner']} AND to_kid IN(" . implode(",", $this->villageChildren) . ") ORDER BY `total_sum` DESC LIMIT {$this->rowLimit}");
+        $stmt = $this->db->query("SELECT *, (u1+u2+u3+u4+u5+u6+u7+u8+u9+u10+u11) as `total_sum` FROM enforcement WHERE uid>" . UserId::NATURE . " AND uid={$this->villageRow['owner']} AND to_kid IN(" . implode(",", $this->villageChildren) . ") ORDER BY `total_sum` DESC LIMIT {$this->rowLimit}");
         while ($this->currentCrop < 0 && ($row = $stmt->fetch_assoc())) {
             $this->starveRow($row, true, false, false, false);
         }
