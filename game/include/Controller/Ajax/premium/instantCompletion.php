@@ -113,8 +113,8 @@ final class instantCompletion extends InstantPurchase
         while ($row = $result->fetch_assoc()) {
             $unitName = (string)T('Troops', (int)$row['nr'] . '.title');
             $buildingLabel = (int)$row['mode'] === ResearchMode::ACADEMY
-                ? (string)T('finishNowPopup', 'smithy')
-                : (string)T('finishNowPopup', 'academy');
+                ? (string)T('finishNowPopup', 'academy')
+                : (string)T('finishNowPopup', 'smithy');
             $orders[] = ['label' => trim($unitName . ' — ' . $buildingLabel)];
         }
 
