@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Game\Mail;
 
 use Core\Database\DBI;
+use Core\Time;
 
 /** Engine job: the vacation-ending reminder, once per vacation, for players who opted in. */
 final class Reminders
 {
     /** A vacation ends "soon" within a day. */
-    public const ENDING_WITHIN = 86400;
+    public const ENDING_WITHIN = Time::DAY;
 
     /** Players handled per run; the job runs every ten minutes. */
     private const BATCH = 200;

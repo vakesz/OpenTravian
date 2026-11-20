@@ -3,6 +3,7 @@
 namespace Game\Map;
 
 use Core\Caching\Caching;
+use Core\Time;
 use function http_response_code;
 
 class ImageMapCache
@@ -21,7 +22,7 @@ class ImageMapCache
                 'time'    => time(),
                 'length'  => strlen($content),
             ];
-            $memcache->set($filename, $cachedContent, 86400);
+            $memcache->set($filename, $cachedContent, Time::DAY);
         }
         $eTag = self::getETag($filename, $cachedContent['time']);
         $headers = self::getRequestHeaders();
@@ -37,7 +38,7 @@ class ImageMapCache
         header(sprintf("Date: %s", date(DATE_RFC822, $cachedContent['time'])));
         if (strpos($filename, 'minimap') !== FALSE) {
             header("Cache-Control: max-age=86400");
-            header(sprintf("Expires: %s", date(DATE_RFC822, $cachedContent['time'] + 86400)));
+            header(sprintf("Expires: %s", date(DATE_RFC822, $cachedContent['time'] + Time::DAY)));
             header("Pragma: public");
         } else if (strpos($filename, 'map_mark') !== FALSE) {
             // The reference sends only no-cache for mark overlays.
@@ -51,7 +52,7 @@ class ImageMapCache
         } else if(strpos($filename, 'stats_6') == FALSE){
             header("Cache-Control: private, max-age=86400");
 //            header(sprintf("Content-Length: %s", $cachedContent['length']));
-            header(sprintf("Expires: %s", date(DATE_RFC822, $cachedContent['time'] + 86400)));
+            header(sprintf("Expires: %s", date(DATE_RFC822, $cachedContent['time'] + Time::DAY)));
             header("Pragma: private");
         }
         if ($servingCachedContent) {

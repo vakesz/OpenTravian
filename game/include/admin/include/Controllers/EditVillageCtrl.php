@@ -8,7 +8,9 @@ use Core\Helper\WebService;
 use Core\Session;
 use Game\Buildings\BuildingAction;
 use Game\ResourcesHelper;
+use Game\Unit;
 use Model\ArtefactsModel;
+use Model\MovementsModel;
 use Model\VillageModel;
 use resources\View\PHPBatchView;
 
@@ -48,7 +50,7 @@ class EditVillageCtrl
                     break;
                 case 'arriveOwnMovements':
                     if (getCustom('allowInterruptionInGame')) {
-                        $this->db->query("UPDATE movement SET end_time=" . miliseconds() . " WHERE (kid=$kid) OR (to_kid=$kid AND mode=1)");
+                        $this->db->query("UPDATE movement SET end_time=" . miliseconds() . " WHERE (kid=$kid) OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")");
                         WebService::redirect("admin.php?action=editVillage&kid=$kid");
                     } else {
                         $dispatcher->appendContent(\Game\AdminUi::notice('Access denied.', 'error'));
@@ -75,16 +77,16 @@ class EditVillageCtrl
             }
             $newTroops = [];
             $troops = $this->getWholeVillageTroops($kid);
-            $currentTroops = array_fill(1, 11, 0);
-            for ($i = 1; $i <= 10; ++$i) {
+            $currentTroops = array_fill(1, Unit::LAST, 0);
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 if (!isset($_POST['u' . $i])) {
                     $currentTroops[$i] = $troops['total'][$i];
                     continue;
                 }
                 $currentTroops[$i] = $this->absVal(is_array($_POST['oldTroops'] ?? null) ? ($_POST['oldTroops'][$i] ?? 0) : 0);
             }
-            for ($i = 1; $i <= 11; ++$i) {
-                if ($i == 11 || !isset($_POST['u' . $i])) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
+                if ($i == Unit::HERO || !isset($_POST['u' . $i])) {
                     $newTroops[$i] = $currentTroops[$i];
                     continue;
                 }
@@ -95,7 +97,7 @@ class EditVillageCtrl
                 $dispatcher->appendContent(\Game\AdminUi::notice('Access denied.', 'error'));
                 return;
             } else if ($diff) {
-                for ($i = 1; $i <= 10; ++$i) {
+                for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                     if ($newTroops[$i] > $currentTroops[$i]) {
                         $diff = $newTroops[$i] - $currentTroops[$i];
                         $this->db->query("UPDATE units SET u{$i}=u{$i}+$diff WHERE kid=$kid");
@@ -155,7 +157,7 @@ class EditVillageCtrl
                             }
                         }
                         if ($diff > 0 && !$failed) {
-                            $movements = $this->db->query("SELECT * FROM movement WHERE ((kid=$kid AND mode=0) OR (to_kid=$kid AND mode=1)) AND u{$i} > 0");
+                            $movements = $this->db->query("SELECT * FROM movement WHERE ((kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")) AND u{$i} > 0");
                             while ($row = $movements->fetch_assoc()) {
                                 $count = min($row['u' . $i], $diff);
                                 $troops_in_row = array_filter_units($row);
@@ -211,7 +213,7 @@ class EditVillageCtrl
         $troops = $this->getWholeVillageTroops($kid);
         $smithy = $this->getSmithy($kid);
         $params['troopsArray'] = $troops['total'];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             $unitId = nrToUnitId($i, $troops['race']);
             $params['troops'] .= '<tr>';
             $params['troops'] .= '<td>' . T("Troops",
@@ -434,9 +436,9 @@ class EditVillageCtrl
             'inVillage'      => array_filter_units($units),
             'outEnforcement' => array_filter_units($db->query("SELECT SUM(u1) as `u1`, SUM(u2) as `u2`, SUM(u3) as `u3`, SUM(u4) as `u4`, SUM(u5) as `u5`, SUM(u6) as `u6`, SUM(u7) as `u7`, SUM(u8) as `u8`, SUM(u9) as `u9`, SUM(u10) as `u10`, SUM(u11) as `u11` FROM enforcement WHERE kid=$kid")->fetch_assoc()),
             'outTrapped'     => array_filter_units($db->query("SELECT SUM(u1) as `u1`, SUM(u2) as `u2`, SUM(u3) as `u3`, SUM(u4) as `u4`, SUM(u5) as `u5`, SUM(u6) as `u6`, SUM(u7) as `u7`, SUM(u8) as `u8`, SUM(u9) as `u9`, SUM(u10) as `u10`, SUM(u11) as `u11` FROM trapped WHERE kid=$kid")->fetch_assoc()),
-            'outMovement'    => array_filter_units($db->query("SELECT SUM(u1) as `u1`, SUM(u2) as `u2`, SUM(u3) as `u3`, SUM(u4) as `u4`, SUM(u5) as `u5`, SUM(u6) as `u6`, SUM(u7) as `u7`, SUM(u8) as `u8`, SUM(u9) as `u9`, SUM(u10) as `u10`, SUM(u11) as `u11` FROM movement WHERE (kid=$kid AND mode=0) OR (to_kid=$kid AND mode=1)")->fetch_assoc()),
+            'outMovement'    => array_filter_units($db->query("SELECT SUM(u1) as `u1`, SUM(u2) as `u2`, SUM(u3) as `u3`, SUM(u4) as `u4`, SUM(u5) as `u5`, SUM(u6) as `u6`, SUM(u7) as `u7`, SUM(u8) as `u8`, SUM(u9) as `u9`, SUM(u10) as `u10`, SUM(u11) as `u11` FROM movement WHERE (kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")")->fetch_assoc()),
         ];
-        $result['total'] = array_fill(1, 11, 0);
+        $result['total'] = array_fill(1, Unit::LAST, 0);
         foreach ($result['inVillage'] as $index => $num) {
             $result['total'][$index] += $num;
         }

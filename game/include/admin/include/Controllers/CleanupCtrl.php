@@ -1,6 +1,7 @@
 <?php
 
 use Core\Database\DB;
+use Core\Time;
 use Game\NoticeHelper;
 use resources\View\PHPBatchView;
 
@@ -17,7 +18,7 @@ class CleanupCtrl
             switch ($_REQUEST['do']) {
                 case 'deleteReportsXDays':
                     if ($days >= 1) {
-                        $time = time() - $days * 86400;
+                        $time = time() - $days * Time::DAY;
                         $rows = 0;
                         do {
                             $db->query("DELETE FROM ndata WHERE time < $time AND archive=0 AND non_deletable=0 LIMIT 50000");
@@ -41,7 +42,7 @@ class CleanupCtrl
 
                     if ($days >= 1) {
                         $rows = 0;
-                        $time = time() - $days * 86400;
+                        $time = time() - $days * Time::DAY;
                         $types = implode(",", $types);
                         do {
                             $db->query("DELETE FROM ndata WHERE type IN ($types) AND time < $time AND archive=0 AND non_deletable=0  LIMIT 50000");

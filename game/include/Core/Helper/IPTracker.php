@@ -6,11 +6,12 @@ namespace Core\Helper;
 
 use Core\Database\DB;
 use Core\Database\GlobalDB;
+use Core\Time;
 
 class IPTracker
 {
     /** A player's address row is rewritten at most this often; a request inside the window writes nothing. */
-    private const REFRESH_SECONDS = 60;
+    private const REFRESH_SECONDS = Time::MINUTE;
 
     /**
      * The canonical text of an IPv4 or IPv6 address (lower-case, compressed IPv6, an IPv4-mapped IPv6 address

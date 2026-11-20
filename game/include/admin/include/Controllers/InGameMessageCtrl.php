@@ -5,7 +5,9 @@ declare(strict_types=1);
 use Core\Database\DB;
 use Core\Helper\WebService;
 use Core\Session;
+use Game\AccessLevel;
 use Game\AdminUi;
+use Game\UserId;
 use Model\MessageModel;
 
 /**
@@ -39,7 +41,7 @@ class InGameMessageCtrl
             $notice = $this->send($subject, $message);
         }
 
-        $count = (int) DB::getInstance()->fetchScalar('SELECT COUNT(id) FROM users WHERE id > 2 AND access<>2');
+        $count = (int) DB::getInstance()->fetchScalar('SELECT COUNT(id) FROM users WHERE id > ' . UserId::LAST_SYSTEM . ' AND access<>' . AccessLevel::ADMIN);
         $body = $notice
             . '<form method="post" action="admin.php?action=inGameMessage">' . getCheckerInput()
             . AdminUi::input('subject', 'Subject', $subject, ['maxlength' => (string) self::MAX_SUBJECT, 'required' => true])
@@ -75,7 +77,7 @@ class InGameMessageCtrl
 
         $from = (int) $session->getPlayerId();
         $model = new MessageModel();
-        $users = DB::getInstance()->query('SELECT id FROM users WHERE id > 2 AND access<>2');
+        $users = DB::getInstance()->query('SELECT id FROM users WHERE id > ' . UserId::LAST_SYSTEM . ' AND access<>' . AccessLevel::ADMIN);
         $sent = 0;
         while ($row = $users->fetch_assoc()) {
             $model->sendMessage($from, (int) $row['id'], $subject, $message);

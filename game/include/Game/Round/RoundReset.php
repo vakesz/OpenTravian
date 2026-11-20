@@ -9,7 +9,10 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Database\GlobalDB;
 use Core\Jobs\EngineHeartbeat;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Installer\WorldInstaller;
+use Game\UserId;
 use Model\InfoBoxModel;
 use Model\RegisterModel;
 
@@ -25,7 +28,7 @@ final class RoundReset
     public const MODE_REMOVE = 'remove';
 
     private const LOCK = 'round_reset';
-    private const LOCK_TTL = 3600;
+    private const LOCK_TTL = Time::HOUR;
     private const PAUSE_SECONDS = 45;
 
     /**
@@ -246,7 +249,7 @@ final class RoundReset
         $db = DB::getInstance();
         $kept = $mode === self::MODE_KEEP ? self::keptAccounts() : [];
         $admins = self::adminRows();
-        $multihunterHash = (string) $db->fetchScalar('SELECT password FROM users WHERE id=2');
+        $multihunterHash = (string) $db->fetchScalar('SELECT password FROM users WHERE id=' . UserId::MULTIHUNTER);
         try {
             $roundId = RoundArchive::write($mode, $adminName);
         } catch (\Throwable $exception) {
@@ -260,7 +263,7 @@ final class RoundReset
             self::clearRound();
             self::startRound();
             WorldInstaller::seedMap(bin2hex(random_bytes(16)));
-            $db->run('UPDATE users SET password=? WHERE id=2', [$multihunterHash]);
+            $db->run('UPDATE users SET password=? WHERE id=' . UserId::MULTIHUNTER, [$multihunterHash]);
             self::placeAccounts($kept);
             self::restoreAdmins($admins);
             self::dropOrphanedAccountRows();
@@ -280,7 +283,7 @@ final class RoundReset
     private static function keptAccounts(): array
     {
         $statement = DB::getInstance()->run(
-            'SELECT * FROM users WHERE id >= ? AND access <> 3 AND id NOT IN (SELECT uid FROM admin_accounts) ORDER BY id',
+            'SELECT * FROM users WHERE id >= ? AND access <> ' . AccessLevel::FAKE_USER . ' AND id NOT IN (SELECT uid FROM admin_accounts) ORDER BY id',
             [RoundArchive::FIRST_PLAYER_ID]
         );
         $accounts = [];
@@ -317,7 +320,7 @@ final class RoundReset
         $db = DB::getInstance();
         foreach ($rows as $row) {
             $uid = (int) $row['id'];
-            $created = $register->addUser('r' . $uid, (string) $row['password'], (string) $row['email'], 0, 0, 1, false, true, false, $uid);
+            $created = $register->addUser('r' . $uid, (string) $row['password'], (string) $row['email'], 0, 0, AccessLevel::PLAYER, false, true, false, $uid);
             if ($created === false) {
                 throw new \RuntimeException('Could not restore the administrator account ' . $uid . '.');
             }

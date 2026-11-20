@@ -6,6 +6,8 @@ namespace Game\Admin;
 
 use Core\Database\DB;
 use Core\Security\Password;
+use Game\AccessLevel;
+use Game\UserId;
 use Model\OptionModel;
 use Model\RegisterModel;
 
@@ -17,7 +19,7 @@ use Model\RegisterModel;
  */
 final class AdminAccounts
 {
-    public const BUILT_IN = [0, 2];
+    public const BUILT_IN = [UserId::SUPPORT, UserId::MULTIHUNTER];
 
     /** @var array<int, array{role: string, disabled: bool, mustChange: bool, builtIn: bool}|null> */
     private static array $cache = [];
@@ -46,7 +48,7 @@ final class AdminAccounts
         if (in_array($uid, self::BUILT_IN, true)) {
             return ['role' => AdminRoles::OWNER, 'disabled' => false, 'mustChange' => false, 'builtIn' => true];
         }
-        if ($uid < 3) {
+        if ($uid < UserId::FIRST_PLAYER) {
             return null;
         }
         if (!array_key_exists($uid, self::$cache)) {
@@ -82,7 +84,7 @@ final class AdminAccounts
     /** An account that exists only for the panel and has no village: Support and every extra administrator. */
     public static function isPanelOnly(int $uid): bool
     {
-        return $uid === 0 || (self::record($uid) !== null && !in_array($uid, self::BUILT_IN, true));
+        return $uid === UserId::SUPPORT || (self::record($uid) !== null && !in_array($uid, self::BUILT_IN, true));
     }
 
     public static function mustChangePassword(int $uid): bool
@@ -205,8 +207,8 @@ final class AdminAccounts
             return ['uid' => null, 'password' => null, 'error' => 'That name is taken or not allowed.'];
         }
         $password = rtrim(strtr(base64_encode(random_bytes(18)), '+/', '-_'), '=');
-        $uid = (new RegisterModel())->addUser($name, Password::hash($password), $email, 0, 0, 1, false, true);
-        if ($uid === false || $uid < 3) {
+        $uid = (new RegisterModel())->addUser($name, Password::hash($password), $email, 0, 0, AccessLevel::PLAYER, false, true);
+        if ($uid === false || $uid < UserId::FIRST_PLAYER) {
             return ['uid' => null, 'password' => null, 'error' => 'That name is taken.'];
         }
         $db = DB::getInstance();
@@ -234,7 +236,7 @@ final class AdminAccounts
     {
         $db = DB::getInstance();
         $db->run('DELETE FROM admin_accounts WHERE uid=?', [$uid]);
-        $db->run('DELETE FROM users WHERE id=? AND id > 2', [$uid]);
+        $db->run('DELETE FROM users WHERE id=? AND id > ' . UserId::LAST_SYSTEM, [$uid]);
         self::forget();
     }
 }

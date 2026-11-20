@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
+use Game\UserId;
 
 class MultiAccount
 {
@@ -15,9 +18,9 @@ class MultiAccount
     public function runProgress(): void
     {
         $db = DB::getInstance();
-        $time = time() - 3600;
+        $time = time() - Time::HOUR;
         $db->query("DELETE FROM `multiaccount_users` WHERE time <= $time");
-        $result = $db->query("SELECT id FROM users WHERE access=1 AND lastMultiAccountCheck < $time ORDER BY lastMultiAccountCheck ASC LIMIT 100");
+        $result = $db->query("SELECT id FROM users WHERE access=" . AccessLevel::PLAYER . " AND lastMultiAccountCheck < $time ORDER BY lastMultiAccountCheck ASC LIMIT 100");
         $batchQueries = [];
         $bannedIDs = [];
         $batchUIDs = [];
@@ -109,7 +112,7 @@ class MultiAccount
 
     public static function addMultiAccountLog(int $uid, int $to_uid, int $type): void
     {
-        if ($uid <= 2 || $to_uid <= 2) {
+        if ($uid <= UserId::LAST_SYSTEM || $to_uid <= UserId::LAST_SYSTEM) {
             return;
         }
         DB::getInstance()->run('INSERT INTO `multiaccount_log`(`uid`, `to_uid`, `type`, `time`) VALUES (?, ?, ?, ?)', [$uid, $to_uid, $type, time()]);

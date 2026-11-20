@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Game\Mail;
 
+use Core\Time;
+
 use function T;
 
 /**
@@ -25,12 +27,12 @@ enum EmailKind: string
     public function rateLimit(): array
     {
         return match ($this) {
-            self::Newsletter => [1, 12 * 3600],
+            self::Newsletter => [1, 12 * Time::HOUR],
             self::Attack => [1, 1800],
-            self::Construction => [1, 3600],
+            self::Construction => [1, Time::HOUR],
             self::Message => [1, 900],
-            self::VacationEnding, self::VacationStarted => [1, 86400],
-            self::SitterSignIn => [1, 86400],
+            self::VacationEnding, self::VacationStarted => [1, Time::DAY],
+            self::SitterSignIn => [1, Time::DAY],
         };
     }
 

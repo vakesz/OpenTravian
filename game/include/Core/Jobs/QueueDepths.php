@@ -6,6 +6,7 @@ namespace Core\Jobs;
 
 use Core\Database\DB;
 use Core\Database\GlobalDB;
+use Core\Time;
 
 /**
  * How much work is waiting in the engine's queues, for the control panel's Engine health page and
@@ -14,7 +15,7 @@ use Core\Database\GlobalDB;
 final class QueueDepths
 {
     /** A queued job counts as overdue once it is this many seconds past its due time. */
-    public const OVERDUE_GRACE = 60;
+    public const OVERDUE_GRACE = Time::MINUTE;
 
     private function __construct()
     {

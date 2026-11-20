@@ -4,6 +4,7 @@ namespace Controller;
 
 use Core\Config;
 use Core\Database\DB;
+use Game\UserId;
 
 class WinnerCtrl
 {
@@ -35,7 +36,7 @@ class WinnerCtrl
             $order[] = $this->getPlayerLink($uData['id'], $uData['name']);
             $order[] = $this->getAllianceLink($uData['aid'], $allianceName);
             $order[] = $this->getPlayerLink($uData['id'], $uData['name']);
-            $pop = $db->query("SELECT id, name FROM users WHERE id>1 AND hidden=0 ORDER BY total_pop DESC LIMIT 3");
+            $pop = $db->query("SELECT id, name FROM users WHERE id>" . UserId::NATARS . " AND hidden=0 ORDER BY total_pop DESC LIMIT 3");
             for ($i = 1; $i <= 3; ++$i) {
                 if (!($row = $pop->fetch_assoc())) {
                     $order[] = '-';
@@ -43,14 +44,14 @@ class WinnerCtrl
                 }
                 $order[] = $this->getPlayerLink($row['id'], $row['name']);
             }
-            $attacker = $db->query("SELECT id, name FROM users WHERE id>1 AND hidden=0 ORDER BY total_attack_points DESC LIMIT 1");
+            $attacker = $db->query("SELECT id, name FROM users WHERE id>" . UserId::NATARS . " AND hidden=0 ORDER BY total_attack_points DESC LIMIT 1");
             if ($attacker->num_rows) {
                 $attacker = $attacker->fetch_assoc();
                 $order[] = $this->getPlayerLink($attacker['id'], $attacker['name']);
             } else {
                 $order[] = '-';
             }
-            $defender = $db->query("SELECT id, name FROM users WHERE id>1 AND hidden=0 ORDER BY total_defense_points DESC LIMIT 1");
+            $defender = $db->query("SELECT id, name FROM users WHERE id>" . UserId::NATARS . " AND hidden=0 ORDER BY total_defense_points DESC LIMIT 1");
             if ($defender->num_rows) {
                 $defender = $defender->fetch_assoc();
                 $order[] = $this->getPlayerLink($defender['id'], $defender['name']);
@@ -62,7 +63,7 @@ class WinnerCtrl
         } else {
             $replace = T("Global", "ServerFinishNoWinner");
             $db = DB::getInstance();
-            $pop = $db->query("SELECT id, name FROM users WHERE id>1 AND hidden=0 ORDER BY total_pop DESC LIMIT 3");
+            $pop = $db->query("SELECT id, name FROM users WHERE id>" . UserId::NATARS . " AND hidden=0 ORDER BY total_pop DESC LIMIT 3");
             for ($i = 1; $i <= 3; ++$i) {
                 if (!($row = $pop->fetch_assoc())) {
                     $order[] = '-';
@@ -70,14 +71,14 @@ class WinnerCtrl
                 }
                 $order[] = $this->getPlayerLink($row['id'], $row['name']);
             }
-            $attacker = $db->query("SELECT id, name FROM users WHERE id>1 AND hidden=0 ORDER BY total_attack_points DESC LIMIT 1");
+            $attacker = $db->query("SELECT id, name FROM users WHERE id>" . UserId::NATARS . " AND hidden=0 ORDER BY total_attack_points DESC LIMIT 1");
             if ($attacker->num_rows) {
                 $attacker = $attacker->fetch_assoc();
                 $order[] = $this->getPlayerLink($attacker['id'], $attacker['name']);
             } else {
                 $order[] = '-';
             }
-            $defender = $db->query("SELECT id, name FROM users WHERE id>1 AND hidden=0 ORDER BY total_defense_points DESC LIMIT 1");
+            $defender = $db->query("SELECT id, name FROM users WHERE id>" . UserId::NATARS . " AND hidden=0 ORDER BY total_defense_points DESC LIMIT 1");
             if ($defender->num_rows) {
                 $defender = $defender->fetch_assoc();
                 $order[] = $this->getPlayerLink($defender['id'], $defender['name']);

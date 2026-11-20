@@ -7,7 +7,10 @@ namespace Model;
 use Core\Caching\Caching;
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Tribes;
+use Game\UserId;
 use function isServerFinished;
 
 class SummaryModel
@@ -22,7 +25,7 @@ class SummaryModel
             return $cached;
         }
         $result = DB::getInstance()->query('SELECT * FROM summary LIMIT 1')->fetch_assoc();
-        $cache->add('Statistics:General:Tribes', $result, 86400);
+        $cache->add('Statistics:General:Tribes', $result, Time::DAY);
 
         return $result;
     }
@@ -58,10 +61,10 @@ class SummaryModel
         }
         $online_timeout = (int) Config::getProperty('settings', 'online_timeout');
         $row = DB::getInstance()->query('SELECT
-        (SELECT COUNT(id) FROM users WHERE id>1 AND hidden=0 AND access>0) `active`,
-        (SELECT COUNT(id) FROM users WHERE id>1 AND hidden=0 AND access=3) `fakeCount`,
-        (SELECT COUNT(id) FROM users WHERE id>1 AND hidden=0 AND access>0 AND access!=3 AND email_verified=1) `verified`,
-        (SELECT COUNT(id) FROM users WHERE id>1 AND hidden=0 AND access>0 AND last_login_time >= ' . (time() - $online_timeout) . ') `real_online`,
+        (SELECT COUNT(id) FROM users WHERE id>' . UserId::NATARS . ' AND hidden=0 AND access>' . AccessLevel::BANNED . ') `active`,
+        (SELECT COUNT(id) FROM users WHERE id>' . UserId::NATARS . ' AND hidden=0 AND access=' . AccessLevel::FAKE_USER . ') `fakeCount`,
+        (SELECT COUNT(id) FROM users WHERE id>' . UserId::NATARS . ' AND hidden=0 AND access>' . AccessLevel::BANNED . ' AND access!=' . AccessLevel::FAKE_USER . ' AND email_verified=1) `verified`,
+        (SELECT COUNT(id) FROM users WHERE id>' . UserId::NATARS . ' AND hidden=0 AND access>' . AccessLevel::BANNED . ' AND last_login_time >= ' . (time() - $online_timeout) . ') `real_online`,
         (SELECT COUNT(id) FROM activation) `activating`')->fetch_assoc();
         $result = array_map('intval', $row);
         $result['registered'] = $result['active'] + $result['activating'];
@@ -74,7 +77,7 @@ class SummaryModel
             }
         }
         $result['online'] = min(floor($result['online']), $result['active']);
-        $cache->add('Statistics:General:Players', $result, 60);
+        $cache->add('Statistics:General:Players', $result, Time::MINUTE);
 
         return $result;
     }

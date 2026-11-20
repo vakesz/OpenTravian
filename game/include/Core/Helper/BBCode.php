@@ -6,10 +6,12 @@ use Controller\ReportsCtrl;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use Game\Formulas;
 use Core\Locale;
 use function get_gpack_cdn_base_url;
 use function is_numeric;
+use Game\UserId;
 use Model\AllianceModel;
 use Model\ClubApi;
 use function preg_match;
@@ -36,7 +38,7 @@ class MedalsBBCode
         }
         $this->processed[$key] = TRUE;
         if (strtolower($key) == 'natars') {
-            if (!$this->data['isAlliance'] && $this->data['uid'] == 1) {
+            if (!$this->data['isAlliance'] && $this->data['uid'] == UserId::NATARS) {
                 $HTML = T("Global", "NatarsName");
                 $HTML .= '<br>';
                 $HTML .= '=======================';
@@ -328,7 +330,7 @@ class AllianceBBCode
                 $bars .= '<td class="bar positive"><div class="wrapper"><div class="bar left red" title="' . $results[$i]['total_off_point'] . '" style="height: ' . $percent1 . '%;"></div><div class="bar right blue" title="' . $results[$i]['total_def_point'] . '" style="height: ' . $percent2 . '%;"></div><div class="clear"></div></div></td>';
             } else {
                 $dates .= '<td>' . TimezoneHelper::date("d.m",
-                        (isset($results[0]['time']) ? $results[0]['time'] : time()) - $i * 86400) . '. </td>';
+                        (isset($results[0]['time']) ? $results[0]['time'] : time()) - $i * Time::DAY) . '. </td>';
                 $bars .= '<td class="bar positive"><div class="wrapper"><div class="bar left red" title="0" style="height: 0%;"></div><div class="bar right blue" title="0" style="height: 0%;"></div><div class="clear"></div></div></td>';
             }
         }
@@ -359,7 +361,7 @@ class AllianceBBCode
         for ($i = 6; $i >= 0; --$i) {
             if (!isset($results[$i])) {
                 $dates .= '<td>' . TimezoneHelper::date("d.m",
-                        (isset($results[0]['time']) ? $results[0]['time'] : time()) - $i * 86400) . '. </td>';
+                        (isset($results[0]['time']) ? $results[0]['time'] : time()) - $i * Time::DAY) . '. </td>';
                 $bars .= '<td class="bar positive"><div class="wrapper"><div class="bar left red" title="0" style="height: 0%;"></div><div class="bar right blue" title="0" style="height: 0%;"></div><div class="clear"></div></div></td>';
                 $bars2 .= '<td class="bar positive"><div class="wrapper"><div class="bar left red" title="0" style="height: 0%;"></div><div class="bar right blue" title="0" style="height: 0%;"></div><div class="clear"></div></div></td>';
                 continue;
@@ -428,7 +430,7 @@ class AllianceBBCode
         }
         for ($i = 6; $i >= 0; --$i) {
             if (!isset($results[$i])) {
-                $dates .= '<td>' . TimezoneHelper::date("d.m", $results[0]['time'] - $i * 86400) . '. </td>';
+                $dates .= '<td>' . TimezoneHelper::date("d.m", $results[0]['time'] - $i * Time::DAY) . '. </td>';
                 $bars .= '<td class="bar positive">
 							<div class="wrapper">
 								<div class="stackedWrapper left" style="height: 0%;">
@@ -722,7 +724,7 @@ class BBCode
 
             return '[x|y]' . $xy['x'] . '|' . $xy['y'] . '[/x|y]';
         }, $input);
-        if ((!is_null(self::$from_uid) && self::$from_uid <= 2) || (!is_null(self::$to_uid) && self::$to_uid <= 2)) {
+        if ((!is_null(self::$from_uid) && self::$from_uid <= UserId::LAST_SYSTEM) || (!is_null(self::$to_uid) && self::$to_uid <= UserId::LAST_SYSTEM)) {
             $input = preg_replace_callback('#(?<!href\=[\'"])(https?|ftp|file)://[-A-Za-z0-9+&@\#/%()?=~_|$!:,.;]*[-A-Za-z0-9+&@\#/%()=~_|$]#',
                 [self::class, 'regexp_url_search'],
                 $input);
@@ -918,7 +920,7 @@ class BBCode
         $bare = sizeof($matches) < 3;
         $address = trim($matches[1]);
         $text = $bare ? $address : $matches[2];
-        if ($bare && !((!is_null(self::$from_uid) && self::$from_uid <= 2) || (!is_null(self::$to_uid) && self::$to_uid <= 2))) {
+        if ($bare && !((!is_null(self::$from_uid) && self::$from_uid <= UserId::LAST_SYSTEM) || (!is_null(self::$to_uid) && self::$to_uid <= UserId::LAST_SYSTEM))) {
             return $matches[0];
         }
         $decoded = html_entity_decode($address);

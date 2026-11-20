@@ -1,6 +1,8 @@
 <?php
 
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Model\InfoBoxModel;
 use Model\MultiAccount;
 
@@ -71,12 +73,12 @@ class MultiAccountCtrl
         $end = $time == 0 ? 0 : $time + time();
         $exists = 0 < $db->fetchScalar('SELECT COUNT(id) FROM banQueue WHERE uid=?', [$uid]);
         if (!$exists) {
-            $db->run('UPDATE users SET access=0 WHERE id=?', [$uid]);
+            $db->run('UPDATE users SET access=' . AccessLevel::BANNED . ' WHERE id=?', [$uid]);
             if ($db->affectedRows()) {
                 $db->run('INSERT INTO `banQueue`(`uid`, `reason`, `time`, `end`) VALUES (?, ?, ?, ?)', [$uid, $reason, time(), $end]);
                 $db->run('INSERT INTO `banHistory`(`uid`, `reason`, `time`, `end`) VALUES (?, ?, ?, ?)', [$uid, $reason, time(), $end]);
                 $db->run('DELETE FROM multiaccount_users WHERE uid=?', [$uid]);
-                (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * 86400);
+                (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * Time::DAY);
                 AdminLog::getInstance()->addLog("Banned ".$this->getPlayerName($uid).".");
             }
         }

@@ -7,7 +7,10 @@ use Core\Database\DB;
 use Core\Helper\PageNavigator;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
+use Game\UserId;
 use Model\AutomationModel;
 use Model\ReportsModel;
 use Model\Quest;
@@ -42,7 +45,7 @@ class StatisticsCtrl extends GameCtrl
     public function __construct()
     {
         parent::__construct();
-        Quest::getInstance()->setQuestBitwise('world', 1, \Model\Quest::QUEST_FINISHED);
+        Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_VIEW_STATISTICS, \Model\Quest::QUEST_FINISHED);
         $this->view = new GameView();
         $this->view->vars['titleInHeader'] = T("Statistics", "titleInHeader");
         // Reference body token is `statistics` (no village perspective shell).
@@ -186,7 +189,7 @@ class StatisticsCtrl extends GameCtrl
         $this->content->vars['favorText'] = T('inGame', 'Set tab');
         if (Session::getInstance()->isAdmin()) {
             if (isset($_GET['showFakeUsers'])) {
-                Session::setCookie('showFakeUsers', $_GET['showFakeUsers'] == 1 ? 1 : 0, 7 * 86400);
+                Session::setCookie('showFakeUsers', $_GET['showFakeUsers'] == 1 ? 1 : 0, 7 * Time::DAY);
             }
             $this->showFakeUsers = Session::getCookie('showFakeUsers', 0);
         }
@@ -416,7 +419,7 @@ class StatisticsCtrl extends GameCtrl
         $rowIndex = 0;
         foreach ($rows as $row) {
             $rank = ++$rowIndex + $pageIndex * $this->pageSize;
-            if (!$this->showFakeUsers && $row['access'] == 3) {
+            if (!$this->showFakeUsers && $row['access'] == AccessLevel::FAKE_USER) {
                 continue;
             }
             $alliance = '-';
@@ -432,12 +435,12 @@ class StatisticsCtrl extends GameCtrl
             }
             if (Session::getInstance()->isAdmin() || getDisplay("showFlagsInStatistics")) {
                 $flag = '<td class="flags " >';
-                if ($row['access'] <> 3) {
-                    if (!empty($row['countryFlag']) && $row['countryFlag'] != "-" && $row['id'] > 2) {
+                if ($row['access'] <> AccessLevel::FAKE_USER) {
+                    if (!empty($row['countryFlag']) && $row['countryFlag'] != "-" && $row['id'] > UserId::LAST_SYSTEM) {
                         $flag .= '<img src="img/spacer.gif" class="flags flag_' . $row['countryFlag'] . '" title="' . $row['countryFlag'] . '" alt="' . $row['countryFlag'] . '">';
                     } elseif ($row['countryFlag'] == "-" || empty($row['countryFlag'])) {
                         $flag .= '?';
-                    } elseif ($row['id'] <= 2) {
+                    } elseif ($row['id'] <= UserId::LAST_SYSTEM) {
                         $flag .= '!';
                     }
                 } else {
@@ -445,10 +448,10 @@ class StatisticsCtrl extends GameCtrl
                 }
                 $flag .= '</td>';
             }
-            if (Session::getInstance()->isAdmin() && $row['access'] <> 3) {
-                if ($row['access'] == 0 && $row['id'] > 2) {
+            if (Session::getInstance()->isAdmin() && $row['access'] <> AccessLevel::FAKE_USER) {
+                if ($row['access'] == AccessLevel::BANNED && $row['id'] > UserId::LAST_SYSTEM) {
                     $row['name'] = '<span style="color:red;">' . $row['name'] . '</span>';
-                } elseif ($row['access'] == 0 && $row['id'] == 2) {
+                } elseif ($row['access'] == AccessLevel::BANNED && $row['id'] == UserId::MULTIHUNTER) {
                     $row['name'] = '<span style="color:blue;">' . $row['name'] . '</span>';
                 }
                 $login_stat = AutomationModel::getOnlineStatusAsImg($row['last_login_time']);

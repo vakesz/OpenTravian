@@ -8,10 +8,12 @@ use Core\Database\GlobalDB;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Game\Admin\AuditLog;
 use Game\Admin\QrCode;
 use Game\Admin\Totp;
 use Game\Admin\TwoFactorGate;
+use Game\UserId;
 use Model\LoginModel;
 use resources\View\OutOfGameView;
 use resources\View\PHPBatchView;
@@ -47,7 +49,7 @@ class LoginCtrl extends OutOfGameCtrl
                     (int)$find['id'],
                     hash('sha256', $token),
                 ]);
-                if ((time() - $find['time']) <= 60) {
+                if ((time() - $find['time']) <= Time::MINUTE) {
                     $user = $db->run("SELECT name, password FROM users WHERE id=? LIMIT 1", [
                         (int)$find['uid'],
                     ])->get_result();
@@ -151,7 +153,7 @@ class LoginCtrl extends OutOfGameCtrl
             $this->LoginView->vars['newPassErr'] = T('Login', 'pwResetUnavailable');
             return false;
         }
-        if (!throttle_public_form('pwforgot', 5, 3600)) {
+        if (!throttle_public_form('pwforgot', 5, Time::HOUR)) {
             $this->LoginView->vars['newPassErr'] = T('Login', 'Password recovery cooldown');
             return false;
         }
@@ -229,7 +231,7 @@ class LoginCtrl extends OutOfGameCtrl
             $this->LoginView->vars['userError'] = T("Login", "userErrors.notFound");
             return false;
         }
-        if ($find['row']['id'] > 2 && $this->isAdmin) {
+        if ($find['row']['id'] > UserId::LAST_SYSTEM && $this->isAdmin) {
             if (!login_throttle_complete($reservation, true)) {
                 $this->LoginView->vars['pwError'] = T("Login", "tooManyAttempts");
                 return false;
@@ -248,7 +250,7 @@ class LoginCtrl extends OutOfGameCtrl
         if ($result <> 3) {
             switch ($find['type']) {
                 case 1:
-                    if ($result <> 0 && $find['row']['last_owner_login_time'] <= time() - 21 * 86400) {
+                    if ($result <> 0 && $find['row']['last_owner_login_time'] <= time() - 21 * Time::DAY) {
                         $this->LoginView->vars['pwError'] = T("Login", "pwErrors.error21Days");
                         $success = false;
                         break;
@@ -401,7 +403,7 @@ class LoginCtrl extends OutOfGameCtrl
         $config = Config::getInstance();
         $remainingTime = $config->game->start_time - time();
         $remainingTimer = null;
-        if ($remainingTime < 86400) {
+        if ($remainingTime < Time::DAY) {
             $remainingTimer = T(
                 "Login",
                 "Server will start in"

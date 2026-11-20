@@ -3,6 +3,7 @@
 namespace Game\Hero;
 
 use Core\Config;
+use Core\Time;
 use Game\Formulas;
 use Game\Tribes;
 
@@ -499,7 +500,7 @@ class HeroItems
                     $result['attributes'],
                     rtrim(rtrim(number_format(100 * $artwork['numerator'] / $artwork['denominator'], 2, '.', ''), '0'), '.'),
                     $artwork['limit'],
-                    intdiv($artwork['cooldown'], 3600)
+                    intdiv($artwork['cooldown'], Time::HOUR)
                 );
                 break;
         }

@@ -4,6 +4,7 @@ namespace Core\Jobs;
 
 use Core\Caching\Caching;
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Engine liveness, stale-code detection and the maintenance pause flag.
@@ -20,7 +21,7 @@ final class EngineHeartbeat
 
     private const BEAT_KEY = 'engine:heartbeat';
     private const PAUSE_KEY = 'engine:pause';
-    private const BEAT_TTL = 3600;
+    private const BEAT_TTL = Time::HOUR;
     /**
      * Unprefixed key so the container health check can read liveness without loading
      * the game or knowing the per-world cache prefix. Same JSON and TTL as the beat.
@@ -71,10 +72,10 @@ final class EngineHeartbeat
             return $age . 's';
         }
         if ($age < 7200) {
-            return intdiv($age, 60) . 'm';
+            return intdiv($age, Time::MINUTE) . 'm';
         }
 
-        return intdiv($age, 3600) . 'h';
+        return intdiv($age, Time::HOUR) . 'h';
     }
 
     /**
@@ -156,7 +157,7 @@ final class EngineHeartbeat
             Caching::singleton()->setex(self::ROUND_KEY, self::BEAT_TTL, json_encode([
                 'job' => $job,
                 'ended_at' => (int)$ended,
-                'duration_ms' => (int)round(($ended - $startedAt) * 1000),
+                'duration_ms' => (int)round(($ended - $startedAt) * Time::SECOND_MS),
             ], JSON_THROW_ON_ERROR));
         } catch (\Throwable $exception) {
             // Reporting must never take a worker down.

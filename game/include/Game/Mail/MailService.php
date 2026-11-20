@@ -8,7 +8,9 @@ use Core\Caching\Caching;
 use Core\Config;
 use Core\Database\DBI;
 use Core\Helper\Mailer;
+use Game\AccessLevel;
 use Game\SmtpConfig;
+use Game\UserId;
 use resources\View\PHPBatchView;
 
 /**
@@ -43,8 +45,8 @@ final class MailService
     public static function queue(int $userId, EmailKind $kind, string $subject, string $bodyHtml, bool $requireOptIn = true): bool
     {
         $db = DBI::getInstance();
-        $user = $db->fetchSingleRow('SELECT name, email, email_verified, access FROM users WHERE id=? AND id>2', [$userId]);
-        if (!is_array($user) || (int) $user['email_verified'] !== 1 || (int) $user['access'] === 0 || trim((string) $user['email']) === '') {
+        $user = $db->fetchSingleRow('SELECT name, email, email_verified, access FROM users WHERE id=? AND id>' . UserId::LAST_SYSTEM, [$userId]);
+        if (!is_array($user) || (int) $user['email_verified'] !== 1 || (int) $user['access'] === AccessLevel::BANNED || trim((string) $user['email']) === '') {
             return false;
         }
         if ((int) $db->fetchScalar('SELECT COUNT(uid) FROM deleting WHERE uid=?', [$userId], 0) > 0) {

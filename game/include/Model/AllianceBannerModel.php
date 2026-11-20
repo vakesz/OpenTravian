@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Caching\Caching;
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Local alliance-banner storage (player draft, gallery proposals, alliance set).
@@ -13,7 +14,7 @@ use Core\Database\DB;
  */
 final class AllianceBannerModel
 {
-    private const TTL = 365 * 86400;
+    private const TTL = 365 * Time::DAY;
 
     /** @var list<int> */
     public const BASE_FORMS = [4, 6, 13, 15, 1, 7, 5, 11, 8, 10, 2, 12, 14, 3, 9];

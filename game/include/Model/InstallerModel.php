@@ -6,9 +6,13 @@ namespace Model;
 
 use Core\Database\DB;
 use Core\Security\Password;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\Map\WaterGenerator;
 use Game\OasisType;
+use Game\Tribes;
+use Game\Unit;
+use Game\UserId;
 use const INCLUDE_PATH;
 use const MAP_SIZE;
 use function getGameSpeed;
@@ -441,7 +445,7 @@ class InstallerModel
      */
     private function initialOasisAnimals(int $type): string
     {
-        $counts = array_fill(1, 10, 0);
+        $counts = array_fill(1, Unit::LAST_TROOP, 0);
         $troops = OasesModel::ANIMALS_BY_TYPE[$type] ?? [];
         if ($troops !== []) {
             $speed = max(1, (int)getGameSpeed());
@@ -1541,9 +1545,9 @@ class InstallerModel
         $natars = $register->addUser(T("Global", "NatarsName"),
             Password::hash(bin2hex(random_bytes(16))),
             '',
-            5,
+            Tribes::NATARS,
             $natar_kid,
-            1,
+            AccessLevel::PLAYER,
             false,
             TRUE);
         $db->query("UPDATE users SET protection=0, kid=$natar_kid, desc1='[#natars]' WHERE id=$natars");
@@ -1551,7 +1555,7 @@ class InstallerModel
         $multihunter = $register->addUser("Multihunter",
             Password::hash($multihunterPassword),
             '',
-            1,
+            Tribes::ROMANS,
             Formulas::xy2kid(1, 0),
             0,
             false,
@@ -1563,20 +1567,20 @@ class InstallerModel
         $db->query("UPDATE users SET id=1 WHERE id=2");
         $db->query("UPDATE users SET id=2 WHERE id=3");
 
-        $register->addHero(1, Formulas::xy2kid(0, 0));
-        $register->addHeroFace(1);
-        $register->addHeroInventory(1);
+        $register->addHero(UserId::NATARS, Formulas::xy2kid(0, 0));
+        $register->addHeroFace(UserId::NATARS);
+        $register->addHeroInventory(UserId::NATARS);
 
-        $register->addHero(2, Formulas::xy2kid(1, 0));
-        $register->addHeroFace(2);
-        $register->addHeroInventory(2);
-        $db->query("DELETE FROM infobox WHERE uid <= 2");
+        $register->addHero(UserId::MULTIHUNTER, Formulas::xy2kid(1, 0));
+        $register->addHeroFace(UserId::MULTIHUNTER);
+        $register->addHeroInventory(UserId::MULTIHUNTER);
+        $db->query("DELETE FROM infobox WHERE uid <= " . UserId::LAST_SYSTEM);
         //natars
         $register->createNatarsBaseVillage($natar_kid);
         $WonderOfTheWorld = new \Model\WonderOfTheWorldModel();
         $WonderOfTheWorld->createWWVillages();
         //multihunter
-        $register->createBaseVillage(2, "Multihunter", 1, Formulas::xy2kid(1, 0));
+        $register->createBaseVillage(UserId::MULTIHUNTER, "Multihunter", Tribes::ROMANS, Formulas::xy2kid(1, 0));
         $db->query("UPDATE config SET installed=1, installationTime=" . time() . ", patchVersion=" . \Game\WorldSchemaVersion::CURRENT);
     }
 }

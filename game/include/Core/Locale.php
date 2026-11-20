@@ -109,7 +109,7 @@ final class Locale
             || !isset($cachedLocale['signature'], $cachedLocale['catalog'])
             || $cachedLocale['signature'] !== $signature) {
             $this->Locale = self::catalog($locale);
-            $cache->set("Language:$locale", ['signature' => $signature, 'catalog' => $this->Locale], 2 * 3600);
+            $cache->set("Language:$locale", ['signature' => $signature, 'catalog' => $this->Locale], 2 * Time::HOUR);
             return;
         }
         $this->Locale = $cachedLocale['catalog'];

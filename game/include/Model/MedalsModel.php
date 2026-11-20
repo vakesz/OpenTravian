@@ -7,6 +7,7 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Core\Log;
+use Core\Time;
 use function getCustom;
 use function getGame;
 
@@ -50,7 +51,7 @@ class MedalsModel
         $db = DB::getInstance();
         $config = Config::getInstance();
         $lastMedalsGiven = (int) $db->fetchScalar('SELECT lastMedalsGiven FROM config');
-        if ($lastMedalsGiven === 0 || $lastMedalsGiven <= (getGame('start_time') - 7 * 86400)) {
+        if ($lastMedalsGiven === 0 || $lastMedalsGiven <= (getGame('start_time') - 7 * Time::DAY)) {
             if (getCustom('startMedalsAtStartOfWeek')) {
                 $startTime = (int) $config->game->start_time;
                 $lastMedalsGiven = (int) strtotime('Tuesday 00:00', $startTime);

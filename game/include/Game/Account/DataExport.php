@@ -6,7 +6,9 @@ namespace Game\Account;
 
 use Core\Database\DBI;
 use Game\Formulas;
+use Game\Slot;
 use Game\SocialAuth\LinkedIdentities;
+use Game\Unit;
 
 /**
  * The player's own data as one JSON document: account, villages, hero, reports, messages and linked social
@@ -112,14 +114,14 @@ final class DataExport
             $xy = Formulas::kid2xy($kid);
             $fields = $db->fetchSingleRow('SELECT * FROM fdata WHERE kid=?', [$kid]);
             $buildings = [];
-            for ($slot = 1; is_array($fields) && $slot <= 40; $slot++) {
+            for ($slot = 1; is_array($fields) && $slot <= Slot::LAST; $slot++) {
                 if ((int) $fields['f' . $slot . 't'] > 0) {
                     $buildings[] = ['slot' => $slot, 'gid' => (int) $fields['f' . $slot . 't'], 'level' => (int) $fields['f' . $slot]];
                 }
             }
             $units = $db->fetchSingleRow('SELECT * FROM units WHERE kid=?', [$kid]);
             $troops = [];
-            for ($unit = 1; is_array($units) && $unit <= 11; $unit++) {
+            for ($unit = 1; is_array($units) && $unit <= Unit::LAST; $unit++) {
                 if ((int) $units['u' . $unit] > 0) {
                     $troops['u' . $unit] = (int) $units['u' . $unit];
                 }

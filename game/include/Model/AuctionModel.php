@@ -7,10 +7,13 @@ namespace Model;
 use Controller\Ajax\heroAuction;
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\Hero\AuctionFee;
 use Game\Hero\HeroItems;
 use Game\Hero\ItemBtype;
+use Game\UserId;
 use mysqli_result;
 
 use function getCustom;
@@ -32,7 +35,7 @@ class AuctionModel
     public const CANCEL_WINDOW_SECONDS = 300;
 
     /** A new listing stays hidden for a random 1–5 minutes at 1×, then that wait is divided by speed. */
-    public const LISTING_DELAY_MIN = 60;
+    public const LISTING_DELAY_MIN = Time::MINUTE;
     public const LISTING_DELAY_MAX = 300;
 
     /**
@@ -110,13 +113,13 @@ class AuctionModel
                 if ($spread_randomly) {
                     $uid = $this->getRandomUID($spread_timeout);
                     if ($uid !== false) {
-                        $dailyQuest->setQuestAsCompleted($activeUid, 4);
+                        $dailyQuest->setQuestAsCompleted($activeUid, DailyQuestModel::QUEST_WIN_AUCTION);
                         $this->addItemToUser($uid, ...$item);
                     }
                 } elseif (!$unsold) {
                     $buyer = $m->getUser($activeUid, 'silver');
                     if ($buyer !== false && $this->updateUserSilver($activeUid, $silver)) {
-                        $dailyQuest->setQuestAsCompleted($activeUid, 4);
+                        $dailyQuest->setQuestAsCompleted($activeUid, DailyQuestModel::QUEST_WIN_AUCTION);
                         $this->addItemToUser($activeUid, ...$item);
                         $this->addBooking($activeUid, [2, ...$item], -$silver, -$silver + (int) $buyer['silver'], (int) $row['time']);
                     } else {
@@ -153,7 +156,7 @@ class AuctionModel
     {
         $time = time() - $spread_timeout;
         $exclude = self::$given_user_ids === [] ? '' : ' AND id NOT IN(' . implode(',', self::$given_user_ids) . ')';
-        $uid = (int) DB::getInstance()->fetchScalar("SELECT id FROM users WHERE id>2 AND access=1 AND last_login_time >= $time$exclude ORDER BY RAND() LIMIT 1");
+        $uid = (int) DB::getInstance()->fetchScalar("SELECT id FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND access=" . AccessLevel::PLAYER . " AND last_login_time >= $time$exclude ORDER BY RAND() LIMIT 1");
         if ($uid) {
             self::$given_user_ids[] = $uid;
 
@@ -326,21 +329,21 @@ class AuctionModel
             return '';
         }
         if ($filter === 'bag') {
-            return ' AND btype IN (7,8,9,10,11,12,13,14,15)';
+            return ' AND btype IN (' . implode(',', range(ItemBtype::FIRST_CONSUMABLE, ItemBtype::ARTWORK)) . ')';
         }
 
         $slotMap = [
-            'helmet' => 1,
-            'body' => 2,
-            'leftHand' => 3,
-            'rightHand' => 4,
-            'shoes' => 5,
-            'horse' => 6,
+            'helmet' => ItemBtype::HELMET,
+            'body' => ItemBtype::BODY,
+            'leftHand' => ItemBtype::LEFT_HAND,
+            'rightHand' => ItemBtype::RIGHT_HAND,
+            'shoes' => ItemBtype::SHOES,
+            'horse' => ItemBtype::HORSE,
         ];
         if (is_string($filter) && isset($slotMap[$filter])) {
             return ' AND btype=' . $slotMap[$filter];
         }
-        if (is_numeric($filter) && (int) $filter >= 1 && (int) $filter <= 15) {
+        if (is_numeric($filter) && (int) $filter >= ItemBtype::HELMET && (int) $filter <= ItemBtype::ARTWORK) {
             return ' AND btype=' . (int) $filter;
         }
 

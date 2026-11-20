@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Game\AccessLevel;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
 use Game\Gid;
@@ -13,7 +14,10 @@ use Game\Helpers\CulturePointsHelper;
 use Game\Hero\HeroFace;
 use Game\Map\Map;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Game\Tribes;
+use Game\Unit;
+use Game\UserId;
 
 use function get_random_string;
 use function getCustom;
@@ -47,7 +51,7 @@ class RegisterModel
             }
             $playable = \Game\Tribes::playable();
             $race = $playable[mt_rand(0, count($playable) - 1)];
-            $uid = $this->addUser($name, sha1(get_random_string(mt_rand(1, 11))), '', $race, $kid, 3);
+            $uid = $this->addUser($name, sha1(get_random_string(mt_rand(1, 11))), '', $race, $kid, AccessLevel::FAKE_USER);
             if (!$uid) {
                 $db->query('UPDATE available_villages SET occupied=0 WHERE kid=' . $kid);
                 continue;
@@ -158,7 +162,7 @@ class RegisterModel
         string $email,
         int $race,
         int $kid,
-        bool|int $access = 1,
+        bool|int $access = AccessLevel::PLAYER,
         bool $addHero = true,
         bool $installation = false,
         bool $newsletter = false,
@@ -250,7 +254,7 @@ class RegisterModel
         $db = DB::getInstance();
         $db->query("UPDATE units SET u11=1 WHERE kid=$kid");
         $this->addResourceFields($kid, true);
-        if ($uid <> 2) {
+        if ($uid <> UserId::MULTIHUNTER) {
             $this->populateBuildingLevels($kid, (int) getGame('firstVillageCreationFieldsLevel'));
         }
         $calculatedCPPOP = VillageModel::calculateVillageCulturePointsAndPopulation($kid, false);
@@ -329,7 +333,7 @@ class RegisterModel
     {
         $fieldsArr = Formulas::getFieldTypeResourceMap($this->getVillageFieldType($kid));
         $queryArr = ['kid' => $kid];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $queryArr["f{$i}t"] = $fieldsArr[$i - 1];
         }
         // All villages begin with a Main Building. Only the registration village
@@ -366,7 +370,7 @@ class RegisterModel
     private function populateBuildingLevels(int $kid, int $level): void
     {
         if ($level > 0) {
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 BuildingAction::upgrade($kid, $i, $level, false, false);
             }
         }
@@ -547,7 +551,7 @@ class RegisterModel
     {
         $fieldsArr = Formulas::getFieldTypeResourceMap($this->getVillageFieldType($kid));
         $queryArr = ['kid' => $kid];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $type = $fieldsArr[$i - 1];
             $level = $type <= 3 ? 5 : 6;
             $queryArr["f{$i}"] = $level;
@@ -597,7 +601,7 @@ class RegisterModel
         }
         $this->addArtifactVillageFields($kid, $size);
         $modify = [];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             if (!isset($units[$i])) {
                 continue;
             }
@@ -621,7 +625,7 @@ class RegisterModel
         $fieldsArr = Formulas::getFieldTypeResourceMap($this->getVillageFieldType($kid));
         // Regardless of the artifact size the Natar Treasury is level 20 (Artifacts wiki).
         $queryArr = ['kid' => $kid, 'f22' => 20];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $queryArr["f{$i}t"] = $fieldsArr[$i - 1];
         }
         if ($size === 1) {
@@ -714,7 +718,7 @@ class RegisterModel
         $this->addWWVillageFields($kid);
         $units = WonderOfTheWorldModel::getWWTroops(Formulas::isGrayArea($kid));
         $modify = [];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             $modify[] = "u{$i}=" . (int) $units[$i];
         }
         $db->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid=$kid");

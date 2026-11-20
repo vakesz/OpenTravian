@@ -9,6 +9,7 @@ use Core\Helper\Mailer;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Game\SmtpConfig;
 use Game\SupportContact;
 use resources\View\OutOfGameView;
@@ -119,7 +120,7 @@ class SupportTicketCtrl extends OutOfGameCtrl
         if ($this->errors !== [] || $this->formError !== '') {
             return;
         }
-        if (!throttle_public_form('support', 5, 3600)) {
+        if (!throttle_public_form('support', 5, Time::HOUR)) {
             $this->formError = T('Login', 'tooManyRequests');
             return;
         }

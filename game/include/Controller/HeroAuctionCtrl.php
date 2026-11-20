@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Core\Time;
 use Game\Account\DeletionLock;
 use Game\ButtonPagination;
 use Controller\Ajax\favouriteTab;
@@ -370,10 +371,10 @@ class HeroAuctionCtrl extends GameCtrl
         $prices = [];
         if ($history !== []) {
             $now = time();
-            $start = $now - 86400;
+            $start = $now - Time::DAY;
             $buckets = array_fill(0, 24, ['sum' => 0, 'count' => 0]);
             foreach ($history as $sale) {
-                $index = min(23, max(0, (int)floor(((int)$sale['time'] - $start) / 3600)));
+                $index = min(23, max(0, (int)floor(((int)$sale['time'] - $start) / Time::HOUR)));
                 $buckets[$index]['sum'] += (int)$sale['silver'];
                 ++$buckets[$index]['count'];
             }
@@ -737,9 +738,9 @@ class HeroAuctionCtrl extends GameCtrl
 
         return sprintf(
             '%02d:%02d:%02d',
-            intdiv($seconds, 3600),
-            intdiv($seconds % 3600, 60),
-            $seconds % 60
+            intdiv($seconds, Time::HOUR),
+            intdiv($seconds % Time::HOUR, 60),
+            $seconds % Time::MINUTE
         );
     }
 
@@ -777,12 +778,12 @@ HTML;
         }
 
         $category = [
-            1 => 'Helmet',
-            2 => 'Armor',
-            3 => 'Weapon',
-            4 => 'Weapon',
-            5 => 'Boots',
-            6 => 'Horse',
+            ItemBtype::HELMET => 'Helmet',
+            ItemBtype::BODY => 'Armor',
+            ItemBtype::LEFT_HAND => 'Weapon',
+            ItemBtype::RIGHT_HAND => 'Weapon',
+            ItemBtype::SHOES => 'Boots',
+            ItemBtype::HORSE => 'Horse',
         ][$btype] ?? 'Item';
 
         return 'Tier ' . (($type - 1) % 3 + 1) . ' / ' . $category;
@@ -868,7 +869,7 @@ HTML;
                     $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
                 } else {
                     $quest = Quest::getInstance();
-                    $quest->setQuestBitwise("battle", 9, 1);
+                    $quest->setQuestBitwise("battle", Quest::BATTLE_AUCTIONS, 1);
                     if ($auction['activeUid'] == 0 || $auction['activeUid'] == $session->getPlayerId()) {
                         $min = $auction['silver'];
                     } else {
@@ -1063,7 +1064,7 @@ HTML;
             return str_replace('[MIN_AMOUNT]', (string)min($packages), (string)T('Auction', 'Not enough items available for auction ([MIN_AMOUNT] items)'));
         }
         if ((int)$item['btype'] === ItemBtype::HORSE) {
-            $horses = (int)$db->fetchScalar('SELECT COALESCE(SUM(num),0) FROM items WHERE uid=' . (int)$session->getPlayerId() . ' AND btype=6');
+            $horses = (int)$db->fetchScalar('SELECT COALESCE(SUM(num),0) FROM items WHERE uid=' . (int)$session->getPlayerId() . ' AND btype=' . ItemBtype::HORSE);
             if ($horses - $amount < 1) {
                 return (string)T('Auction', 'You cannot sell your last horse.', 'You cannot sell your last horse.');
             }
@@ -1075,7 +1076,7 @@ HTML;
                 $sold = $m->getItemFromUser($item['id'], $item['num'], $amount)
                     && $db->run('UPDATE users SET silver=silver+? WHERE id=?', [$silver, $session->getPlayerId()]);
                 if ($sold && $db->commit()) {
-                    Quest::getInstance()->setQuestBitwise('battle', 9, 1);
+                    Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_AUCTIONS, 1);
 
                     return null;
                 }
@@ -1103,7 +1104,7 @@ HTML;
 
             return (string)T('Auction', 'AuctionNotFound');
         }
-        Quest::getInstance()->setQuestBitwise('battle', 9, 1);
+        Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_AUCTIONS, 1);
 
         return null;
     }
@@ -1160,7 +1161,7 @@ HTML;
             // The legacy item catalogue does not persist the newer crafting rarity enum; its auction cards are the
             // reference common tier.
             'rarityIndicator' => RechartsMarkup::auctionRarityIndicator('common'),
-            'chart' => $this->renderAuctionPriceChart((new AuctionModel())->getBuyAuctionItemHistory($type, time() - 86400)),
+            'chart' => $this->renderAuctionPriceChart((new AuctionModel())->getBuyAuctionItemHistory($type, time() - Time::DAY)),
         ];
     }
 
@@ -1178,7 +1179,7 @@ HTML;
             'wrapperClass' => '',
         ]);
         $view->vars['layout'] = $layout;
-        $hours = (string)round(Config::getInstance()->auction->auctionTime / 3600, 1);
+        $hours = (string)round(Config::getInstance()->auction->auctionTime / Time::HOUR, 1);
         $view->vars['spacer'] = sprintf(
             T(
                 'Auction',

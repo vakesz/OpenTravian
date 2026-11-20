@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\UserId;
 
 class PublicMsgModel
 {
@@ -12,6 +13,6 @@ class PublicMsgModel
     {
         $db = DB::getInstance();
         $db->run('UPDATE config SET message=?', [$message]);
-        $db->query('UPDATE users SET ok=1 WHERE id>=2');
+        $db->query('UPDATE users SET ok=1 WHERE id>=' . UserId::MULTIHUNTER);
     }
 }

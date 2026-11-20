@@ -24,7 +24,7 @@ if (!str_contains($controller, "\$recipientParam = \$_GET['to'] ?? null;")) {
 $menu = (string) file_get_contents($root . '/game/include/Game/Admin/AdminMenu.php');
 $panel = (string) file_get_contents($root . '/game/include/admin/include/Controllers/InGameMessageCtrl.php');
 if (!str_contains($menu, 'admin.php?action=inGameMessage')
-    || !str_contains($panel, 'id > 2 AND access<>2')
+    || !str_contains($panel, "id > ' . UserId::LAST_SYSTEM . ' AND access<>' . AccessLevel::ADMIN")
     || !str_contains($controller, "\$recipientParam == '[all]'")) {
     fwrite(STDERR, 'Mass messages are sent from the in-game message page, and ?to=[all] still prefills the compose form.' . PHP_EOL);
     exit(1);

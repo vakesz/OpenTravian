@@ -8,6 +8,7 @@ use Core\Helper\BBCode;
 use Core\Helper\StringChecker;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
+use Core\Time;
 use Game\Formulas;
 use Game\Map\Map;
 use Game\NoticeHelper;
@@ -813,7 +814,7 @@ class AllianceCtrl extends GameCtrl
                     $allianceNotificationEnabled = $db->fetchScalar("SELECT allianceNotificationEnabled FROM users WHERE id={$row['uid']}");
                     if ($allianceNotificationEnabled) {
                         $now = time();
-                        $sentBefore = $db->fetchScalar("SELECT COUNT(id) FROM alliance_notification WHERE aid={$this->selectedAllianceID} AND to_uid={$row['uid']} AND type=2 AND $now-time <= 86400*2");
+                        $sentBefore = $db->fetchScalar("SELECT COUNT(id) FROM alliance_notification WHERE aid={$this->selectedAllianceID} AND to_uid={$row['uid']} AND type=2 AND $now-time <= " . Time::DAY . "*2");
                         if (!$sentBefore) {
                             $data = [
                                 $name,
@@ -1135,7 +1136,7 @@ class AllianceCtrl extends GameCtrl
                 )->fetch_assoc();
                 if (is_array($member)) {
                     $joinedAt = (int) ($member['alliance_join_time'] ?? 0);
-                    if ($joinedAt > 0 && (time() - $joinedAt) < 86400) {
+                    if ($joinedAt > 0 && (time() - $joinedAt) < Time::DAY) {
                         $view->vars['error'] = T(
                             "Alliance",
                             "Players who joined recently cannot be kicked from the alliance within 24 hours after joining."

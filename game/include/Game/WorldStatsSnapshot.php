@@ -7,6 +7,7 @@ namespace Game;
 use Core\Caching\Caching;
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Model\StatisticsModel;
 
 use function getGameSpeed;
@@ -72,7 +73,7 @@ final class WorldStatsSnapshot
 
         return [
             'startTime' => $startTime,
-            'ageDays' => max(0, intdiv(time() - $startTime, 86400)),
+            'ageDays' => max(0, intdiv(time() - $startTime, Time::DAY)),
             'speed' => (int) getGameSpeed(),
             'players' => (int) $db->fetchScalar('SELECT COUNT(u.id) FROM users u WHERE ' . $public),
             'alliances' => (int) $db->fetchScalar('SELECT COUNT(DISTINCT u.aid) FROM users u JOIN alidata a ON a.id = u.aid WHERE ' . $public),

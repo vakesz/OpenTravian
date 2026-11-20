@@ -7,6 +7,8 @@ namespace Model;
 use Core\AI;
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Hero\HeroExperience;
 use function getGameElapsedSeconds;
 use function getGameSpeed;
@@ -22,7 +24,7 @@ class FakeUserModel
         $db = DB::getInstance();
         $speed = getGameSpeed();
         $now = time();
-        $stmt = $db->query('SELECT id FROM users WHERE access=3 AND lastHeroExpCheck <= ' . ($now - mt_rand(3600, 10800)) . ' LIMIT 10');
+        $stmt = $db->query('SELECT id FROM users WHERE access=' . AccessLevel::FAKE_USER . ' AND lastHeroExpCheck <= ' . ($now - mt_rand(Time::HOUR, 10800)) . ' LIMIT 10');
         while ($row = $stmt->fetch_assoc()) {
             $uid = (int) $row['id'];
             $db->query("UPDATE users SET lastHeroExpCheck=$now WHERE id=$uid");
@@ -30,7 +32,7 @@ class FakeUserModel
             HeroExperience::add($uid, $exp);
         }
         $interval = match (true) {
-            $speed <= 10 => mt_rand(600, 3600),
+            $speed <= 10 => mt_rand(600, Time::HOUR),
             $speed <= 100 => mt_rand(200, 400),
             $speed <= 1000 => mt_rand(100, 250),
             default => mt_rand(50, 150),
@@ -66,18 +68,18 @@ class FakeUserModel
         if (getGameSpeed() <= 10) {
             $elapsedSeconds = getGameElapsedSeconds();
             $interval = match (true) {
-                $elapsedSeconds <= 4 * 86400 => 3 * 86400,
-                $elapsedSeconds <= 15 * 86400 => 7 * 86400,
-                $elapsedSeconds <= 45 * 86400 => 5 * 86400,
-                default => 15 * 86400,
+                $elapsedSeconds <= 4 * Time::DAY => 3 * Time::DAY,
+                $elapsedSeconds <= 15 * Time::DAY => 7 * Time::DAY,
+                $elapsedSeconds <= 45 * Time::DAY => 5 * Time::DAY,
+                default => 15 * Time::DAY,
             };
         } else {
-            $interval = (int) round(mt_rand(65, 165) / 100 * 86400);
+            $interval = (int) round(mt_rand(65, 165) / 100 * Time::DAY);
         }
         $time = time() - $interval;
         $db = DB::getInstance();
         $register = new RegisterModel();
-        $result = $db->query("SELECT id, race, lastVillageExpand FROM users WHERE access=3 AND lastVillageExpand<=$time LIMIT 5");
+        $result = $db->query("SELECT id, race, lastVillageExpand FROM users WHERE access=" . AccessLevel::FAKE_USER . " AND lastVillageExpand<=$time LIMIT 5");
         while ($row = $result->fetch_assoc()) {
             $uid = (int) $row['id'];
             $lastExpand = (int) $row['lastVillageExpand'];

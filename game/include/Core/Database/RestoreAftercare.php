@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\Database;
 
 use Core\Config;
+use Core\Time;
 use Model\InfoBoxModel;
 
 /**
@@ -37,8 +38,8 @@ final class RestoreAftercare
         $infoBoxModel->deleteInfoByTypeInServer(9);
         $infoBoxModel->deleteInfoByTypeInServer(15);
 
-        $infoBoxModel->addInfo(0, 1, 8, '', (int)($conf->timers->ArtifactsReleaseTime + $delayTime - 3 * 86400), (int)($conf->timers->ArtifactsReleaseTime + $delayTime));
-        $infoBoxModel->addInfo(0, 1, 9, '', (int)($conf->timers->wwPlansReleaseTime + $delayTime - 3 * 86400), (int)($conf->timers->wwPlansReleaseTime + $delayTime));
+        $infoBoxModel->addInfo(0, 1, 8, '', (int)($conf->timers->ArtifactsReleaseTime + $delayTime - 3 * Time::DAY), (int)($conf->timers->ArtifactsReleaseTime + $delayTime));
+        $infoBoxModel->addInfo(0, 1, 9, '', (int)($conf->timers->wwPlansReleaseTime + $delayTime - 3 * Time::DAY), (int)($conf->timers->wwPlansReleaseTime + $delayTime));
 
         if ($conf->game->catapultAvailableTime > $conf->game->start_time) {
             $infoBoxModel->addInfo(0, 1, 15, '', (int)$conf->game->start_time, (int)$conf->game->catapultAvailableTime);
