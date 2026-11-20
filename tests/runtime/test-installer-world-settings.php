@@ -1,6 +1,8 @@
 <?php
 
 require_once dirname(__DIR__, 2) . '/game/deployment/include/env.php';
+// WorldSpeedProfile and the installer classes use Core\Time; this test loads classes without the autoloader.
+require_once dirname(__DIR__, 2) . '/game/include/Core/Time.php';
 foreach (['WorldSpeedProfile', 'FinishConstruction', 'Tribes', 'WorldOverrides', 'WorldSchemaVersion', 'SupportContact', 'SmtpConfig', 'Installer/InstallInput', 'Installer/WorldInstaller'] as $installerClass) {
     require_once dirname(__DIR__, 2) . '/game/include/Game/' . $installerClass . '.php';
 }
