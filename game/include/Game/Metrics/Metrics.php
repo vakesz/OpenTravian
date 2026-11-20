@@ -19,7 +19,7 @@ use Core\Time;
 final class Metrics
 {
     /** Players count as online when they were active this many seconds ago (the admin panel's 10 minutes). */
-    public const ONLINE_SECONDS = 600;
+    public const ONLINE_SECONDS = 10 * Time::MINUTE;
     public const REQUEST_COUNTER_KEY = 'metrics:requests';
 
     private const REQUEST_CLASSES = ['1xx', '2xx', '3xx', '4xx', '5xx'];

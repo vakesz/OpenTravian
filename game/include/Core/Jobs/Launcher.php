@@ -59,7 +59,7 @@ class Launcher
         }
         {
             $job = [new AuctionModel(), 'fakeAuction'];
-            $jobs[] = new Job('routineJobs:fakeAuction', 600, $job);
+            $jobs[] = new Job('routineJobs:fakeAuction', 10 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'buildComplete'];
@@ -111,7 +111,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'banProgress'];
-            $jobs[] = new Job('gameProgress:banProgress', 120, $job);
+            $jobs[] = new Job('gameProgress:banProgress', 2 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'referenceCheck'];
@@ -127,7 +127,7 @@ class Launcher
         }
         {
             $job = [new StatisticsGeneralModel(), 'snapshotDaily'];
-            $jobs[] = new Job('gameProgress:statisticsSnapshot', 900, $job);
+            $jobs[] = new Job('gameProgress:statisticsSnapshot', 15 * Time::MINUTE, $job);
         }
         {
             $job = [new DailyQuestModel(), 'resetDailyQuest'];
@@ -146,7 +146,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'updateFoolArtifact'];
-            $jobs[] = new Job('generalProgress:updateFoolArtifact', 120, $job);
+            $jobs[] = new Job('generalProgress:updateFoolArtifact', 2 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'checkForArtifactActivation'];
@@ -154,7 +154,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'cleanupServer'];
-            $jobs[] = new Job('generalProgress:cleanupServer', 300, $job);
+            $jobs[] = new Job('generalProgress:cleanupServer', 5 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'deleteOasisComplete'];
@@ -188,11 +188,11 @@ class Launcher
         }
         {
             $job = [new Reminders(), 'vacationEnding'];
-            $jobs[] = new Job('routineJobs:vacationEndingReminders', 600, $job);
+            $jobs[] = new Job('routineJobs:vacationEndingReminders', 10 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'cleanupIndex'];
-            $jobs[] = new Job('checkIndexFunctions:cleanupIndex', 600, $job);
+            $jobs[] = new Job('checkIndexFunctions:cleanupIndex', 10 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'refreshCountryFlag'];
@@ -217,7 +217,7 @@ class Launcher
                     EngineHeartbeat::requeueStaleCodeQuarantines($startedAt);
                 }
             };
-            $jobs[] = new Job('routineJobs:requeueStaleCodeQuarantines', 600, $job);
+            $jobs[] = new Job('routineJobs:requeueStaleCodeQuarantines', 10 * Time::MINUTE, $job);
         }
         new Job('routineJobs', 20, $jobs, TRUE);
     }

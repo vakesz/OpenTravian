@@ -264,7 +264,7 @@ class MessageModel
 
         return 2 >= (int) $db->fetchScalar(
             'SELECT COUNT(id) FROM mdata WHERE uid=? AND md5_checksum=? AND time >= ?',
-            [$uid, $this->getHash($subject, $text), time() - 600]
+            [$uid, $this->getHash($subject, $text), time() - 10 * Time::MINUTE]
         );
     }
 

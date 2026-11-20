@@ -327,7 +327,7 @@ class OptionCtrl extends GameCtrl
         $uid = (int)$session->getPlayerId();
         $stored = DBI::getInstance()->fetchScalar('SELECT password FROM users WHERE id=?', [$uid], '');
         $given = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
-        if (!throttle_public_form('account-export', 3, 600)) {
+        if (!throttle_public_form('account-export', 3, 10 * Time::MINUTE)) {
             $view->vars['error'] = T('Login', 'tooManyRequests');
             return;
         }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Game\Payment;
 
+use Core\Time;
+
 /** Stripe Checkout (hosted page) with signed webhooks. */
 final class StripeProvider implements Provider
 {
     private const API = 'https://api.stripe.com/v1/';
-    private const TOLERANCE_SECONDS = 300;
+    private const TOLERANCE_SECONDS = 5 * Time::MINUTE;
 
     private readonly \Closure $now;
 

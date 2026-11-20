@@ -739,7 +739,7 @@ class HeroAuctionCtrl extends GameCtrl
         return sprintf(
             '%02d:%02d:%02d',
             intdiv($seconds, Time::HOUR),
-            intdiv($seconds % Time::HOUR, 60),
+            intdiv($seconds % Time::HOUR, Time::MINUTE),
             $seconds % Time::MINUTE
         );
     }

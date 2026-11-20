@@ -151,7 +151,7 @@ class HeroAdventureCtrl extends GameCtrl
         $HTML .= '<td class="distance">' . "\u{202D}" . rtrim(rtrim(number_format($distance, 2, '.', ''), '0'), '.') . "\u{202C}" . ' ' . T('map', 'fields') . '</td>';
         $HTML .= '<td class="duration" id="walktime' . $row['kid'] . '">';
         $hours = (int)floor($need / Time::HOUR);
-        $minutes = (int)floor($need % Time::HOUR / 60);
+        $minutes = (int)floor($need % Time::HOUR / Time::MINUTE);
         $seconds = (int)floor($need % Time::MINUTE);
         $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
         $HTML .= '<div class="cellWrapper"><div class="iconWrapper"><i class="clock_medium" aria-hidden="true"></i></div><div class="duration">' . $duration . '</div></div>';

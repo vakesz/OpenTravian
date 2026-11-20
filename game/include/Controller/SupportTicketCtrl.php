@@ -58,7 +58,7 @@ class SupportTicketCtrl extends OutOfGameCtrl
             $this->handleSubmission();
         }
 
-        $showSuccess = SessionVar::getVariable('supportTicketQueued', false, 300) === true;
+        $showSuccess = SessionVar::getVariable('supportTicketQueued', false, 5 * Time::MINUTE) === true;
         if ($showSuccess) {
             SessionVar::timeoutNow('supportTicketQueued');
         }

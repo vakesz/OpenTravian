@@ -30,7 +30,7 @@ final class WorldSpeedTimers
         $oldUnit = WorldSpeedProfile::trainingTimeUnit($from);
         $newUnit = WorldSpeedProfile::trainingTimeUnit($to);
         $auction = WorldSpeedProfile::auctionDuration($to) / WorldSpeedProfile::auctionDuration($from);
-        $abandon = max(6 * Time::HOUR / $to, 600) / max(6 * Time::HOUR / $from, 600);
+        $abandon = max(6 * Time::HOUR / $to, 10 * Time::MINUTE) / max(6 * Time::HOUR / $from, 10 * Time::MINUTE);
 
         $plans = [
             ['label' => 'building queue', 'table' => 'building_upgrade', 'columns' => ['commence'], 'ratio' => $economy, 'unit' => 1, 'now' => $nowSeconds],

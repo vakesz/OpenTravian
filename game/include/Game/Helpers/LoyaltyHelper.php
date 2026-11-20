@@ -8,7 +8,7 @@ use Game\Slot;
 
 class LoyaltyHelper
 {
-    const UPDATE_DELAY = 600;
+    const UPDATE_DELAY = 10 * Time::MINUTE;
 
     /** Village loyalty: 2 points per building level every 3 hours. */
     public static function pointsPerHour(int $level): float

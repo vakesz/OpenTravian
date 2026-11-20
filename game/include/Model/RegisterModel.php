@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\AccessLevel;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
@@ -57,7 +58,7 @@ class RegisterModel
                 continue;
             }
             $this->createBaseVillage($uid, $name, $race, $kid);
-            $db->run('UPDATE users SET last_login_time=? WHERE id=?', [time() - mt_rand(1, 7200), $uid]);
+            $db->run('UPDATE users SET last_login_time=? WHERE id=?', [time() - mt_rand(1, 2 * Time::HOUR), $uid]);
             $db->run('UPDATE users SET countryFlag=?, lastCountryFlagCheck=? WHERE id=?', [AutomationModel::getRandomCountryFlag(), time(), $uid]);
             $this->populateUserRank($uid);
             ++$k;
@@ -75,7 +76,7 @@ class RegisterModel
     {
         $minDistance = Formulas::getMapMinDistanceFromCenter();
         $maxDistance = $minDistance + 10 * ($tries + 3);
-        if (getGameElapsedSeconds() <= 7200) {
+        if (getGameElapsedSeconds() <= 2 * Time::HOUR) {
             $minDistance = max($minDistance, 23);
             $maxDistance = ($minDistance + 10) + 10 * $tries;
         }

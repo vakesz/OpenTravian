@@ -152,7 +152,7 @@ class EditPlayerCtrl
                 }
             } else if (!isServerFinished() && $_REQUEST['section'] == 'deletePlayer' && Session::validateChecker()) {
                 $uid = (int)$_REQUEST['uid'];
-                $this->db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 600) . ')');
+                $this->db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 10 * Time::MINUTE) . ')');
                 $dispatcher = Dispatcher::getInstance();
                 $dispatcher->appendContent(\Game\AdminUi::notice('Player will be deleted in some minutes.', 'info'));
                 AdminLog::getInstance()->addLog("Deleted a player({$uid}).");

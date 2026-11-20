@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Game;
 
+use Core\Time;
+
 /**
  * The remembered Simple / Advanced choice of the control panel and the setup wizard: a cookie set
  * by a plain link (?view=advanced). It only decides what is shown, never what is allowed, so it
@@ -40,7 +42,7 @@ final class AdminView
      */
     public static function remember(string $mode, string $cookie = self::PANEL_COOKIE): void
     {
-        setcookie($cookie, $mode, ['expires' => time() + 31536000, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax', 'secure' => !empty($_SERVER['HTTPS'])]);
+        setcookie($cookie, $mode, ['expires' => time() + 365 * Time::DAY, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax', 'secure' => !empty($_SERVER['HTTPS'])]);
     }
 
     /** The request URI without the view parameter, to redirect back to after it was stored. */

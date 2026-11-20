@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Game\SocialAuth;
 
+use Core\Time;
+
 /** Builds the ES256 client_secret JWT Sign in with Apple expects, signed with the operator's .p8 key. */
 final class AppleClientSecret
 {
-    private const LIFETIME = 300;
+    private const LIFETIME = 5 * Time::MINUTE;
 
     private function __construct()
     {

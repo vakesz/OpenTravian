@@ -24,7 +24,7 @@ class FakeUserModel
         $db = DB::getInstance();
         $speed = getGameSpeed();
         $now = time();
-        $stmt = $db->query('SELECT id FROM users WHERE access=' . AccessLevel::FAKE_USER . ' AND lastHeroExpCheck <= ' . ($now - mt_rand(Time::HOUR, 10800)) . ' LIMIT 10');
+        $stmt = $db->query('SELECT id FROM users WHERE access=' . AccessLevel::FAKE_USER . ' AND lastHeroExpCheck <= ' . ($now - mt_rand(Time::HOUR, 3 * Time::HOUR)) . ' LIMIT 10');
         while ($row = $stmt->fetch_assoc()) {
             $uid = (int) $row['id'];
             $db->query("UPDATE users SET lastHeroExpCheck=$now WHERE id=$uid");
@@ -32,7 +32,7 @@ class FakeUserModel
             HeroExperience::add($uid, $exp);
         }
         $interval = match (true) {
-            $speed <= 10 => mt_rand(600, Time::HOUR),
+            $speed <= 10 => mt_rand(10 * Time::MINUTE, Time::HOUR),
             $speed <= 100 => mt_rand(200, 400),
             $speed <= 1000 => mt_rand(100, 250),
             default => mt_rand(50, 150),

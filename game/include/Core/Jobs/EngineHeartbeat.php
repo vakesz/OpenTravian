@@ -17,7 +17,7 @@ final class EngineHeartbeat
 {
     public const FRESH_SECONDS = 90;
     public const BEAT_INTERVAL = 15;
-    public const FINGERPRINT_INTERVAL = 300;
+    public const FINGERPRINT_INTERVAL = 5 * Time::MINUTE;
 
     private const BEAT_KEY = 'engine:heartbeat';
     private const PAUSE_KEY = 'engine:pause';
@@ -68,10 +68,10 @@ final class EngineHeartbeat
 
     private static function formatAge(int $age): string
     {
-        if ($age < 120) {
+        if ($age < 2 * Time::MINUTE) {
             return $age . 's';
         }
-        if ($age < 7200) {
+        if ($age < 2 * Time::HOUR) {
             return intdiv($age, Time::MINUTE) . 'm';
         }
 

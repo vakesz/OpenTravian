@@ -198,7 +198,7 @@ class MarketPlaceCtrl extends AnyCtrl
             $player = $m->getPlayerRaceAndName($owner);
             $xy = Formulas::kid2xy($row['kid']);
             $travelSeconds = (int)Formulas::travelTimeSeconds(Formulas::getDistance($row['kid'], Village::getInstance()->getKid()) / $speed * Time::HOUR);
-            $duration = sprintf('%02d:%02d:%02d', intdiv($travelSeconds, Time::HOUR), intdiv($travelSeconds % Time::HOUR, 60), $travelSeconds % 60);
+            $duration = sprintf('%02d:%02d:%02d', intdiv($travelSeconds, Time::HOUR), intdiv($travelSeconds % Time::HOUR, Time::MINUTE), $travelSeconds % Time::MINUTE);
             $quality = $ratio <= 1 ? 4 : ($ratio < 1.5 ? 3 : ($ratio < 2 ? 2 : 1));
             $view->vars['content'] .= '<tr>'
                 . '<td class="offered"><div class="inlineIcon"><i class="' . $resourceClass[$row['giveType']] . '_small" title="' . T('inGame', 'resources.r' . $row['giveType']) . '"></i><span>' . "\u{202D}" . number_format_x($row['giveValue']) . "\u{202C}" . '</span></div></td>'
@@ -545,7 +545,7 @@ class MarketPlaceCtrl extends AnyCtrl
             if (WebService::isPost() && Session::claimAction($_POST['c'] ?? null) && isset($_POST['did_dest'])) {
                 $repeat = max(min((int)$_POST['repeat'], 3), 1);
                 if ($usePeriodicTradeRoutes) {
-                    $hour = max(min((int)$_POST['hour'], 30 * Time::DAY), 600);
+                    $hour = max(min((int)$_POST['hour'], 30 * Time::DAY), 10 * Time::MINUTE);
                 } else {
                     $hour = max(min((int)$_POST['hour'], 23), 0);
                 }
@@ -585,7 +585,7 @@ class MarketPlaceCtrl extends AnyCtrl
             if (WebService::isPost() && Session::claimAction($_POST['c'] ?? null)) {
                 $repeat = max(min((int)$_POST['repeat'], 3), 1);
                 if ($usePeriodicTradeRoutes) {
-                    $hour = max(min((int)$_POST['hour'], 30 * Time::DAY), 600);
+                    $hour = max(min((int)$_POST['hour'], 30 * Time::DAY), 10 * Time::MINUTE);
                 } else {
                     $hour = max(min((int)$_POST['hour'], 23), 0);
                 }

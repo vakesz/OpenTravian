@@ -12,9 +12,9 @@ final class Artwork
     public static function rules(int $speed): array
     {
         return match (true) {
-            $speed >= 10 => ['numerator' => 1, 'denominator' => 6, 'limit' => 400, 'cooldown' => 21600],
-            $speed >= 5 => ['numerator' => 1, 'denominator' => 3, 'limit' => 700, 'cooldown' => 43200],
-            $speed >= 3 => ['numerator' => 1, 'denominator' => 2, 'limit' => 1000, 'cooldown' => 43200],
+            $speed >= 10 => ['numerator' => 1, 'denominator' => 6, 'limit' => 400, 'cooldown' => 6 * Time::HOUR],
+            $speed >= 5 => ['numerator' => 1, 'denominator' => 3, 'limit' => 700, 'cooldown' => 12 * Time::HOUR],
+            $speed >= 3 => ['numerator' => 1, 'denominator' => 2, 'limit' => 1000, 'cooldown' => 12 * Time::HOUR],
             $speed >= 2 => ['numerator' => 2, 'denominator' => 3, 'limit' => 1300, 'cooldown' => Time::DAY],
             default => ['numerator' => 1, 'denominator' => 1, 'limit' => 2000, 'cooldown' => Time::DAY],
         };

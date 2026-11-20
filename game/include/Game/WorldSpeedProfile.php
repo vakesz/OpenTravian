@@ -312,7 +312,7 @@ final class WorldSpeedProfile
 
         // The ×10 window is one day. Faster worlds shrink it with speed and
         // never spawn the first animals in under ten minutes.
-        return max((int)round(Time::DAY * 10 / $speed), 10 * 60);
+        return max((int)round(Time::DAY * 10 / $speed), 10 * Time::MINUTE);
     }
 
     /**
@@ -366,7 +366,7 @@ final class WorldSpeedProfile
             return 2 * Time::HOUR;
         }
 
-        return max(15 * 60, (int)floor((2 * Time::HOUR) / max(1.0, $movementSpeed)));
+        return max(15 * Time::MINUTE, (int)floor((2 * Time::HOUR) / max(1.0, $movementSpeed)));
     }
 
     /**
@@ -389,7 +389,7 @@ final class WorldSpeedProfile
      */
     public static function natarNewVillageTravelTime(int $speed): float
     {
-        return max(24 * Time::HOUR / self::speed($speed), 10 * 60);
+        return max(24 * Time::HOUR / self::speed($speed), 10 * Time::MINUTE);
     }
 
     /**
@@ -461,7 +461,7 @@ final class WorldSpeedProfile
             return 72 * Time::HOUR;
         }
 
-        return (int)max(ceil(72 * Time::HOUR * sqrt(20 / $speed)), 300);
+        return (int)max(ceil(72 * Time::HOUR * sqrt(20 / $speed)), 5 * Time::MINUTE);
     }
 
     /** Starvation crop multiplier: 1 through x10, then 1+4.5*log10(s/10) capped at 10. */

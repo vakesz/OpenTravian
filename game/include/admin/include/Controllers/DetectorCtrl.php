@@ -58,7 +58,7 @@ class DetectorCtrl
         }
         if (isset($_GET['deletePlayer'])) {
             $uid = (int) $_GET['deletePlayer'];
-            $db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 600) . ')');
+            $db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 10 * Time::MINUTE) . ')');
             AdminLog::getInstance()->addLog('Detector queued deletion for uid ' . $uid . '.');
 
             return AdminUi::notice('Player ' . $uid . ' will be deleted in 10 minutes.', 'warning');

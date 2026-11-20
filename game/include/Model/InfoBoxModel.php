@@ -238,7 +238,7 @@ class InfoBoxModel
             return $_cache;
         }
         $data = GlobalDB::getInstance()->query('SELECT * FROM infobox WHERE showTo>' . time() . ' ORDER BY showTo DESC')->fetch_all(MYSQLI_ASSOC);
-        $cache->add('InfoBox:Public', $data, 1800);
+        $cache->add('InfoBox:Public', $data, 30 * Time::MINUTE);
 
         return $data;
     }

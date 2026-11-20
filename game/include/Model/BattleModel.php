@@ -887,7 +887,7 @@ class BattleModel
         $calculator->setMinSpeed($speeds);
         $neededTime = $calculator->calc();
         $move = new MovementsModel();
-        $move->addMovement($this->row['to_kid'], $this->row['kid'], 4, $caged, 0, 0, 0, 0, MovementsModel::MODE_GOING, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + 1000 * $neededTime);
+        $move->addMovement($this->row['to_kid'], $this->row['kid'], 4, $caged, 0, 0, 0, 0, MovementsModel::MODE_GOING, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + Time::SECOND_MS * $neededTime);
         //send hero back and send report.
         $helper = new HeroHelper();
         $calculator = new SpeedCalculator();
@@ -1124,7 +1124,7 @@ class BattleModel
                 (new OasesModel())->updateResources($this->row['to_kid']);
                 $resources = $this->model->fetchRow("SELECT wood, clay, iron, crop, lastfarmed FROM odata WHERE kid={$this->row['to_kid']}");
                 $lastFarmed = (int) ($resources['lastfarmed'] ?? 0);
-                $elapsed = $lastFarmed > 0 ? max(0, time() - $lastFarmed) : 600;
+                $elapsed = $lastFarmed > 0 ? max(0, time() - $lastFarmed) : 10 * Time::MINUTE;
                 $fraction = min(0.10, $elapsed / 6000);
                 $stock = [
                     1 => (float) ($resources['wood'] ?? 0) * $fraction,
@@ -1677,7 +1677,7 @@ class BattleModel
         }
         $rate = max(1.0, (float) (Config::getInstance()->heroConfig->heroItemsSettings->heroReviveArrivalTimeRate ?? 1));
 
-        return 1000 * max((int) round(Time::DAY / $rate), $travel);
+        return Time::SECOND_MS * max((int) round(Time::DAY / $rate), $travel);
     }
 
     private function tournamentSquareLevel(int $kid): int
@@ -2395,7 +2395,7 @@ class BattleModel
         $calculator->setMinSpeed($speeds);
         $calculator->setShip($this->row['ship'], (int)$this->row['race']);
         $move = new MovementsModel();
-        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], $alive, 0, 0, 0, 0, MovementsModel::MODE_RETURN, $this->row['attack_type'], $this->row['end_time'], $this->row['end_time'] + $calculator->calc() * 1000, $data, $this->row['ship']);
+        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], $alive, 0, 0, 0, 0, MovementsModel::MODE_RETURN, $this->row['attack_type'], $this->row['end_time'], $this->row['end_time'] + $calculator->calc() * Time::SECOND_MS, $data, $this->row['ship']);
         return true;
     }
 

@@ -129,7 +129,7 @@ class TimezoneHelper
                 'UTC%s%02d:%02d',
                 $offset < 0 ? '-' : '+',
                 intdiv($absoluteOffset, Time::HOUR),
-                intdiv($absoluteOffset % Time::HOUR, 60)
+                intdiv($absoluteOffset % Time::HOUR, Time::MINUTE)
             );
         }
 

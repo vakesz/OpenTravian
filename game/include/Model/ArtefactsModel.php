@@ -48,7 +48,7 @@ class ArtefactsModel
             return 4 * Time::HOUR;
         }
         // Unsupported speeds retain the established local high-speed policy.
-        return max(Time::DAY / $rate, 600);
+        return max(Time::DAY / $rate, 10 * Time::MINUTE);
     }
 
     public static function getFoolArtifactChangeEffectInterval(): int|float
@@ -60,7 +60,7 @@ class ArtefactsModel
         if ($rate == 1 || $rate == 2 || $rate == 3 || $rate == 5 || $rate === 10) {
             return Time::DAY;
         }
-        return max(Time::DAY / $rate, 1800);
+        return max(Time::DAY / $rate, 30 * Time::MINUTE);
     }
 
     /**
@@ -571,7 +571,7 @@ class ArtefactsModel
         $now = time();
         // Article 102: after the interval, the next change waits for a full hour.
         $anchor = 'GREATEST(lastupdate, conquered+' . $changeInterval . '+' . (int) $activationTime . ')';
-        $due = 'FLOOR((' . $anchor . ' + ' . $changeInterval . ' + 3599) / 3600) * 3600';
+        $due = 'FLOOR((' . $anchor . ' + ' . $changeInterval . ' + ' . (Time::HOUR - 1) . ') / ' . Time::HOUR . ') * ' . Time::HOUR;
         $find = $db->query('SELECT * FROM artefacts WHERE type=' . self::ART_FOOL . " AND status=1 AND (lastupdate=0 OR $due <= $now)");
         while ($find && ($row = $find->fetch_assoc())) {
             $this->updateFoolArtifact($row);

@@ -10,7 +10,7 @@ use Core\Time;
 final class JwksCache
 {
     private const DEFAULT_TTL = Time::HOUR;
-    private const MIN_TTL = 300;
+    private const MIN_TTL = 5 * Time::MINUTE;
     private const MAX_TTL = Time::DAY;
     /** An unknown kid may force a refetch at most this often (stops fetch amplification). */
     private const REFETCH_INTERVAL = Time::MINUTE;

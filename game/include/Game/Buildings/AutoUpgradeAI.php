@@ -4,6 +4,7 @@ namespace Game\Buildings;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\Gid;
 use Game\Slot;
@@ -405,7 +406,7 @@ class AutoUpgradeAI
      */
     public function upgrade()
     {
-        if ((time()-$this->creationTime) < 5400) {
+        if ((time()-$this->creationTime) < 90 * Time::MINUTE) {
             $rand_field = mt_rand(Slot::FIRST_FIELD, Slot::LAST_FIELD);
         } else {
             $rand_field = mt_rand(1, 5) <= 3 ? mt_rand(Slot::FIRST_FIELD, Slot::LAST_FIELD) : mt_rand(Slot::FIRST_BUILDING, Slot::LAST);

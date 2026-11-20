@@ -135,7 +135,7 @@ final class distanceSpeedAndDuration extends AjaxBase
     private function displayTimeOffset(): int
     {
         $date = new \DateTimeImmutable('now', new \DateTimeZone(TimezoneHelper::getTimezone()));
-        return ((int)$date->format('G') * Time::HOUR) + ((int)$date->format('i') * 60) + (int)$date->format('s');
+        return ((int)$date->format('G') * Time::HOUR) + ((int)$date->format('i') * Time::MINUTE) + (int)$date->format('s');
     }
 
     private function positiveInteger($value): ?int

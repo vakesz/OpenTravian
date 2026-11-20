@@ -150,7 +150,7 @@ class RallyPoint extends RallyPointHTML
                     $move = new MovementsModel();
                     if (($wholeCount - $total) <= 0) {
                         if ($m->enforcementExists($d) && $m->deleteEnforce($d)) {
-                            $move->addMovement($row['to_kid'], $row['kid'], $session->getRace(), $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
+                            $move->addMovement($row['to_kid'], $row['kid'], $session->getRace(), $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * Time::SECOND_MS);
                         }
                     } else {
                         $modify = [];
@@ -160,7 +160,7 @@ class RallyPoint extends RallyPointHTML
                             }
                         }
                         if ($m->enforcementExists($d) && $m->modifyEnforce($modify, $d)) {
-                            $move->addMovement($row['to_kid'], $row['kid'], $session->getRace(), $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
+                            $move->addMovement($row['to_kid'], $row['kid'], $session->getRace(), $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * Time::SECOND_MS);
                         }
                     }
                     if ($row['race'] <> Tribes::NATURE) {
@@ -294,7 +294,7 @@ class RallyPoint extends RallyPointHTML
                     //process here
                     if (($wholeCount - $total) <= 0) {
                         if ($m->deleteEnforce($d) && $row['race'] <> Tribes::NATURE) {
-                            $move->addMovement($row['to_kid'], $row['kid'], $row['race'], $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
+                            $move->addMovement($row['to_kid'], $row['kid'], $row['race'], $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * Time::SECOND_MS);
                         }
                     } else {
                         $modify = [];
@@ -304,7 +304,7 @@ class RallyPoint extends RallyPointHTML
                             }
                         }
                         if ($m->modifyEnforce($modify, $d) && $row['race'] <> Tribes::NATURE) {
-                            $move->addMovement($row['to_kid'], $row['kid'], $row['race'], $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
+                            $move->addMovement($row['to_kid'], $row['kid'], $row['race'], $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * Time::SECOND_MS);
                         }
                     }
                     if ($row['race'] <> Tribes::NATURE) {

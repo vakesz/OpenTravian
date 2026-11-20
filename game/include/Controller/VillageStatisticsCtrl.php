@@ -512,7 +512,7 @@ class VillageStatisticsCtrl extends GameCtrl
                 $data['th_lvl'] = $m->getTHLevel($row['kid']);
                 $data['units'] = $TrainingHelper->getExpansionUnits($row['kid']);
                 $data['slots'] = $TrainingHelper->getSlots($row['kid']);
-                $cache->set("dorf3:showCulturePoints:{$row['kid']}", $data, 600);
+                $cache->set("dorf3:showCulturePoints:{$row['kid']}", $data, 10 * Time::MINUTE);
             }
             $summary['slots']['total'] += $data['slots']['maxSlots'];
             $summary['slots']['filled'] += $data['slots']['filledSlots'];

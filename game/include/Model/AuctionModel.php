@@ -32,11 +32,11 @@ class AuctionModel
     public const HERO_INVENTORY_MAX_SLOTS = self::HERO_INVENTORY_COLUMNS * self::HERO_INVENTORY_MAX_ROWS;
 
     /** Knowledge Base article 94: a sale can be cancelled within the first five minutes. */
-    public const CANCEL_WINDOW_SECONDS = 300;
+    public const CANCEL_WINDOW_SECONDS = 5 * Time::MINUTE;
 
     /** A new listing stays hidden for a random 1–5 minutes at 1×, then that wait is divided by speed. */
     public const LISTING_DELAY_MIN = Time::MINUTE;
-    public const LISTING_DELAY_MAX = 300;
+    public const LISTING_DELAY_MAX = 5 * Time::MINUTE;
 
     /**
      * The multiple is not published. A bid above twice the current price, made
@@ -563,7 +563,7 @@ class AuctionModel
     public function modifyAuction(int $id, int $activeId, int $activeUid, int|float $silver, int|float $maxSilver, int $time, bool $add = true): bool
     {
         $db = DB::getInstance();
-        $time = max($time, time() + 300);
+        $time = max($time, time() + 5 * Time::MINUTE);
         // A settled auction is never rewritten.
         $query = $db->query("UPDATE auction SET activeId=$activeId, activeUid=$activeUid, silver = $silver, maxSilver=$maxSilver" . ($add ? ', bids = bids + 1' : '') . ", time = $time where id = $id AND finish=0");
 

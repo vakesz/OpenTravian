@@ -23,7 +23,7 @@ use function getGameSpeed;
 final class WorldStatsSnapshot
 {
     public const CACHE_KEY = 'Statistics:PublicWorld';
-    public const TTL = 300;
+    public const TTL = 5 * Time::MINUTE;
     public const TOP_SIZE = 10;
 
     private function __construct()

@@ -51,7 +51,7 @@ final class OAuthCallbackCtrl extends OutOfGameCtrl
         $result = OAuthFlowFactory::create()->complete($provider, $params, $sessionState, is_string($cookie) ? $cookie : null);
         if ($result->kind === 'error') {
             // Only failed callbacks consume the budget: successful sign-ins are free.
-            throttle_public_form('oauth-callback', 20, 600);
+            throttle_public_form('oauth-callback', 20, 10 * Time::MINUTE);
         }
         $this->finish($result, $flash, $provider);
     }

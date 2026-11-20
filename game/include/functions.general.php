@@ -185,7 +185,7 @@ function login_throttle_reserve(array $buckets)
 function login_throttle_complete(array $reservation, $failed, $clearPairKey = null): bool
 {
     try {
-        return LoginAttemptLimiter::complete(Caching::singleton(), $reservation, (bool) $failed, 900, $clearPairKey);
+        return LoginAttemptLimiter::complete(Caching::singleton(), $reservation, (bool) $failed, 15 * \Core\Time::MINUTE, $clearPairKey);
     } catch (\Throwable $e) {
         error_log('login throttle unavailable: ' . $e->getMessage());
         return false;
@@ -216,7 +216,7 @@ function throttle_is_limited(array $buckets, $failClosed = true): bool
  * @param array<mixed> $buckets
  * @param int $window
  */
-function throttle_hit(array $buckets, $window = 900): void
+function throttle_hit(array $buckets, $window = 15 * \Core\Time::MINUTE): void
 {
     try {
         $cache = Caching::getInstance();
@@ -1140,7 +1140,7 @@ function secondsToString($seconds, $isTrainingTime = false)
         return TimezoneHelper::date('H:i:s');
     }
     $h = (int) floor($seconds / \Core\Time::HOUR);
-    $m = (int) floor(($seconds % \Core\Time::HOUR) / 60);
+    $m = (int) floor(($seconds % \Core\Time::HOUR) / \Core\Time::MINUTE);
     $s = (int) floor($seconds % \Core\Time::MINUTE);
     return $h . ':' . ($m < 10 ? '0' : '') . $m . ':' . ($s < 10 ? '0' : '') . $s;
 }
@@ -1158,8 +1158,8 @@ function milisecondsToString($ms)
     $ms = $ms % \Core\Time::SECOND_MS;
     $min = (int) floor($sec / \Core\Time::MINUTE);
     $sec = $sec % \Core\Time::MINUTE;
-    $hr = (int) floor($min / 60);
-    $min = $min % 60;
+    $hr = (int) floor($min / (\Core\Time::HOUR / \Core\Time::MINUTE));
+    $min = $min % (\Core\Time::HOUR / \Core\Time::MINUTE);
     $res = sprintf('%d:%02d:%02d (+%d ' . T('Global', 'ms') . ')', $hr, $min, $sec, $ms);
     return $res;
 }
@@ -1177,8 +1177,8 @@ function nanosecondsToString($ns)
     $ns = $ns % 1e9;
     $min = (int) floor($sec / \Core\Time::MINUTE);
     $sec = $sec % \Core\Time::MINUTE;
-    $hr = (int) floor($min / 60);
-    $min = $min % 60;
+    $hr = (int) floor($min / (\Core\Time::HOUR / \Core\Time::MINUTE));
+    $min = $min % (\Core\Time::HOUR / \Core\Time::MINUTE);
     $res = sprintf('%d:%02d:%02d (+%s ' . T('Global', 'ms') . ')', $hr, $min, $sec, round($ns / 1e6, 3));
     return $res;
 }
@@ -1478,7 +1478,7 @@ function filemtime_remote_key($uri, $cacheKey)
     }
     fclose($handle);
     $result = substr(sha1((string) $result), -5);
-    $cache->add($cacheKey, $result, 7200);
+    $cache->add($cacheKey, $result, 2 * \Core\Time::HOUR);
     return $result;
 }
 

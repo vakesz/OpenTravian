@@ -25,7 +25,7 @@ use Core\Time;
  */
 final class TwoFactorGate
 {
-    public const PENDING_TTL = 300;
+    public const PENDING_TTL = 5 * Time::MINUTE;
     public const GRANT_TTL = Time::MINUTE;
 
     /** @param array<string, mixed> $session */

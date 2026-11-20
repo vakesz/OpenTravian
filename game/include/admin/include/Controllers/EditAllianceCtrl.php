@@ -74,13 +74,13 @@ class EditAllianceCtrl
             }
             $login_stat = '';
             if ($isMyAlliance) {
-                if ((time() - 600) < $row['last_login_time']) { // 0 Min - 10 Min
+                if ((time() - 10 * Time::MINUTE) < $row['last_login_time']) { // 0 Min - 10 Min
                     $login_stat = T("Alliance", "online now");
-                } else if ((time() - Time::DAY) < $row['last_login_time'] && (time() - 600) > $row['last_login_time']) { // 10 Min - 1 Days
+                } else if ((time() - Time::DAY) < $row['last_login_time'] && (time() - 10 * Time::MINUTE) > $row['last_login_time']) { // 10 Min - 1 Days
                     $login_stat = T("Alliance", "active players");
-                } else if ((time() - 259200) < $row['last_login_time'] && (time() - Time::DAY) > $row['last_login_time']) { // 1-3 Days
+                } else if ((time() - 3 * Time::DAY) < $row['last_login_time'] && (time() - Time::DAY) > $row['last_login_time']) { // 1-3 Days
                     $login_stat = T("Alliance", "active 3days");
-                } else if ((time() - Time::WEEK) < $row['last_login_time'] && (time() - 259200) > $row['last_login_time']) { // 3-7 Days
+                } else if ((time() - Time::WEEK) < $row['last_login_time'] && (time() - 3 * Time::DAY) > $row['last_login_time']) { // 3-7 Days
                     $login_stat = T("Alliance", "active 7days");
                 } else {
                     $login_stat = T("Alliance", "inactive");

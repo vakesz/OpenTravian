@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Model;
 
+use Core\Time;
 use Game\FarmList\FarmListInbox;
 use Core\Database\DB;
 use Game\Buildings\BuildingAction;
@@ -52,7 +53,7 @@ class VillageModel
         $Troops = min(abs($Troops), 100);
         $punishBuildings = min(abs($punishBuildings), 20);
         ignore_user_abort(TRUE);
-        set_time_limit(600);
+        set_time_limit(10 * Time::MINUTE);
         $db = DB::getInstance();
         if ($resources) {
             if ($kid > 0) {

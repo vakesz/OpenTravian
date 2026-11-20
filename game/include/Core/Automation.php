@@ -577,7 +577,7 @@ class Automation
     {
         $halfDay = time() - Time::DAY / 2;
         $oneHour = time() - Time::HOUR;
-        $tenMin = time() - 600;
+        $tenMin = time() - 10 * Time::MINUTE;
         $db = DB::getInstance();
         $this->deleteBatched("DELETE FROM login_handshake WHERE time < $tenMin");
         $this->deleteBatched("DELETE FROM newproc WHERE time < $halfDay");
@@ -628,7 +628,7 @@ class Automation
     {
         $db = DB::getInstance();
         $installationTime = (int)$db->fetchScalar("SELECT installationTime FROM config");
-        if ($installationTime == 0 || (time() - $installationTime) < 120) {
+        if ($installationTime == 0 || (time() - $installationTime) < 2 * Time::MINUTE) {
             return;
         }
         $conf = Config::getInstance();
@@ -682,7 +682,7 @@ class Automation
     public function refreshCountryFlag(): void
     {
         $db = DB::getInstance();
-        $time = time() - 7200;
+        $time = time() - 2 * Time::HOUR;
         $result = $db->query("SELECT id, access, countryFlag FROM users WHERE (access!=" . AccessLevel::FAKE_USER . " OR lastCountryFlagCheck=0) AND (lastCountryFlagCheck <= $time) LIMIT 100");
         while ($row = $result->fetch_assoc()) {
             if ($row['access'] == AccessLevel::FAKE_USER) {
@@ -1119,7 +1119,7 @@ class Automation
 
     public function backup(): void
     {
-        if (getGameElapsedSeconds() <= 1800 || !DB::scheduledBackupsEnabled()) {
+        if (getGameElapsedSeconds() <= 30 * Time::MINUTE || !DB::scheduledBackupsEnabled()) {
             return;
         }
         $db = DB::getInstance();

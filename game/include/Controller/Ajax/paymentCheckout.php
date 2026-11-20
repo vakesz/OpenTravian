@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Controller\Ajax;
 
+use Core\Time;
 use Game\Account\DeletionLock;
 use Core\Caching\Caching;
 use Core\Database\GlobalDB;
@@ -49,7 +50,7 @@ class paymentCheckout extends AjaxBase
 
             return;
         }
-        if (!Caching::getInstance()->incrementWithinLimit(throttle_key('payment-checkout', 'player', (string) $uid), 10, 600)) {
+        if (!Caching::getInstance()->incrementWithinLimit(throttle_key('payment-checkout', 'player', (string) $uid), 10, 10 * Time::MINUTE)) {
             $this->error(T('PaymentWizard', 'paymentUnAvailable'), 429);
 
             return;

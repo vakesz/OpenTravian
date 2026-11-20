@@ -3593,7 +3593,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         $ub = getGameSpeed();
         $ub *= getGame('extra_training_time_multiplier');
         if ($u == Unit::TRAP) {
-            $time = 600;
+            $time = 10 * Time::MINUTE;
             $race = 2;
         } else {
             $race = unitIdToTribe($u) - 1;
@@ -3952,13 +3952,13 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         // here would be lossy at extreme speed because it deliberately floors
         // training to one second.
         $trainingTime = $unitId == Unit::TRAP
-            ? 600
+            ? 10 * Time::MINUTE
             : self::$data['units'][unitIdToTribe($unitId) - 1][$u]['time'];
         if ($u < 8) { //normal troops
-            $duration = (1800 + 3 * $trainingTime) / $speed;
+            $duration = (30 * Time::MINUTE + 3 * $trainingTime) / $speed;
         } else {
             // Chiefs: (training time + 7200) / 4, as kirilloid lists them.
-            $duration = (7200 + $trainingTime) / 4 / $speed;
+            $duration = (2 * Time::HOUR + $trainingTime) / 4 / $speed;
         }
 
         // Research end times live in the INTEGER Unix-seconds column used by
@@ -4138,7 +4138,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         // A batch of `ceil(speed / 50)` celebrations (cost and culture points scale with it, see celebrationCost()) lasts one
         // cool-down, which keeps shrinking with the speed down to the one second minimum.
-        $cool_down_time = (($big ? 216000 : Time::DAY) * self::townHallCelebrationTime($lvl)) / (floor(getGameSpeed() / 3) + 1);
+        $cool_down_time = (($big ? 60 * Time::HOUR : Time::DAY) * self::townHallCelebrationTime($lvl)) / (floor(getGameSpeed() / 3) + 1);
         return max(1, round($cool_down_time));
     }
 
@@ -4314,7 +4314,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
             $max_distance = floor(hypot(MAP_SIZE, MAP_SIZE)) * 0.5;
         }
         $distance_increase_per_second = $max_distance / $round_length / Time::DAY / $rate;
-        if ($elapsed <= (10800 * $rate)) {
+        if ($elapsed <= (3 * Time::HOUR * $rate)) {
             $distance_increase_per_second *= 25;
         }
         return 25 + ($elapsed * $distance_increase_per_second);

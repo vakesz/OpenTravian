@@ -188,7 +188,7 @@ class WonderOfTheWorldModel
                 11 => 0,
             ];
             $units = array_map(static fn ($count): int => (int) ceil($count), $units);
-            $time = max(24 * Time::HOUR / getGameSpeed(), 300);
+            $time = max(24 * Time::HOUR / getGameSpeed(), 5 * Time::MINUTE);
             $move->addMovement($cap_kid,
                 $kid,
                 5,

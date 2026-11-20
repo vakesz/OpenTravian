@@ -26,7 +26,7 @@ $check(str_contains($event, "'Incoming attacks'") === false && str_contains($eve
 
 $kind = $read('game/include/Game/Mail/EmailKind.php');
 $check(str_contains($kind, 'return [self::Attack, self::Construction, self::Message, self::VacationEnding, self::VacationStarted, self::SitterSignIn];'), 'Options offers the six event mails, in the approved order.');
-foreach (['self::Attack => [1, 1800]', 'self::Construction => [1, Time::HOUR]', 'self::Message => [1, 900]'] as $limit) {
+foreach (['self::Attack => [1, 30 * Time::MINUTE]', 'self::Construction => [1, Time::HOUR]', 'self::Message => [1, 15 * Time::MINUTE]'] as $limit) {
     $check(str_contains($kind, $limit), "Rate limit: {$limit}");
 }
 

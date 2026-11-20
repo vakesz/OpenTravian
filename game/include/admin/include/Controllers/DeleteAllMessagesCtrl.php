@@ -30,7 +30,7 @@ class DeleteAllMessagesCtrl
     private function banPlayer($uid): void
     {
         $reason = 'Spam';
-        $time = 7200;
+        $time = 2 * Time::HOUR;
         $db = DB::getInstance();
         $exists = 0 < $db->fetchScalar('SELECT COUNT(id) FROM banQueue WHERE uid=?', [$uid]);
         if (!$exists) {

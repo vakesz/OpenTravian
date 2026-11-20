@@ -47,7 +47,7 @@ class HeroMansionCtrl extends AnyCtrl
         if (isset($_GET['del']) && Session::claimAction($_GET['c'] ?? null)) {
             $isMine = $db->fetchScalar("SELECT COUNT(kid) FROM odata WHERE did=" . Village::getInstance()->getKid() . " AND kid=" . (int)$_GET['del']) > 0;
             if ($isMine && !$this->isInDeletion($_GET['del'])) {
-                $duration = max(6 * Time::HOUR / getGameSpeed(), 600);
+                $duration = max(6 * Time::HOUR / getGameSpeed(), 10 * Time::MINUTE);
                 $db->query("INSERT INTO odelete (`kid`, `oid`, `end_time`) VALUES (" . Village::getInstance()->getKid() . "," . (int)$_GET['del'] . "," . (time() + $duration) . ")");
                 $this->abandoning[(int)$_GET['del']] = [
                     "id"       => $db->lastInsertId(),

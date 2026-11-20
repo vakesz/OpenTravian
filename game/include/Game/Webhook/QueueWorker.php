@@ -58,7 +58,7 @@ final class QueueWorker
             return 1;
         }
         if ($result['status'] === 429) {
-            $wait = min(600, max(1, $result['retryAfter']));
+            $wait = min(10 * Time::MINUTE, max(1, $result['retryAfter']));
             $db->run('UPDATE webhook_queue SET next_attempt_at=?, lease_until=0 WHERE id=?', [time() + $wait, $id]);
 
             return 0;

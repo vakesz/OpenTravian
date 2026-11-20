@@ -12,7 +12,7 @@ use Core\Time;
 
 class BackupsCtrl
 {
-    private const LOCK_TTL = 21600;
+    private const LOCK_TTL = 6 * Time::HOUR;
 
     public function __construct()
     {

@@ -265,7 +265,7 @@ class NatarsModel
             default => 100,
         };
         $now = time();
-        $time = $now - 900;
+        $time = $now - 15 * Time::MINUTE;
         $result = $db->query("SELECT kid, lastVillageCheck FROM vdata WHERE owner=" . UserId::NATARS . " AND isWW=0 AND isFarm=0 AND isArtifact=0 AND lastVillageCheck > 0 AND lastVillageCheck <= $time LIMIT 10");
         while ($row = $result->fetch_assoc()) {
             $kid = (int) $row['kid'];

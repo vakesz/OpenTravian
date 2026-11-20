@@ -68,8 +68,8 @@ final class CatchUp
             'demolition' => ['table' => 'demolition', 'sql' => "SELECT id, end_time AS due FROM demolition WHERE end_time<=$cutoff$own", 'order' => 'end_time', 'scale' => 1],
             'research' => ['table' => 'research', 'sql' => "SELECT id, end_time AS due FROM research WHERE end_time<=$cutoff$own", 'order' => 'end_time', 'scale' => 1],
             'market' => ['table' => 'send', 'sql' => "SELECT id, end_time AS due FROM send WHERE end_time<$cutoff$either", 'order' => 'end_time', 'scale' => 1],
-            'attack' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=" . MovementsModel::MODE_GOING . " AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => 1000],
-            'return' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=" . MovementsModel::MODE_RETURN . " AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => 1000],
+            'attack' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=" . MovementsModel::MODE_GOING . " AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => Time::SECOND_MS],
+            'return' => ['table' => 'movement', 'sql' => "SELECT id, end_time AS due FROM movement WHERE mode=" . MovementsModel::MODE_RETURN . " AND end_time<=$milliseconds$either", 'order' => 'end_time', 'scale' => Time::SECOND_MS],
             'training' => ['table' => 'training', 'sql' => 'SELECT id, commence AS due FROM training WHERE commence<' . ($cutoff * $trainingScale) . $own, 'order' => 'commence', 'scale' => $trainingScale],
         ];
     }

@@ -6,6 +6,7 @@ use Core\Helper\IPTracker;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 
 class IPBanCtrl
 {
@@ -16,7 +17,7 @@ class IPBanCtrl
         $this->countryCodes = Config::getInstance()->countryCodes;
         $params = [
             'ip' => is_string($_REQUEST['ip'] ?? null) ? trim($_REQUEST['ip']) : null,
-            'time' => is_string($_POST['time'] ?? null) ? max(0, (int)$_POST['time']) : 7200,
+            'time' => is_string($_POST['time'] ?? null) ? max(0, (int)$_POST['time']) : 2 * Time::HOUR,
             'reason' => is_string($_POST['reason'] ?? null) ? $_POST['reason'] : 'Pushing',
         ];
         if(!isServerFinished() && WebService::isPost() && Session::validateChecker()){

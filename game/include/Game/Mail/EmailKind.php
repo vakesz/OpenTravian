@@ -28,9 +28,9 @@ enum EmailKind: string
     {
         return match ($this) {
             self::Newsletter => [1, 12 * Time::HOUR],
-            self::Attack => [1, 1800],
+            self::Attack => [1, 30 * Time::MINUTE],
             self::Construction => [1, Time::HOUR],
-            self::Message => [1, 900],
+            self::Message => [1, 15 * Time::MINUTE],
             self::VacationEnding, self::VacationStarted => [1, Time::DAY],
             self::SitterSignIn => [1, Time::DAY],
         };

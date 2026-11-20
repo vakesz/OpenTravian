@@ -136,7 +136,7 @@ class Session
     /** Idle limit for a player session; never shorter than the remember-me lifetime. */
     private static function playerIdleTimeout(): int
     {
-        return max(600, (int)Config::getProperty("settings", "session_timeout"), RememberMe::LIFETIME);
+        return max(10 * Time::MINUTE, (int)Config::getProperty("settings", "session_timeout"), RememberMe::LIFETIME);
     }
 
     /**
@@ -232,7 +232,7 @@ class Session
             }
         }
         $key = $this->fixSessionPrefix('admin_login_time');
-        if (isset($_SESSION[$key]) && (time() - $_SESSION[$key]) > max(600, Config::getProperty("settings", "session_timeout"))) {
+        if (isset($_SESSION[$key]) && (time() - $_SESSION[$key]) > max(10 * Time::MINUTE, Config::getProperty("settings", "session_timeout"))) {
             $this->logout();
             redirect("/dorf1.php");
             return;
@@ -1680,7 +1680,7 @@ class Session
 
     public function needValidation(): bool
     {
-        return SessionVar::getVariable("reCaptchaValidation", true, 1200) == false;
+        return SessionVar::getVariable("reCaptchaValidation", true, 20 * Time::MINUTE) == false;
     }
 
     /**

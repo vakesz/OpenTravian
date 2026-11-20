@@ -10,6 +10,7 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\AccessLevel;
 use Game\Formulas;
@@ -522,7 +523,7 @@ class tileDetails extends AjaxBase
         if (empty($reports)) {
             $reports = '<tr><td>' . T("map", "No information<br>available!") . '</td></tr>';
         }
-        $cache->add($key, $reports, 1800);
+        $cache->add($key, $reports, 30 * Time::MINUTE);
         return $reports;
     }
 

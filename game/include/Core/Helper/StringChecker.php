@@ -33,7 +33,7 @@ class StringChecker
     {
         if ($badWords && $urls) return;
         if (!Session::getInstance()->banned()) {
-            $spam_count = (int) SessionVar::getVariable('spamCount', 0, 600);
+            $spam_count = (int) SessionVar::getVariable('spamCount', 0, 10 * Time::MINUTE);
             SessionVar::setVariable('spamCount', ++$spam_count);
             $maxTries = !$urls ? self::MAX_TRIES : self::MAX_TRIES_URL;
             if ($spam_count >= intdiv($maxTries, 2)) {
