@@ -82,22 +82,30 @@ class AuctionModel
         $dailyQuest = new DailyQuestModel();
         $spread_randomly = Config::getInstance()->auction->fakeAuction->SpreadOutRandomlyBetweenPlayers;
         $spread_timeout = (int) Config::getInstance()->auction->fakeAuction->SpreadOutTimeout;
-        while ($find && ($row = $find->fetch_assoc())) {
-            $auctionId = (int) $row['id'];
-            $activeUid = (int) $row['activeUid'];
-            $owner = (int) $row['uid'];
-            $silver = (int) $row['silver'];
-            $item = [(int) $row['btype'], (int) $row['type'], (int) $row['num']];
+        while ($find && ($candidate = $find->fetch_assoc())) {
+            $auctionId = (int) $candidate['id'];
             // Each auction settles once and completely: claim it (finish=0 to 1) and settle it in one transaction.
             if (!$db->begin_transaction()) {
                 continue;
             }
             try {
-                $claimed = $db->query("UPDATE auction SET finish=1 WHERE id=$auctionId AND finish=0");
+                // The time check is repeated so an auction a late bid extended is not settled early.
+                $claimed = $db->query("UPDATE auction SET finish=1 WHERE id=$auctionId AND finish=0 AND time <= " . time());
                 if (!$claimed || $db->affectedRows() !== 1) {
                     $db->rollback();
                     continue;
                 }
+                // Re-read under the row lock the claim holds: a bid may have landed after the unlocked SELECT above.
+                $locked = $db->query("SELECT * FROM auction WHERE id=$auctionId FOR UPDATE");
+                $row = $locked ? $locked->fetch_assoc() : null;
+                if (!$row) {
+                    $db->rollback();
+                    continue;
+                }
+                $activeUid = (int) $row['activeUid'];
+                $owner = (int) $row['uid'];
+                $silver = (int) $row['silver'];
+                $item = [(int) $row['btype'], (int) $row['type'], (int) $row['num']];
                 $unsold = (int) $row['activeId'] === 0;
                 if ($spread_randomly) {
                     $uid = $this->getRandomUID($spread_timeout);
