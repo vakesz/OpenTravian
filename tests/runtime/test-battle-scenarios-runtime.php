@@ -285,10 +285,12 @@ $expect('small cranny artefact', (int)$scalar('SELECT f30 FROM fdata WHERE kid=?
 $pdo->run('UPDATE config SET ArtifactsReleased=?', [$artifactsReleased]);
 
 // --- oases -----------------------------------------------------------------------------------------------------
-// One neutral oasis within the Legends capture range (3 fields) is borrowed and put back afterwards.
+// One neutral oasis within the capture range (the 7x7 square around the village) is borrowed and put back afterwards.
 $oasis = null;
+$home = Formulas::kid2xy($attacker['kid']);
 foreach ($pdo->run('SELECT kid FROM odata WHERE owner=0 AND did=0')->fetchAll(PDO::FETCH_COLUMN) as $candidate) {
-    if (Formulas::getDistance($attacker['kid'], (int)$candidate) <= 3) {
+    $there = Formulas::kid2xy((int)$candidate);
+    if (abs(Formulas::delta($there['x'], $home['x'])) <= 3 && abs(Formulas::delta($there['y'], $home['y'])) <= 3) {
         $oasis = (int)$candidate;
         break;
     }
@@ -314,15 +316,21 @@ if ($oasis === null) {
         $pdo->run('UPDATE units SET u1=0, u2=0, u3=0, u4=0, u5=0, u6=0, u7=0, u8=0, u9=0, u10=0 WHERE kid=?', [$oasis]);
     };
 
-    // The Hero's Mansion decides how many oases a village may hold. Raids no
-    // longer capture; a normal attack takes an empty oasis when loyalty is low
-    // enough for the one-third loyalty step to finish it.
+    // The Hero's Mansion decides how many oases a village may hold. One won raid
+    // or one won normal attack takes a free oasis, and it starts at full loyalty.
     $oasisOwner = static fn (): int => (int)$scalar('SELECT did FROM odata WHERE kid=?', [$oasis]);
     $reset();
     $build($attacker, 31, 37, 10);
-    $emptyOasis(0, 0, 30.0);
+    $emptyOasis(0, 0, 100.0);
+    $send('oasis capture by raid', MovementsModel::ATTACKTYPE_RAID, [1 => 400, 11 => 1], ['target' => $oasis]);
+    $expect('oasis capture by raid', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured by a raid.');
+    $expect('captured oasis loyalty', (float)$scalar('SELECT loyalty FROM odata WHERE kid=?', [$oasis]) >= 100.0, 'a captured oasis must start at loyalty 100.');
+
+    $reset();
+    $build($attacker, 31, 37, 10);
+    $emptyOasis(0, 0, 100.0);
     $send('oasis capture by attack', MovementsModel::ATTACKTYPE_NORMAL, [1 => 400, 11 => 1], ['target' => $oasis]);
-    $expect('oasis capture by attack', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured.');
+    $expect('oasis capture by attack', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured by one normal attack.');
 
     $reset();
     $build($attacker, 31, 37, 10);

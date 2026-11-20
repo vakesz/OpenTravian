@@ -272,7 +272,7 @@ class SendTroops extends RallyPointHTML
                 $attackTypes = [
                     MovementsModel::ATTACKTYPE_SPY => ["disabled" => true, "checked" => false], //reinforcement
                     MovementsModel::ATTACKTYPE_REINFORCEMENT => ["disabled" => true, "checked" => false], //reinforcement
-                    MovementsModel::ATTACKTYPE_NORMAL => ["disabled" => true, "checked" => false], //normal attacks
+                    MovementsModel::ATTACKTYPE_NORMAL => ["disabled" => false, "checked" => false], //normal attacks capture a free oasis too
                     MovementsModel::ATTACKTYPE_RAID => ["disabled" => false, "checked" => true],//raid attacks
                 ];
             }
@@ -864,7 +864,7 @@ class SendTroops extends RallyPointHTML
             $attackTypes = [
                 MovementsModel::ATTACKTYPE_SPY => ["disabled" => false, "checked" => false],//spy
                 MovementsModel::ATTACKTYPE_REINFORCEMENT => ["disabled" => true, "checked" => false],//reinforcement
-                MovementsModel::ATTACKTYPE_NORMAL => ["disabled" => true, "checked" => false],//normal attacks
+                MovementsModel::ATTACKTYPE_NORMAL => ["disabled" => false, "checked" => false],//normal attacks capture a free oasis too
                 MovementsModel::ATTACKTYPE_RAID => ["disabled" => false, "checked" => true],//raid attacks
             ];
         } elseif ($owner) {//village or occupied oasis

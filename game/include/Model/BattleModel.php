@@ -69,7 +69,7 @@ class BattleModel
         5 => 10,
         6 => 8,
         7 => 6,
-        8 => 10,
+        8 => 6,
         9 => 6,
     ];
     /** Loyalty a chief lowers (min, max), per tribe. */
@@ -2011,12 +2011,21 @@ class BattleModel
         }
 
         if ($this->defender['isOasis'] && $oasis->getOasisCaptureKid($this->row['to_kid']) != $this->row['kid'] && !$defender['total_left']) {
-            $distance = Formulas::getDistance($this->row['kid'], $this->row['to_kid']);
-            if ($distance <= 3) {
+            // An oasis can be taken within the 7x7 square around the village (map wrap included),
+            // the same area the crop bonus and the Hero's Mansion list use.
+            $from = Formulas::kid2xy($this->row['kid']);
+            $to = Formulas::kid2xy($this->row['to_kid']);
+            if (abs(Formulas::delta($to['x'], $from['x'])) <= 3 && abs(Formulas::delta($to['y'], $from['y'])) <= 3) {
                 $oasesCount = (int)$db->fetchScalar("SELECT COUNT(kid) FROM odata WHERE did={$this->row['kid']}");
                 $slots = max(0, floor(($heroMansion - 5) / 5)) - $oasesCount;
                 if ($this->row['attack_type'] == MovementsModel::ATTACKTYPE_RAID) {
-                    return;
+                    // A won raid takes a free oasis; it never lowers an occupied oasis's loyalty.
+                    if ($slots > 0 && !$this->defender['isOccupied']) {
+                        $this->info['oasisCapture'] = 0;
+                        OasesModel::captureOasis($this->row['to_kid'], $this->attacker['uid'], $this->row['kid']);
+                    } elseif ($slots <= 0 && !$this->defender['isOccupied']) {
+                        $this->info['oasisCapture'] = -1;
+                    }
                 } else {
                     LoyaltyHelper::updateOasisLoyalty($this->row['to_kid']);
                     $oasis = $db->query("SELECT loyalty, did FROM odata WHERE kid={$this->row['to_kid']}")->fetch_assoc();
@@ -2027,7 +2036,10 @@ class BattleModel
                         if ($slots <= 0) {
                             $this->info['oasisCapture'] = -1;
                         } else {
-                            $loyaltyChange = max(0, min(floor(100 / max(1, min(3, (4 - $ownerOases)))), $oasis['loyalty']));
+                            // One won attack takes a free oasis.
+                            $loyaltyChange = (int)$oasis['did'] === 0
+                                ? $oasis['loyalty']
+                                : max(0, min(floor(100 / max(1, min(3, (4 - $ownerOases)))), $oasis['loyalty']));
                             if ($loyaltyChange >= $oasis['loyalty']) {
                                 OasesModel::releaseOasis($this->row['to_kid'], (int) $oasis['did']);
                                 OasesModel::captureOasis($this->row['to_kid'], $this->attacker['uid'], $this->row['kid']);
@@ -2187,8 +2199,11 @@ class BattleModel
                     round(($af[0] + $ld) * $c),
                     round(($af[1] + $ld) * $c),
                 ];
-                $roll = mt_rand((int) $loy[0], (int) $loy[1]);
-                $loyaltyChange = $roll * $alive_admins;
+                // Each chief rolls its own loyalty drop.
+                $loyaltyChange = 0;
+                for ($i = 1; $i <= $alive_admins; ++$i) {
+                    $loyaltyChange += mt_rand((int) $loy[0], (int) $loy[1]);
+                }
                 LoyaltyHelper::updateVillageLoyalty($this->row['to_kid']);
                 $village = $db->query("SELECT loyalty FROM vdata WHERE kid={$this->row['to_kid']}")->fetch_assoc();
                 if ($loyaltyChange >= floor((float) $village['loyalty'])) {

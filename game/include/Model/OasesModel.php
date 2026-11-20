@@ -224,7 +224,7 @@ class OasesModel
     {
         $db = DB::getInstance();
         FarmListInbox::targetChangedOwner($kid);
-        $db->query("UPDATE odata SET did=$did, owner=$uid, loyalty=0, conquered_time=" . time() . ", last_loyalty_update=" . time() . " WHERE kid=$kid");
+        $db->query("UPDATE odata SET did=$did, owner=$uid, loyalty=100, conquered_time=" . time() . ", last_loyalty_update=" . time() . " WHERE kid=$kid");
         $db->query("UPDATE wdata SET occupied=1 WHERE id=$kid");
         Map::OccupyOrLeaveOasisCacheRemove($kid);
         ResourcesHelper::updateVillageResources($did, false);
