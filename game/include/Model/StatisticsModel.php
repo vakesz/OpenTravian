@@ -8,8 +8,12 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
 
+use Game\Slot;
+use Game\UserId;
 use mysqli_result;
 
 use function getCustom;
@@ -33,14 +37,14 @@ class StatisticsModel
     {
         $prefix = $table === '' ? '' : $table . '.';
 
-        return $prefix . 'id > 1 AND ' . $prefix . 'hidden = 0 AND ' . $prefix . 'access > 0';
+        return $prefix . 'id > ' . UserId::NATARS . ' AND ' . $prefix . 'hidden = 0 AND ' . $prefix . 'access > ' . AccessLevel::BANNED;
     }
 
     private function publicVillageCondition(string $table = ''): string
     {
         $prefix = $table === '' ? '' : $table . '.';
 
-        return $prefix . 'owner > 1 AND ' . $prefix . 'hidden = 0 AND EXISTS (SELECT 1 FROM users WHERE users.id = '
+        return $prefix . 'owner > ' . UserId::NATARS . ' AND ' . $prefix . 'hidden = 0 AND EXISTS (SELECT 1 FROM users WHERE users.id = '
             . $prefix . 'owner AND ' . $this->publicUserCondition('users') . ')';
     }
 
@@ -51,7 +55,7 @@ class StatisticsModel
         $constructionStarted = $config->timers->WWConstructStartTime > 0 && $config->timers->WWConstructStartTime < time();
 
         return (int)$this->db->fetchScalar(
-            'SELECT COUNT(kid) FROM vdata WHERE isWW=1' . ($constructionStarted ? '' : ' AND IF(owner=1, capital=0, TRUE)')
+            'SELECT COUNT(kid) FROM vdata WHERE isWW=1' . ($constructionStarted ? '' : ' AND IF(owner=' . UserId::NATARS . ', capital=0, TRUE)')
         ) > 0;
     }
 
@@ -65,12 +69,12 @@ class StatisticsModel
         $types = implode(",", [MovementsModel::ATTACKTYPE_NORMAL, MovementsModel::ATTACKTYPE_RAID,]);
         $wonderVillages = $this->db->query("SELECT v.kid, v.owner, f.f99 AS `wonder_level`, f.lastWWUpgrade AS `last_WWUpgrade`, f.wwname AS `wonder_name`,
             u.name AS `playerName`, u.aid, a.tag AS `allianceTag`,
-            (SELECT MIN(m.end_time) FROM movement m WHERE m.kid=$mainNatarsVillageID AND m.to_kid=v.kid AND m.mode=0 AND m.attack_type IN($types)) AS `attackEnd`
+            (SELECT MIN(m.end_time) FROM movement m WHERE m.kid=$mainNatarsVillageID AND m.to_kid=v.kid AND m.mode=" . MovementsModel::MODE_GOING . " AND m.attack_type IN($types)) AS `attackEnd`
             FROM vdata v
             LEFT JOIN fdata f ON f.kid=v.kid
             LEFT JOIN users u ON u.id=v.owner
             LEFT JOIN alidata a ON a.id=u.aid
-            WHERE v.isWW=1" . ($constructionStarted ? '' : ' AND IF(v.owner=1, v.capital=0, TRUE)') . "
+            WHERE v.isWW=1" . ($constructionStarted ? '' : ' AND IF(v.owner=' . UserId::NATARS . ', v.capital=0, TRUE)') . "
             ORDER BY `wonder_level` DESC, `last_WWUpgrade` ASC, v.kid ASC")->fetch_all(MYSQLI_ASSOC);
         $rows = [];
         foreach ($wonderVillages as $row) {
@@ -82,7 +86,7 @@ class StatisticsModel
                 'allianceTag' => $row['aid'] ? (string)$row['allianceTag'] : '',
                 'name' => (string)$row['wonder_name'],
                 'level' => (int)$row['wonder_level'],
-                'attackArrival' => $row['attackEnd'] === null ? null : TimezoneHelper::autoDateString((int) ((int) $row['attackEnd'] / 1000), true),
+                'attackArrival' => $row['attackEnd'] === null ? null : TimezoneHelper::autoDateString((int) ((int) $row['attackEnd'] / Time::SECOND_MS), true),
             ];
         }
         return $rows;
@@ -122,7 +126,7 @@ class StatisticsModel
                         . '" onclick="Travian.Game.FarmList.openSlotDialog({type: \'create\', listId: ' . $list . ', coordinates: {x: ' . $xy['x'] . ', y: ' . $xy['y'] . '}}); return false;">' . $icon . '</button>';
                 }
             }
-            $farms .= ' <a href="/build.php?id=39&amp;tt=2&amp;z=' . $row['kid'] . '&c=4"><button type="button" title="' . T(
+            $farms .= ' <a href="/build.php?id=' . Slot::RALLY_POINT . '&amp;tt=2&amp;z=' . $row['kid'] . '&c=4"><button type="button" title="' . T(
                 "map",
                 "sendTroops"
             ) . '" class="icon"><img class="reportButton" ' . $x_style . ' src="' . get_gpack_cdn_mainPage_url() . gpack_image_path('report/simulate-small.png', $direction) . '"></button></a>';

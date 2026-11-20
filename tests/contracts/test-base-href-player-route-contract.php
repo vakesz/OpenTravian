@@ -231,7 +231,7 @@ $troopsTable = $troopsTableStart === false || $troopsTableEnd === false
     ? ''
     : substr($sendTroops, $troopsTableStart, $troopsTableEnd - $troopsTableStart);
 if ($troopsTable === ''
-    || !str_contains($troopsTable, 'href="/build.php?gid=16&amp;tt=2"')
+    || !str_contains($troopsTable, 'href="/build.php?gid=\' . Gid::RALLY_POINT . \'&amp;tt=2"')
     || !str_contains($troopsTable, "trigger(\\'focus\\'); return false\"")) {
     failBaseHrefPlayerRouteContract(
         'Rally Point troop and hero count controls must keep a root-absolute fallback and cancel default navigation.'

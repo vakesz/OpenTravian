@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Model\Movements;
 
 use Core\Database\DB;
+use Core\Time;
 use Game\ResourcesHelper;
+use Game\Tribes;
+use Game\Unit;
 use Model\HeroResourceInventory;
 use Model\MovementsModel;
 
@@ -16,13 +19,13 @@ class ReturnProcessor
      */
     public function __construct(array $row)
     {
-        if ((int) $row['race'] === 5) {
+        if ((int) $row['race'] === Tribes::NATARS) {
             return;
         }
         $db = DB::getInstance();
         $toKid = (int) $row['to_kid'];
         $modify = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $count = (int) $row['u' . $i];
             if ($count < 0) {
                 return; //There is a bug certainly
@@ -34,7 +37,7 @@ class ReturnProcessor
         if ($modify !== []) {
             $db->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid=$toKid");
             if ((int) $row['kid'] !== 0) {
-                $db->query('UPDATE vdata SET lastReturn=' . (int) ceil($row['end_time'] / 1000) . " WHERE kid=$toKid");
+                $db->query('UPDATE vdata SET lastReturn=' . (int) ceil($row['end_time'] / Time::SECOND_MS) . " WHERE kid=$toKid");
             }
         }
         $data = (string) ($row['data'] ?? '');

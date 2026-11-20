@@ -246,6 +246,16 @@ $reset();
 $pdo->run('UPDATE users SET cp=1000000 WHERE id=?', [$attacker['id']]);
 $pdo->run('UPDATE vdata SET capital=0, loyalty=1 WHERE kid=?', [$defender['kid']]);
 $demolish($defender, [25, 26, 44]);
+// Without a free expansion slot in the attacking village the chiefs cannot take the village.
+$demolish($attacker, [25, 26, 44]);
+$send('conquest without a free expansion slot', MovementsModel::ATTACKTYPE_NORMAL, [1 => 600, 9 => 3]);
+$expect('conquest without a free expansion slot', (int)$scalar('SELECT owner FROM vdata WHERE kid=?', [$defender['kid']]) === $defender['id'], 'the village changed hands without a free expansion slot.');
+$expect('conquest without a free expansion slot', str_contains((string)$scalar('SELECT data FROM ndata WHERE uid=? ORDER BY id DESC LIMIT 1', [$attacker['id']]), '-6'), 'the report must say that no expansion slot is free.');
+$reset();
+$pdo->run('UPDATE vdata SET capital=0, loyalty=1 WHERE kid=?', [$defender['kid']]);
+$demolish($defender, [25, 26, 44]);
+// A level-10 Residence gives the attacking village one free expansion slot.
+$build($attacker, 32, 25, 10);
 $send('village conquest', MovementsModel::ATTACKTYPE_NORMAL, [1 => 600, 9 => 3]);
 $expect('village conquest', (int)$scalar('SELECT owner FROM vdata WHERE kid=?', [$defender['kid']]) === $attacker['id'], 'the village did not change hands.');
 $pdo->run('UPDATE users SET cp=0 WHERE id=?', [$attacker['id']]);
@@ -258,6 +268,87 @@ $pdo->run('UPDATE units SET race=3, u1=3000, u99=50 WHERE kid=?', [$defender['ki
 $build($defender, 30, 36, 10);
 $send('Gaul traps', MovementsModel::ATTACKTYPE_NORMAL, [1 => 100]);
 $expect('Gaul traps', (int)$scalar('SELECT COALESCE(SUM(u1), 0) FROM trapped WHERE kid=? AND to_kid=?', [$attacker['kid'], $defender['kid']]) > 0, 'no attacker was caught in a trap.');
+
+// A trapper lowered by catapults holds more prisoners than it now offers: no free trap is left, and the
+// attackers must neither be "trapped" a negative number of times nor come home in greater numbers than they left.
+$reset();
+$pdo->run('UPDATE users SET race=3 WHERE id=?', [$defender['id']]);
+$pdo->run('UPDATE units SET race=3, u99=200 WHERE kid=?', [$defender['kid']]);
+$build($defender, 30, 36, 1);
+$pdo->run('INSERT INTO trapped (kid, to_kid, race, u1) VALUES (?, ?, ?, 200)', [$defenderSpare['kid'], $defender['kid'], $defenderRace]);
+$lastMove = (int)$scalar('SELECT COALESCE(MAX(id), 0) FROM movement');
+$send('full traps after a trapper downgrade', MovementsModel::ATTACKTYPE_NORMAL, [1 => 10]);
+$expect('full traps after a trapper downgrade', (int)$scalar('SELECT COUNT(*) FROM trapped WHERE kid=? AND to_kid=?', [$attacker['kid'], $defender['kid']]) === 0, 'attackers were moved into traps that are all full.');
+$returning = (int)$scalar('SELECT COALESCE(SUM(u1), 0) FROM movement WHERE id>? AND kid=? AND to_kid=? AND mode=1', [$lastMove, $defender['kid'], $attacker['kid']]);
+$expect('full traps after a trapper downgrade', $returning <= 10, "more attackers return ($returning) than were sent (10).");
+$pdo->run('DELETE FROM movement WHERE id>? AND kid=? AND to_kid=? AND mode=1', [$lastMove, $defender['kid'], $attacker['kid']]);
+
+// A hero freed from traps loses 25 health.
+$reset();
+$pdo->run('UPDATE users SET race=3 WHERE id=?', [$defender['id']]);
+$pdo->run('UPDATE units SET race=3, u99=5 WHERE kid=?', [$defender['kid']]);
+$build($defender, 30, 36, 10);
+$pdo->run('INSERT INTO trapped (kid, to_kid, race, u11) VALUES (?, ?, ?, 1)', [$attacker['kid'], $defender['kid'], $race]);
+$heroHealth = (float)$scalar('SELECT health FROM hero WHERE uid=?', [$attacker['id']]);
+$pdo->run('UPDATE hero SET health=60 WHERE uid=?', [$attacker['id']]);
+$lastMove = (int)$scalar('SELECT COALESCE(MAX(id), 0) FROM movement');
+$send('freeing a trapped hero', MovementsModel::ATTACKTYPE_NORMAL, [1 => 400]);
+$freedHealth = (float)$scalar('SELECT health FROM hero WHERE uid=?', [$attacker['id']]);
+$expect('freeing a trapped hero', abs($freedHealth - 35.0) < 0.01, "a freed hero at 60 health should keep 35, it has $freedHealth.");
+$pdo->run('UPDATE hero SET health=? WHERE uid=?', [$heroHealth, $attacker['id']]);
+$pdo->run('DELETE FROM movement WHERE id>? AND kid=? AND to_kid=? AND mode=1', [$lastMove, $defender['kid'], $attacker['kid']]);
+
+// --- evasion ---------------------------------------------------------------------------------------------------
+// With Gold Club evasion on, the garrison leaves; a hidden hero stays at home and must not vanish.
+$reset();
+$defenderUser = $pdo->fetchSingleRow('SELECT escape, goldclub FROM users WHERE id=?', [$defender['id']]);
+$defenderHero = $pdo->fetchSingleRow('SELECT hide FROM hero WHERE uid=?', [$defender['id']]);
+$defenderVillage = $pdo->fetchSingleRow('SELECT capital, lastReturn FROM vdata WHERE kid=?', [$defender['kid']]);
+$pdo->run('UPDATE users SET escape=1, goldclub=1 WHERE id=?', [$defender['id']]);
+$pdo->run('UPDATE hero SET hide=1 WHERE uid=?', [$defender['id']]);
+$pdo->run('UPDATE vdata SET capital=1, lastReturn=0 WHERE kid=?', [$defender['kid']]);
+$pdo->run('UPDATE units SET u11=1 WHERE kid=?', [$defender['kid']]);
+$build($defender, 39, 16, 1);
+$send('evasion with a hidden hero', MovementsModel::ATTACKTYPE_NORMAL, [1 => 30]);
+$evasion = $pdo->fetchSingleRow('SELECT id, u1, u11 FROM movement WHERE kid=? AND attack_type=? ORDER BY id DESC LIMIT 1', [$defender['kid'], MovementsModel::ATTACKTYPE_EVASION]);
+$expect('evasion with a hidden hero', is_array($evasion) && (int)$evasion['u1'] === 40 && (int)$evasion['u11'] === 0, 'the garrison should evade without the hidden hero.');
+$expect('evasion with a hidden hero', (int)$scalar('SELECT u11 FROM units WHERE kid=?', [$defender['kid']]) === 1, 'the hidden hero disappeared from the village.');
+$pdo->run('DELETE FROM movement WHERE kid=? AND attack_type=?', [$defender['kid'], MovementsModel::ATTACKTYPE_EVASION]);
+$pdo->run('UPDATE users SET escape=?, goldclub=? WHERE id=?', [$defenderUser['escape'], $defenderUser['goldclub'], $defender['id']]);
+$pdo->run('UPDATE hero SET hide=? WHERE uid=?', [$defenderHero['hide'], $defender['id']]);
+$pdo->run('UPDATE vdata SET capital=?, lastReturn=? WHERE kid=?', [$defenderVillage['capital'], $defenderVillage['lastReturn'], $defender['kid']]);
+
+// --- bandages and wounded --------------------------------------------------------------------------------------
+// The attacker's hero carries 25% small bandages and the home village has a Hospital (40%). Every attacker dies:
+// bandages revive 25 of 100, and only the other 75 can become wounded (30), not all 100 (40). The revived troops
+// keep their upkeep at home.
+$reset();
+$pdo->run('UPDATE units SET u1=5000 WHERE kid=?', [$defender['kid']]);
+$build($attacker, 32, 46, 1);
+$pdo->run('INSERT INTO items (uid, btype, type, num, placeId, proc) VALUES (?, 7, 112, 100, 0, 1)', [$attacker['id']]);
+$bandageItem = (int)$pdo->fetchScalar('SELECT LAST_INSERT_ID()');
+$pdo->run('UPDATE inventory SET bag=? WHERE uid=?', [$bandageItem, $attacker['id']]);
+$heroHealth = (float)$scalar('SELECT health FROM hero WHERE uid=?', [$attacker['id']]);
+$pdo->run('UPDATE hero SET health=100 WHERE uid=?', [$attacker['id']]);
+$pdo->run('DELETE FROM wounded WHERE kid=?', [$attacker['kid']]);
+$upkeepBefore = (float)$scalar('SELECT upkeep FROM vdata WHERE kid=?', [$attacker['kid']]);
+$lastMove = (int)$scalar('SELECT COALESCE(MAX(id), 0) FROM movement');
+$send('bandages and wounded', MovementsModel::ATTACKTYPE_NORMAL, [1 => 100, 11 => 1]);
+$revived = (int)$scalar('SELECT COALESCE(SUM(u1), 0) FROM movement WHERE id>? AND kid=? AND to_kid=? AND mode=1 AND attack_type=?', [$lastMove, $attacker['kid'], $attacker['kid'], MovementsModel::ATTACKTYPE_REINFORCEMENT]);
+$wounded = (int)round((float)$scalar("SELECT COALESCE(SUM(num), 0) FROM wounded WHERE kid=? AND nr=1", [$attacker["kid"]]));
+$expect('bandages and wounded', $revived === 25, "bandages should revive 25 of the 100 dead, they revived $revived.");
+$expect('bandages and wounded', $wounded === 30, "only the 75 not revived can be wounded (30 at 40%), there are $wounded.");
+$upkeepAfter = (float)$scalar('SELECT upkeep FROM vdata WHERE kid=?', [$attacker['kid']]);
+// The 75 that stay dead stop eating, and so does the hero (6 crop) if it fell; the 25 revived keep eating.
+$deadUpkeep = 75 * Formulas::uUpkeep(nrToUnitId(1, $race), 0, true)
+    + ((float)$scalar('SELECT health FROM hero WHERE uid=?', [$attacker['id']]) <= 0 ? 6 : 0);
+$expect('bandages and wounded', $upkeepAfter >= $upkeepBefore - $deadUpkeep - 0.5, "the revived troops lost their upkeep: before $upkeepBefore, after $upkeepAfter, only $deadUpkeep may go.");
+$pdo->run('DELETE FROM movement WHERE id>? AND kid=? AND to_kid=? AND mode=1', [$lastMove, $attacker['kid'], $attacker['kid']]);
+$pdo->run('DELETE FROM wounded WHERE kid=?', [$attacker['kid']]);
+$pdo->run('DELETE FROM items WHERE id=?', [$bandageItem]);
+$pdo->run('UPDATE inventory SET bag=0 WHERE uid=?', [$attacker['id']]);
+$pdo->run('UPDATE hero SET health=? WHERE uid=?', [$heroHealth, $attacker['id']]);
+$pdo->run('UPDATE vdata SET upkeep=? WHERE kid=?', [$upkeepBefore, $attacker['kid']]);
 
 // --- artifacts -------------------------------------------------------------------------------------------------
 $reset();
@@ -285,10 +376,12 @@ $expect('small cranny artefact', (int)$scalar('SELECT f30 FROM fdata WHERE kid=?
 $pdo->run('UPDATE config SET ArtifactsReleased=?', [$artifactsReleased]);
 
 // --- oases -----------------------------------------------------------------------------------------------------
-// One neutral oasis within the Legends capture range (3 fields) is borrowed and put back afterwards.
+// One neutral oasis within the capture range (the 7x7 square around the village) is borrowed and put back afterwards.
 $oasis = null;
+$home = Formulas::kid2xy($attacker['kid']);
 foreach ($pdo->run('SELECT kid FROM odata WHERE owner=0 AND did=0')->fetchAll(PDO::FETCH_COLUMN) as $candidate) {
-    if (Formulas::getDistance($attacker['kid'], (int)$candidate) <= 3) {
+    $there = Formulas::kid2xy((int)$candidate);
+    if (abs(Formulas::delta($there['x'], $home['x'])) <= 3 && abs(Formulas::delta($there['y'], $home['y'])) <= 3) {
         $oasis = (int)$candidate;
         break;
     }
@@ -314,15 +407,21 @@ if ($oasis === null) {
         $pdo->run('UPDATE units SET u1=0, u2=0, u3=0, u4=0, u5=0, u6=0, u7=0, u8=0, u9=0, u10=0 WHERE kid=?', [$oasis]);
     };
 
-    // The Hero's Mansion decides how many oases a village may hold. Raids no
-    // longer capture; a normal attack takes an empty oasis when loyalty is low
-    // enough for the one-third loyalty step to finish it.
+    // The Hero's Mansion decides how many oases a village may hold. One won raid
+    // or one won normal attack takes a free oasis, and it starts at full loyalty.
     $oasisOwner = static fn (): int => (int)$scalar('SELECT did FROM odata WHERE kid=?', [$oasis]);
     $reset();
     $build($attacker, 31, 37, 10);
-    $emptyOasis(0, 0, 30.0);
+    $emptyOasis(0, 0, 100.0);
+    $send('oasis capture by raid', MovementsModel::ATTACKTYPE_RAID, [1 => 400, 11 => 1], ['target' => $oasis]);
+    $expect('oasis capture by raid', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured by a raid.');
+    $expect('captured oasis loyalty', (float)$scalar('SELECT loyalty FROM odata WHERE kid=?', [$oasis]) >= 100.0, 'a captured oasis must start at loyalty 100.');
+
+    $reset();
+    $build($attacker, 31, 37, 10);
+    $emptyOasis(0, 0, 100.0);
     $send('oasis capture by attack', MovementsModel::ATTACKTYPE_NORMAL, [1 => 400, 11 => 1], ['target' => $oasis]);
-    $expect('oasis capture by attack', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured.');
+    $expect('oasis capture by attack', $oasisOwner() === $attacker['kid'], 'the empty oasis was not captured by one normal attack.');
 
     $reset();
     $build($attacker, 31, 37, 10);

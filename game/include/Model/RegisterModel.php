@@ -6,13 +6,19 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Gid;
 use Game\Helpers\CulturePointsHelper;
 use Game\Hero\HeroFace;
 use Game\Map\Map;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Game\Tribes;
+use Game\Unit;
+use Game\UserId;
 
 use function get_random_string;
 use function getCustom;
@@ -46,13 +52,13 @@ class RegisterModel
             }
             $playable = \Game\Tribes::playable();
             $race = $playable[mt_rand(0, count($playable) - 1)];
-            $uid = $this->addUser($name, sha1(get_random_string(mt_rand(1, 11))), '', $race, $kid, 3);
+            $uid = $this->addUser($name, sha1(get_random_string(mt_rand(1, 11))), '', $race, $kid, AccessLevel::FAKE_USER);
             if (!$uid) {
                 $db->query('UPDATE available_villages SET occupied=0 WHERE kid=' . $kid);
                 continue;
             }
             $this->createBaseVillage($uid, $name, $race, $kid);
-            $db->run('UPDATE users SET last_login_time=? WHERE id=?', [time() - mt_rand(1, 7200), $uid]);
+            $db->run('UPDATE users SET last_login_time=? WHERE id=?', [time() - mt_rand(1, 2 * Time::HOUR), $uid]);
             $db->run('UPDATE users SET countryFlag=?, lastCountryFlagCheck=? WHERE id=?', [AutomationModel::getRandomCountryFlag(), time(), $uid]);
             $this->populateUserRank($uid);
             ++$k;
@@ -70,7 +76,7 @@ class RegisterModel
     {
         $minDistance = Formulas::getMapMinDistanceFromCenter();
         $maxDistance = $minDistance + 10 * ($tries + 3);
-        if (getGameElapsedSeconds() <= 7200) {
+        if (getGameElapsedSeconds() <= 2 * Time::HOUR) {
             $minDistance = max($minDistance, 23);
             $maxDistance = ($minDistance + 10) + 10 * $tries;
         }
@@ -157,7 +163,7 @@ class RegisterModel
         string $email,
         int $race,
         int $kid,
-        bool|int $access = 1,
+        bool|int $access = AccessLevel::PLAYER,
         bool $addHero = true,
         bool $installation = false,
         bool $newsletter = false,
@@ -249,7 +255,7 @@ class RegisterModel
         $db = DB::getInstance();
         $db->query("UPDATE units SET u11=1 WHERE kid=$kid");
         $this->addResourceFields($kid, true);
-        if ($uid <> 2) {
+        if ($uid <> UserId::MULTIHUNTER) {
             $this->populateBuildingLevels($kid, (int) getGame('firstVillageCreationFieldsLevel'));
         }
         $calculatedCPPOP = VillageModel::calculateVillageCulturePointsAndPopulation($kid, false);
@@ -328,16 +334,16 @@ class RegisterModel
     {
         $fieldsArr = Formulas::getFieldTypeResourceMap($this->getVillageFieldType($kid));
         $queryArr = ['kid' => $kid];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $queryArr["f{$i}t"] = $fieldsArr[$i - 1];
         }
         // All villages begin with a Main Building. Only the registration village
         // receives a Rally Point; settled villages must leave that slot empty.
         $queryArr['f26'] = 1;
-        $queryArr['f26t'] = 15;
+        $queryArr['f26t'] = Gid::MAIN_BUILDING;
         if ($includeRallyPoint) {
             $queryArr['f39'] = 1;
-            $queryArr['f39t'] = 16;
+            $queryArr['f39t'] = Gid::RALLY_POINT;
         }
         DB::getInstance()->query("DELETE FROM fdata WHERE kid=$kid");
 
@@ -365,7 +371,7 @@ class RegisterModel
     private function populateBuildingLevels(int $kid, int $level): void
     {
         if ($level > 0) {
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 BuildingAction::upgrade($kid, $i, $level, false, false);
             }
         }
@@ -546,7 +552,7 @@ class RegisterModel
     {
         $fieldsArr = Formulas::getFieldTypeResourceMap($this->getVillageFieldType($kid));
         $queryArr = ['kid' => $kid];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $type = $fieldsArr[$i - 1];
             $level = $type <= 3 ? 5 : 6;
             $queryArr["f{$i}"] = $level;
@@ -554,23 +560,23 @@ class RegisterModel
         }
         $queryArr = array_merge($queryArr,
             [
-                'f99t' => 40,
+                'f99t' => Gid::WONDER_OF_THE_WORLD,
                 'f19'  => 20,
-                'f19t' => 10,
+                'f19t' => Gid::WAREHOUSE,
                 'f20'  => 10,
-                'f20t' => 10,
+                'f20t' => Gid::WAREHOUSE,
                 'f22'  => 15,
-                'f22t' => 15,
+                'f22t' => Gid::MAIN_BUILDING,
                 'f23'  => 20,
-                'f23t' => 11,
+                'f23t' => Gid::GRANARY,
                 'f27'  => 10,
-                'f27t' => 11,
+                'f27t' => Gid::GRANARY,
                 'f36'  => 1,
-                'f36t' => 17,
+                'f36t' => Gid::MARKETPLACE,
                 'f38'  => 5,
-                'f38t' => 23,
+                'f38t' => Gid::CRANNY,
                 'f39'  => 20,
-                'f39t' => 16,
+                'f39t' => Gid::RALLY_POINT,
             ]);
         $store = Formulas::storeCAP(20) + Formulas::storeCAP(10);
         $this->insertFdata($queryArr);
@@ -596,7 +602,7 @@ class RegisterModel
         }
         $this->addArtifactVillageFields($kid, $size);
         $modify = [];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             if (!isset($units[$i])) {
                 continue;
             }
@@ -620,7 +626,7 @@ class RegisterModel
         $fieldsArr = Formulas::getFieldTypeResourceMap($this->getVillageFieldType($kid));
         // Regardless of the artifact size the Natar Treasury is level 20 (Artifacts wiki).
         $queryArr = ['kid' => $kid, 'f22' => 20];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $queryArr["f{$i}t"] = $fieldsArr[$i - 1];
         }
         if ($size === 1) {
@@ -644,21 +650,21 @@ class RegisterModel
                     'f16'  => 1,
                     'f17'  => 3,
                     'f18'  => 1,
-                    'f22t' => 27,
+                    'f22t' => Gid::TREASURY,
                     'f24'  => 10,
-                    'f24t' => 17,
+                    'f24t' => Gid::MARKETPLACE,
                     'f26'  => 10,
-                    'f26t' => 15,
+                    'f26t' => Gid::MAIN_BUILDING,
                     'f27'  => 10,
-                    'f27t' => 23,
+                    'f27t' => Gid::CRANNY,
                     'f28'  => 10,
-                    'f28t' => 23,
+                    'f28t' => Gid::CRANNY,
                     'f30'  => 10,
-                    'f30t' => 11,
+                    'f30t' => Gid::GRANARY,
                     'f31'  => 10,
-                    'f31t' => 10,
+                    'f31t' => Gid::WAREHOUSE,
                     'f39'  => 10,
-                    'f39t' => 16,
+                    'f39t' => Gid::RALLY_POINT,
                 ]);
         } elseif ($size === 2 || $size === 3) {
             $queryArr = array_merge($queryArr,
@@ -681,21 +687,21 @@ class RegisterModel
                     'f16'  => 1, //
                     'f17'  => 3, //
                     'f18'  => 1, //
-                    'f22t' => 27,
+                    'f22t' => Gid::TREASURY,
                     'f24'  => 10,
-                    'f24t' => 17,
+                    'f24t' => Gid::MARKETPLACE,
                     'f26'  => 10,
-                    'f26t' => 15,
+                    'f26t' => Gid::MAIN_BUILDING,
                     'f27'  => 10,
-                    'f27t' => 23,
+                    'f27t' => Gid::CRANNY,
                     'f28'  => 10,
-                    'f28t' => 23,
+                    'f28t' => Gid::CRANNY,
                     'f30'  => 10,
-                    'f30t' => 11,
+                    'f30t' => Gid::GRANARY,
                     'f31'  => 10,
-                    'f31t' => 10,
+                    'f31t' => Gid::WAREHOUSE,
                     'f39'  => 10,
-                    'f39t' => 16,
+                    'f39t' => Gid::RALLY_POINT,
                 ]);
         }
         $this->insertFdata($queryArr);
@@ -713,7 +719,7 @@ class RegisterModel
         $this->addWWVillageFields($kid);
         $units = WonderOfTheWorldModel::getWWTroops(Formulas::isGrayArea($kid));
         $modify = [];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             $modify[] = "u{$i}=" . (int) $units[$i];
         }
         $db->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid=$kid");

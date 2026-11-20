@@ -9,6 +9,7 @@ use Core\Security\Password;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Game\Account\DataExport;
 use Game\Admin\AuditLog;
 use Game\Formulas;
@@ -294,7 +295,7 @@ class OptionCtrl extends GameCtrl
                 } elseif (!$m->isDeletion(Session::getInstance()->getPlayerId())) {
                     if (Session::getInstance()->isInVacationMode()) {
                         $this->redirect('/options/vacation');
-                    } elseif (!throttle_public_form('account-delete', 5, 3600)) {
+                    } elseif (!throttle_public_form('account-delete', 5, Time::HOUR)) {
                         $view->vars['error'] = T('Login', 'tooManyRequests');
                     } else {
                         $m->addDeleting(Session::getInstance()->getPlayerId());
@@ -326,7 +327,7 @@ class OptionCtrl extends GameCtrl
         $uid = (int)$session->getPlayerId();
         $stored = DBI::getInstance()->fetchScalar('SELECT password FROM users WHERE id=?', [$uid], '');
         $given = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
-        if (!throttle_public_form('account-export', 3, 600)) {
+        if (!throttle_public_form('account-export', 3, 10 * Time::MINUTE)) {
             $view->vars['error'] = T('Login', 'tooManyRequests');
             return;
         }
@@ -489,7 +490,7 @@ class OptionCtrl extends GameCtrl
                 && array_sum($view->vars['conditions']) === count($view->vars['conditions'])
                 && $remainingVacationDays >= $days) {
                 $m->enterVacationMode(Session::getInstance()->getPlayerId(), $days);
-                Session::getInstance()->setVacationTill($days * 86400 + time());
+                Session::getInstance()->setVacationTill($days * Time::DAY + time());
                 Session::getInstance()->setVacationUsedDays(Session::getInstance()->getUsedVacationDays() + $days);
                 $this->showVacationActive();
 
@@ -503,7 +504,7 @@ class OptionCtrl extends GameCtrl
     {
         $view = new PHPBatchView("options/VacationActive");
         $view->vars['vacationTil'] = TimezoneHelper::autoDate(Session::getInstance()->getVacationTil(), true);
-        $view->vars['vacationDays'] = max(1, ceil((Session::getInstance()->getVacationTil() - time()) / 86400));
+        $view->vars['vacationDays'] = max(1, ceil((Session::getInstance()->getVacationTil() - time()) / Time::DAY));
         $this->view->vars['content'] .= $view->output();
     }
 }

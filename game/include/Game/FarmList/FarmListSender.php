@@ -7,9 +7,14 @@ namespace Game\FarmList;
 use Core\Config;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
+use Game\Gid;
 use Game\Ships;
 use Game\SpeedCalculator;
+use Game\Unit;
+use Game\UserId;
 use Model\ArtefactsModel;
 use Model\MovementsModel;
 use Model\OasesModel;
@@ -103,7 +108,7 @@ final class FarmListSender
     private function listRefusal(int $kid): ?string
     {
         $rallyPoint = $this->row('SELECT f39, f39t FROM fdata WHERE kid=?', [$kid]);
-        if ($rallyPoint === null || (int)$rallyPoint['f39t'] !== 16 || (int)$rallyPoint['f39'] < 1) {
+        if ($rallyPoint === null || (int)$rallyPoint['f39t'] !== Gid::RALLY_POINT || (int)$rallyPoint['f39'] < 1) {
             $name = FarmListData::plain((string)$this->db->fetchScalar('SELECT name FROM vdata WHERE kid=?', [$kid], ''));
 
             return str_replace('[NAME]', $name, self::text('noRallyPoint'));
@@ -132,10 +137,10 @@ final class FarmListSender
         if ($refusal !== null) {
             return $refusal;
         }
-        $send = array_fill(1, 11, 0);
+        $send = array_fill(1, Unit::LAST, 0);
         $changed = [];
         $speeds = [];
-        for ($unit = 1; $unit <= 10; ++$unit) {
+        for ($unit = 1; $unit <= Unit::LAST_TROOP; ++$unit) {
             $amount = (int)$slot['u' . $unit];
             $send[$unit] = $amount;
             if ($amount > 0) {
@@ -168,8 +173,8 @@ final class FarmListSender
             // A list that asks for ships sails when a fitting ship waits; a failure below gives the ship back.
             $ship = Ships::boardRaid($kid, (int)$list['useShip'] === 1, (int)array_sum($send), $calculator, (int)$this->session->getRace());
             $movement = (new MovementsModel())->addMovement(
-                $kid, $target, (int) $this->session->getRace(), $send, 0, 0, 0, 0, 0, MovementsModel::ATTACKTYPE_RAID, miliseconds(),
-                miliseconds() + $calculator->calc() * 1000, (int)$list['onlyLosses'] === 1 ? self::ONLY_LOSSES_MOVEMENT_DATA : null, $ship
+                $kid, $target, (int) $this->session->getRace(), $send, 0, 0, 0, 0, MovementsModel::MODE_GOING, MovementsModel::ATTACKTYPE_RAID, miliseconds(),
+                miliseconds() + $calculator->calc() * Time::SECOND_MS, (int)$list['onlyLosses'] === 1 ? self::ONLY_LOSSES_MOVEMENT_DATA : null, $ship
             );
             if (!$movement) {
                 $this->db->rollback();
@@ -200,7 +205,7 @@ final class FarmListSender
         if ($row === null) {
             return self::text('noMoreVillage');
         }
-        $protection = (int)$row['owner'] === 0 ? 0 : (int)$row['protection'];
+        $protection = (int)$row['owner'] === UserId::NATURE ? 0 : (int)$row['protection'];
         if ((int)$row['vacationActiveTil'] > time()) {
             return self::text('target_is_in_vacation');
         }
@@ -214,7 +219,7 @@ final class FarmListSender
             return self::text('target_player_has_noobprotection');
         }
 
-        return (int)$row['access'] === 0 ? self::text('target_is_banned') : null;
+        return (int)$row['access'] === AccessLevel::BANNED ? self::text('target_is_banned') : null;
     }
 
     /** @param array<int, int> $units amounts by unit number */

@@ -18,7 +18,7 @@ if ($model === false || $allianceBonus === false || $migration === false) {
     failDailyQuestAllianceStepsContract('Daily-quest sources and the world migration must be readable.');
 }
 
-if (!str_contains($model, "11 => ['reward' => 1, 'stepCount' => 6]")) {
+if (!str_contains($model, "self::QUEST_ALLIANCE_CONTRIBUTION => ['reward' => 1, 'stepCount' => 6]")) {
     failDailyQuestAllianceStepsContract('Alliance contribution must grant six daily-quest steps worth one point each.');
 }
 

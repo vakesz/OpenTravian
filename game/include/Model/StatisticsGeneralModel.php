@@ -4,10 +4,13 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
 use Game\Hero\HeroHelper;
 use Game\Tribes;
+use Game\Unit;
+use Game\UserId;
 
 /**
  * Data behind the General statistics dashboard (/statistics/general).
@@ -18,7 +21,7 @@ use Game\Tribes;
  */
 class StatisticsGeneralModel
 {
-    private const DAY = 86400;
+    private const DAY = Time::DAY;
 
     private DB $db;
     private StatisticsModel $statistics;
@@ -86,7 +89,7 @@ class StatisticsGeneralModel
     private function productionPerDay(): array
     {
         $rows = $this->db->query(
-            'SELECT owner, SUM(woodp) w, SUM(clayp) c, SUM(ironp) i, SUM(cropp) k FROM vdata WHERE owner > 1 AND hidden = 0 GROUP BY owner'
+            'SELECT owner, SUM(woodp) w, SUM(clayp) c, SUM(ironp) i, SUM(cropp) k FROM vdata WHERE owner > ' . UserId::NATARS . ' AND hidden = 0 GROUP BY owner'
         )->fetch_all(MYSQLI_ASSOC);
         $result = [];
         foreach ($rows as $row) {
@@ -199,7 +202,7 @@ class StatisticsGeneralModel
         $dayStart = self::worldDayStart();
         $second = $this->db->query(
             'SELECT t.owner, t.created, u.name, u.race FROM (
-                SELECT owner, created, ROW_NUMBER() OVER (PARTITION BY owner ORDER BY created ASC, kid ASC) rn FROM vdata WHERE owner > 1 AND hidden = 0
+                SELECT owner, created, ROW_NUMBER() OVER (PARTITION BY owner ORDER BY created ASC, kid ASC) rn FROM vdata WHERE owner > ' . UserId::NATARS . ' AND hidden = 0
              ) t JOIN users u ON u.id = t.owner WHERE t.rn = 2 ORDER BY t.created ASC LIMIT 1'
         )->fetch_assoc();
         $firstWw = (int)$this->db->fetchScalar('SELECT MIN(lastWWUpgrade) FROM fdata WHERE f99 >= 1 AND lastWWUpgrade > 0');
@@ -358,13 +361,13 @@ class StatisticsGeneralModel
             'SELECT v.kid, v.owner, v.name, v.seq, u.aid, u.race AS owner_race, un.race AS unit_race,
                     un.u1, un.u2, un.u3, un.u4, un.u5, un.u6, un.u7, un.u8, un.u9, un.u10
              FROM vdata v JOIN users u ON u.id = v.owner LEFT JOIN units un ON un.kid = v.kid
-             WHERE v.owner > 1 AND v.hidden = 0 AND ' . $this->statistics->publicUserCondition('u') . ' ORDER BY v.owner ASC, v.seq ASC, v.kid ASC'
+             WHERE v.owner > ' . UserId::NATARS . ' AND v.hidden = 0 AND ' . $this->statistics->publicUserCondition('u') . ' ORDER BY v.owner ASC, v.seq ASC, v.kid ASC'
         )->fetch_all(MYSQLI_ASSOC);
         $villages = [];
         foreach ($rows as $row) {
             $race = (int)($row['unit_race'] ?: $row['owner_race']);
             $off = $defInfantry = $defCavalry = 0;
-            for ($i = 1; $i <= 10; $i++) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; $i++) {
                 $count = (int)($row['u' . $i] ?? 0);
                 if ($count <= 0 || $race < 1) {
                     continue;

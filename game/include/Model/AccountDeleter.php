@@ -6,12 +6,18 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\Map\Map;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Game\SpeedCalculator;
+use Game\Tribes;
+use Game\Unit;
+use Game\UserId;
 use Game\Wounded;
 use function getCustom;
 use function logError;
@@ -25,7 +31,7 @@ class AccountDeleter
      */
     public function isVillageDestroyAble(int $attacker_uid, int $kid, int $uid): string|true
     {
-        if ($attacker_uid > 1 && !getCustom("destroyVillageOnZeroPop")) {
+        if ($attacker_uid > UserId::NATARS && !getCustom("destroyVillageOnZeroPop")) {
             return 'disabled';
         }
         // some exception for speed servers
@@ -91,15 +97,15 @@ class AccountDeleter
         $owner = (int) $vdata['owner'];
         if ($full && (int) $vdata['capital'] === 1) {
             $villageModel = new VillageModel();
-            $villageModel->captureVillage($owner, $kid, 100, 1, 0, 5, Formulas::xy2kid(0, 0));
+            $villageModel->captureVillage($owner, $kid, 100, 1, 0, Tribes::NATARS, Formulas::xy2kid(0, 0));
             $buildings = $villageModel->getBuildingsAssoc($kid);
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 if ($buildings[$i]['level'] > 10) {
                     BuildingAction::downgrade($kid, $i, $buildings[$i]['level'] - 10);
                 }
             }
-            for ($i = 19; $i <= 40; ++$i) {
-                if (in_array($buildings[$i]['item_id'], [34, 35])) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
+                if (in_array($buildings[$i]['item_id'], [Gid::STONEMASON, Gid::BREWERY])) {
                     BuildingAction::downgrade($kid, $i, 0, true);
                 }
             }
@@ -117,13 +123,13 @@ class AccountDeleter
         Wounded::purge($kid);
         $db->query("DELETE FROM odelete WHERE kid=$kid");
         $db->query("DELETE FROM traderoutes WHERE (kid=$kid OR to_kid=$kid)");
-        $db->query("DELETE FROM send WHERE kid=$kid OR (to_kid=$kid AND mode=1)");
+        $db->query("DELETE FROM send WHERE kid=$kid OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")");
         $db->query("DELETE FROM market WHERE kid=$kid");
         $db->query("DELETE FROM building_upgrade WHERE kid=$kid");
         $db->query("DELETE FROM demolition WHERE kid=$kid");
-        $find = $db->query("SELECT * FROM send WHERE to_kid=$kid AND mode=0");
+        $find = $db->query("SELECT * FROM send WHERE to_kid=$kid AND mode=" . MovementsModel::MODE_GOING);
         while ($row = $find->fetch_assoc()) {
-            $db->query("UPDATE send SET mode=1, kid={$row['to_kid']}, to_kid={$row['kid']} WHERE id={$row['id']}");
+            $db->query("UPDATE send SET mode=" . MovementsModel::MODE_RETURN . ", kid={$row['to_kid']}, to_kid={$row['kid']} WHERE id={$row['id']}");
             //return merchants.
         }
         $capital = (int) $vdata['capital'];
@@ -137,9 +143,9 @@ class AccountDeleter
         $db->query("DELETE FROM raidlist WHERE kid=$kid");
         $endProfile('deleteVillage:deleteFarmlist');
         $addProfile('deleteVillage:cancelMovements');
-        $db->query("DELETE FROM movement WHERE (kid=$kid AND mode=0) OR (mode=1 AND to_kid=$kid)");
+        $db->query("DELETE FROM movement WHERE (kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (mode=" . MovementsModel::MODE_RETURN . " AND to_kid=$kid)");
         //return all movements.
-        $find = $db->query("SELECT * FROM movement WHERE to_kid=$kid AND mode=0");
+        $find = $db->query("SELECT * FROM movement WHERE to_kid=$kid AND mode=" . MovementsModel::MODE_GOING);
         while ($row = $find->fetch_assoc()) {
             $this->cancelMovement((int) $row['id'], (int) $row['to_kid'], (int) $row['kid']);
         }
@@ -153,7 +159,7 @@ class AccountDeleter
             Map::OccupyOrLeaveOasisCacheRemove($row['kid']);
         }
         $endProfile('deleteVillage:freeOases');
-        $db->query("UPDATE odata SET owner=0, did=0 WHERE did=$kid");
+        $db->query("UPDATE odata SET owner=" . UserId::NATURE . ", did=0 WHERE did=$kid");
         $db->query("DELETE FROM units WHERE kid=$kid");
         $db->query("DELETE FROM enforcement WHERE kid=$kid");
         $db->query("DELETE FROM trapped WHERE kid=$kid");
@@ -227,7 +233,7 @@ class AccountDeleter
     public function cancelMovement(int $id, int $kid, int $to_kid): void
     {
         $miliseconds = miliseconds();
-        DB::getInstance()->query("UPDATE movement SET kid=$kid, to_kid=$to_kid, mode=1, end_time=(" . (2 * $miliseconds) . "-start_time), start_time=" . $miliseconds . " WHERE id=$id");
+        DB::getInstance()->query("UPDATE movement SET kid=$kid, to_kid=$to_kid, mode=" . MovementsModel::MODE_RETURN . ", end_time=(" . (2 * $miliseconds) . "-start_time), start_time=" . $miliseconds . " WHERE id=$id");
     }
 
     /**
@@ -255,9 +261,9 @@ class AccountDeleter
         $units = [];
         $speeds = [];
         $units_id = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $units[$i] = (int)$enforce['u' . $i];
-            if (!$enforce['u' . $i] || $i == 11) {
+            if (!$enforce['u' . $i] || $i == Unit::HERO) {
                 continue;
             }
             $speeds[] = Formulas::uSpeed(nrToUnitId($i, $enforce['race']));
@@ -320,10 +326,10 @@ class AccountDeleter
                 0,
                 0,
                 0,
-                1,
+                MovementsModel::MODE_RETURN,
                 MovementsModel::ATTACKTYPE_REINFORCEMENT,
                 $time,
-                $time + 1000 * $calculator->calc(),
+                $time + Time::SECOND_MS * $calculator->calc(),
                 null);
             ResourcesHelper::updateVillageResources($enforce['kid'], false);
             if ($isEnforce) {

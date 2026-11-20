@@ -35,7 +35,7 @@ foreach ([
     'private function getQueueTail(int $field): int',
     'building_field BETWEEN ? AND ?',
     'SELECT MAX(commence) FROM building_upgrade',
-    'return $field <= 18 ? [1, 18] : [19, 99];',
+    'return $field <= Slot::LAST_FIELD ? [Slot::FIRST_FIELD, Slot::LAST_FIELD] : [Slot::FIRST_BUILDING, Slot::WONDER];',
 ] as $needle) {
     if (!str_contains($village, $needle)) {
         failBuildQueueChainingContract("Village must keep the inclusive queue-tail helper: {$needle}");
@@ -51,7 +51,7 @@ foreach (['function getLastCommence', 'sizeof($previousCommence)', 'building_fie
 }
 foreach ([$ai => 'AutoUpgradeAI', $master => 'MasterBuilder'] as $source => $name) {
     if (!str_contains($source, 'MAX(commence)') || !str_contains($source, 'BETWEEN $min AND $max')
-        || !str_contains($source, '[19, 99]')) {
+        || !str_contains($source, '[Slot::FIRST_BUILDING, Slot::WONDER]')) {
         failBuildQueueChainingContract("{$name} must chain per queue with inclusive bounds and MAX(commence).");
     }
 }

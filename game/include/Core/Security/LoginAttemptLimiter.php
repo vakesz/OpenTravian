@@ -2,6 +2,7 @@
 
 namespace Core\Security;
 
+use Core\Time;
 use Redis;
 
 /**
@@ -13,7 +14,7 @@ use Redis;
  */
 final class LoginAttemptLimiter
 {
-    private const PENDING_TTL = 180;
+    private const PENDING_TTL = 3 * Time::MINUTE;
 
     /**
      * Gives unknown identifiers a stable, Unicode-aware bucket until a database

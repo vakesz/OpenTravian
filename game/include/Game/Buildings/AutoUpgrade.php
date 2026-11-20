@@ -4,6 +4,8 @@ namespace Game\Buildings;
 
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
 use Model\VillageModel;
 
 class AutoUpgrade
@@ -56,10 +58,10 @@ class AutoUpgrade
     {
         $db = DB::getInstance();
         $helper = new BuildingHelper();
-        if ($rand_field == 39) {
-            if ($helper->canCreateNewBuild($this->capital, $this->race, 16, $this->buildings) == 1) {
+        if ($rand_field == Slot::RALLY_POINT) {
+            if ($helper->canCreateNewBuild($this->capital, $this->race, Gid::RALLY_POINT, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
-                    $this->buildings[$rand_field]['item_id'] = 16;
+                    $this->buildings[$rand_field]['item_id'] = Gid::RALLY_POINT;
                     $db->query("UPDATE fdata SET f{$rand_field}t=16 WHERE kid=" . $this->kid);
                     $this->addUpgrade($rand_field);
                 }
@@ -67,7 +69,7 @@ class AutoUpgrade
             }
             return;
         }
-        if ($rand_field == 40) {
+        if ($rand_field == Slot::WALL) {
             $buildingGID = Formulas::getWallID($this->race);
             if ($helper->canCreateNewBuild($this->capital, $this->race, $buildingGID, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
@@ -119,7 +121,7 @@ class AutoUpgrade
         ];
         shuffle($rand_arr);
         foreach ($rand_arr as $gid) {
-            if ($gid == 16) {
+            if ($gid == Gid::RALLY_POINT) {
                 continue;
             }
             if ($helper->checkArtifactDependencies(0,
@@ -149,7 +151,7 @@ class AutoUpgrade
 
     public function upgrade(): void
     {
-        $rand_field = mt_rand(1, 10) <= 6 ? mt_rand(1, 18) : mt_rand(19, 40);
+        $rand_field = mt_rand(1, 10) <= 6 ? mt_rand(Slot::FIRST_FIELD, Slot::LAST_FIELD) : mt_rand(Slot::FIRST_BUILDING, Slot::LAST);
 
         if ($this->buildings[$rand_field]['item_id'] <= 0) {
             $this->newBuilding($rand_field);

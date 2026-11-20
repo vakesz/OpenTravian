@@ -6,12 +6,14 @@ use Controller\AnyCtrl;
 use Controller\BuildCtrl;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\RallyPointSubFilters;
 use Game\Formulas;
 use Game\Hero\SessionHero;
 use Core\Locale;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Model\AccountDeleter;
 use Model\RallyPoint\RallyPointModel;
 use Model\TrainingModel;
@@ -88,7 +90,7 @@ class RallyPointCtrl extends AnyCtrl
         // Reference uses #content.build.buildRallyPoint (+ FarmList suffix on tt=99).
         $build->view->vars['contentCssClass'] .= $tt === 99 ? ' buildRallyPointFarmList' : ' buildRallyPoint';
         $x['content'] = '';
-        $x['show'] = Village::getInstance()->getField(39)['level'] > 0;
+        $x['show'] = Village::getInstance()->getField(Slot::RALLY_POINT)['level'] > 0;
         //tabs
         $x['favorTabId'] = $session->getStoredFavoriteTab("buildingRallyPoint");
         $x['tabs'][0]['id'] = get_button_id();
@@ -125,7 +127,7 @@ class RallyPointCtrl extends AnyCtrl
                 if ($filter == 1 || $filter == 2) {
                     $subFiltersCookieName = 'active_rallypoint_sub_filters_' . $filter;
                     if (!isset($_COOKIE[$subFiltersCookieName])) {
-                        setcookie($subFiltersCookieName, RallyPointSubFilters::implode($subFiltersArray), time() + 86400 * 365 * 4); // 4years!
+                        setcookie($subFiltersCookieName, RallyPointSubFilters::implode($subFiltersArray), time() + Time::DAY * 365 * 4); // 4years!
                         $_COOKIE[$subFiltersCookieName] = RallyPointSubFilters::implode($subFiltersArray);
                     }
                     $subFilters = isset($_REQUEST['subfilters']) && !empty($_REQUEST['subfilters']) ? $_REQUEST['subfilters'] : $_COOKIE[$subFiltersCookieName];
@@ -140,7 +142,7 @@ class RallyPointCtrl extends AnyCtrl
                         }
                         $subFiltersArray[$subFilterId] = $find ? 1 : 0;
                     }
-                    setcookie($subFiltersCookieName, RallyPointSubFilters::implode($subFiltersArray), time() + 86400 * 365 * 4); // 4years!
+                    setcookie($subFiltersCookieName, RallyPointSubFilters::implode($subFiltersArray), time() + Time::DAY * 365 * 4); // 4years!
                     $_COOKIE[$subFiltersCookieName] = RallyPointSubFilters::implode($subFiltersArray);
                 }
                 // The reference keeps the order of the outgoing list in the query only, never in a cookie.
@@ -154,7 +156,7 @@ class RallyPointCtrl extends AnyCtrl
                 $x['content'] .= $view->output();
                 break;
             case 2:
-                if (isset($_GET['a']) && $_GET['a'] == 6) {
+                if (isset($_GET['a']) && $_GET['a'] == RallyPoint::NEW_VILLAGE_FORM) {
                     $x['content'] .= $rallyPoint->procSettlers();
                     break;
                 }

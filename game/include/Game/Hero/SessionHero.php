@@ -7,9 +7,12 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\Formulas;
 use Game\Helpers\HeroHealthHelper;
+use Game\Tribes;
+use Game\Unit;
 use Model\MovementsModel;
 use Model\TrainingModel;
 
@@ -57,7 +60,7 @@ class SessionHero extends HeroHelper
         $this->hero = $db->query("SELECT uid, kid, exp, health, power, offBonus, itemHealth, lastupdate, defBonus, production, productionType, hide FROM hero WHERE uid=" . $session->getPlayerId())->fetch_assoc();
         if ($this->hero['health'] == 0) {
             $this->hero['kid'] = (int)$this->hero['kid'];
-            $this->heroTrain = $db->query("SELECT kid, end_time, training_time FROM training WHERE item_id=98 AND kid={$this->hero['kid']}");
+            $this->heroTrain = $db->query("SELECT kid, end_time, training_time FROM training WHERE item_id=" . Unit::HERO_ID . " AND kid={$this->hero['kid']}");
             if ($this->heroTrain->num_rows) {
                 $this->heroTrain = $this->heroTrain->fetch_assoc();
             } else {
@@ -66,7 +69,7 @@ class SessionHero extends HeroHelper
         } else {
             $healthRate = ($this->calcHealth() + $this->hero['itemHealth'])
                 * max(1, (float)Config::getProperty('game', 'heroRegenerationMultiplier'));
-            $generatedHealth = $healthRate / 86400 * (time() - $this->hero['lastupdate']);
+            $generatedHealth = $healthRate / Time::DAY * (time() - $this->hero['lastupdate']);
             $this->hero['health'] = min($this->hero['health'] + $generatedHealth, 100);
         }
         $this->findHero();
@@ -178,12 +181,12 @@ class SessionHero extends HeroHelper
             return true;
         }
         // A hero that is not trapped, reinforcing, or in a village is moving.
-        $find = $db->query("SELECT kid, to_kid, mode, attack_type, start_time, end_time FROM movement WHERE u11>0 AND ((mode=1 AND to_kid={$this->hero['kid']}) OR (mode=0 AND kid={$this->hero['kid']})) LIMIT 1");
+        $find = $db->query("SELECT kid, to_kid, mode, attack_type, start_time, end_time FROM movement WHERE u11>0 AND ((mode=" . MovementsModel::MODE_RETURN . " AND to_kid={$this->hero['kid']}) OR (mode=" . MovementsModel::MODE_GOING . " AND kid={$this->hero['kid']})) LIMIT 1");
         if ($find->num_rows) {
             $find = $find->fetch_assoc();
-            $find['start_time_seconds'] = ceil($find['start_time'] / 1000);
-            $find['end_time_seconds'] = ceil($find['end_time'] / 1000);
-            if ($find['mode'] == 0) {
+            $find['start_time_seconds'] = ceil($find['start_time'] / Time::SECOND_MS);
+            $find['end_time_seconds'] = ceil($find['end_time'] / Time::SECOND_MS);
+            if ($find['mode'] == MovementsModel::MODE_GOING) {
                 // The hero is en route.
                 switch ($find['attack_type']) {
                     case MovementsModel::ATTACKTYPE_ADVENTURE:
@@ -424,7 +427,7 @@ class SessionHero extends HeroHelper
         $db = DB::getInstance();
         if ($this->heroTrain !== null) {
             if ($waterBucket) {
-                $db->query("DELETE FROM training WHERE nr=11 AND kid={$this->heroTrain['kid']}");
+                $db->query("DELETE FROM training WHERE nr=" . Unit::HERO . " AND kid={$this->heroTrain['kid']}");
                 $this->heroTrain = null;
             } else {
                 return;
@@ -534,9 +537,9 @@ class SessionHero extends HeroHelper
                 $items[$array]['name'] = htmlspecialchars("{$itemData['name']}");
                 $items[$array]['place'] = $row['proc'] ? $itemData['slot'] : "inventory";
                 $items[$array]['slot'] = $itemData['slot'];
-                $items[$array]['isConsumable'] = (int)$row['btype'] >= 7
-                    && !in_array((int)$row['btype'], [12, 13], true);
-                $items[$array]['isMaterial'] = in_array((int)$row['btype'], [12, 13], true);
+                $items[$array]['isConsumable'] = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE
+                    && !in_array((int)$row['btype'], ItemBtype::MATERIALS, true);
+                $items[$array]['isMaterial'] = in_array((int)$row['btype'], ItemBtype::MATERIALS, true);
                 $items[$array]['amount'] = (int)$row['num'];
                 $items[$array]['instant'] = $itemData['instant'];
                 $items[$array]['isUsableIfDead'] = $itemData['isUsableIfDead'];
@@ -556,7 +559,7 @@ class SessionHero extends HeroHelper
                         (int)$row['num']
                     );
                 }
-                if ((int)$row['btype'] === 15) {
+                if ((int)$row['btype'] === ItemBtype::ARTWORK) {
                     $uid = (int)Session::getInstance()->getPlayerId();
                     $production = (int)$db->fetchScalar("SELECT COALESCE(SUM(cp), 0) FROM vdata WHERE owner=$uid");
                     $lastUse = (int)$db->fetchScalar("SELECT lastArtworkUse FROM inventory WHERE uid=$uid");
@@ -588,11 +591,11 @@ class SessionHero extends HeroHelper
             'bonus' => 0,
             'loyaltyFull' => false,
         ];
-        if ($btype === 10) {
+        if ($btype === ItemBtype::SCROLL) {
             $properties = (new HeroItems())->getHeroItemProperties($btype, $type);
             $context['perScroll'] = (int)floor((float)$properties['exp']);
             $context['bonus'] = (int)(new HeroHelper())->calcMoreExp((int)$db->fetchScalar('SELECT helmet FROM inventory WHERE uid=?', [$uid]));
-        } elseif ($btype === 14) {
+        } elseif ($btype === ItemBtype::TABLET_OF_LAW) {
             $loyalty = $db->fetchScalar('SELECT loyalty FROM vdata WHERE kid=? AND owner=?', [(int)$this->hero['kid'], $uid]);
             $context['loyaltyFull'] = $loyalty !== false && (int)$loyalty >= 125;
         }
@@ -727,13 +730,13 @@ class SessionHero extends HeroHelper
         $HTML = T("HeroInventory", "heroLevel") . '||';
         $HTML .= '<br /><span class="heroAttributeInformation">';
         switch (Session::getInstance()->getRace()) {
-            case 1:
+            case Tribes::ROMANS:
                 $HTML .= sprintf(T("HeroInventory", "RomanSpecialHeroAttribute"), 100);
                 break;
-            case 2://percent mark :((
+            case Tribes::TEUTONS://percent mark :((
                 $HTML .= sprintf(T("HeroInventory", "TeutonSpecialHeroAttribute"), 30 . "%");
                 break;
-            case 3:
+            case Tribes::GAULS:
                 $HTML .= sprintf(T("HeroInventory", "GualSpecialHeroAttribute"), 5);
                 break;
         }

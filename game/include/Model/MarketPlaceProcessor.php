@@ -19,7 +19,7 @@ class MarketPlaceProcessor
      */
     public function processRow(array $row): void
     {
-        if ((int) $row['mode'] === 1) {
+        if ((int) $row['mode'] === MovementsModel::MODE_RETURN) {
             $this->processReturn($row);
             return;
         }
@@ -104,7 +104,7 @@ class MarketPlaceProcessor
             (int) $row['kid'],
             [(int) $row['wood'], (int) $row['clay'], (int) $row['iron'], (int) $row['crop']],
             (int) $row['x'] - 1,
-            1,
+            MovementsModel::MODE_RETURN,
             $row['end_time'] + $timeTaken,
             (int) $row['ships']
         );
@@ -145,7 +145,7 @@ class MarketPlaceProcessor
         ];
         $end_time = $row['end_time'] + Ships::tradeTravelSeconds($kid, $toKid, (int) $m->getUser((int) $res['owner'], 'race')['race'], (int) $row['ships'] > 0);
         DB::getInstance()->query("UPDATE vdata SET wood=wood-{$resources[0]}, clay=clay-{$resources[1]}, iron=iron-{$resources[2]}, crop=crop-{$resources[3]} WHERE kid=$toKid");
-        $this->insert($toKid, $kid, $resources, (int) $row['x'], 0, $end_time, (int) $row['ships']);
+        $this->insert($toKid, $kid, $resources, (int) $row['x'], MovementsModel::MODE_GOING, $end_time, (int) $row['ships']);
         (new MasterBuilder())->updateCommence($toKid, false, false);
     }
 }

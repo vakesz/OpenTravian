@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\Gold;
 
 use Core\Helper\WebService;
+use Core\Time;
 
 /**
  * One-time confirmation token of a two-step gold purchase. The sign step issues it for
@@ -14,7 +15,7 @@ use Core\Helper\WebService;
  */
 final class PurchaseNonce
 {
-    private const TTL = 600;
+    private const TTL = 10 * Time::MINUTE;
 
     private function __construct()
     {

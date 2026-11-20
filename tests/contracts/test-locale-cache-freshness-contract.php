@@ -8,7 +8,7 @@ if ($source === false
     || !str_contains($source, '$cachedLocale = $cache->get("Language:$locale");')
     || !str_contains($source, '$signature = implode(\',\', array_map(static fn(string $file): int => (int)filemtime($file), $files));')
     || !str_contains($source, "\$cachedLocale['signature'] !== \$signature")
-    || !str_contains($source, "\$cache->set(\"Language:\$locale\", ['signature' => \$signature, 'catalog' => \$this->Locale], 2 * 3600);")) {
+    || !str_contains($source, "\$cache->set(\"Language:\$locale\", ['signature' => \$signature, 'catalog' => \$this->Locale], 2 * Time::HOUR);")) {
     fwrite(STDERR, "Locale cache entries must refresh when any translation layer changes.\n");
     exit(1);
 }

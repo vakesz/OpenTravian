@@ -17,6 +17,7 @@ function failRearrangeContract(string $message): void
 }
 
 $root = dirname(__DIR__, 2);
+require_once $root . '/game/include/Game/Gid.php';
 require_once $root . '/game/include/Game/Buildings/BuildingRearranger.php';
 
 use Game\Buildings\BuildingRearranger;

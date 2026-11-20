@@ -2,6 +2,8 @@
 
 namespace Game;
 
+use Core\Time;
+
 /**
  * The gameplay values that vary with a world's advertised economic speed.
  *
@@ -90,7 +92,7 @@ final class WorldSpeedProfile
      */
     public static function officialRoundTimeline(int $speed): ?array
     {
-        $day = 24 * 3600;
+        $day = 24 * Time::HOUR;
         if ($speed === 1) {
             return [
                 'registrationCloseAfter' => 70 * $day,
@@ -128,7 +130,7 @@ final class WorldSpeedProfile
                 'registrationCloseAfter' => 7 * $day,
                 'artifactsReleaseAfter' => 9 * $day,
                 'plansReleaseAfter' => 18 * $day,
-                'natarWwFinishAfter' => 35 * $day + 12 * 3600,
+                'natarWwFinishAfter' => 35 * $day + 12 * Time::HOUR,
             ];
         }
 
@@ -146,7 +148,7 @@ final class WorldSpeedProfile
         $speed = self::speed($speed);
         $timeline = self::officialRoundTimeline($speed);
         if ($timeline !== null) {
-            return max(1, (int)ceil($timeline['natarWwFinishAfter'] / 86400));
+            return max(1, (int)ceil($timeline['natarWwFinishAfter'] / Time::DAY));
         }
 
         return max(1, (int)ceil(350 / $speed));
@@ -193,10 +195,10 @@ final class WorldSpeedProfile
         // when the rest of the game advances much faster.
         $speed = self::speed($speed);
         if ($speed <= 20) {
-            return 24 * 3600;
+            return 24 * Time::HOUR;
         }
 
-        return $speed >= 5000 ? 6 * 3600 : 12 * 3600;
+        return $speed >= 5000 ? 6 * Time::HOUR : 12 * Time::HOUR;
     }
 
     /**
@@ -213,8 +215,8 @@ final class WorldSpeedProfile
     public static function protectionParts(int $speed): array
     {
         $speed = self::speed($speed);
-        $day = 86400;
-        $floor = 3 * 3600;
+        $day = Time::DAY;
+        $floor = 3 * Time::HOUR;
         $anchors = [
             1 => [5 * $day, 3 * $day],
             2 => [3 * $day, 3 * $day],
@@ -266,21 +268,21 @@ final class WorldSpeedProfile
     public static function legacyProtectionTime(int $speed): int
     {
         $speed = self::speed($speed);
-        $minimum = 3 * 3600;
+        $minimum = 3 * Time::HOUR;
         if ($speed <= 20) {
             return $minimum;
         }
         if ($speed <= 100) {
-            return 72 * 3600;
+            return 72 * Time::HOUR;
         }
         if ($speed <= 500) {
-            return 24 * 3600;
+            return 24 * Time::HOUR;
         }
         if ($speed <= 1000) {
-            return 16 * 3600;
+            return 16 * Time::HOUR;
         }
         if ($speed <= 2000) {
-            return 8 * 3600;
+            return 8 * Time::HOUR;
         }
 
         return $minimum;
@@ -296,21 +298,21 @@ final class WorldSpeedProfile
     {
         $speed = self::speed($speed);
         if ($speed === 1) {
-            return 5 * 24 * 3600;
+            return 5 * 24 * Time::HOUR;
         }
         if ($speed <= 3) {
-            return 3 * 24 * 3600;
+            return 3 * 24 * Time::HOUR;
         }
         if ($speed <= 5) {
-            return 2 * 24 * 3600;
+            return 2 * 24 * Time::HOUR;
         }
         if ($speed <= 10) {
-            return 24 * 3600;
+            return 24 * Time::HOUR;
         }
 
         // The ×10 window is one day. Faster worlds shrink it with speed and
         // never spawn the first animals in under ten minutes.
-        return max((int)round(86400 * 10 / $speed), 10 * 60);
+        return max((int)round(Time::DAY * 10 / $speed), 10 * Time::MINUTE);
     }
 
     /**
@@ -361,10 +363,10 @@ final class WorldSpeedProfile
     public static function oasisRespawnInterval(int $speed, float $movementSpeed): int
     {
         if (self::speed($speed) <= 20) {
-            return 2 * 3600;
+            return 2 * Time::HOUR;
         }
 
-        return max(15 * 60, (int)floor((2 * 3600) / max(1.0, $movementSpeed)));
+        return max(15 * Time::MINUTE, (int)floor((2 * Time::HOUR) / max(1.0, $movementSpeed)));
     }
 
     /**
@@ -387,7 +389,7 @@ final class WorldSpeedProfile
      */
     public static function natarNewVillageTravelTime(int $speed): float
     {
-        return max(24 * 3600 / self::speed($speed), 10 * 60);
+        return max(24 * Time::HOUR / self::speed($speed), 10 * Time::MINUTE);
     }
 
     /**
@@ -456,10 +458,10 @@ final class WorldSpeedProfile
     {
         $speed = self::speed($speed);
         if ($speed <= 20) {
-            return 72 * 3600;
+            return 72 * Time::HOUR;
         }
 
-        return (int)max(ceil(72 * 3600 * sqrt(20 / $speed)), 300);
+        return (int)max(ceil(72 * Time::HOUR * sqrt(20 / $speed)), 5 * Time::MINUTE);
     }
 
     /** Starvation crop multiplier: 1 through x10, then 1+4.5*log10(s/10) capped at 10. */
@@ -473,6 +475,6 @@ final class WorldSpeedProfile
     /** Duration in seconds of a new auction: the vendor's 24 h / 12 h / 8 h / 4 h / 2 h at x1/x2/x3/x5/x10, i.e. floor(24/s) hours, never under one hour. */
     public static function auctionDuration(int $speed): int
     {
-        return max(1, intdiv(24, self::speed($speed))) * 3600;
+        return max(1, intdiv(24, self::speed($speed))) * Time::HOUR;
     }
 }

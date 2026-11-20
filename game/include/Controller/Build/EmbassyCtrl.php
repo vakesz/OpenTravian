@@ -10,10 +10,12 @@ use Core\Helper\WebService;
 use Core\Session;
 use Core\Village;
 use Game\Formulas;
+use Game\Gid;
 use Model\AllianceModel;
 use Model\MessageModel;
 use resources\View\PHPBatchView;
 use Controller\BuildCtrl;
+use Game\UserId;
 
 use function array_values;
 
@@ -127,7 +129,7 @@ class EmbassyCtrl extends AnyCtrl
             return '';
         }
         Session::getInstance()->setAllianceId($result);
-        $this->redirect(buildTabUrl($this->slot, 18, 'tt', 'info'));
+        $this->redirect(buildTabUrl($this->slot, Gid::EMBASSY, 'tt', 'info'));
         return '';
     }
 
@@ -182,7 +184,7 @@ class EmbassyCtrl extends AnyCtrl
             $view->vars['tag'] = $alliance['tag'];
             $view->vars['name'] = $alliance['name'];
             $view->vars['leaveError'] = $leaveError;
-            $view->vars['formAction'] = buildTabUrl($this->slot, 18, 'tt', 'info');
+            $view->vars['formAction'] = buildTabUrl($this->slot, Gid::EMBASSY, 'tt', 'info');
             $this->view->vars['content'] = $view->output();
             return;
         }
@@ -208,7 +210,7 @@ class EmbassyCtrl extends AnyCtrl
              JOIN wdata w ON w.id=v.kid
              JOIN users u ON u.id=v.owner
              LEFT JOIN alidata a ON a.id=u.aid
-             WHERE v.owner<>{$uid} AND v.owner>1 AND {$distance} <= {$radius}
+             WHERE v.owner<>{$uid} AND v.owner>" . UserId::NATARS . " AND {$distance} <= {$radius}
              ORDER BY `distance` ASC, v.kid ASC
              LIMIT {$limit}"
         );
@@ -225,7 +227,7 @@ class EmbassyCtrl extends AnyCtrl
         $view = new PHPBatchView("build/building/EmbassyJoin");
         $view->vars['error'] = $error;
         $view->vars['invitations'] = [];
-        $view->vars['formAction'] = buildTabUrl($this->slot, 18, 'tt', 'join');
+        $view->vars['formAction'] = buildTabUrl($this->slot, Gid::EMBASSY, 'tt', 'join');
         if (!$this->view->vars['hasAlliance']) {
             $db = DB::getInstance();
             $invites = (new AllianceModel())->getInvitesForUser(Session::getInstance()->getPlayerId());
@@ -251,7 +253,7 @@ class EmbassyCtrl extends AnyCtrl
             $view = new PHPBatchView("build/building/EmbassyFound");
             $view->vars['errorTag'] = $view->vars['errorName'] = '';
             $view->vars['tbody'] = $view->vars['tag'] = $view->vars['name'] = '';
-            $view->vars['formAction'] = buildTabUrl($this->slot, 18, 'tt', 'info');
+            $view->vars['formAction'] = buildTabUrl($this->slot, Gid::EMBASSY, 'tt', 'info');
             if (Session::getInstance()->banned()) {
                 $this->innerRedirect("InGameBannedPage");
             }

@@ -1,6 +1,7 @@
 <?php
 
 use Core\Database\DBI;
+use Game\Slot;
 
 class FixesCtrl
 {
@@ -13,7 +14,7 @@ class FixesCtrl
             $db = DBI::getInstance();
             $village = $db->fetchSingleRow('SELECT * FROM fdata WHERE kid=?', $fixKid);
             if ($village) {
-                for ($i = 19; $i <= 40; ++$i) {
+                for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
                     if ($village['f' . $i . 't'] > 0 && $village['f' . $i] == 0
                         && (int)$db->fetchScalar('SELECT COUNT(id) FROM building_upgrade WHERE kid=? AND building_field=?', [$fixKid, $i]) === 0) {
                         $db->run("UPDATE fdata SET f{$i}t=0 WHERE kid=?", $fixKid);

@@ -4,6 +4,7 @@ namespace Game\Buildings;
 
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Gid;
 use Game\Helpers\CulturePointsHelper;
 use Game\Helpers\LoyaltyHelper;
 use Game\Map\Map;
@@ -18,6 +19,8 @@ use Model\SeasonPassModel;
 use Model\SummaryModel;
 use Model\VillageModel;
 use Model\WonderOfTheWorldModel;
+use Game\Slot;
+use Game\UserId;
 use function miliseconds;
 
 class BuildingAction
@@ -47,13 +50,13 @@ class BuildingAction
         if (($level + $levels) > $maxLevel && !$force) {
             return;
         }
-        if ($item_id == 25 || $item_id == 26) {
+        if ($item_id == Gid::RESIDENCE || $item_id == Gid::PALACE) {
             LoyaltyHelper::updateVillageLoyalty($kid);
         }
         $dailyQuest = new DailyQuestModel();
-        $dailyQuest->setQuestAsCompleted($villageRow['owner'], 6);
-        if ($item_id <= 4) {
-            $dailyQuest->setQuestAsCompleted($villageRow['owner'], 7);
+        $dailyQuest->setQuestAsCompleted($villageRow['owner'], DailyQuestModel::QUEST_UPGRADE_BUILDING);
+        if ($item_id <= Gid::LAST_RESOURCE_FIELD) {
+            $dailyQuest->setQuestAsCompleted($villageRow['owner'], DailyQuestModel::QUEST_UPGRADE_FIELD);
         }
         list($pop, $cp) = Formulas::buildingCpPop($item_id, $level, $level + $levels, $isWW);
         if ($modifyPopCP) {
@@ -61,34 +64,35 @@ class BuildingAction
         }
         self::increaseFieldLevel($kid, $building_field, $levels);
         EventMail::constructionFinished((int)$kid, $item_id, $level + $levels);
-        if($item_id == 37){
+        if($item_id == Gid::HEROS_MANSION){
             $newLevel = $level + $levels;
             $db->query("UPDATE fdata SET heroMansion=$newLevel WHERE kid=$kid");
-        } else if ($item_id == 18) {
+        } else if ($item_id == Gid::EMBASSY) {
             self::updateEmbassyLevel($kid, $level + $levels);
             $aid = $m->getUser($villageRow['owner'], 'aid')['aid'];
             if ($aid) {
                 $max = Formulas::getEmbassyMembersCount($level + $levels);
                 $db->query("UPDATE alidata SET max=IF(max>{$max}, max, {$max}) WHERE id=$aid");
             }
-        } else if ($item_id == 10 || $item_id == 11 || $item_id == 38 || $item_id == 39) {
+        } else if ($item_id == Gid::WAREHOUSE || $item_id == Gid::GRANARY || $item_id == Gid::GREAT_WAREHOUSE || $item_id == Gid::GREAT_GRANARY) {
             $nextLevel = $level + $levels;
-            $big = $item_id == 38 || $item_id == 39;
-            $type = $item_id == 10 || $item_id == 38 ? 'maxstore' : 'maxcrop';
+            $big = $item_id == Gid::GREAT_WAREHOUSE || $item_id == Gid::GREAT_GRANARY;
+            $type = $item_id == Gid::WAREHOUSE || $item_id == Gid::GREAT_WAREHOUSE ? 'maxstore' : 'maxcrop';
             $max = $villageRow[$type];
-            $extraCapacity = $villageRow[$item_id == 10 || $item_id == 38 ? 'extraMaxstore' : 'extraMaxcrop'] * Formulas::storeCAP(20);
+            $extraCapacity = $villageRow[$item_id == Gid::WAREHOUSE || $item_id == Gid::GREAT_WAREHOUSE ? 'extraMaxstore' : 'extraMaxcrop'] * Formulas::storeCAP(20);
             $real_storage_capacity = $max - $extraCapacity;
             if ($nextLevel >= 1 && $real_storage_capacity == Formulas::storeCAP(0)) {
                 $max -= Formulas::storeCAP(0);
             }
-            if ($nextLevel > 1) {
+            // Remove the old level's capacity. A new building (level 0) has none; its base was removed above.
+            if ($level >= 1) {
                 $max -= ($big ? Formulas::bigStoreCAP($level) : Formulas::storeCAP($level));
             }
             $max += ($big ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel));
             $db->query("UPDATE vdata SET {$type}=$max WHERE kid={$kid}");
-        } else if ($item_id == 40 && ($level + $levels) >= 100) {
+        } else if ($item_id == Gid::WONDER_OF_THE_WORLD && ($level + $levels) >= 100) {
             $finish = true;
-        } else if ($item_id == 40) {
+        } else if ($item_id == Gid::WONDER_OF_THE_WORLD) {
             (new SummaryModel())->setFirstWWUser($db->fetchScalar('SELECT name FROM users WHERE id=' . $villageRow['owner']));
             $to_level = $level + $levels;
             if ($to_level > 95) {
@@ -102,10 +106,10 @@ class BuildingAction
             }
             $db->query("UPDATE fdata SET lastWWUpgrade=" . miliseconds() . " WHERE kid={$kid}");
         }
-        if (in_array($item_id, [1, 2, 3, 4, 5, 6, 7, 8, 9, 45])) {
+        if (in_array($item_id, [Gid::WOODCUTTER, Gid::CLAY_PIT, Gid::IRON_MINE, Gid::CROPLAND, Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::GRAIN_MILL, Gid::BAKERY, Gid::WATERWORKS])) {
             ResourcesHelper::updateVillageResources($kid, false);
         }
-        if ($item_id == 41) {
+        if ($item_id == Gid::HORSE_DRINKING_TROUGH) {
             ResourcesHelper::updateVillageUpkeep($villageRow['owner'], $villageRow['kid'], $isWW, ($level + $levels));
         }
         $master->updateCommence($kid, true);
@@ -148,7 +152,7 @@ class BuildingAction
                 $db->query("UPDATE alidata SET week_pop_changes=week_pop_changes+{$pop} WHERE id=$aid");
             }
             $db->query("UPDATE vdata SET cp=cp+$cp, pop=pop+$pop WHERE kid=$kid");
-            if ((int)$uid > 2) {
+            if ((int)$uid > UserId::LAST_SYSTEM) {
                 $seasonPass = new SeasonPassModel();
                 if ((int)$pop > 0) {
                     $seasonPass->onMissionEvent((int)$uid, 'gainPopulation');
@@ -208,7 +212,7 @@ class BuildingAction
         if ($levels >= $level) {
             $complete = true;
         }
-        if ($item_id == 25 || $item_id == 26 || $item_id == 44) {
+        if ($item_id == Gid::RESIDENCE || $item_id == Gid::PALACE || $item_id == Gid::COMMAND_CENTER) {
             LoyaltyHelper::updateVillageLoyalty($kid);
         }
         $villageRow = $m->getVillage($kid, 'kid, owner, isWW, pop, maxcrop, maxstore, extraMaxstore, extraMaxcrop');
@@ -218,31 +222,31 @@ class BuildingAction
         if (!$complete) {
             $db->query("UPDATE fdata SET f{$building_field}=f{$building_field}-$levels WHERE kid = " . $kid);
         } else {
-            if ($building_field > 18 && $building_field <> 99 && !self::building_upgrade_state($kid, $building_field)) {
+            if ($building_field > Slot::LAST_FIELD && $building_field <> Slot::WONDER && !self::building_upgrade_state($kid, $building_field)) {
                 $db->query("UPDATE fdata SET f{$building_field}=0, f{$building_field}t=0 WHERE kid=" . $kid);
             } else {
                 $db->query("UPDATE fdata SET f{$building_field}=0 WHERE kid = " . $kid);
             }
         }
         $db->query("DELETE FROM demolition WHERE kid=$kid AND building_field=$building_field");
-        if($item_id == 37){
+        if($item_id == Gid::HEROS_MANSION){
             $newLevel = $complete ? 0 : ($level - $levels);
             $db->query("UPDATE fdata SET heroMansion=$newLevel WHERE kid=$kid");
-        } else if ($item_id == 18) {
+        } else if ($item_id == Gid::EMBASSY) {
             self::updateEmbassyLevel($kid, $complete ? 0 : ($level - $levels));
             $aid = $m->getUser($villageRow['owner'], 'aid')['aid'];
             if ($aid) {
                 $m = new AllianceModel();
                 $m->recalculateMaxUsers($aid);
             }
-        } else if ($item_id == 10 || $item_id == 11 || $item_id == 38 || $item_id == 39) {
+        } else if ($item_id == Gid::WAREHOUSE || $item_id == Gid::GRANARY || $item_id == Gid::GREAT_WAREHOUSE || $item_id == Gid::GREAT_GRANARY) {
             $base = Formulas::storeCAP(0);
-            $type = $item_id == 10 || $item_id == 38 ? 'maxstore' : 'maxcrop';
+            $type = $item_id == Gid::WAREHOUSE || $item_id == Gid::GREAT_WAREHOUSE ? 'maxstore' : 'maxcrop';
             $max = $villageRow[$type];
-            $extraCapacity = $villageRow[$item_id == 10 || $item_id == 38 ? 'extraMaxstore' : 'extraMaxcrop'] * Formulas::storeCAP(20);
+            $extraCapacity = $villageRow[$item_id == Gid::WAREHOUSE || $item_id == Gid::GREAT_WAREHOUSE ? 'extraMaxstore' : 'extraMaxcrop'] * Formulas::storeCAP(20);
             $newStorage = $max == $base ? 0 : $max;
             $nextLevel = $complete ? 0 : $level - $levels;
-            $big = $item_id == 38 || $item_id == 39;
+            $big = $item_id == Gid::GREAT_WAREHOUSE || $item_id == Gid::GREAT_GRANARY;
             $value_inc = ($big ? Formulas::bigStoreCAP($level) : Formulas::storeCAP($level)) - ($nextLevel <= 0 ? 0 : ($big ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel)));
             $newStorage = $newStorage - $value_inc;
             $real_new_storage = $newStorage - $extraCapacity;
@@ -250,19 +254,19 @@ class BuildingAction
                 $newStorage += $base;
             }
             $db->query("UPDATE vdata SET {$type}=$newStorage WHERE kid={$kid}");
-        } else if ($item_id == 17 || $item_id == 28) {
+        } else if ($item_id == Gid::MARKETPLACE || $item_id == Gid::TRADE_OFFICE) {
             (new MarketModel())->cancelAllOffers($kid);
         } else if ($item_id == \Game\Ships::HARBOR_GID && $complete) {
             // A destroyed Harbor sinks the ships in the village; ships away are lost when they come back to no Harbor.
             $db->query("UPDATE units SET ship1=0, ship2=0, ship3=0, ship4=0 WHERE kid=$kid");
         }
-        if ($building_field > 18 && $building_field <> 99 && !$complete && ((int)$level - 1) === 0 && !self::building_upgrade_state($kid, $building_field)) {
+        if ($building_field > Slot::LAST_FIELD && $building_field <> Slot::WONDER && !$complete && ((int)$level - 1) === 0 && !self::building_upgrade_state($kid, $building_field)) {
             $db->query("UPDATE fdata SET f{$building_field}t=0 WHERE kid={$kid}");
         }
-        if (in_array($item_id, [1, 2, 3, 4, 5, 6, 7, 8, 9, 45])) {
+        if (in_array($item_id, [Gid::WOODCUTTER, Gid::CLAY_PIT, Gid::IRON_MINE, Gid::CROPLAND, Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::GRAIN_MILL, Gid::BAKERY, Gid::WATERWORKS])) {
             ResourcesHelper::updateVillageResources($kid, false);
         }
-        if ($item_id == 41) {
+        if ($item_id == Gid::HORSE_DRINKING_TROUGH) {
             ResourcesHelper::updateVillageUpkeep($villageRow['owner'], $villageRow['kid'], $villageRow['isWW'] == 1, $complete ? 0 : ($level - $levels));
         }
         $master->updateCommence($kid, true);
@@ -310,8 +314,8 @@ class BuildingAction
         $db = DB::getInstance();
         foreach ($buildings as $index => $build) {
             if ($build['item_id'] == 0 || $build['level'] > 0) continue;
-            if ($index <= 18) continue;
-            if ($index == 99) continue;
+            if ($index <= Slot::LAST_FIELD) continue;
+            if ($index == Slot::WONDER) continue;
             if (self::building_upgrade_state($kid, $index)) continue;
             //it's probably bugged
             $db->query("UPDATE fdata SET f{$index}t=0 WHERE kid={$kid}");

@@ -4,17 +4,24 @@ namespace Controller\Ajax\map;
 
 use Controller\Ajax\AjaxBase;
 use function array_key_exists;
+use Controller\RallyPoint\RallyPoint;
 use Core\Caching\Caching;
 use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use Core\Village;
+use Game\AccessLevel;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\Hero\SessionHero;
 use Core\Locale;
 use Game\NoticeHelper;
+use Game\Slot;
+use Game\Unit;
+use Game\UserId;
 use Model\AccountDeleter;
 use Model\ReportsModel;
 use Model\FarmListModel;
@@ -182,7 +189,7 @@ class tileDetails extends AjaxBase
      */
     private function targetUrl(array $tile, ?int $eventType): string
     {
-        return '/build.php?gid=16&tt=2' . ($eventType === null ? '' : '&eventType=' . $eventType) . '&targetMapId=' . $tile['id'];
+        return '/build.php?gid=' . Gid::RALLY_POINT . '&tt=2' . ($eventType === null ? '' : '&eventType=' . $eventType) . '&targetMapId=' . $tile['id'];
     }
 
     /**
@@ -194,7 +201,7 @@ class tileDetails extends AjaxBase
     private function annexOption(array $tile, bool $lockedWithoutMansion): string
     {
         $label = T("map", "Annex Oasis");
-        $level = max(Village::getInstance()->getTypeLevel(37));
+        $level = max(Village::getInstance()->getTypeLevel(Gid::HEROS_MANSION));
         if ($level == 0) {
             return $lockedWithoutMansion ? $this->disabledOption($label, T("map", "buildHeroMansion")) : '';
         }
@@ -225,14 +232,14 @@ class tileDetails extends AjaxBase
             if ($protect = $m->hasBeginnerProtection($tile['id'])) {
                 return $this->disabledOption($label, sprintf(T("map", "x is under protection to y"), TimezoneHelper::autoDateString($protect, true)));
             }
-            if ($m->getPlayerAccesses($owner['owner']) == 0) {
+            if ($m->getPlayerAccesses($owner['owner']) == AccessLevel::BANNED) {
                 return $this->disabledOption($label, T("map", "banned"));
             }
             if ($m->isInVacation($tile['id'])) {
                 return $this->disabledOption($label, T("map", "vacationModeActive"));
             }
         }
-        if (max(Village::getInstance()->getTypeLevel(16))) {
+        if (max(Village::getInstance()->getTypeLevel(Gid::RALLY_POINT))) {
             return $this->linkOption($label, $this->targetUrl($tile, $eventType));
         }
         if ($owner !== null && $owner['owner'] != $session->getPlayerId() && ($protect = $m->hasBeginnerProtection($owner['did']))) {
@@ -279,7 +286,7 @@ class tileDetails extends AjaxBase
             }
             $access = $m->getPlayerAccesses($village['owner']);
             if ($village['isWW'] && !Config::getInstance()->dynamic->WWPlansReleased && !Config::getProperty("custom",
-                    "wwPlansEnabled")) $access = 0;
+                    "wwPlansEnabled")) $access = AccessLevel::BANNED;
             //banned
             //vacation
             //beginner protection
@@ -290,7 +297,7 @@ class tileDetails extends AjaxBase
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "YouAreInVacationMode") . '">' . T("map", "sendTroops") . '</span></div>';
             } else if (!Config::getProperty("custom",
-                    "skipProtectionOnAttack") && Session::getInstance()->hasProtection() && !($village['owner'] == 1) && Session::getInstance()->getPlayerId() != $village['owner']) {
+                    "skipProtectionOnAttack") && Session::getInstance()->hasProtection() && !($village['owner'] == UserId::NATARS) && Session::getInstance()->getPlayerId() != $village['owner']) {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "YouAreProtected") . '">' . T("map", "sendTroops") . '</span></div>';
             } else if ($village['owner'] != Session::getInstance()->getPlayerId() && ($protect = $m->hasBeginnerProtection($tile['id']))) {
@@ -298,13 +305,13 @@ class tileDetails extends AjaxBase
                         "x is under protection to y"),
                         TimezoneHelper::autoDateString($protect, TRUE)) . '">' . T("map",
                         "sendTroops") . '</span></div>';
-            } else if ($access == 0) {
+            } else if ($access == AccessLevel::BANNED) {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "banned") . '">' . T("map", "sendTroops") . '</span></div>';
             } else if ($m->isInVacation($tile['id'])) {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "vacationModeActive") . '">' . T("map", "sendTroops") . '</span></div>';
-            } else if (max(Village::getInstance()->getTypeLevel(16))) {
+            } else if (max(Village::getInstance()->getTypeLevel(Gid::RALLY_POINT))) {
                 $view->vars['options'] .= $this->linkOption(T("map", "sendTroops"), $this->targetUrl($tile, 5));
             } else {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
@@ -316,11 +323,11 @@ class tileDetails extends AjaxBase
             } else if (Session::getInstance()->isInVacationMode()) {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "YouAreInVacationMode") . '">' . T("map", "sendMerchants") . '</span></div>';
-            } else if ($access == 0) {
+            } else if ($access == AccessLevel::BANNED) {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "banned") . '">' . T("map", "sendMerchants") . '</span></div>';
             } else if (Village::getInstance()->hasMarketPlace()) {
-                $view->vars['options'] .= '<div class="option"><a href="/build.php?z=' . $tile['id'] . '&amp;gid=17&amp;t=5" class="a arrow" title="' . T("map",
+                $view->vars['options'] .= '<div class="option"><a href="/build.php?z=' . $tile['id'] . '&amp;gid=' . Gid::MARKETPLACE . '&amp;t=5" class="a arrow" title="' . T("map",
                         "sendMerchants") . '">' . T("map", "sendMerchants") . '</a></div>';
             } else {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
@@ -344,7 +351,7 @@ class tileDetails extends AjaxBase
                 if ($cp < $cpNeeded) {
                     $view->vars['options'] .= $this->disabledOption($foundLabel, T("map", "culturePointsForNewVillage") . ' ' . $cp . '/' . $cpNeeded);
                 } elseif (Village::getInstance()->isResourcesAvailable(array_fill(0, 4, Formulas::newVillageCost()))) {
-                    $view->vars['options'] .= '<div class="option"><a href="/build.php?id=39&tt=2&kid=' . $tile['id'] . '&a=6" class="a arrow" title="' . $foundLabel . '">' . $foundLabel . '</a></div>';
+                    $view->vars['options'] .= '<div class="option"><a href="/build.php?id=' . Slot::RALLY_POINT . '&tt=2&kid=' . $tile['id'] . '&a=' . RallyPoint::NEW_VILLAGE_FORM . '" class="a arrow" title="' . $foundLabel . '">' . $foundLabel . '</a></div>';
                 } else {
                     $view->vars['options'] .= $this->disabledOption($foundLabel, sprintf(T("map", "noResourcesForNewVillage"), $this->number_format(Formulas::newVillageCost())));
                 }
@@ -398,7 +405,7 @@ class tileDetails extends AjaxBase
             OasesModel::oasesTrain($tile['id']);
             $view->vars['troops_info'] = '';
             $units = $db->query("SELECT * FROM units WHERE kid={$tile['id']}")->fetch_assoc();
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 if (!$units['u' . $i]) {
                     continue;
                 }
@@ -409,7 +416,7 @@ class tileDetails extends AjaxBase
             }
             $view->vars['troops_info'] = $view->vars['troops_info'] === ''
                 ? '<tr><td>' . T("map", "noUnits") . '</td></tr>'
-                : $view->vars['troops_info'] . '<tr><td colspan="3"><a href="/build.php?id=39&tt=3&screen=combatSimulator&kid=' . $tile['id']
+                : $view->vars['troops_info'] . '<tr><td colspan="3"><a href="/build.php?id=' . Slot::RALLY_POINT . '&tt=3&screen=combatSimulator&kid=' . $tile['id']
                     . '" class="a arrow">' . T("map", "Simulate raid") . '</a></td></tr>';
         } else {
             $oasis = $m->getOasisInfo($tile['id'], "kid, did, type, owner");
@@ -470,7 +477,7 @@ class tileDetails extends AjaxBase
                     $resources = array_sum($bounty) - (int) $bounty[4];
                     $style = $resources == $bounty[4] ? 'full' : ($resources == 0 ? 'empty' : 'half');
                     if (Session::getInstance()->hasPlus()) {
-                        $reports .= '<a class="reportInfoIcon" href="/build.php?id=39&amp;tt=2&amp;bid=' . $row['id'] . '"><img title="' . $this->number_format($resources) . '/' . $this->number_format($bounty[4]) . '" alt="' . $this->number_format($resources) . '/' . $this->number_format($bounty[4]) . '" src="img/spacer.gif" class="reportInfo carry ' . $style . '" /></a>';
+                        $reports .= '<a class="reportInfoIcon" href="/build.php?id=' . Slot::RALLY_POINT . '&amp;tt=2&amp;bid=' . $row['id'] . '"><img title="' . $this->number_format($resources) . '/' . $this->number_format($bounty[4]) . '" alt="' . $this->number_format($resources) . '/' . $this->number_format($bounty[4]) . '" src="img/spacer.gif" class="reportInfo carry ' . $style . '" /></a>';
                     } else {
                         $reports .= '<a class="reportInfoIcon" href="#"><img title="' . $this->number_format($resources) . '/' . $this->number_format($bounty[4]) . '" alt="' . $this->number_format($resources) . '/' . $this->number_format($bounty[4]) . '" src="img/spacer.gif" class="reportInfo carry ' . $style . '" /></a>';
                     }
@@ -516,7 +523,7 @@ class tileDetails extends AjaxBase
         if (empty($reports)) {
             $reports = '<tr><td>' . T("map", "No information<br>available!") . '</td></tr>';
         }
-        $cache->add($key, $reports, 1800);
+        $cache->add($key, $reports, 30 * Time::MINUTE);
         return $reports;
     }
 

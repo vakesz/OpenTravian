@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Game\SocialAuth;
 
+use Core\Time;
+
 /**
  * Provider-independent authorization-code flow. All collaborators are injected
  * so the protocol logic is testable with mocked HTTP, JWKS and storage.
  */
 final class OAuthFlow
 {
-    private const STATE_TTL = 600;
+    private const STATE_TTL = 10 * Time::MINUTE;
 
     /**
      * @param \Closure():int $clock

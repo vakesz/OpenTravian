@@ -25,7 +25,7 @@ if ($controller === false || $buy === false) {
 foreach ([
     "static fn (int \$target): string => '/build.php?' . http_build_query(",
     '$href = "/build.php?id="',
-    'href="/build.php?gid=17',
+    'href="/build.php?gid=\' . Gid::MARKETPLACE',
 ] as $needle) {
     if (!str_contains($controller, $needle)) {
         failMarketplaceRootAbsoluteUrlsContract("Marketplace controller query destination must be root-absolute: {$needle}");

@@ -7,6 +7,9 @@ use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Game\CatapultTargets;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
+use Game\Unit;
 use Model\ArtefactsModel;
 use Model\WonderOfTheWorldModel;
 
@@ -31,7 +34,7 @@ class RallyPointHTML
             $HTML .= '<a href="/karte.php?d=' . $row['owner']['kid'] . '">' . $row['owner']['villageName'] . '</a>';
         }
         $size = sizeof($row['units']);
-        if (isset($row['units'][98]) && $noHeroWhenZero && $row['units'][98] == 0) {
+        if (isset($row['units'][Unit::HERO_ID]) && $noHeroWhenZero && $row['units'][Unit::HERO_ID] == 0) {
             $size--;
         }
         $HTML .= '</td>';
@@ -59,7 +62,7 @@ class RallyPointHTML
         $i = 1;
         $isset = isset($settings['unitsRowId']) && $settings['unitsRowId'] == "unitRowAtTown";
         foreach ($row['units'] as $u => $value) {
-            if ($i == 11 || $i == 98) {
+            if ($i == Unit::HERO || $i == Unit::HERO_ID) {
                 if ($value == 0 && $noHeroWhenZero) continue;
                 $u = "hero";
             }
@@ -75,7 +78,7 @@ class RallyPointHTML
         $HTML .= '<tbody class="units last"><tr><th>' . T("RallyPoint", "troops") . '</th>';
         $i = 1;
         foreach ($row['units'] as $value) {
-            if ($i == 11 || $i == 98) {
+            if ($i == Unit::HERO || $i == Unit::HERO_ID) {
                 if ($value == 0 && $noHeroWhenZero) continue;
             }
             $none = "";
@@ -238,7 +241,7 @@ class RallyPointHTML
                     $HTML .= '<div class="sup"><div class="inlineIconList supplyWrapper"><div class="inlineIcon resources"><span class="value ">' . $this->number_format($info['consumption']) . '</span><i class="r4"></i></div></div> <span>' . T("Global", "General.perHour") . '</span></div>';
                     if (isset($info['withdraw']) && $info['withdraw']) {
                         $HTML .= '<div class="sback">';
-                        $HTML .= '<a class="arrow" href="/build.php?id=39&amp;tt=2&amp;d=' . $info['taskId'] . '" title="' . T("RallyPoint",
+                        $HTML .= '<a class="arrow" href="/build.php?id=' . Slot::RALLY_POINT . '&amp;tt=2&amp;d=' . $info['taskId'] . '" title="' . T("RallyPoint",
                                 "withdraw") . '">' . T("RallyPoint", "withdraw") . '</a>';
                         $HTML .= '</div>';
                     } else if (isset($info['kill']) && $info['kill']) {
@@ -247,7 +250,7 @@ class RallyPointHTML
                         $kill = T("RallyPoint", "kill");
                         $query = "/build.php?" . http_build_query([
                                 'tt' => 1,
-                                "gid" => 16,
+                                "gid" => Gid::RALLY_POINT,
                                 "kill" => $info['taskId'],
                                 Session::getCheckerName() => Session::getInstance()->getChecker(),
                                 "page" => isset($_REQUEST['page']) ? $_REQUEST['page'] : 1,
@@ -266,12 +269,12 @@ HTML;
                         $HTML .= '</div>';
                     } else if (isset($info['free']) && $info['free']) {
                         $HTML .= '<div class="sback">';
-                        $HTML .= '<a class="arrow" href="/build.php?id=39&amp;tt=2&amp;free=' . $info['taskId'] . '&' . (Session::getCheckerForUrl()) . '" title="' . T("RallyPoint",
+                        $HTML .= '<a class="arrow" href="/build.php?id=' . Slot::RALLY_POINT . '&amp;tt=2&amp;free=' . $info['taskId'] . '&' . (Session::getCheckerForUrl()) . '" title="' . T("RallyPoint",
                                 "free") . '">' . T("RallyPoint", "free") . '</a>';
                         $HTML .= '</div>';
                     } else if (isset($info['back']) && $info['back']) {
                         $HTML .= '<div class="sback">';
-                        $HTML .= '<a class="arrow" href="/build.php?id=39&amp;tt=2&amp;d=' . $info['taskId'] . '" title="' . T("RallyPoint",
+                        $HTML .= '<a class="arrow" href="/build.php?id=' . Slot::RALLY_POINT . '&amp;tt=2&amp;d=' . $info['taskId'] . '" title="' . T("RallyPoint",
                                 "back") . '">' . T("RallyPoint", "back") . '</a>';
                         $HTML .= '</div>';
                     }
@@ -323,7 +326,7 @@ HTML;
                     $HTML .= '&nbsp;' . T("Global", "General.hour") . '.</div>';
                     if (isset($info['abort']) && $info['abort']) {//need fix later!
                         $HTML .= '<div class="abort"><button type="button" class="icon " title="' . T("Global",
-                                "General.cancel") . '" onclick="window.location.href = \'/build.php?gid=16&amp;tt=1&amp;a=4&amp;t=' . $info['taskId'] . '&amp;tt=1&amp;' . Session::getCheckerForUrl() . '\'; return false;"><img src="img/spacer.gif" class="del" alt="' . T("Global",
+                                "General.cancel") . '" onclick="window.location.href = \'/build.php?gid=' . Gid::RALLY_POINT . '&amp;tt=1&amp;a=4&amp;t=' . $info['taskId'] . '&amp;tt=1&amp;' . Session::getCheckerForUrl() . '\'; return false;"><img src="img/spacer.gif" class="del" alt="' . T("Global",
                                 "General.cancel") . '" /></button></div>';
                     }
                     // <div class="at"><span>at&nbsp;HH:MM:SS</span><span> </span></div>

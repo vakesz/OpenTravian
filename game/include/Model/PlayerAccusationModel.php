@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Core\Time;
 
 /** Player reports to the operator: filed from a profile, reviewed in the admin panel. */
 final class PlayerAccusationModel
@@ -20,7 +21,7 @@ final class PlayerAccusationModel
     {
         $filed = (int) DB::getInstance()->fetchScalar(
             'SELECT COUNT(id) FROM player_accusation WHERE reporter_uid=? AND time > ?',
-            [$reporter, time() - 86400]
+            [$reporter, time() - Time::DAY]
         );
 
         return max(0, self::MAX_PER_DAY - $filed);

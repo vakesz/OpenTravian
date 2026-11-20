@@ -6,6 +6,8 @@ namespace Game;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Model\MovementsModel;
 
 /**
  * Single source for Harbor ships (gid 49).
@@ -29,7 +31,7 @@ final class Ships
     public const TRAINING_NR_OFFSET = 100;
 
     /** Harbor building gid. */
-    public const HARBOR_GID = 49;
+    public const HARBOR_GID = Gid::HARBOR;
 
     /** Ships allowed by Harbor level 1..20 (Knowledge Base building data). */
     private const CAP_BY_LEVEL = [
@@ -120,7 +122,7 @@ final class Ships
      */
     public static function deepWaterSpeed(int $type, int $tribe): float
     {
-        $speed = ($type === self::RAID && $tribe === 9) ? self::VIKING_RAID_SPEED : self::DEEP_WATER_SPEED;
+        $speed = ($type === self::RAID && $tribe === Tribes::VIKINGS) ? self::VIKING_RAID_SPEED : self::DEEP_WATER_SPEED;
         return $speed * ($type === self::TRADE ? getGameSpeed() : Config::getProperty('game', 'movement_speed_increase'));
     }
 
@@ -151,8 +153,8 @@ final class Ships
     {
         $db = DB::getInstance();
 
-        return (int)$db->fetchScalar("SELECT COUNT(id) FROM movement WHERE ship>0 AND ((mode=0 AND kid=?) OR (mode=1 AND to_kid=?))", [$kid, $kid])
-            + (int)$db->fetchScalar("SELECT SUM(ships) FROM send WHERE ships>0 AND ((mode=0 AND kid=?) OR (mode=1 AND to_kid=?))", [$kid, $kid]);
+        return (int)$db->fetchScalar("SELECT COUNT(id) FROM movement WHERE ship>0 AND ((mode=" . MovementsModel::MODE_GOING . " AND kid=?) OR (mode=" . MovementsModel::MODE_RETURN . " AND to_kid=?))", [$kid, $kid])
+            + (int)$db->fetchScalar("SELECT SUM(ships) FROM send WHERE ships>0 AND ((mode=" . MovementsModel::MODE_GOING . " AND kid=?) OR (mode=" . MovementsModel::MODE_RETURN . " AND to_kid=?))", [$kid, $kid]);
     }
 
     /** Ships the Harbor may still build: its cap minus every ship owned, away or queued. */
@@ -167,7 +169,7 @@ final class Ships
     public static function hasHarbor(int $kid): bool
     {
         $conditions = [];
-        for ($field = 19; $field <= 40; ++$field) {
+        for ($field = Slot::FIRST_BUILDING; $field <= Slot::LAST; ++$field) {
             $conditions[] = "(f{$field}t=" . self::HARBOR_GID . " AND f{$field}>0)";
         }
 
@@ -192,9 +194,9 @@ final class Ships
         if (!self::isShip($type)) {
             return;
         }
-        if ((int)$row['mode'] === 1) {
+        if ((int)$row['mode'] === MovementsModel::MODE_RETURN) {
             $home = (int)$row['to_kid'];
-        } elseif (in_array((int)$row['attack_type'], [2, 5], true)) {
+        } elseif (in_array((int)$row['attack_type'], [MovementsModel::ATTACKTYPE_REINFORCEMENT, MovementsModel::ATTACKTYPE_SETTLERS], true)) {
             $home = (int)$row['kid'];
         } else {
             return;
@@ -217,7 +219,7 @@ final class Ships
     public static function pickForArmy(int $kid, int $attackType, int $unitCount): int
     {
         $home = self::homeShips($kid);
-        $order = $attackType === 4 ? [self::RAID, self::DECOY, self::WAR] : [self::DECOY, self::WAR];
+        $order = $attackType === MovementsModel::ATTACKTYPE_RAID ? [self::RAID, self::DECOY, self::WAR] : [self::DECOY, self::WAR];
         foreach ($order as $type) {
             if ($home[$type] > 0 && $unitCount <= self::unitCapacity($type)) {
                 return $type;
@@ -255,12 +257,12 @@ final class Ships
     {
         $landSpeed = Formulas::merchantSpeed($tribe);
         if (!$byShip) {
-            return Formulas::travelTimeSeconds(Formulas::getDistance($fromKid, $toKid) / $landSpeed * 3600);
+            return Formulas::travelTimeSeconds(Formulas::getDistance($fromKid, $toKid) / $landSpeed * Time::HOUR);
         }
         $distance = Formulas::getFlatDistance($fromKid, $toKid);
         $deep = $distance * \Game\Map\ShipRoute::deepFraction($fromKid, $toKid);
 
-        return Formulas::travelTimeSeconds($deep / self::deepWaterSpeed(self::TRADE, $tribe) * 3600 + ($distance - $deep) / $landSpeed * 3600);
+        return Formulas::travelTimeSeconds($deep / self::deepWaterSpeed(self::TRADE, $tribe) * Time::HOUR + ($distance - $deep) / $landSpeed * Time::HOUR);
     }
 
     /** Docks trade ships that finished a delivery; they are lost when their Harbor is gone. */

@@ -7,6 +7,7 @@ namespace Core\Helper;
 use Core\Caching\Caching;
 use Core\Config;
 use Core\Session;
+use Core\Time;
 use function json_decode;
 use function json_encode;
 
@@ -186,7 +187,7 @@ class PreferencesHelper
                     }
                 }
         }
-        Caching::getInstance()->set("preferences:" . self::getCacheKey(), $session_cookie_value, 86400);
+        Caching::getInstance()->set("preferences:" . self::getCacheKey(), $session_cookie_value, Time::DAY);
     }
 
     /**
@@ -205,7 +206,7 @@ class PreferencesHelper
             } else {
                 self::reSetT3E();
                 self::$currentPreferences = self::$preferences;
-                Caching::getInstance()->set("preferences:" . self::getCacheKey(), self::$currentPreferences, 3 * 86400);
+                Caching::getInstance()->set("preferences:" . self::getCacheKey(), self::$currentPreferences, 3 * Time::DAY);
             }
         }
         return self::$currentPreferences;
@@ -223,7 +224,7 @@ class PreferencesHelper
         if ($int > 9999999 || $int < 1111111) {
             $int = mt_rand(1111111, 9999999);
             $_COOKIE[$cookie] = (string) $int;
-            setcookie($cookie, (string) $int, time() + 3 * 86400);
+            setcookie($cookie, (string) $int, time() + 3 * Time::DAY);
         }
 
         return $int;
@@ -237,7 +238,7 @@ class PreferencesHelper
     public static function reSetT3E(): void
     {
         Caching::getInstance()->delete("preferences:" . self::getCacheKey());
-        Caching::getInstance()->set("preferences:" . self::getCacheKey(), self::$preferences, 3 * 86400);
+        Caching::getInstance()->set("preferences:" . self::getCacheKey(), self::$preferences, 3 * Time::DAY);
     }
 
     public static function isJSON(mixed $string): bool

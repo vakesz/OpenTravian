@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game;
 
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Wounded troops (Hospital gid 46, Asclepeion gid 48).
@@ -25,8 +26,8 @@ use Core\Database\DB;
  */
 final class Wounded
 {
-    public const HOSPITAL = 46;
-    public const ASCLEPEION = 48;
+    public const HOSPITAL = Gid::HOSPITAL;
+    public const ASCLEPEION = Gid::ASCLEPEION;
     public const HOSPITAL_SHARE = 0.4;
     public const ASCLEPEION_SHARE = 0.6;
     public const DECAY_PER_DAY = 0.9;
@@ -40,18 +41,18 @@ final class Wounded
     /** Which building a tribe heals in. */
     public static function buildingFor(int $tribe): int
     {
-        return $tribe === 8 ? self::ASCLEPEION : self::HOSPITAL;
+        return $tribe === Tribes::SPARTANS ? self::ASCLEPEION : self::HOSPITAL;
     }
 
     /** Unit numbers (1-10) that can be wounded: not siege (7, 8), administrators (9) or settlers (10). */
     public static function canBeWounded(int $tribe, int $nr): bool
     {
-        return !in_array($tribe, [4, 5], true) && $nr >= 1 && $nr <= 6;
+        return !in_array($tribe, [Tribes::NATURE, Tribes::NATARS], true) && $nr >= 1 && $nr <= 6;
     }
 
     public static function decayed(float $amount, int $seconds): float
     {
-        return $amount * pow(self::DECAY_PER_DAY, max(0, $seconds) / 86400);
+        return $amount * pow(self::DECAY_PER_DAY, max(0, $seconds) / Time::DAY);
     }
 
     /** Wounded produced for a village's losses of one unit type. */
@@ -70,7 +71,7 @@ final class Wounded
         if (!$row) {
             return 0;
         }
-        for ($field = 19; $field <= 40; ++$field) {
+        for ($field = Slot::FIRST_BUILDING; $field <= Slot::LAST; ++$field) {
             if ((int)$row['f' . $field . 't'] === $building) {
                 $level = max($level, (int)$row['f' . $field]);
             }
@@ -87,7 +88,7 @@ final class Wounded
      */
     public static function record(int $homeKid, int $tribe, array $dead): array
     {
-        if ($homeKid <= 0 || in_array($tribe, [4, 5], true)) {
+        if ($homeKid <= 0 || in_array($tribe, [Tribes::NATURE, Tribes::NATARS], true)) {
             return [];
         }
         if (self::buildingLevel($homeKid, $tribe) <= 0) {

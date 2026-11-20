@@ -53,7 +53,7 @@ namespace {
     $summary = strpos($unitsAction, '$unitsSummary += $num;');
     $unitMapping = strpos($unitsAction, 'nrToUnitId($i, $units[\'race\'])');
     if (!str_contains($model, 'array_filter_units($units)')
-        || !str_contains($unitFilter, 'for ($i = 1; $i <= 11; ++$i)')
+        || !str_contains($unitFilter, 'for ($i = 1; $i <= \\Game\\Unit::LAST; ++$i)')
         || $summary === false
         || $unitMapping === false
         || $summary > $unitMapping) {

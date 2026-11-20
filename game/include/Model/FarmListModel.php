@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Database\DB;
 use Game\Formulas;
+use Game\UserId;
 use mysqli_result;
 
 /**
@@ -19,7 +20,7 @@ class FarmListModel
     public function addUniqueFarms(int $uid, int $kid, int $count): int
     {
         $db = DB::getInstance();
-        $farms = $db->query("SELECT v.* FROM vdata v WHERE v.owner=1 AND v.isWW=0 AND (SELECT COUNT(a.id) FROM artefacts a WHERE a.kid=v.kid)=0 AND (SELECT COUNT(r.id) FROM raidlist r WHERE r.kid=v.kid AND (SELECT f.owner FROM farmlist f WHERE f.id=r.lid AND f.kid=$kid)=$uid)=0 LIMIT $count");
+        $farms = $db->query("SELECT v.* FROM vdata v WHERE v.owner=" . UserId::NATARS . " AND v.isWW=0 AND (SELECT COUNT(a.id) FROM artefacts a WHERE a.kid=v.kid)=0 AND (SELECT COUNT(r.id) FROM raidlist r WHERE r.kid=v.kid AND (SELECT f.owner FROM farmlist f WHERE f.id=r.lid AND f.kid=$kid)=$uid)=0 LIMIT $count");
         if (!$farms instanceof mysqli_result || !$farms->num_rows) {
             return 0;
         }

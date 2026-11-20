@@ -65,6 +65,18 @@ if (!str_contains($router, '#^/messages/(inbox|write|sent|archive|notes|ignore)/
 }
 
 // Helpers emit the clean shapes.
+require_once $root . '/game/include/Core/Time.php';
+require_once $root . '/game/include/Game/UserId.php';
+require_once $root . '/game/include/Game/AccessLevel.php';
+require_once $root . '/game/include/Game/Slot.php';
+require_once $root . '/game/include/Game/ResearchMode.php';
+require_once $root . '/game/include/Game/Conquest/CaptureResult.php';
+require_once $root . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Unit.php';
+require_once $root . '/game/include/Game/Tribes.php';
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
+require_once $root . '/game/include/Game/Hero/ItemType.php';
 require_once $root . '/game/include/functions.general.php';
 $expected = [
     profileUrl(2874) => '/profile/2874',

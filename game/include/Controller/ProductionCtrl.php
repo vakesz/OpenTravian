@@ -13,10 +13,13 @@ use Core\Database\DB;
 use Core\Session;
 use Core\Village;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\SessionHero;
+use Game\Tribes;
 use Core\Locale;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
+use Game\Slot;
 
 class ProductionCtrl extends GameCtrl
 {
@@ -41,7 +44,7 @@ class ProductionCtrl extends GameCtrl
     /** @var array<mixed> */
     public  $heroProd         = [0, 0, 0, 0];
     /** @var array<mixed> */
-    public  $boost            = [1 => [5], 2 => [6], 3 => [7], 4 => [8, 9],];
+    public  $boost            = [1 => [Gid::SAWMILL], 2 => [Gid::BRICKYARD], 3 => [Gid::IRON_FOUNDRY], 4 => [Gid::GRAIN_MILL, Gid::BAKERY],];
 
     /**
      * Canonical production overview tab slug for stock-bar and menu links.
@@ -79,9 +82,9 @@ class ProductionCtrl extends GameCtrl
     public function __construct()
     {
         parent::__construct();
-        if (Session::getInstance()->getRace() == 6) {
+        if (Session::getInstance()->getRace() == Tribes::EGYPTIANS) {
             $this->bonusBuildings[45] = 0;
-            $this->boost = [1 => [5, 45], 2 => [6, 45], 3 => [7, 45], 4 => [8, 9, 45]];
+            $this->boost = [1 => [Gid::SAWMILL, Gid::WATERWORKS], 2 => [Gid::BRICKYARD, Gid::WATERWORKS], 3 => [Gid::IRON_FOUNDRY, Gid::WATERWORKS], 4 => [Gid::GRAIN_MILL, Gid::BAKERY, Gid::WATERWORKS]];
         }
         $this->tabIndex = self::resolveTabIndex($_GET['t'] ?? null);
         $this->view = new GameView();
@@ -135,20 +138,20 @@ class ProductionCtrl extends GameCtrl
     {
         $db = DB::getInstance();
         $village = Village::getInstance();
-        for ($i = 1; $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_BUILDING; ++$i) {
 
             $field = $village->getField($i);
 
-            if (!$field['level'] && $i > 18) {
+            if (!$field['level'] && $i > Slot::LAST_FIELD) {
                 continue;
             }
-            if ($i <= 18 && $field['item_id'] == $this->tabIndex) {
+            if ($i <= Slot::LAST_FIELD && $field['item_id'] == $this->tabIndex) {
                 $this->productionFields[] = [
                     "item_id" => $field['item_id'],
                     "level" => $field['level'],
                     "value" => Formulas::fieldProduction($field['level']),
                 ];
-            } else if (($field['item_id'] <= 9 || $field['item_id'] == 45) && in_array($field['item_id'], $this->boost[$this->tabIndex])) {
+            } else if (($field['item_id'] <= Gid::BAKERY || $field['item_id'] == Gid::WATERWORKS) && in_array($field['item_id'], $this->boost[$this->tabIndex])) {
                 $this->bonusBuildings[$field['item_id']] = $field['level'];
             }
         }

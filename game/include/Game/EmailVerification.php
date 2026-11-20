@@ -7,6 +7,7 @@ use Core\Database\DB;
 use Core\Helper\Mailer;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use resources\View\PHPBatchView;
 
 class EmailVerification
@@ -33,7 +34,7 @@ class EmailVerification
             Session::getInstance()->setValidationStatus(false);
             return false;
         }
-        $cache->set($key, $cache->exists($key) ? ($cache->get($key) + 1) : 1, 3600);
+        $cache->set($key, $cache->exists($key) ? ($cache->get($key) + 1) : 1, Time::HOUR);
         $params = [
             'playerName' => Session::getInstance()->getName(),
             'email' => $row['email'],

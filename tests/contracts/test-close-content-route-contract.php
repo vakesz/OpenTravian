@@ -44,7 +44,7 @@ foreach ([
 }
 if (!str_contains(
     $build,
-    '$this->selectedBuildingIndex <= 18 || $this->selectedBuildingIndex == 39 ? "build perspectiveResources" : "build perspectiveBuildings"'
+    '$this->selectedBuildingIndex <= Slot::LAST_FIELD || $this->selectedBuildingIndex == Slot::RALLY_POINT ? "build perspectiveResources" : "build perspectiveBuildings"'
 )) {
     failCloseContentRoute('Build slots must continue to explicitly identify their resource/building perspective.');
 }

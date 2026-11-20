@@ -6,7 +6,10 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
+use Game\UserId;
 use Game\WorldSpeedProfile;
 
 use mysqli_result;
@@ -57,11 +60,11 @@ class AdventureModel
     public function checkForNewAdventures(): void
     {
         $db = DB::getInstance();
-        $interval = 1 * 3600;
+        $interval = 1 * Time::HOUR;
         $now = time();
         $find = $db->query(
             'SELECT id, total_adventures, last_adventure_time, signupTime FROM users'
-            . ' WHERE id>1 AND access=1 AND last_adventure_time <= ' . ($now - $interval)
+            . ' WHERE id>' . UserId::NATARS . ' AND access=' . AccessLevel::PLAYER . ' AND last_adventure_time <= ' . ($now - $interval)
             . ' ORDER BY last_adventure_time ASC LIMIT 100'
         );
         while ($find && ($row = $find->fetch_assoc())) {
@@ -102,7 +105,7 @@ class AdventureModel
             $previous = isset($intervals[$i - 1]['time']) ? $intervals[$i - 1]['time'] : 0;
             if ($seconds_past > $previous) {
                 $duration = $seconds_past - $previous;
-                $days = $duration / 86400;
+                $days = $duration / Time::DAY;
                 $adventures += $days * $intervals[$i]['rate'];
                 $seconds_past -= $duration;
             }
@@ -122,10 +125,10 @@ class AdventureModel
         $speed = max(1, (int)getGameSpeed());
         $scale = $speed * WorldSpeedProfile::adventureSpawnMultiplier($speed);
         return [
-            1 => ['time' => 3 * 86400 / $scale, 'rate' => 3 * $scale],
-            2 => ['time' => 16 * 86400 / $scale, 'rate' => 2 * $scale],
-            3 => ['time' => 63 * 86400 / $scale, 'rate' => 1.5 * $scale],
-            4 => ['time' => 1000 * 86400, 'rate' => 1 * $scale],
+            1 => ['time' => 3 * Time::DAY / $scale, 'rate' => 3 * $scale],
+            2 => ['time' => 16 * Time::DAY / $scale, 'rate' => 2 * $scale],
+            3 => ['time' => 63 * Time::DAY / $scale, 'rate' => 1.5 * $scale],
+            4 => ['time' => 1000 * Time::DAY, 'rate' => 1 * $scale],
         ];
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\Mail;
 
 use Core\Database\GlobalDB;
+use Core\Time;
 use Game\SmtpConfig;
 
 /**
@@ -18,7 +19,7 @@ final class QueueWorker
     private const LEASE_SECONDS = 90;
     private const MAX_ATTEMPTS = 8;
     private const RETRY_BASE_SECONDS = 30;
-    private const RETRY_MAX_SECONDS = 3600;
+    private const RETRY_MAX_SECONDS = Time::HOUR;
 
     /** The last blocked-state message logged; it is logged again only after the state changes or recovers. */
     private ?string $lastWarning = null;

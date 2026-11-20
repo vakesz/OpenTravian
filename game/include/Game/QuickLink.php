@@ -18,12 +18,12 @@ use Model\TrainingModel;
 class QuickLink
 {
     private const TRAINING_GIDS = [
-        'BarracksManagement' => 19,
-        'GreatBarracksManagement' => 29,
-        'StableManagement' => 20,
-        'GreatStableManagement' => 30,
-        'WorkshopManagement' => 21,
-        'TrapperManagement' => 36,
+        'BarracksManagement' => Gid::BARRACKS,
+        'GreatBarracksManagement' => Gid::GREAT_BARRACKS,
+        'StableManagement' => Gid::STABLE,
+        'GreatStableManagement' => Gid::GREAT_STABLE,
+        'WorkshopManagement' => Gid::WORKSHOP,
+        'TrapperManagement' => Gid::TRAPPER,
     ];
 
     private const FIXED_TITLES = [
@@ -71,7 +71,7 @@ class QuickLink
         } elseif ($type === 'ExpansionTrain') {
             $text = self::trainingText($kid, $gid);
         } elseif ($type === 'BlacksmithManagement') {
-            $end = (int) DB::getInstance()->fetchScalar("SELECT MAX(end_time) FROM research WHERE kid=$kid AND mode=0");
+            $end = (int) DB::getInstance()->fetchScalar("SELECT MAX(end_time) FROM research WHERE kid=$kid AND mode=" . ResearchMode::SMITHY);
             $text = $end > time()
                 ? sprintf(T('quickLinks', 'upgradingTime'), secondsToString($end - time()))
                 : T('quickLinks', 'notUpgrading');
@@ -104,8 +104,8 @@ class QuickLink
         if ($session->getAllianceId() > 0) {
             $allianceBonus = AllianceBonus::getTradersBonus($session->getAllianceId(), $session->getAllianceJoinTime());
         }
-        $cap = Formulas::merchantCAP($session->getRace(), max($village->getTypeLevel(28)), $allianceBonus);
-        $total = max($village->getTypeLevel(17));
+        $cap = Formulas::merchantCAP($session->getRace(), max($village->getTypeLevel(Gid::TRADE_OFFICE)), $allianceBonus);
+        $total = max($village->getTypeLevel(Gid::MARKETPLACE));
         $market = new MarketModel();
         $kid = $village->getKid();
         $free = $total - $market->getOnTheWayMerchantsCount($kid, $cap) - $market->getOfferingMerchantsCount($kid, $cap);
@@ -126,18 +126,18 @@ class QuickLink
     private static function gidFor(string $type, Village $village): int
     {
         $map = self::TRAINING_GIDS + [
-            'BlacksmithManagement' => 13,
-            'RallyPointFarmList' => 16,
-            'RallyPointOverview' => 16,
-            'RallyPointSendTroops' => 16,
-            'MarketplaceBuy' => 17,
-            'MarketplaceSendResources' => 17,
-            'MarketplaceTradeRoutes' => 17,
-            'TownHallCelebration' => 24,
-            'HerosMansionManagement' => 37,
+            'BlacksmithManagement' => Gid::SMITHY,
+            'RallyPointFarmList' => Gid::RALLY_POINT,
+            'RallyPointOverview' => Gid::RALLY_POINT,
+            'RallyPointSendTroops' => Gid::RALLY_POINT,
+            'MarketplaceBuy' => Gid::MARKETPLACE,
+            'MarketplaceSendResources' => Gid::MARKETPLACE,
+            'MarketplaceTradeRoutes' => Gid::MARKETPLACE,
+            'TownHallCelebration' => Gid::TOWN_HALL,
+            'HerosMansionManagement' => Gid::HEROS_MANSION,
         ];
         if ($type === 'HospitalManagement') {
-            foreach ([46, 48] as $candidate) {
+            foreach ([Gid::HOSPITAL, Gid::ASCLEPEION] as $candidate) {
                 if ((int) $village->findBuildingByGid($candidate) > 0) {
                     return $candidate;
                 }
@@ -146,7 +146,7 @@ class QuickLink
             return 0;
         }
         if ($type === 'ExpansionTrain') {
-            foreach ([25, 26, 44] as $candidate) {
+            foreach (Gid::EXPANSION as $candidate) {
                 if ((int) $village->findBuildingByGid($candidate) > 0) {
                     return $candidate;
                 }

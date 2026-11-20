@@ -7,6 +7,7 @@ namespace Model;
 use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Database\GlobalDB;
+use Core\Time;
 use Exception;
 
 /**
@@ -70,7 +71,7 @@ class InfoBoxModel
             . $this->excludeIds('id', $ignore_ids) . ' ORDER BY type=14 DESC, type=16 DESC, showTo ASC, showFrom DESC'
         );
         $data = $result instanceof \mysqli_result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-        $cache->add("InfoBox:Private:$uid", $data, 60);
+        $cache->add("InfoBox:Private:$uid", $data, Time::MINUTE);
 
         return $data;
     }
@@ -89,7 +90,7 @@ class InfoBoxModel
             $ids[] = (int) $row['infoId'];
         }
         $return = implode(',', $ids);
-        $memcache->set("infoBox:deleted:$uid", $return, 86400);
+        $memcache->set("infoBox:deleted:$uid", $return, Time::DAY);
 
         return $return;
     }
@@ -117,7 +118,7 @@ class InfoBoxModel
         }
         $db = DB::getInstance();
         $return = trim((string)$db->fetchScalar('SELECT GROUP_CONCAT(infoId) FROM infobox_read WHERE uid=?', [$uid]));
-        $memcache->set("infoBox:read:$uid", $return, 86400);
+        $memcache->set("infoBox:read:$uid", $return, Time::DAY);
 
         return $return;
     }
@@ -237,7 +238,7 @@ class InfoBoxModel
             return $_cache;
         }
         $data = GlobalDB::getInstance()->query('SELECT * FROM infobox WHERE showTo>' . time() . ' ORDER BY showTo DESC')->fetch_all(MYSQLI_ASSOC);
-        $cache->add('InfoBox:Public', $data, 1800);
+        $cache->add('InfoBox:Public', $data, 30 * Time::MINUTE);
 
         return $data;
     }

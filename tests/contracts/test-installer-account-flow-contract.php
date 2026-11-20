@@ -65,7 +65,7 @@ assertInstallerAccountFlow(
 );
 assertInstallerAccountFlow(
     str_contains($installer, 'Password::hash($multihunterPassword)')
-        && str_contains($installer, '$register->createBaseVillage(2, "Multihunter", 1, Formulas::xy2kid(1, 0));'),
+        && str_contains($installer, '$register->createBaseVillage(UserId::MULTIHUNTER, "Multihunter", Tribes::ROMANS, Formulas::xy2kid(1, 0));'),
     'The installer must retain its dedicated Multihunter account identity.'
 );
 

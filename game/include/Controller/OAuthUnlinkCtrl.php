@@ -8,6 +8,7 @@ use Core\Database\DBI;
 use Core\Helper\WebService;
 use Core\Security\Password;
 use Core\Session;
+use Core\Time;
 use Game\SocialAuth\LinkedIdentities;
 use Game\SocialAuth\Provider;
 use Game\SocialAuth\SocialAudit;
@@ -32,7 +33,7 @@ final class OAuthUnlinkCtrl extends GameCtrl
         $name = (string) $this->session->getName();
         $stored = DBI::getInstance()->fetchScalar('SELECT password FROM users WHERE id=?', [$userId], '');
         $given = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
-        if (!throttle_public_form('oauth-unlink', 10, 600) || !is_string($stored) || $given === '' || !Password::verify($given, $stored)) {
+        if (!throttle_public_form('oauth-unlink', 10, 10 * Time::MINUTE) || !is_string($stored) || $given === '' || !Password::verify($given, $stored)) {
             SocialAudit::record('unlink-refused', $userId, $name, $provider, 'password');
             $flash->setNotice('passwordWrong', $provider);
             $this->redirect(OAuthLinkCtrl::OPTIONS_URL);

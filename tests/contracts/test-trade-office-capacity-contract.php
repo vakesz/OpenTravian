@@ -9,7 +9,7 @@ $formulas = file_get_contents($root . '/game/include/Game/Formulas.php');
 
 if ($formulas === false
     || !str_contains($formulas, 'public static function TradeOfficeValue($race, $lvl)')
-    || !str_contains($formulas, 'return 100 + $lvl * ($race == 1 ? 20 : 10);')
+    || !str_contains($formulas, 'return 100 + $lvl * ($race == Tribes::ROMANS ? 20 : 10);')
     || !str_contains($formulas, 'self::TradeOfficeValue($race, $tradeOfficeLevel) / 100')
     || str_contains($formulas, '($bid18 * 10)')) {
     fwrite(STDERR, "Merchant capacity must apply the tribe-specific Trade Office bonus (Romans 20%/level, others 10%/level).\n");

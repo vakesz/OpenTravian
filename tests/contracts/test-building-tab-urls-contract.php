@@ -18,6 +18,18 @@ $fail = static function (string $message): void {
     exit(1);
 };
 
+require_once $root . '/Core/Time.php';
+require_once $root . '/Game/UserId.php';
+require_once $root . '/Game/AccessLevel.php';
+require_once $root . '/Game/Slot.php';
+require_once $root . '/Game/ResearchMode.php';
+require_once $root . '/Game/Conquest/CaptureResult.php';
+require_once $root . '/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/Game/Gid.php';
+require_once $root . '/Game/Unit.php';
+require_once $root . '/Game/Tribes.php';
+require_once $root . '/Game/Hero/ItemBtype.php';
+require_once $root . '/Game/Hero/ItemType.php';
 require_once $root . '/functions.general.php';
 
 if (buildTabUrl(39, 16, 'tt', 99) !== '/build.php?id=39&gid=16&tt=99'

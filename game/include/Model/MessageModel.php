@@ -9,7 +9,9 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\Notification;
 use Core\Session;
+use Core\Time;
 use Game\Mail\EventMail;
+use Game\UserId;
 use mysqli_result;
 
 use function clean_string_from_white;
@@ -42,7 +44,7 @@ class MessageModel
 
     public function ignorePlayer(int $uid, int $ignore_id): bool
     {
-        if ($ignore_id <= 2 || $uid === $ignore_id) {
+        if ($ignore_id <= UserId::LAST_SYSTEM || $uid === $ignore_id) {
             return false;
         }
         if ($this->isPlayerIgnored($uid, $ignore_id) || !$this->checkIgnoreListLimit($uid)) {
@@ -131,7 +133,7 @@ class MessageModel
                     ' AND autoType=0 AND reported=0 FOR UPDATE'
             );
             $reportedUid = $message instanceof mysqli_result ? (int) ($message->fetch_assoc()['uid'] ?? 0) : 0;
-            if ($reportedUid <= 2 || $reportedUid === $recipientId) {
+            if ($reportedUid <= UserId::LAST_SYSTEM || $reportedUid === $recipientId) {
                 throw new \DomainException('The message cannot be reported.');
             }
 
@@ -166,7 +168,7 @@ class MessageModel
      */
     public function getMessage(int $id, int $uid): array|false
     {
-        $query = $uid <= 2
+        $query = $uid <= UserId::LAST_SYSTEM
             ? "SELECT * FROM mdata WHERE id=$id"
             : "SELECT * FROM mdata WHERE (uid=$uid OR to_uid=$uid) AND id=$id";
 
@@ -241,20 +243,20 @@ class MessageModel
 
     public function checkLastMessage(int $uid, bool $banned, int|false $to_uid, string|int|float|null $subject, string|int|float|null $text): bool
     {
-        if ($to_uid !== false && $to_uid <= 2) {
+        if ($to_uid !== false && $to_uid <= UserId::LAST_SYSTEM) {
             return true;
         }
-        if ($uid <= 2) {
+        if ($uid <= UserId::LAST_SYSTEM) {
             return true;
         }
         $limit = $banned ? 5 : 15;
         $db = DB::getInstance();
-        $since = time() - 10 * 60;
+        $since = time() - 10 * Time::MINUTE;
         $result = (int) $db->fetchScalar(
-            "SELECT COUNT(id) FROM mdata WHERE uid=$uid AND to_uid>2 AND to_uid!=$uid AND isAlliance=0 AND time>=$since"
+            "SELECT COUNT(id) FROM mdata WHERE uid=$uid AND to_uid>" . UserId::LAST_SYSTEM . " AND to_uid!=$uid AND isAlliance=0 AND time>=$since"
         );
         $alliance = (int) $db->fetchScalar(
-            "SELECT COUNT(id) FROM mdata WHERE uid=$uid AND to_uid>2 AND to_uid!=$uid AND isAlliance=1 AND time>=$since"
+            "SELECT COUNT(id) FROM mdata WHERE uid=$uid AND to_uid>" . UserId::LAST_SYSTEM . " AND to_uid!=$uid AND isAlliance=1 AND time>=$since"
         );
         if ($result >= $limit || $alliance >= ($limit - $result) * 20) {
             return false;
@@ -262,7 +264,7 @@ class MessageModel
 
         return 2 >= (int) $db->fetchScalar(
             'SELECT COUNT(id) FROM mdata WHERE uid=? AND md5_checksum=? AND time >= ?',
-            [$uid, $this->getHash($subject, $text), time() - 600]
+            [$uid, $this->getHash($subject, $text), time() - 10 * Time::MINUTE]
         );
     }
 
@@ -339,8 +341,8 @@ class MessageModel
      */
     public function sendMessage(int $uid, int $to_uid, string|int|float|null $subject, string|int|float|null $text, int $autoType = 0, bool $isAlliance = false): int|string
     {
-        if ($to_uid === 0) {
-            $to_uid = 2;
+        if ($to_uid === UserId::SUPPORT) {
+            $to_uid = UserId::MULTIHUNTER;
         }
         $md5_checksum = $this->getHash($subject, $text);
         $db = DB::getInstance();
@@ -354,7 +356,7 @@ class MessageModel
         if ($autoType === 0 && !$isAlliance) {
             EventMail::newMessage($to_uid, $uid);
         }
-        if ($uid > 2 && $to_uid <= 2) {
+        if ($uid > UserId::LAST_SYSTEM && $to_uid <= UserId::LAST_SYSTEM) {
             $gameWorldUrl = rtrim((string) Config::getProperty('settings', 'gameWorldUrl'), '/');
             $link = '<a href="' . $gameWorldUrl . '/messages?id=' . $insertId . '">» Answer message</a>';
             $subjectLink = '<a href="' . $gameWorldUrl . '/messages?id=' . $insertId . '">' . htmlspecialchars($subject, ENT_QUOTES) . '</a>';

@@ -11,6 +11,9 @@ use Core\Helper\StringChecker;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
+use Game\AccessLevel;
+use Game\UserId;
 use Model\AllianceModel;
 use Model\InfoBoxModel;
 use Model\MessageModel;
@@ -211,7 +214,7 @@ class MessagesCtrl extends GameCtrl
                 $view->vars['reportable'] =
                     $view->vars['uid'] != Session::getInstance()->getPlayerId() &&
                     !$message['autoType'] &&
-                    $view->vars['uid'] > 2;
+                    $view->vars['uid'] > UserId::LAST_SYSTEM;
                 $view->vars['canReportSpam'] = Session::getInstance()->checkSitterPermission(
                     Session::SITTER_CAN_REMOVE_ARCHIVE_MESSAGES_OR_REPORTS
                 );
@@ -224,9 +227,9 @@ class MessagesCtrl extends GameCtrl
                 $view->vars['reported'] = $message['reported'];
                 $view->vars['goldClub'] = Session::getInstance()->hasGoldClub();
                 if (!$view->vars['isAllianceAutoType']) {
-                    if ($view->vars['uid'] == 0) {
+                    if ($view->vars['uid'] == UserId::SUPPORT) {
                         $view->vars['name'] = T('Messages', 'TG Support');
-                    } elseif ($view->vars['uid'] == 2) {
+                    } elseif ($view->vars['uid'] == UserId::MULTIHUNTER) {
                         $view->vars['name'] = '<u>' . $view->vars['name'] . '</u>';
                     }
                 }
@@ -236,7 +239,7 @@ class MessagesCtrl extends GameCtrl
                     !Session::getInstance()->isAdminInAnotherAccount()
                 ) {
                     if ($message['autoType'] == 3) {
-                        Quest::getInstance()->setQuestBitwise('world', 6, 1);
+                        Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_READ_MESSAGE, 1);
                     }
                     $m->setMessageAsViewed($message['id'], $message['to_uid']);
                 }
@@ -284,7 +287,7 @@ class MessagesCtrl extends GameCtrl
         $limit = 2;
         $count = $db->fetchScalar(
             'SELECT COUNT(id) FROM mdata WHERE viewed=0 AND time >= ' .
-                (time() - 2 * 3600) .
+                (time() - 2 * Time::HOUR) .
                 " AND to_uid=$toPlayerId AND uid=$fromPlayerId AND isAlliance=0"
         );
         if ($toPlayerId == 2 || $toPlayerId == 0) {
@@ -304,18 +307,18 @@ class MessagesCtrl extends GameCtrl
         $db = DB::getInstance();
         $count = $db->fetchScalar(
             'SELECT COUNT(id) FROM mdata WHERE viewed=0 AND time >= ' .
-                (time() - 2 * 3600) .
+                (time() - 2 * Time::HOUR) .
                 " AND uid=$fromPlayerId AND isAlliance=0"
         );
         if ($count >= mt_rand(6, 12)) {
             $this->redirect('/messages?spamDetected=true');
             $uid = Session::getInstance()->getPlayerId();
             $reason = 'Spam';
-            $time = 10 * 60;
+            $time = 10 * Time::MINUTE;
             $db = DB::getInstance();
             $exists = 0 < $db->fetchScalar("SELECT COUNT(id) FROM banQueue WHERE uid=$uid");
             if (!$exists) {
-                $db->query("UPDATE users SET access=0 WHERE id=$uid");
+                $db->query("UPDATE users SET access=" . AccessLevel::BANNED . " WHERE id=$uid");
                 if ($db->affectedRows()) {
                     $db->query(
                         "INSERT INTO `banQueue`(`uid`, `reason`, `time`, `end`) VALUES ($uid, '$reason', " .
@@ -332,7 +335,7 @@ class MessagesCtrl extends GameCtrl
                             ')'
                     );
                     $db->query("DELETE FROM multiaccount_users WHERE uid=$uid");
-                    (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * 86400);
+                    (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * Time::DAY);
                     Notification::notify('Spam blocked', 'Lots of unread messages for a player!');
                 }
             }
@@ -579,7 +582,7 @@ class MessagesCtrl extends GameCtrl
             if ($InadmissibleMessage) {
                 goto process;
             }
-            $banned = Session::getInstance()->data['access'] == 0 && Session::getInstance()->getPlayerId() > 2;
+            $banned = Session::getInstance()->data['access'] == AccessLevel::BANNED && Session::getInstance()->getPlayerId() > UserId::LAST_SYSTEM;
             $db = DB::getInstance();
             $redirect = false;
             foreach ($recipients as $recipient) {
@@ -628,7 +631,7 @@ class MessagesCtrl extends GameCtrl
                     case '[all]':
                         if (Session::getInstance()->isAdmin() && !Session::getInstance()->isAdminInAnotherAccount()) {
                             $db = DB::getInstance();
-                            $users = $db->query('SELECT id FROM users WHERE id > 2 AND access<>2');
+                            $users = $db->query('SELECT id FROM users WHERE id > ' . UserId::LAST_SYSTEM . ' AND access<>' . AccessLevel::ADMIN);
                             while ($row = $users->fetch_assoc()) {
                                 $m->sendMessage(
                                     Session::getInstance()->getPlayerId(),

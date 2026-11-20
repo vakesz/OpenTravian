@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Core\Time;
 use Game\Account\DeletionLock;
 use Game\ButtonPagination;
 use Controller\Ajax\favouriteTab;
@@ -19,6 +20,7 @@ use Game\Hero\AuctionSort;
 use Game\Hero\HeroItemTile;
 use Game\Hero\HeroItemTooltip;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
 use Game\Hero\SessionHero;
 use Model\AuctionModel;
 use Model\AutomationModel;
@@ -369,10 +371,10 @@ class HeroAuctionCtrl extends GameCtrl
         $prices = [];
         if ($history !== []) {
             $now = time();
-            $start = $now - 86400;
+            $start = $now - Time::DAY;
             $buckets = array_fill(0, 24, ['sum' => 0, 'count' => 0]);
             foreach ($history as $sale) {
-                $index = min(23, max(0, (int)floor(((int)$sale['time'] - $start) / 3600)));
+                $index = min(23, max(0, (int)floor(((int)$sale['time'] - $start) / Time::HOUR)));
                 $buckets[$index]['sum'] += (int)$sale['silver'];
                 ++$buckets[$index]['count'];
             }
@@ -414,7 +416,7 @@ class HeroAuctionCtrl extends GameCtrl
     /** Tier or consumable class plus the slot class the inventory shows for the item. */
     private function heroItemTileClasses(int $btype, string $slot): string
     {
-        return ($btype >= 7 ? 'consumable' : 'tier1') . ' neutral ' . HeroItems::tileSlot($btype, $slot);
+        return ($btype >= ItemBtype::FIRST_CONSUMABLE ? 'consumable' : 'tier1') . ' neutral ' . HeroItems::tileSlot($btype, $slot);
     }
 
     /** Hero item tiles carry their reference tooltip in the title attribute: an empty tip title and the markup as text. */
@@ -670,7 +672,7 @@ class HeroAuctionCtrl extends GameCtrl
         $item = (new HeroItems())->getHeroItemProperties((int)$row['btype'], (int)$row['type']);
         $name = htmlspecialchars((string)$item['name'], ENT_QUOTES, 'UTF-8');
         // A consumable shows its stack size after the name, as the reference does.
-        $quantityLabel = (int)$row['btype'] >= 7 ? ' (x' . (int)$row['num'] . ')' : '';
+        $quantityLabel = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE ? ' (x' . (int)$row['num'] . ')' : '';
         // The reference prints the start as day.month.year, hh:mm (for example 8.11.2026, 05:44).
         $startedAt = TimezoneHelper::date('j.n.Y, H:i', (int)($row['created'] ?? 0));
         // For the first five minutes the sale can be cancelled: the reference shows the cancel button and the time
@@ -701,7 +703,7 @@ class HeroAuctionCtrl extends GameCtrl
     {
         $item = (new HeroItems())->getHeroItemProperties((int)$row['btype'], (int)$row['type']);
         $itemSlot = htmlspecialchars((string)$item['slot'], ENT_QUOTES, 'UTF-8');
-        $consumable = (int)$row['btype'] >= 7;
+        $consumable = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE;
         $slotClasses = $this->heroItemTileClasses((int)$row['btype'], $itemSlot);
 
         return '<div class="heroItem ' . $slotClasses . ' heroItemV1" id="item_' . (int)$row['id']
@@ -736,9 +738,9 @@ class HeroAuctionCtrl extends GameCtrl
 
         return sprintf(
             '%02d:%02d:%02d',
-            intdiv($seconds, 3600),
-            intdiv($seconds % 3600, 60),
-            $seconds % 60
+            intdiv($seconds, Time::HOUR),
+            intdiv($seconds % Time::HOUR, Time::MINUTE),
+            $seconds % Time::MINUTE
         );
     }
 
@@ -771,17 +773,17 @@ HTML;
      */
     private function auctionItemMeta(int $btype, int $type): string
     {
-        if ($btype >= 7) {
+        if ($btype >= ItemBtype::FIRST_CONSUMABLE) {
             return 'Consumable';
         }
 
         $category = [
-            1 => 'Helmet',
-            2 => 'Armor',
-            3 => 'Weapon',
-            4 => 'Weapon',
-            5 => 'Boots',
-            6 => 'Horse',
+            ItemBtype::HELMET => 'Helmet',
+            ItemBtype::BODY => 'Armor',
+            ItemBtype::LEFT_HAND => 'Weapon',
+            ItemBtype::RIGHT_HAND => 'Weapon',
+            ItemBtype::SHOES => 'Boots',
+            ItemBtype::HORSE => 'Horse',
         ][$btype] ?? 'Item';
 
         return 'Tier ' . (($type - 1) % 3 + 1) . ' / ' . $category;
@@ -832,7 +834,6 @@ HTML;
             return;
         }
         $session = Session::getInstance();
-        $current_silver = $session->getAvailableSilver();
         $m = new AuctionModel();
         $db = DB::getInstance();
         if ($canTakePlaceInAuction && WebService::isPost() && isset($_REQUEST['a']) && Session::claimAction($_REQUEST['z'] ?? null)) {
@@ -843,58 +844,82 @@ HTML;
             } elseif ($session->isInVacationMode()) {
                 $this->redirect("/options/vacation");
             }
-            $auction = $m->getAuctionBySecureId($_REQUEST['a']);
-            $visibleAt = is_array($auction) ? (int) ($auction['visible'] ?? 0) : 0;
-            if ($auction === false || $auction['uid'] == $session->getPlayerId() || ($visibleAt > 0 && $visibleAt > time())) {
+            if (!$db->begin_transaction()) {
                 $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionNotFound") . '</div>';
-            } elseif ($auction['finish'] || $auction['time'] < time()) {
-                $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionFinished") . '</div>';
-            } elseif ($m->isBidLocked((int) $session->getPlayerId(), (int) $auction['id'])) {
-                $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
-            } else {
-                $quest = Quest::getInstance();
-                $quest->setQuestBitwise("battle", 9, 1);
-                if ($auction['activeUid'] == 0 || $auction['activeUid'] == $session->getPlayerId()) {
-                    $min = $auction['silver'];
-                } else {
-                    $min = $auction['silver'] + 1;
+                return;
+            }
+            try {
+                // Lock the bidder, then the auction, and work out the free silver from the locked rows, so two bids (or a
+                // bid and a silver exchange, which locks in the same order) cannot commit the same silver twice.
+                $uid = (int)$session->getPlayerId();
+                $silverRow = $db->query("SELECT silver FROM users WHERE id=$uid FOR UPDATE");
+                $silverNow = (int)(($silverRow ? $silverRow->fetch_assoc() : null)['silver'] ?? 0);
+                $auction = $m->getAuctionBySecureId($_REQUEST['a']);
+                if ($auction !== false) {
+                    $lockedAuction = $db->query('SELECT * FROM auction WHERE id=' . (int)$auction['id'] . ' FOR UPDATE');
+                    $auction = $lockedAuction ? ($lockedAuction->fetch_assoc() ?: false) : false;
                 }
-                $max = $auction['activeUid'] == $session->getPlayerId() ? $auction['silver'] : max($auction['maxSilver'], $auction['silver']);
-                $bidSilver = abs((int)($_REQUEST['bidAmount'] ?? 0));
-                $currentPrice = max(1, (int) $auction['silver']);
-                if ((int) $auction['activeUid'] !== 0
-                    && (int) $auction['activeUid'] !== (int) $session->getPlayerId()
-                    && $bidSilver > $currentPrice * AuctionModel::LARGE_BID_MULTIPLE) {
-                    $m->lockOutBidder((int) $session->getPlayerId(), (int) $auction['id']);
+                $current_silver = $silverNow - (int)$db->fetchScalar("SELECT COALESCE(SUM(maxSilver), 0) FROM auction WHERE finish=0 AND activeUid=$uid FOR UPDATE");
+                $visibleAt = is_array($auction) ? (int) ($auction['visible'] ?? 0) : 0;
+                if ($auction === false || $auction['uid'] == $session->getPlayerId() || ($visibleAt > 0 && $visibleAt > time())) {
+                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionNotFound") . '</div>';
+                } elseif ($auction['finish'] || $auction['time'] < time()) {
+                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionFinished") . '</div>';
+                } elseif ($m->isBidLocked((int) $session->getPlayerId(), (int) $auction['id'])) {
                     $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
-                } elseif ($current_silver < $bidSilver && $auction['activeUid'] != $session->getPlayerId()) {
-                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
-                } elseif ($auction['activeUid'] == $session->getPlayerId() && ($current_silver + $auction['maxSilver']) < $bidSilver) {
-                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
-                } elseif ($bidSilver < $min) {
-                    $this->view->vars['content'] .= '<div class="error">' . sprintf(T("Auction", "notEnoughSilverAuctionError"), $min) . '</div>';
-                } elseif ($bidSilver <= $max && $auction['activeUid'] != $session->getPlayerId() && $auction['activeUid'] != 0) {
-                    if ($m->modifyAuction($auction['id'], $auction['activeId'], $auction['activeUid'], $bidSilver, $max, $auction['time'])) {
-                        $m->setAsOutBid($m->addBid($session->getPlayerId(), $auction['id']));
-                    }
                 } else {
-                    $activeId = $auction['activeId'];
-                    if ($auction['activeUid'] <> $session->getPlayerId()) {
-                        $auction['activeId'] = $m->addBid($session->getPlayerId(), $auction['id']);
-                    }
-                    if ($activeId == 0) {
-                        $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time']);
+                    $quest = Quest::getInstance();
+                    $quest->setQuestBitwise("battle", Quest::BATTLE_AUCTIONS, 1);
+                    if ($auction['activeUid'] == 0 || $auction['activeUid'] == $session->getPlayerId()) {
+                        $min = $auction['silver'];
                     } else {
-                        $bidder = $db->query("SELECT * FROM bids WHERE id=$activeId")->fetch_assoc();
-                        if ($bidder['uid'] == $session->getPlayerId()) {
-                            $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time'], false);
+                        $min = $auction['silver'] + 1;
+                    }
+                    $max = $auction['activeUid'] == $session->getPlayerId() ? $auction['silver'] : max($auction['maxSilver'], $auction['silver']);
+                    $bidSilver = abs((int)($_REQUEST['bidAmount'] ?? 0));
+                    $currentPrice = max(1, (int) $auction['silver']);
+                    if ((int) $auction['activeUid'] !== 0
+                        && (int) $auction['activeUid'] !== (int) $session->getPlayerId()
+                        && $bidSilver > $currentPrice * AuctionModel::LARGE_BID_MULTIPLE) {
+                        $m->lockOutBidder((int) $session->getPlayerId(), (int) $auction['id']);
+                        $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
+                    } elseif ($current_silver < $bidSilver && $auction['activeUid'] != $session->getPlayerId()) {
+                        $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
+                    } elseif ($auction['activeUid'] == $session->getPlayerId() && ($current_silver + $auction['maxSilver']) < $bidSilver) {
+                        $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
+                    } elseif ($bidSilver < $min) {
+                        $this->view->vars['content'] .= '<div class="error">' . sprintf(T("Auction", "notEnoughSilverAuctionError"), $min) . '</div>';
+                    } elseif ($bidSilver <= $max && $auction['activeUid'] != $session->getPlayerId() && $auction['activeUid'] != 0) {
+                        if ($m->modifyAuction($auction['id'], $auction['activeId'], $auction['activeUid'], $bidSilver, $max, $auction['time'])) {
+                            $m->setAsOutBid($m->addBid($session->getPlayerId(), $auction['id']));
+                        }
+                    } else {
+                        $activeId = $auction['activeId'];
+                        if ($auction['activeUid'] <> $session->getPlayerId()) {
+                            $auction['activeId'] = $m->addBid($session->getPlayerId(), $auction['id']);
+                        }
+                        if ($activeId == 0) {
+                            $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time']);
                         } else {
-                            if ($m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $max, $bidSilver, $auction['time'])) {
-                                $m->setAsOutBid($activeId);
+                            $bidder = $db->query("SELECT * FROM bids WHERE id=$activeId")->fetch_assoc();
+                            if ($bidder['uid'] == $session->getPlayerId()) {
+                                $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time'], false);
+                            } else {
+                                if ($m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $max, $bidSilver, $auction['time'])) {
+                                    $m->setAsOutBid($activeId);
+                                }
                             }
                         }
                     }
                 }
+                if (!$db->commit()) {
+                    throw new \RuntimeException('Could not save the bid.');
+                }
+            } catch (\Throwable $exception) {
+                if ($db->inTransaction()) {
+                    $db->rollback();
+                }
+                throw $exception;
             }
         }
     }
@@ -993,7 +1018,7 @@ HTML;
         $information = new PHPBatchView('hero/AuctionItemInformation');
         $information->vars = [
             // Only equipment lists its effects; a consumable shows its name and kind (as on the reference).
-            'stats' => $btype <= 6 ? HeroItemTooltip::stats($btype, $type) : [],
+            'stats' => $btype <= ItemBtype::LAST_EQUIPMENT ? HeroItemTooltip::stats($btype, $type) : [],
         ] + $this->itemInformationVars($btype, $type, $properties, $prices);
         $form = new PHPBatchView('hero/AuctionSellDialog');
         $form->vars['information'] = $information->output();
@@ -1038,8 +1063,8 @@ HTML;
         if (!in_array($amount, $packages, true) || $amount > (int)$item['num']) {
             return str_replace('[MIN_AMOUNT]', (string)min($packages), (string)T('Auction', 'Not enough items available for auction ([MIN_AMOUNT] items)'));
         }
-        if ((int)$item['btype'] === 6) {
-            $horses = (int)$db->fetchScalar('SELECT COALESCE(SUM(num),0) FROM items WHERE uid=' . (int)$session->getPlayerId() . ' AND btype=6');
+        if ((int)$item['btype'] === ItemBtype::HORSE) {
+            $horses = (int)$db->fetchScalar('SELECT COALESCE(SUM(num),0) FROM items WHERE uid=' . (int)$session->getPlayerId() . ' AND btype=' . ItemBtype::HORSE);
             if ($horses - $amount < 1) {
                 return (string)T('Auction', 'You cannot sell your last horse.', 'You cannot sell your last horse.');
             }
@@ -1051,7 +1076,7 @@ HTML;
                 $sold = $m->getItemFromUser($item['id'], $item['num'], $amount)
                     && $db->run('UPDATE users SET silver=silver+? WHERE id=?', [$silver, $session->getPlayerId()]);
                 if ($sold && $db->commit()) {
-                    Quest::getInstance()->setQuestBitwise('battle', 9, 1);
+                    Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_AUCTIONS, 1);
 
                     return null;
                 }
@@ -1079,7 +1104,7 @@ HTML;
 
             return (string)T('Auction', 'AuctionNotFound');
         }
-        Quest::getInstance()->setQuestBitwise('battle', 9, 1);
+        Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_AUCTIONS, 1);
 
         return null;
     }
@@ -1136,7 +1161,7 @@ HTML;
             // The legacy item catalogue does not persist the newer crafting rarity enum; its auction cards are the
             // reference common tier.
             'rarityIndicator' => RechartsMarkup::auctionRarityIndicator('common'),
-            'chart' => $this->renderAuctionPriceChart((new AuctionModel())->getBuyAuctionItemHistory($type, time() - 86400)),
+            'chart' => $this->renderAuctionPriceChart((new AuctionModel())->getBuyAuctionItemHistory($type, time() - Time::DAY)),
         ];
     }
 
@@ -1154,7 +1179,7 @@ HTML;
             'wrapperClass' => '',
         ]);
         $view->vars['layout'] = $layout;
-        $hours = (string)round(Config::getInstance()->auction->auctionTime / 3600, 1);
+        $hours = (string)round(Config::getInstance()->auction->auctionTime / Time::HOUR, 1);
         $view->vars['spacer'] = sprintf(
             T(
                 'Auction',

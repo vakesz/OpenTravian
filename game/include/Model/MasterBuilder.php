@@ -6,10 +6,14 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Buildings\BuildingHelper;
 use Game\Formulas;
+use Game\Gid;
 use Game\GoldHelper;
 use Game\ResourcesHelper;
+use Game\Slot;
+use Game\Tribes;
 
 use function logError;
 
@@ -46,14 +50,14 @@ class MasterBuilder
         $workers = $this->isWorkersBusy((int) $player['race'],
             $player['plus'] >= time(),
             (int) $row['kid'],
-            $row['building_field'] <= 18,
-            $item_id == 40);
+            $row['building_field'] <= Slot::LAST_FIELD,
+            $item_id == Gid::WONDER_OF_THE_WORLD);
         if ($workers['isBusy']) {
             //logError("MasterBuilder: Workers were busy.");
             return;
         }
         //ignore  ww here
-        if ($item_id <> 40) {
+        if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
             if (!$this->isResourcesAvailable($village, $costs)) {
                 //maybe a server lag!
                 //logError("MasterBuilder: Resources not available.");
@@ -66,7 +70,7 @@ class MasterBuilder
         }
 
         $gold = 0;
-        if ($item_id <> 40) {
+        if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
             $gold = Config::getInstance()->gold->masterBuilderGold;
             if (($player['gift_gold'] + $player['bought_gold']) < $gold) {
                 $db->rollback();
@@ -76,7 +80,7 @@ class MasterBuilder
 
         try {
             $changed = 'The queued build or its Gold debit changed before it could be processed.';
-            if ($item_id <> 40 && $gold > 0 && !GoldHelper::decreaseGold($village['owner'], $gold, true)) {
+            if ($item_id <> Gid::WONDER_OF_THE_WORLD && $gold > 0 && !GoldHelper::decreaseGold($village['owner'], $gold, true)) {
                 throw new \RuntimeException($changed);
             }
             $dequeued = $db->query("DELETE FROM building_upgrade WHERE id={$row['id']} AND isMaster=1");
@@ -91,7 +95,7 @@ class MasterBuilder
             if ($db->query("INSERT INTO building_upgrade (`kid`, `building_field`, `isMaster`, start_time, `commence`) VALUES ({$row['kid']},{$row['building_field']},0," . time() . ",$commence)") === false) {
                 throw new \RuntimeException('Could not create the scheduled build.');
             }
-            if ($item_id <> 40) {
+            if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
                 $deducted = $db->query(
                     "UPDATE vdata SET wood=wood-{$costs[0]}, clay=clay-{$costs[1]}, iron=iron-{$costs[2]}, crop=crop-{$costs[3]}"
                     . " WHERE kid={$row['kid']} AND wood>={$costs[0]} AND clay>={$costs[1]} AND iron>={$costs[2]} AND crop>={$costs[3]}"
@@ -113,7 +117,7 @@ class MasterBuilder
 
     private function getLastCommence(int $kid, int $field, int $race): int
     {
-        [$min, $max] = $race == 1 ? ($field <= 18 ? [1, 18] : [19, 99]) : [0, 99];
+        [$min, $max] = $race == Tribes::ROMANS ? ($field <= Slot::LAST_FIELD ? [Slot::FIRST_FIELD, Slot::LAST_FIELD] : [Slot::FIRST_BUILDING, Slot::WONDER]) : [0, Slot::WONDER];
         $commence = (int)DB::getInstance()->fetchScalar("SELECT MAX(commence) FROM building_upgrade WHERE kid=$kid AND isMaster=0 AND building_field BETWEEN $min AND $max");
 
         return max(time(), $commence);
@@ -128,12 +132,12 @@ class MasterBuilder
         $buildings_db = $db->query("SELECT * FROM fdata WHERE kid={$kid}")->fetch_assoc() ?? [];
         $whole_village_buildings = [];
         $mainBuildingLevel = 0;
-        for ($i = 1; $i <= 40; $i++) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST; $i++) {
             $whole_village_buildings[$i] = [
                 'item_id' => (int) ($buildings_db['f' . $i . 't'] ?? 0),
                 'level'   => (int) ($buildings_db['f' . $i] ?? 0),
             ];
-            if ($whole_village_buildings[$i]['item_id'] == 15) {
+            if ($whole_village_buildings[$i]['item_id'] == Gid::MAIN_BUILDING) {
                 $mainBuildingLevel = $whole_village_buildings[$i]['level'];
             }
         }
@@ -156,13 +160,13 @@ class MasterBuilder
         $workers = ['fieldsNum' => 0, 'buildsNum' => 0];
         $stmt = $db->query("SELECT building_field FROM building_upgrade WHERE isMaster=0 AND kid=$kid");
         while ($row = $stmt->fetch_assoc()) {
-            ++$workers[$row['building_field'] <= 18 ? 'fieldsNum' : 'buildsNum'];
+            ++$workers[$row['building_field'] <= Slot::LAST_FIELD ? 'fieldsNum' : 'buildsNum'];
         }
         $maxTasks = $hasPlus ? 2 : 1; //its with wonder
         if ($isWW) {
             $maxTasks = 2;
         }
-        if ($race == 1) {
+        if ($race == Tribes::ROMANS) {
             return [
                 'fieldsNum'  => $workers['fieldsNum'],
                 'buildsNum'  => $workers['buildsNum'],
@@ -201,7 +205,7 @@ class MasterBuilder
 
     public function updateCommence(int $kid, bool $update = true, bool $simple = false): bool
     {
-        $maxTime = time() + 100 * 86400;
+        $maxTime = time() + 100 * Time::DAY;
         $helper = new BuildingHelper();
         $db = DB::getInstance();
         $masterBuilders = $db->query("SELECT * FROM building_upgrade WHERE isMaster=1 AND kid={$kid} ORDER BY id");
@@ -239,12 +243,12 @@ class MasterBuilder
                 $this->deleteProcess($row['id'], $kid, $row['building_field'], $level);
                 continue;
             }
-            if ($row['building_field'] > 18 && $level == 1 && $helper->canCreateNewBuild($village['capital'],
+            if ($row['building_field'] > Slot::LAST_FIELD && $level == 1 && $helper->canCreateNewBuild($village['capital'],
                     $player['race'],
                     $item_id,
                     $buildings['buildings'],
                     true,
-                    $item_id == 49 && $helper->isShoreVillage((int)$kid)) <> 1) {
+                    $item_id == Gid::HARBOR && $helper->isShoreVillage((int)$kid)) <> 1) {
                 $this->deleteProcess($row['id'], $kid, $row['building_field'], $level);
                 continue;
             }
@@ -271,8 +275,8 @@ class MasterBuilder
             $workers = $this->isWorkersBusy((int) $player['race'],
                 $player['plus'] >= time(),
                 (int) $row['kid'],
-                $item_id <= 4,
-                $item_id == 40);
+                $item_id <= Gid::LAST_RESOURCE_FIELD,
+                $item_id == Gid::WONDER_OF_THE_WORLD);
             if ($workers['isBusy']) {
                 $end_time = $db->fetchScalar("SELECT commence FROM building_upgrade WHERE isMaster=0 AND kid={$row['kid']} ORDER BY commence ASC LIMIT 1");
                 if ($end_time > $commence) {
@@ -280,7 +284,7 @@ class MasterBuilder
                 }
             }
             //ignore WW here cuz it's not actually master and we got the resources first.
-            if ($item_id <> 40) {
+            if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
                 $cost = Formulas::buildingUpgradeCosts($item_id, $level);
                 if (!$this->isResourcesAvailable($village, $cost)) {
                     $commence += $this->calcualteAvailable($village, $cost);
@@ -304,7 +308,7 @@ class MasterBuilder
     private function deleteProcess(int|string $processId, int $wid, int|string $building_field, int $level): mixed
     {
         $db = DB::getInstance();
-        if ($level == 1 && $building_field > 18 && $building_field < 99) {
+        if ($level == 1 && $building_field > Slot::LAST_FIELD && $building_field < Slot::WONDER) {
             $db->query("UPDATE fdata SET f{$building_field}t=0 WHERE kid=" . $wid);
         }
 
@@ -349,14 +353,15 @@ class MasterBuilder
             (float) $data['woodp'],
             (float) $data['clayp'],
             (float) $data['ironp'],
-            (float) $data['cropp'],
+            // Net crop: population and troops eat from the gross production.
+            (float) $data['cropp'] - (float) $data['pop'] - (float) $data['upkeep'],
         ];
         for ($i = 0; $i < 4; ++$i) {
             if (floor($cur_res[$i]) < $costs[$i]) {
-                if ($i == 3 && $cur_prod[$i] <= 0) {
-                    $neededTime = 86400;
+                if ($cur_prod[$i] <= 0) {
+                    $neededTime = Time::DAY;
                 } else {
-                    $neededTime = ($costs[$i] - floor($cur_res[$i])) / $cur_prod[$i] * 3600000;
+                    $neededTime = ($costs[$i] - floor($cur_res[$i])) / $cur_prod[$i] * Time::HOUR_MS;
                 }
                 if ($neededTime > $timeNeeded) {
                     $timeNeeded = $neededTime;
@@ -364,6 +369,6 @@ class MasterBuilder
             }
         }
 
-        return floor($timeNeeded / 1000);
+        return floor($timeNeeded / Time::SECOND_MS);
     }
 }

@@ -10,6 +10,18 @@ use Game\WorldOverrides;
 // the world rules file keeps the database login and the install-only keys when it is rewritten.
 
 $root = dirname(__DIR__, 2);
+require_once $root . '/game/include/Core/Time.php';
+require_once $root . '/game/include/Game/UserId.php';
+require_once $root . '/game/include/Game/AccessLevel.php';
+require_once $root . '/game/include/Game/Slot.php';
+require_once $root . '/game/include/Game/ResearchMode.php';
+require_once $root . '/game/include/Game/Conquest/CaptureResult.php';
+require_once $root . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Unit.php';
+require_once $root . '/game/include/Game/Tribes.php';
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
+require_once $root . '/game/include/Game/Hero/ItemType.php';
 require_once $root . '/game/include/Game/OperationsSettings.php';
 require_once $root . '/game/include/Game/WorldOverrides.php';
 require_once $root . '/game/include/Game/Admin/WorldRulesFile.php';

@@ -6,6 +6,7 @@ namespace Controller;
 
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Game\PublicHomepageLocale;
 use Game\SocialAuth\FlowError;
 use Game\SocialAuth\OAuthFlowFactory;
@@ -41,7 +42,7 @@ final class OAuthStartCtrl extends OutOfGameCtrl
             $flash->set(FlowError::InvalidState);
             $this->redirect(self::registrationUrl($locale, $referral));
         }
-        if (!throttle_public_form('oauth-start', 20, 600)) {
+        if (!throttle_public_form('oauth-start', 20, 10 * Time::MINUTE)) {
             $flash->set(FlowError::RateLimited);
             $this->redirect(self::registrationUrl($locale, $referral));
         }
@@ -68,7 +69,7 @@ final class OAuthStartCtrl extends OutOfGameCtrl
             // sent. This separate cookie binds the callback to this browser.
             // (The __Host- prefix would force Path=/, so the path scopes it instead.)
             setcookie(self::BINDING_COOKIE, $started['binding'], [
-                'expires' => time() + 600,
+                'expires' => time() + 10 * Time::MINUTE,
                 'path' => '/oauth/apple/',
                 'secure' => true,
                 'httponly' => true,

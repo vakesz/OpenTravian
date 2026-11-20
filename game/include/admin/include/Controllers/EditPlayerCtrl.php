@@ -7,10 +7,14 @@ use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
 use Core\Security\Password;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\Map\Map;
 use Game\ResourcesHelper;
+use Game\UserId;
 use Model\AccountDeleter;
+use Model\MovementsModel;
 use Model\OptionModel;
 use Model\StatisticsModel;
 use Model\SummaryModel;
@@ -112,7 +116,7 @@ class EditPlayerCtrl
                             $_POST['username'] = $user['name'];
                         }
                         $email = (string)filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
-                        $email_verified = ($_POST['email_verified'] ?? null) === '1' && $email !== '' || (int)$_REQUEST['uid'] <= 2;
+                        $email_verified = ($_POST['email_verified'] ?? null) === '1' && $email !== '' || (int)$_REQUEST['uid'] <= UserId::LAST_SYSTEM;
                         $uid = (int)$_REQUEST['uid'];
                         $intField = static fn (string $key): int => is_scalar($_POST[$key] ?? null) ? (int)$_POST[$key] : 0;
                         $date = static fn (string $key): int => (int)TimezoneHelper::strtotime($_POST[$key]);
@@ -148,7 +152,7 @@ class EditPlayerCtrl
                 }
             } else if (!isServerFinished() && $_REQUEST['section'] == 'deletePlayer' && Session::validateChecker()) {
                 $uid = (int)$_REQUEST['uid'];
-                $this->db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 600) . ')');
+                $this->db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 10 * Time::MINUTE) . ')');
                 $dispatcher = Dispatcher::getInstance();
                 $dispatcher->appendContent(\Game\AdminUi::notice('Player will be deleted in some minutes.', 'info'));
                 AdminLog::getInstance()->addLog("Deleted a player({$uid}).");
@@ -188,13 +192,13 @@ class EditPlayerCtrl
             } else if (!isServerFinished() && $_REQUEST['section'] == 'setAsNormalUser') {
                 $uid = (int)$_REQUEST['uid'];
                 $db = DB::getInstance();
-                $db->query("UPDATE users SET access=IF(access=0, 0, 1) WHERE id=$uid");
+                $db->query("UPDATE users SET access=IF(access=" . AccessLevel::BANNED . ", " . AccessLevel::BANNED . ", " . AccessLevel::PLAYER . ") WHERE id=$uid");
                 $dispatcher = Dispatcher::getInstance();
                 $dispatcher->appendContent(\Game\AdminUi::notice('This user is now normal user.', 'success'));
             } else if (!isServerFinished() && $_REQUEST['section'] == 'setAsFakeUser') {
                 $uid = (int)$_REQUEST['uid'];
                 $db = DB::getInstance();
-                $db->query("UPDATE users SET access=IF(access=0, 0, 3) WHERE id=$uid");
+                $db->query("UPDATE users SET access=IF(access=" . AccessLevel::BANNED . ", " . AccessLevel::BANNED . ", " . AccessLevel::FAKE_USER . ") WHERE id=$uid");
                 $dispatcher = Dispatcher::getInstance();
                 $dispatcher->appendContent(\Game\AdminUi::notice('This user is now fake user.', 'success'));
             } else if (!isServerFinished() && $_REQUEST['section'] == 'changeTribeToRomans') {
@@ -253,7 +257,7 @@ class EditPlayerCtrl
             if (sizeof($kids)) {
                 $implode = implode(",", $kids);
                 $db->query("UPDATE enforcement SET race=$race WHERE kid IN($implode)");
-                $db->query("UPDATE movement SET race=$race WHERE kid IN($implode) OR (to_kid IN($implode) AND mode=1)");
+                $db->query("UPDATE movement SET race=$race WHERE kid IN($implode) OR (to_kid IN($implode) AND mode=" . MovementsModel::MODE_RETURN . ")");
                 $db->query("UPDATE trapped SET race=$race WHERE kid IN($implode)");
                 $db->query("UPDATE units SET race=$race, u99=0 WHERE kid IN($implode)");
             }
@@ -375,7 +379,7 @@ class EditPlayerCtrl
             } else {
                 $params['banHistory']['content'] .= '<td class="head">' . TimezoneHelper::autoDateString($row['end'],
                         true) . '</td>';
-                $params['banHistory']['content'] .= '<td class="head">' . round((($row['end'] - $row['time']) / 3600),
+                $params['banHistory']['content'] .= '<td class="head">' . round((($row['end'] - $row['time']) / Time::HOUR),
                         2) . 'h</td>';
             }
             $params['banHistory']['content'] .= '<td class="head">' . $row['reason'] . '</td>';

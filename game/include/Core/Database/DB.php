@@ -4,6 +4,7 @@ namespace Core\Database;
 
 use Core\Config;
 use Core\ErrorHandler;
+use Core\Time;
 use const BACKUP_PATH;
 use function logError;
 use function miliseconds;
@@ -677,7 +678,7 @@ class DB
         $keep = array_slice(array_keys($sets), 0, $keepLast);
         $days = [];
         foreach (array_keys($sets) as $stamp) {
-            $day = gmdate('Y-m-d', intdiv((int)$stamp, 1000));
+            $day = gmdate('Y-m-d', intdiv((int)$stamp, Time::SECOND_MS));
             if (!isset($days[$day]) && count($days) < $keepDaily) {
                 $days[$day] = $stamp;
             }

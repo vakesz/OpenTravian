@@ -7,11 +7,12 @@ namespace Controller;
 use Core\Database\DB;
 use Core\Security\Password;
 use Core\Session;
+use Core\Time;
 use resources\View\OutOfGameView;
 
 class PasswordCtrl extends OutOfGameCtrl
 {
-    private const TOKEN_LIFETIME = 3600;
+    private const TOKEN_LIFETIME = Time::HOUR;
 
     public function __construct()
     {

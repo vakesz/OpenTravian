@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\SocialAuth;
 
 use Core\Security\Password;
+use Core\Time;
 
 /**
  * A verified social identity waiting to become a game account. The callback
@@ -13,7 +14,7 @@ use Core\Security\Password;
  */
 final class PendingSignup
 {
-    private const TTL = 1800;
+    private const TTL = 30 * Time::MINUTE;
 
     /** @param array<string,mixed> $session */
     public function __construct(private array &$session, private readonly string $key, private readonly \Closure $clock)

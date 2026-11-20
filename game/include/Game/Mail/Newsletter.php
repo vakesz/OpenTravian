@@ -6,6 +6,9 @@ namespace Game\Mail;
 
 use Core\Caching\Caching;
 use Core\Database\DBI;
+use Core\Time;
+use Game\AccessLevel;
+use Game\UserId;
 
 /** The administrator's newsletter: only players who opted in (users.newsletter), one personalised mail each. */
 final class Newsletter
@@ -27,7 +30,7 @@ final class Newsletter
     {
         $rows = DBI::getInstance()->run(
             "SELECT MIN(u.id) AS uid, MIN(u.name) AS name, MIN(u.email) AS email FROM users u"
-            . " WHERE u.id > 2 AND u.newsletter = 1 AND u.email_verified = 1 AND u.email <> '' AND u.access > 0"
+            . " WHERE u.id > " . UserId::LAST_SYSTEM . " AND u.newsletter = 1 AND u.email_verified = 1 AND u.email <> '' AND u.access > " . AccessLevel::BANNED
             . ' AND NOT EXISTS (SELECT 1 FROM deleting d WHERE d.uid = u.id) GROUP BY LOWER(u.email) ORDER BY uid'
         )->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -40,8 +43,8 @@ final class Newsletter
         try {
             $cache = Caching::getInstance();
 
-            return $cache->incrementWithinLimit(throttle_key('newsletter-campaign', 'world', 'hour'), self::CAMPAIGNS_PER_HOUR, 3600)
-                && $cache->incrementWithinLimit(throttle_key('newsletter-campaign', 'world', 'day'), self::CAMPAIGNS_PER_DAY, 86400);
+            return $cache->incrementWithinLimit(throttle_key('newsletter-campaign', 'world', 'hour'), self::CAMPAIGNS_PER_HOUR, Time::HOUR)
+                && $cache->incrementWithinLimit(throttle_key('newsletter-campaign', 'world', 'day'), self::CAMPAIGNS_PER_DAY, Time::DAY);
         } catch (\Throwable) {
             return false;
         }

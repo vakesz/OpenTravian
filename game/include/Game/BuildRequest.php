@@ -35,7 +35,7 @@ final class BuildRequest
         }
         $slot = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
         $gid = filter_var($_GET['gid'] ?? null, FILTER_VALIDATE_INT);
-        if ($slot === false || $gid === false || $slot < 1 || ($slot > 40 && $slot !== 99)) {
+        if ($slot === false || $gid === false || $slot < 1 || ($slot > Slot::LAST && $slot !== Slot::WONDER)) {
             return true;
         }
         $master = array_key_exists('buildmaster', $_GET);
@@ -43,7 +43,7 @@ final class BuildRequest
         if (is_array($field) && (int)$field['item_id'] === $gid && $gid > 0) {
             // Gold "Upgrade to max level" is ExtraModules::upgradeToMaxLevel (instant); &max is not a build path.
             $village->upgradeBuilding($slot, $master);
-        } elseif (is_array($field) && (int)$field['item_id'] === 0 && $gid > 4) {
+        } elseif (is_array($field) && (int)$field['item_id'] === 0 && $gid > Gid::LAST_RESOURCE_FIELD) {
             $village->constructBuilding($slot, $gid, $master);
         }
 

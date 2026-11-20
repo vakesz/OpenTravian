@@ -6,6 +6,7 @@ namespace Controller;
 
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Game\SocialAuth\DbIdentityRepository;
 use Game\SocialAuth\FlowError;
 use Game\SocialAuth\FlowResult;
@@ -45,12 +46,12 @@ final class OAuthCallbackCtrl extends OutOfGameCtrl
         $cookie = $_COOKIE[OAuthStartCtrl::BINDING_COOKIE] ?? null;
         if ($provider->usesFormPost()) {
             // Single use, whatever the outcome.
-            setcookie(OAuthStartCtrl::BINDING_COOKIE, '', ['expires' => time() - 3600, 'path' => '/oauth/apple/', 'secure' => true, 'httponly' => true, 'samesite' => 'None']);
+            setcookie(OAuthStartCtrl::BINDING_COOKIE, '', ['expires' => time() - Time::HOUR, 'path' => '/oauth/apple/', 'secure' => true, 'httponly' => true, 'samesite' => 'None']);
         }
         $result = OAuthFlowFactory::create()->complete($provider, $params, $sessionState, is_string($cookie) ? $cookie : null);
         if ($result->kind === 'error') {
             // Only failed callbacks consume the budget: successful sign-ins are free.
-            throttle_public_form('oauth-callback', 20, 600);
+            throttle_public_form('oauth-callback', 20, 10 * Time::MINUTE);
         }
         $this->finish($result, $flash, $provider);
     }

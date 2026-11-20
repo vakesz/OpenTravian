@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Game;
 
+use Core\Time;
 use InvalidArgumentException;
 
 final class PremiumDuration
 {
     /** User rule 2026-11-08: every timed bonus (Plus, +25% production, quest rewards) lasts at least one day. */
-    public const int MIN_SECONDS = 86400;
+    public const int MIN_SECONDS = Time::DAY;
     private const int DAY_SECONDS = self::MIN_SECONDS;
     private const int MAX_HOURS = 8760;
 
@@ -78,6 +79,6 @@ final class PremiumDuration
             'options' => ['min_range' => 0, 'max_range' => self::MAX_HOURS],
         ]);
 
-        return $validated === false ? null : $validated * 3600;
+        return $validated === false ? null : $validated * Time::HOUR;
     }
 }

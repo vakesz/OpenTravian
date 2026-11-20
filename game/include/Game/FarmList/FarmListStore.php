@@ -8,6 +8,7 @@ use Core\Database\DB;
 use Core\Session;
 use Game\Formulas;
 use Game\Ships;
+use Game\Unit;
 
 use function T;
 
@@ -295,7 +296,7 @@ final class FarmListStore
     {
         $units = is_array($units) ? $units : [];
         $amounts = [];
-        for ($unit = 1; $unit <= 10; $unit++) {
+        for ($unit = 1; $unit <= Unit::LAST_TROOP; $unit++) {
             $value = $units['t' . $unit] ?? $fallback['u' . $unit] ?? 0;
             if ($value === '' || $value === null) {
                 $value = 0;

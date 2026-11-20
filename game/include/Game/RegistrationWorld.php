@@ -52,7 +52,7 @@ final class RegistrationWorld
             'mapSide' => 2 * (int)MAP_SIZE + 1,
             'startTime' => $startTime,
             'roundDays' => (int)round((float)getGame('round_length')),
-            'players' => (int)DB::getInstance()->fetchScalar('SELECT COUNT(id) FROM users WHERE id > 2 AND access <> 3'),
+            'players' => (int)DB::getInstance()->fetchScalar('SELECT COUNT(id) FROM users WHERE id > ' . UserId::LAST_SYSTEM . ' AND access <> ' . AccessLevel::FAKE_USER),
             'status' => $status,
             // Registration also works before the start: players pick a tribe and wait for the opening.
             'registrationOpen' => !in_array($status, ['closed', 'finished', 'maintenance'], true),

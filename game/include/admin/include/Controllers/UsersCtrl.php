@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
+use Game\AccessLevel;
 use Game\AdminUi;
 use Game\Tribes;
+use Game\UserId;
 
 /**
  * The Players → Users list: search and open a player for editing inside the control panel
@@ -20,7 +22,7 @@ class UsersCtrl
         $db = DB::getInstance();
         $q = is_string($_GET['q'] ?? null) ? trim($_GET['q']) : '';
         $page = max(1, (int) ($_GET['p'] ?? 1));
-        $where = 'u.id > 2';
+        $where = 'u.id > ' . UserId::LAST_SYSTEM;
         $args = [];
         if ($q !== '') {
             if (ctype_digit($q)) {
@@ -94,10 +96,10 @@ class UsersCtrl
     private function statusLabel(int $access, bool $hidden): string
     {
         $label = match ($access) {
-            0 => 'Banned',
-            1 => 'Player',
-            2 => 'Administrator',
-            3 => 'Fake user',
+            AccessLevel::BANNED => 'Banned',
+            AccessLevel::PLAYER => 'Player',
+            AccessLevel::ADMIN => 'Administrator',
+            AccessLevel::FAKE_USER => 'Fake user',
             default => 'Access ' . $access,
         };
 

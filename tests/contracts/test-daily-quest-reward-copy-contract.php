@@ -86,7 +86,7 @@ expectRewardCopy(array_keys($group['questData']) === range(1, 11), 'questData mu
 
 // Every reward the model can grant is announced: a line and an icon for its id, in the box and in the table.
 $model = (string)file_get_contents($root . '/game/include/Model/DailyQuestModel.php');
-preg_match_all("/=> \\['([A-Za-z_0-9]+)', \\d+, '(?:res|exp|cp|plus|productionBoost|item|adv)'\\]/", $model, $granted);
+preg_match_all("/=> \\['([A-Za-z_0-9]+)', (?:\\d+|Time::DAY), '(?:res|exp|cp|plus|productionBoost|item|adv)'\\]/", $model, $granted);
 $css = (string)file_get_contents($root . '/assets/gpack/travian/mainPage/css_ltr/imports.css');
 expectRewardCopy(count(array_unique($granted[1])) === count($lines), 'The grant table must name the reference reward ids only (found ' . implode(', ', array_unique($granted[1])) . ').');
 foreach (array_unique($granted[1]) as $id) {

@@ -2,8 +2,10 @@
 
 namespace Controller\Ajax;
 
+use Core\Time;
 use Game\EmailVerification;
 use Game\SmtpConfig;
+use Game\UserId;
 use Model\EmailVerification as EmailVerificationModel;
 
 /**
@@ -20,7 +22,7 @@ class verify extends AjaxBase
             return;
         }
         $uid = (int)$this->session->getPlayerId();
-        if ($uid <= 2) {
+        if ($uid <= UserId::LAST_SYSTEM) {
             $this->error('Invalid session.', 403);
             return;
         }
@@ -50,7 +52,7 @@ class verify extends AjaxBase
             $this->fail('alreadyInProgress');
             return;
         }
-        if (!throttle_public_form('verify', 5, 3600) || !throttle_public_form('verify-uid-' . $uid, 3, 3600)) {
+        if (!throttle_public_form('verify', 5, Time::HOUR) || !throttle_public_form('verify-uid-' . $uid, 3, Time::HOUR)) {
             $this->fail('tooManyResends');
             return;
         }
@@ -86,7 +88,7 @@ class verify extends AjaxBase
             $this->fail('noVerificationInProgress');
             return;
         }
-        if (!throttle_public_form('verifycode-uid-' . $uid, 5, 3600)) {
+        if (!throttle_public_form('verifycode-uid-' . $uid, 5, Time::HOUR)) {
             $this->fail('tooManyResends');
             return;
         }

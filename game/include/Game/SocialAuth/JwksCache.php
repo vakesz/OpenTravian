@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Game\SocialAuth;
 
+use Core\Time;
+
 /** Fetches and caches a provider's JWKS document. */
 final class JwksCache
 {
-    private const DEFAULT_TTL = 3600;
-    private const MIN_TTL = 300;
-    private const MAX_TTL = 86400;
+    private const DEFAULT_TTL = Time::HOUR;
+    private const MIN_TTL = 5 * Time::MINUTE;
+    private const MAX_TTL = Time::DAY;
     /** An unknown kid may force a refetch at most this often (stops fetch amplification). */
-    private const REFETCH_INTERVAL = 60;
+    private const REFETCH_INTERVAL = Time::MINUTE;
 
     public function __construct(
         private readonly HttpClient $http,

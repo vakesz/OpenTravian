@@ -5,6 +5,10 @@ namespace Game\Buildings;
 use Core\Config;
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
+use Game\Tribes;
+use Game\UserId;
 use Model\ArtefactsModel;
 use Model\WonderOfTheWorldModel;
 use function getCustom;
@@ -55,7 +59,7 @@ class BuildingHelper
             return -1;
         }
         if (isset($buildMetadata['req']['race'])) {
-            if ($tribe <> $buildMetadata['req']['race'] && !($item_id == 31 && $tribe == 5)) {
+            if ($tribe <> $buildMetadata['req']['race'] && !($item_id == Gid::CITY_WALL && $tribe == Tribes::NATARS)) {
                 return -1;
             }
         }
@@ -84,7 +88,7 @@ class BuildingHelper
                 if (!$alreadyBuiltWithMaxLevel) {
                     return -1;
                 }
-                if ($item_id == 36 && Config::getProperty("game", "maxTrapperCount") > 0) {
+                if ($item_id == Gid::TRAPPER && Config::getProperty("game", "maxTrapperCount") > 0) {
                     $count = 0;
                     foreach ($buildings as $villageBuild) {
                         if ($villageBuild['item_id'] == $item_id) {
@@ -116,7 +120,7 @@ class BuildingHelper
                 }
                 $result = FALSE;
                 foreach ($buildings as $villageBuild) {
-                    if (($villageBuild['item_id'] == $req_item_id && $villageBuild['level'] >= $level) || $req_item_id == 40) {
+                    if (($villageBuild['item_id'] == $req_item_id && $villageBuild['level'] >= $level) || $req_item_id == Gid::WONDER_OF_THE_WORLD) {
                         $result = TRUE;
                         break;
                     }
@@ -151,11 +155,11 @@ class BuildingHelper
     {
         $currentPop = $level > 1 ? Formulas::buildingCropConsumption($item_id, $level - 1) : 0;
         $deltaPop = Formulas::buildingCropConsumption($item_id, $level) - $currentPop;
-        if (getGame("starvation") && !$natar && (int)$item_id !== 4 && (int)$item_id !== 40) {
+        if (getGame("starvation") && !$natar && (int)$item_id !== Gid::CROPLAND && (int)$item_id !== Gid::WONDER_OF_THE_WORLD) {
             $base = $baseCrop === null ? 0.0 : (float)$baseCrop;
-            $raisesCrop = in_array((int)$item_id, [8, 9], true) && (0.05 * $base) > $deltaPop;
-            $firstMainBuilding = (int)$item_id === 15 && (int)$level === 1;
-            $earlyStorage = in_array((int)$item_id, [10, 11, 15], true) && (int)$level <= 10 && $base >= 276;
+            $raisesCrop = in_array((int)$item_id, [Gid::GRAIN_MILL, Gid::BAKERY], true) && (0.05 * $base) > $deltaPop;
+            $firstMainBuilding = (int)$item_id === Gid::MAIN_BUILDING && (int)$level === 1;
+            $earlyStorage = in_array((int)$item_id, [Gid::WAREHOUSE, Gid::GRANARY, Gid::MAIN_BUILDING], true) && (int)$level <= 10 && $base >= 276;
             if (!$raisesCrop && !$firstMainBuilding && !$earlyStorage && ($cropProduction - $deltaPop) < 1) {
                 return 1;
             }
@@ -192,17 +196,17 @@ class BuildingHelper
      */
     public function checkArtifactDependencies($aid, $uid, $kid, $item_id, $isWW, $wwLevel): int
     {
-        if($uid == 1){
+        if($uid == UserId::NATARS){
             return 0;
         }
-        if ($item_id == 38 || $item_id == 39) {
+        if ($item_id == Gid::GREAT_WAREHOUSE || $item_id == Gid::GREAT_GRANARY) {
             //check great ware house plan
             //artifact type 9 is for Great Warehouse or Granny
             if (!$isWW && ArtefactsModel::getArtifactEffectByType($uid, $kid, ArtefactsModel::ARTIFACT_GREAT_STORE) <= 0) {
                 return 1;
             }
         } //great warehouse
-        if ($item_id == 40) {
+        if ($item_id == Gid::WONDER_OF_THE_WORLD) {
             $m = new WonderOfTheWorldModel();
             if (getCustom("wwPlansEnabled")) {
                 $artEffBP = $this->checkIfPlayerHasWWBuildingPlan($uid);
@@ -230,7 +234,7 @@ class BuildingHelper
     public function checkIfPlayerHasWWBuildingPlan($uid): bool
     {
         $db = DB::getInstance();
-        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid=$uid AND active=1 AND type=12 LIMIT 1");
+        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid=$uid AND active=1 AND type=" . ArtefactsModel::WW_PLAN . " LIMIT 1");
     }
 
     // Alliance configuration may also affect this value.
@@ -253,7 +257,7 @@ class BuildingHelper
             return FALSE;
         }
         $members = implode(",", $members);
-        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid IN($members) AND type=12 AND active=1 LIMIT 1");
+        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid IN($members) AND type=" . ArtefactsModel::WW_PLAN . " AND active=1 LIMIT 1");
     }
 
 
@@ -265,8 +269,8 @@ class BuildingHelper
         $db = DB::getInstance();
         $fields = $db->query("SELECT f.* FROM fdata f, vdata v WHERE f.kid=v.kid AND v.owner=$uid");
         while ($row = $fields->fetch_assoc()) {
-            for ($i = 19; $i <= 38; ++$i) {
-                if ($row['f' . $i . 't'] == 26) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
+                if ($row['f' . $i . 't'] == Gid::PALACE) {
                     return TRUE;
                 }
             }

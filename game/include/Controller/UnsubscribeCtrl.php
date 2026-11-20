@@ -6,6 +6,7 @@ namespace Controller;
 
 use Core\Database\DBI;
 use Core\Helper\WebService;
+use Core\Time;
 use Game\Admin\AuditLog;
 use Game\Mail\EmailKind;
 use Game\Mail\EmailPreferences;
@@ -30,7 +31,7 @@ final class UnsubscribeCtrl extends OutOfGameCtrl
             $this->innerRedirect('PageNotFoundCtrl');
         }
         $done = false;
-        if (WebService::isPost() && throttle_public_form('unsubscribe', 30, 600)) {
+        if (WebService::isPost() && throttle_public_form('unsubscribe', 30, 10 * Time::MINUTE)) {
             $scope = isset($_POST['all']) ? UnsubscribeToken::ALL : $token['scope'];
             EmailPreferences::unsubscribe($token['uid'], $scope);
             $name = (string) DBI::getInstance()->fetchScalar('SELECT name FROM users WHERE id=?', [$token['uid']], '');

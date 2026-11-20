@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\Gid;
+use Game\ResearchMode;
+use Game\Unit;
 use mysqli_result;
 
 class VillageOverviewModel
@@ -19,7 +22,7 @@ class VillageOverviewModel
 
     public function getGoingUnits(int $kid): mysqli_result|false
     {
-        return $this->fetchAll('SELECT * FROM movement WHERE kid=? AND mode=0', [$kid]);
+        return $this->fetchAll('SELECT * FROM movement WHERE kid=? AND mode=' . MovementsModel::MODE_GOING, [$kid]);
     }
 
     public function getVillageEnforcements(int $kid): mysqli_result|false
@@ -44,7 +47,7 @@ class VillageOverviewModel
 
     public function getReturningUnits(int $kid): mysqli_result|false
     {
-        return $this->fetchAll('SELECT * FROM movement WHERE to_kid=? AND mode=1', [$kid]);
+        return $this->fetchAll('SELECT * FROM movement WHERE to_kid=? AND mode=' . MovementsModel::MODE_RETURN, [$kid]);
     }
 
     public function getVillageUpgradeBuildings(int $kid): mysqli_result|false
@@ -72,7 +75,7 @@ class VillageOverviewModel
 
     public function getArmoryProgress(int $kid): mysqli_result|false
     {
-        return $this->fetchAll('SELECT * FROM research WHERE kid=? AND mode=0', [$kid]);
+        return $this->fetchAll('SELECT * FROM research WHERE kid=? AND mode=' . ResearchMode::SMITHY, [$kid]);
     }
 
     public function getPlayerVillageResources(int $uid): mysqli_result|false
@@ -98,7 +101,7 @@ class VillageOverviewModel
     public function getPlayerTrainingQueues(int $uid): array
     {
         $result = $this->fetchAll(
-            'SELECT t.kid, t.item_id, SUM(t.num) AS units FROM training t JOIN vdata v ON v.kid = t.kid WHERE v.owner=? AND t.item_id!=98 GROUP BY t.kid, t.item_id',
+            'SELECT t.kid, t.item_id, SUM(t.num) AS units FROM training t JOIN vdata v ON v.kid = t.kid WHERE v.owner=? AND t.item_id!=' . Unit::HERO_ID . ' GROUP BY t.kid, t.item_id',
             [$uid]
         );
         $queues = [];
@@ -115,7 +118,7 @@ class VillageOverviewModel
     public function getVillageTroopsTraining(int $kid): array
     {
         $training = [];
-        $result = $this->fetchAll('SELECT * FROM training WHERE kid=? AND item_id!=98 ORDER BY nr', [$kid]);
+        $result = $this->fetchAll('SELECT * FROM training WHERE kid=? AND item_id!=' . Unit::HERO_ID . ' ORDER BY nr', [$kid]);
         while ($result && ($row = $result->fetch_assoc())) {
             $itemId = (int) $row['item_id'];
             $nr = (int) $row['nr'];
@@ -132,7 +135,7 @@ class VillageOverviewModel
      */
     public function getResidencePalaceLevel(int $capWref): array|false
     {
-        $building = $this->findBuilding($capWref, [25, 26, 44]);
+        $building = $this->findBuilding($capWref, Gid::EXPANSION);
 
         return $building === null ? false : ['item_id' => $building['item_id'], 'level' => $building['level']];
     }
@@ -140,7 +143,7 @@ class VillageOverviewModel
     /** Town Hall level, 0 when the village has none. */
     public function getTHLevel(int $capWref): int
     {
-        return $this->findBuilding($capWref, [24])['level'] ?? 0;
+        return $this->findBuilding($capWref, [Gid::TOWN_HALL])['level'] ?? 0;
     }
 
     /**

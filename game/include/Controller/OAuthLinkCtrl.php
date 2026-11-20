@@ -6,6 +6,7 @@ namespace Controller;
 
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use Game\SocialAuth\DbIdentityRepository;
 use Game\SocialAuth\FlowError;
 use Game\SocialAuth\OAuthFlowFactory;
@@ -32,7 +33,7 @@ final class OAuthLinkCtrl extends GameCtrl
         }
         $flash = SocialFlash::fromGlobals();
         $userId = (int) $this->session->getPlayerId();
-        if (!throttle_public_form('oauth-link', 20, 600)) {
+        if (!throttle_public_form('oauth-link', 20, 10 * Time::MINUTE)) {
             $flash->setNotice('error', $provider, FlowError::RateLimited);
             $this->redirect(self::OPTIONS_URL);
         }

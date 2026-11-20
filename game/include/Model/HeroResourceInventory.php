@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\ResourcesHelper;
 
 /**
@@ -23,14 +25,14 @@ final class HeroResourceInventory
 
     /** Inventory item type ids matching Gpack `.item.item145`–`.item.item148`. */
     public const ITEM_TYPES = [
-        'wood' => 145,
-        'clay' => 146,
-        'iron' => 147,
-        'crop' => 148,
+        'wood' => ItemType::RESOURCE_WOOD,
+        'clay' => ItemType::RESOURCE_CLAY,
+        'iron' => ItemType::RESOURCE_IRON,
+        'crop' => ItemType::RESOURCE_CROP,
     ];
 
     /** Dedicated btype so use/move treat stacks as bag consumables (btype ≥ 10). */
-    public const ITEM_BTYPE = 16;
+    public const ITEM_BTYPE = ItemBtype::RESOURCES;
 
     /**
      * @param array<string, int|float|string> $resources
@@ -218,6 +220,25 @@ final class HeroResourceInventory
             }
 
             ResourcesHelper::updateVillageResources($kid, true);
+            // Only what fits in the warehouse and granary moves; the rest stays with the hero (as one-item use does).
+            $stock = $db->run(
+                'SELECT wood, clay, iron, crop, maxstore, maxcrop FROM vdata WHERE kid=? AND owner=? FOR UPDATE',
+                [$kid, $uid]
+            );
+            $village = $stock === false ? null : $stock->get_result()->fetch_assoc();
+            if (!is_array($village)) {
+                throw new \RuntimeException('The selected village is no longer available.');
+            }
+            foreach (self::RESOURCE_FIELDS as $field) {
+                $capacity = (float)$village[$field === 'crop' ? 'maxcrop' : 'maxstore'];
+                $taken[$field] = min($taken[$field], max(0, (int)floor($capacity - (float)$village[$field])));
+            }
+            if (array_sum($taken) === 0) {
+                if (!$db->commit()) {
+                    throw new \RuntimeException('Could not release the hero resource inventory.');
+                }
+                return $taken;
+            }
             $credited = $db->run(
                 'UPDATE vdata SET wood=wood+?, clay=clay+?, iron=iron+?, crop=crop+? WHERE kid=? AND owner=?',
                 [$taken['wood'], $taken['clay'], $taken['iron'], $taken['crop'], $kid, $uid]

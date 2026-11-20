@@ -11,6 +11,18 @@ $fail = static function (string $message): never {
     exit(1);
 };
 
+require_once $root . '/game/include/Core/Time.php';
+require_once $root . '/game/include/Game/UserId.php';
+require_once $root . '/game/include/Game/AccessLevel.php';
+require_once $root . '/game/include/Game/Slot.php';
+require_once $root . '/game/include/Game/ResearchMode.php';
+require_once $root . '/game/include/Game/Conquest/CaptureResult.php';
+require_once $root . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Unit.php';
+require_once $root . '/game/include/Game/Tribes.php';
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
+require_once $root . '/game/include/Game/Hero/ItemType.php';
 require_once $root . '/game/include/Model/WonderOfTheWorldModel.php';
 foreach ([0 => 0, 19 => 0, 20 => 1, 39 => 1, 40 => 2, 59 => 2, 60 => 3, 79 => 3, 80 => 4, 89 => 4, 90 => 5, 100 => 5] as $level => $stage) {
     if (\Model\WonderOfTheWorldModel::stage($level) !== $stage) {

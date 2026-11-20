@@ -11,6 +11,7 @@ use Game\Formulas;
 use Game\GoldHelper;
 use Game\Hero\HeroHelper;
 use Game\Hero\SessionHero;
+use Game\Tribes;
 use Model\AuctionModel;
 use Model\HeroInventoryModel;
 use Model\HeroResourceInventory;
@@ -148,7 +149,7 @@ class HeroInventoryCtrl extends GameCtrl
                 "regenerating" => $hero->getHeroStatus() == SessionHero::STATUS_REVIVING,
                 "regeneratedHealth" => $hero->getRegeneratedHealth(),
                 "reviveEndTime" => $hero->getReviveEndTime(),
-                "fsperpoint" => Session::getInstance()->getRace() == 1 ? 100 : 80,
+                "fsperpoint" => Session::getInstance()->getRace() == Tribes::ROMANS ? 100 : 80,
                 "itemfs" => $helper->calcItemPower($inventory['rightHand'], $inventory['leftHand'], $inventory['body']),
                 "speed" => $helper->calcTotalSpeed(
                     Session::getInstance()->getRace(),

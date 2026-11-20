@@ -7,7 +7,10 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Game\Hero\HeroExperience;
+use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\PremiumDuration;
 use Game\ResourcesHelper;
 
@@ -16,6 +19,35 @@ use function logError;
 
 class DailyQuestModel
 {
+    /*
+     * Daily quest ids: the quest_data keys, the daily_quest.qstN columns and the
+     * DailyQuest.questData.N translation keys.
+     */
+    /** Complete an adventure. */
+    public const QUEST_ADVENTURE = 1;
+    /** Raid an unoccupied oasis. */
+    public const QUEST_RAID_UNOCCUPIED_OASIS = 2;
+    /** Raid or attack a Natarian village. */
+    public const QUEST_ATTACK_NATARS = 3;
+    /** Win an auction. */
+    public const QUEST_WIN_AUCTION = 4;
+    /** Gain or spend gold. */
+    public const QUEST_GOLD = 5;
+    /** Upgrade a building. */
+    public const QUEST_UPGRADE_BUILDING = 6;
+    /** Upgrade a resource field. */
+    public const QUEST_UPGRADE_FIELD = 7;
+    /** Build 20 infantry units of one type at once. */
+    public const QUEST_TRAIN_INFANTRY = 8;
+    /** Build 20 cavalry units of one type at once. */
+    public const QUEST_TRAIN_CAVALRY = 9;
+    /** Hold a small or big celebration. */
+    public const QUEST_CELEBRATION = 10;
+    /** Contribute resources to an alliance bonus. */
+    public const QUEST_ALLIANCE_CONTRIBUTION = 11;
+    /** Number of daily quests (qst1..qst11): `for ($i = 1; $i <= self::QUEST_COUNT; ++$i)`. */
+    public const QUEST_COUNT = 11;
+
     /** The milestones: 25, 50, 75 and 100 points. */
     public const MILESTONES = [1 => 25, 2 => 50, 3 => 75, 4 => 100];
 
@@ -34,11 +66,11 @@ class DailyQuestModel
             4 => ['randomResource', 1000, 'res'],
         ],
         2 => [
-            1 => ['duration', 86400, 'plus'],
-            2 => ['resource_lumber', 86400, 'productionBoost'],
-            3 => ['resource_clay', 86400, 'productionBoost'],
-            4 => ['resource_iron', 86400, 'productionBoost'],
-            5 => ['resource_crop', 86400, 'productionBoost'],
+            1 => ['duration', Time::DAY, 'plus'],
+            2 => ['resource_lumber', Time::DAY, 'productionBoost'],
+            3 => ['resource_clay', Time::DAY, 'productionBoost'],
+            4 => ['resource_iron', Time::DAY, 'productionBoost'],
+            5 => ['resource_crop', Time::DAY, 'productionBoost'],
         ],
         3 => [
             1 => ['heroItem_ointment', 5, 'item'],
@@ -57,25 +89,25 @@ class DailyQuestModel
 
     /** Hero items: [building type, item type]. */
     private const ITEMS = [
-        'heroItem_ointment' => [11, 106],
-        'heroItem_tabletOfLaw' => [14, 109],
-        'heroItem_bandage25' => [7, 112],
-        'heroItem_cage' => [9, 114],
+        'heroItem_ointment' => [ItemBtype::OINTMENT, ItemType::OINTMENT],
+        'heroItem_tabletOfLaw' => [ItemBtype::TABLET_OF_LAW, ItemType::TABLET_OF_LAW],
+        'heroItem_bandage25' => [ItemBtype::SMALL_BANDAGE, ItemType::SMALL_BANDAGE],
+        'heroItem_cage' => [ItemBtype::CAGE, ItemType::CAGE],
     ];
 
     /** @var array<int, array{reward: int, stepCount: int}> */
     private array $quest_data = [
-        1  => ['reward' => 5, 'stepCount' => 1],
-        2  => ['reward' => 3, 'stepCount' => 3],
-        3  => ['reward' => 3, 'stepCount' => 3],
-        4  => ['reward' => 5, 'stepCount' => 1],
-        5  => ['reward' => 2, 'stepCount' => 3],
-        6  => ['reward' => 4, 'stepCount' => 3],
-        7  => ['reward' => 5, 'stepCount' => 3],
-        8  => ['reward' => 3, 'stepCount' => 3], //changed
-        9  => ['reward' => 3, 'stepCount' => 3], //changed
-        10 => ['reward' => 5, 'stepCount' => 3],
-        11 => ['reward' => 1, 'stepCount' => 6],
+        self::QUEST_ADVENTURE => ['reward' => 5, 'stepCount' => 1],
+        self::QUEST_RAID_UNOCCUPIED_OASIS => ['reward' => 3, 'stepCount' => 3],
+        self::QUEST_ATTACK_NATARS => ['reward' => 3, 'stepCount' => 3],
+        self::QUEST_WIN_AUCTION => ['reward' => 5, 'stepCount' => 1],
+        self::QUEST_GOLD => ['reward' => 2, 'stepCount' => 3],
+        self::QUEST_UPGRADE_BUILDING => ['reward' => 4, 'stepCount' => 3],
+        self::QUEST_UPGRADE_FIELD => ['reward' => 5, 'stepCount' => 3],
+        self::QUEST_TRAIN_INFANTRY => ['reward' => 3, 'stepCount' => 3], //changed
+        self::QUEST_TRAIN_CAVALRY => ['reward' => 3, 'stepCount' => 3], //changed
+        self::QUEST_CELEBRATION => ['reward' => 5, 'stepCount' => 3],
+        self::QUEST_ALLIANCE_CONTRIBUTION => ['reward' => 1, 'stepCount' => 6],
     ];
     /** @var array<string, array<string, mixed>> */
     private array $quest_json_data = [
@@ -403,7 +435,7 @@ class DailyQuestModel
         [$id, $base, $effect] = self::REWARDS[$milestone][$type];
         $value = self::calcEffect($base, $effect);
         if ($effect === 'plus' || $effect === 'productionBoost') {
-            $value = round($value / 86400, 2);
+            $value = round($value / Time::DAY, 2);
         }
 
         return ['id' => $id, 'value' => is_float($value) && floor($value) === $value ? (int)$value : $value];
@@ -642,7 +674,7 @@ class DailyQuestModel
     {
         $quest = $this->normalizeQuestProgress($quest);
         $json = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= self::QUEST_COUNT; ++$i) {
             if (!$this->isQuestCompleted($i, $quest['qst' . $i])) {
                 if ($i < 10) {
                     $i = '0' . $i;
@@ -678,7 +710,7 @@ class DailyQuestModel
     {
         $quest = $this->normalizeQuestProgress($quest);
         $points = 0;
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= self::QUEST_COUNT; ++$i) {
             $points += $this->getQuestReward($i, $quest['qst' . $i]);
         }
 
@@ -740,7 +772,7 @@ class DailyQuestModel
      */
     private function normalizeQuestProgress(array $quest): array
     {
-        for ($questId = 1; $questId <= 11; ++$questId) {
+        for ($questId = 1; $questId <= self::QUEST_COUNT; ++$questId) {
             $column = 'qst' . $questId;
             $quest[$column] = min(
                 $this->getStepCount($questId),

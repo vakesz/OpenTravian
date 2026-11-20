@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\Buildings;
 
 use Core\Database\DB;
+use Game\Gid;
 
 /**
  * Main Building "Rearrange your buildings": the player permutes the buildings of
@@ -32,7 +33,7 @@ final class BuildingRearranger
     public const BUILDING_ID_PREFIX = '2504';
 
     /** Main Building, Rally Point, the tribe walls and the World Wonder cannot be moved. */
-    public const FIXED_GIDS = [15, 16, 31, 32, 33, 40, 42, 43, 47, 50];
+    public const FIXED_GIDS = [Gid::MAIN_BUILDING, Gid::RALLY_POINT, Gid::CITY_WALL, Gid::EARTH_WALL, Gid::PALISADE, Gid::WONDER_OF_THE_WORLD, Gid::STONE_WALL, Gid::MAKESHIFT_WALL, Gid::DEFENSIVE_WALL, Gid::BARRICADE];
 
     /**
      * @param array<int,int> $gids slot => building type; slots that hold a fixed building are left out

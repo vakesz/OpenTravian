@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\AdminUi;
+use Game\UserId;
 use Model\InfoBoxModel;
 
 /**
@@ -55,7 +58,7 @@ class DetectorCtrl
         }
         if (isset($_GET['deletePlayer'])) {
             $uid = (int) $_GET['deletePlayer'];
-            $db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 600) . ')');
+            $db->query('INSERT IGNORE INTO deleting (uid, time) VALUES (' . $uid . ', ' . (time() + 10 * Time::MINUTE) . ')');
             AdminLog::getInstance()->addLog('Detector queued deletion for uid ' . $uid . '.');
 
             return AdminUi::notice('Player ' . $uid . ' will be deleted in 10 minutes.', 'warning');
@@ -78,18 +81,18 @@ class DetectorCtrl
             return;
         }
         $end = $time === 0 ? 0 : $time + time();
-        $db->run('UPDATE users SET access=0 WHERE id=?', [$uid]);
+        $db->run('UPDATE users SET access=' . AccessLevel::BANNED . ' WHERE id=?', [$uid]);
         if ($db->affectedRows()) {
             $db->run('INSERT INTO `banQueue`(`uid`, `reason`, `time`, `end`) VALUES (?, ?, ?, ?)', [$uid, $reason, time(), $end]);
             $db->run('INSERT INTO `banHistory`(`uid`, `reason`, `time`, `end`) VALUES (?, ?, ?, ?)', [$uid, $reason, time(), $end]);
             $db->run('DELETE FROM multiaccount_users WHERE uid=?', [$uid]);
-            (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * 86400);
+            (new InfoBoxModel())->addInfo($uid, 0, 14, '', time(), time() + 365 * Time::DAY);
         }
     }
 
     private function releaseBannedPlayer(DB $db, int $uid): void
     {
-        $db->run('UPDATE users SET access=1 WHERE id=?', [$uid]);
+        $db->run('UPDATE users SET access=' . AccessLevel::PLAYER . ' WHERE id=?', [$uid]);
         if ($db->affectedRows()) {
             (new InfoBoxModel())->deleteInfoByType($uid, 14);
         }
@@ -102,7 +105,7 @@ class DetectorCtrl
             . '<th>Player</th><th>Pop</th><th>Gold</th><th>Silver</th><th>Auction silver</th><th></th>'
             . '</tr></thead><tbody>';
         $auctions = $db->query(
-            'SELECT DISTINCT uid FROM auction a WHERE a.bids > 0 AND a.uid > 2 AND (SELECT access FROM users WHERE id=a.uid)=1 '
+            'SELECT DISTINCT uid FROM auction a WHERE a.bids > 0 AND a.uid > ' . UserId::LAST_SYSTEM . ' AND (SELECT access FROM users WHERE id=a.uid)=1 '
             . 'ORDER BY (SELECT SUM(silver) FROM auction WHERE uid=a.uid) DESC, a.uid ASC'
         );
         $count = 0;
@@ -141,7 +144,7 @@ class DetectorCtrl
             . '</tr></thead><tbody>';
         $users = $db->query(
             'SELECT DISTINCT a.* FROM users a JOIN users b ON a.total_pop = b.total_pop AND a.id != b.id '
-            . 'AND a.id > 2 AND a.access=1 AND a.total_pop > 100'
+            . 'AND a.id > ' . UserId::LAST_SYSTEM . ' AND a.access=' . AccessLevel::PLAYER . ' AND a.total_pop > 100'
         );
         $count = 0;
         while ($row = $users->fetch_assoc()) {
@@ -200,13 +203,13 @@ class DetectorCtrl
         if ($end === 0) {
             return 'Never';
         }
-        if ($diff > 86400) {
-            return round($diff / 86400, 1) . 'd';
+        if ($diff > Time::DAY) {
+            return round($diff / Time::DAY, 1) . 'd';
         }
-        if ($diff > 3600) {
-            return round($diff / 3600, 1) . 'h';
+        if ($diff > Time::HOUR) {
+            return round($diff / Time::HOUR, 1) . 'h';
         }
 
-        return round($diff / 60, 1) . 'm';
+        return round($diff / Time::MINUTE, 1) . 'm';
     }
 }

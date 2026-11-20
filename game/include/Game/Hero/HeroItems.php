@@ -3,7 +3,9 @@
 namespace Game\Hero;
 
 use Core\Config;
+use Core\Time;
 use Game\Formulas;
+use Game\Tribes;
 
 class HeroItems
 {
@@ -15,24 +17,24 @@ class HeroItems
     public static function getAvailableItemTypes(): array
     {
         $btypes = [
-            1 => range(1, 15),
-            2 => range(82, 93),
-            3 => array_merge(range(61, 69), range(73, 81)),
-            4 => array_merge(range(16, 60), range(164, 178)),
-            5 => range(94, 102),
-            6 => range(103, 105),
-            7 => [112],
-            8 => [113],
-            9 => [114],
-            10 => [107],
-            11 => [106],
-            12 => [108],
-            13 => [110],
-            14 => [109],
-            15 => [111],
+            ItemBtype::HELMET => range(1, 15),
+            ItemBtype::BODY => range(82, 93),
+            ItemBtype::LEFT_HAND => array_merge(range(61, 69), range(73, 81)),
+            ItemBtype::RIGHT_HAND => array_merge(range(16, 60), range(164, 178)),
+            ItemBtype::SHOES => range(94, 102),
+            ItemBtype::HORSE => range(103, 105),
+            ItemBtype::SMALL_BANDAGE => [ItemType::SMALL_BANDAGE],
+            ItemBtype::BANDAGE => [ItemType::BANDAGE],
+            ItemBtype::CAGE => [ItemType::CAGE],
+            ItemBtype::SCROLL => [ItemType::SCROLL],
+            ItemBtype::OINTMENT => [ItemType::OINTMENT],
+            ItemBtype::BUCKET => [ItemType::BUCKET],
+            ItemBtype::BOOK_OF_WISDOM => [ItemType::BOOK_OF_WISDOM],
+            ItemBtype::TABLET_OF_LAW => [ItemType::TABLET_OF_LAW],
+            ItemBtype::ARTWORK => [ItemType::ARTWORK],
         ];
 
-        if (array_intersect([6, 7, 8, 9], \Game\Tribes::playable())) {
+        if (array_intersect([Tribes::EGYPTIANS, Tribes::HUNS, Tribes::SPARTANS, Tribes::VIKINGS], \Game\Tribes::playable())) {
             $btypes[4] = array_merge($btypes[4], range(115, 144), range(149, 163));
         }
 
@@ -55,7 +57,7 @@ class HeroItems
      */
     public static function tileSlot(int $btype, string $slot): string
     {
-        return in_array($btype, [12, 13, 15], true) ? 'inventory' : $slot;
+        return in_array($btype, [ItemBtype::BUCKET, ItemBtype::BOOK_OF_WISDOM, ItemBtype::ARTWORK], true) ? 'inventory' : $slot;
     }
 
     /**
@@ -68,7 +70,7 @@ class HeroItems
         $btype = mt_rand(1, 15);
         $type = $btypes[$btype][mt_rand(0, sizeof($btypes[$btype]) - 1)];
         $consume = FALSE;
-        if ($btype >= 7 && $btype != 12 && $btype != 13) {
+        if ($btype >= ItemBtype::FIRST_CONSUMABLE && $btype != ItemBtype::BUCKET && $btype != ItemBtype::BOOK_OF_WISDOM) {
             $consume = TRUE;
         }
         return ["btype" => $btype, "type" => $type, "consume" => $consume];
@@ -89,12 +91,12 @@ class HeroItems
 
         // Carried adventure/quest resources — inventory tiles item145–148.
         // attributes must be a string[] — Inventory JS calls attributes.join().
-        if ($btype === 16 && in_array($type, [145, 146, 147, 148], true)) {
+        if ($btype === ItemBtype::RESOURCES && in_array($type, [ItemType::RESOURCE_WOOD, ItemType::RESOURCE_CLAY, ItemType::RESOURCE_IRON, ItemType::RESOURCE_CROP], true)) {
             $names = [
-                145 => (string)T('inGame', 'resources.r1'),
-                146 => (string)T('inGame', 'resources.r2'),
-                147 => (string)T('inGame', 'resources.r3'),
-                148 => (string)T('inGame', 'resources.r4'),
+                ItemType::RESOURCE_WOOD => (string)T('inGame', 'resources.r1'),
+                ItemType::RESOURCE_CLAY => (string)T('inGame', 'resources.r2'),
+                ItemType::RESOURCE_IRON => (string)T('inGame', 'resources.r3'),
+                ItemType::RESOURCE_CROP => (string)T('inGame', 'resources.r4'),
             ];
             // hero.json calls this out as a transfer action, not a
             // production bonus. Persian has no catalog, so do
@@ -115,7 +117,7 @@ class HeroItems
         // The Spartan weapon sets (149-163) carry the same effect as the other tribes' weapons: an attack and
         // defence bonus per unit plus fighting strength. The catalogue publishes no legacy attribute text for them, so
         // the name is shown only where the catalogue has one and the effect comes from the tooltip builder.
-        if ($btype === 4 && $type >= 149 && $type <= 163) {
+        if ($btype === ItemBtype::RIGHT_HAND && $type >= 149 && $type <= 163) {
             // Hoplite, Shieldsman, Twinsteel Therion, Elpida Rider and Corinthian Crusher, three tiers each.
             $weapon = [[71, 4, 2], [73, 4, 2], [74, 4, 2], [75, 8, 4], [76, 12, 6]][intdiv($type - 149, 3)];
             $tier = ($type - 149) % 3;
@@ -137,7 +139,7 @@ class HeroItems
         // Viking weapons (164-178). Heimdall's Eye has none. Thrall and Shield
         // Maiden are +3/+4/+5; Berserker, Huskarl Rider and Valkyrie's Blessing
         // are +6/+8/+10, each with fighting strength 250/1000/4000.
-        if ($btype === 4 && $type >= 164 && $type <= 178) {
+        if ($btype === ItemBtype::RIGHT_HAND && $type >= 164 && $type <= 178) {
             $weapon = [[81, 3, 1], [82, 3, 1], [83, 6, 2], [85, 6, 2], [86, 6, 2]][intdiv($type - 164, 3)];
             $tier = ($type - 164) % 3;
             $result['name'] = in_array(get_locale(), ['en-US', 'ar-AE', 'el-GR'], true)
@@ -156,30 +158,30 @@ class HeroItems
         }
 
         $result['name'] = T("HeroItems", "{$btype}.{$type}.name");
-        if ($btype == 1) {
+        if ($btype == ItemBtype::HELMET) {
             $result['slot'] = "helmet";
-        } elseif ($btype == 2) {
+        } elseif ($btype == ItemBtype::BODY) {
             $result['slot'] = "body";
-        } elseif ($btype == 3) {
+        } elseif ($btype == ItemBtype::LEFT_HAND) {
             $result['slot'] = "leftHand";
-        } elseif ($btype == 4) {
+        } elseif ($btype == ItemBtype::RIGHT_HAND) {
             $result['slot'] = "rightHand";
-        } elseif ($btype == 5) {
+        } elseif ($btype == ItemBtype::SHOES) {
             $result['slot'] = "shoes";
-        } elseif ($btype == 6) {
+        } elseif ($btype == ItemBtype::HORSE) {
             $result['slot'] = "horse";
-        } elseif ($btype >= 7) {
+        } elseif ($btype >= ItemBtype::FIRST_CONSUMABLE) {
             $result['slot'] = "bag";
         }
         $result['instant'] = !($btype <= 9 || $btype == 10);
-        if ($btype < 7 || $btype == 10 || $btype == 11) {
+        if ($btype < ItemBtype::FIRST_CONSUMABLE || $btype == ItemBtype::SCROLL || $btype == ItemBtype::OINTMENT) {
             $result['isUsableIfDead'] = FALSE;
         } else {
             $result['isUsableIfDead'] = TRUE;
         }
         $result['attributes'] = T("HeroItems", "{$btype}.{$type}.title");
         switch ($btype) {
-            case 1:
+            case ItemBtype::HELMET:
                 if ($type <= 3) {
                     $result['exp'] = (10 + ($type * 5)) * $heroItemsSettings['heroExtraExperienceGainRate'];
                     $result['attributes'] = sprintf($result['attributes'], $result['exp']);
@@ -197,7 +199,7 @@ class HeroItems
                     $result['attributes'] = sprintf($result['attributes'], $result['inf']);
                 }
                 break;
-            case 2:
+            case ItemBtype::BODY:
                 if ($type <= 84) {
                     $result['reg'] = (20 + (($type - 82) * 10)) * $heroItemsSettings['heroRegenerationRate'];
                     $result['attributes'] = sprintf($result['attributes'], $result['reg']);
@@ -214,7 +216,7 @@ class HeroItems
                     $result['attributes'] = sprintf($result['attributes'], $result['hero_power'], $result['resist']);
                 }
                 break;
-            case 3:
+            case ItemBtype::LEFT_HAND:
                 if ($type <= 63) {
                     $result['return_speed'] = (30 + (($type - 61) * 10)) * $heroItemsSettings['heroIncreaseSpeedRate'];
                     $result['attributes'] = sprintf($result['attributes'], $result['return_speed']);
@@ -235,7 +237,7 @@ class HeroItems
                     $result['attributes'] = sprintf($result['attributes'], $result['powerAgainstNatars']);
                 }
                 break;
-            case 4:
+            case ItemBtype::RIGHT_HAND:
                 //roman tribe
                 if ($type <= 18) {
                     $result['unitId'] = 1;
@@ -441,7 +443,7 @@ class HeroItems
                         $result['unit_power']);
                 }
                 break;
-            case 5:
+            case ItemBtype::SHOES:
                 if ($type <= 96) {
                     $result['reg'] = (10 + (($type - 94) * 5)) * $heroItemsSettings['heroRegenerationRate'];
                     $result['attributes'] = sprintf($result['attributes'], $result['reg']);
@@ -456,7 +458,7 @@ class HeroItems
                     $result['attributes'] = sprintf($result['attributes'], $result['hero_cav_speed']);
                 }
                 break;
-            case 6:
+            case ItemBtype::HORSE:
                 if ($type <= 105) {
                     // Legends article 89: the mount itself is 14 / 17 / 20 fields per
                     // hour at ×1. Movement scaling is applied when the hero travels.
@@ -464,41 +466,41 @@ class HeroItems
                     $result['attributes'] = sprintf($result['attributes'], $result['speed_horse']);
                 }
                 break;
-            case 7:
+            case ItemBtype::SMALL_BANDAGE:
                 $result['revive'] = 25 * $heroItemsSettings['heroReviveRate'];
                 $result['arrival_time'] = 24 / $heroItemsSettings['heroReviveArrivalTimeRate'];
                 $result['attributes'] = sprintf($result['attributes'], $result['revive'], $result['arrival_time']);
                 break;
-            case 8:
+            case ItemBtype::BANDAGE:
                 $result['revive'] = 33 * $heroItemsSettings['heroReviveRate'];
                 $result['arrival_time'] = 24 / $heroItemsSettings['heroReviveArrivalTimeRate'];
                 $result['attributes'] = sprintf($result['attributes'], $result['revive'], $result['arrival_time']);
                 break;
-            case 9:
+            case ItemBtype::CAGE:
                 break;
-            case 10:
+            case ItemBtype::SCROLL:
                 $result['exp'] = 10 * $heroItemsSettings['heroExtraExperienceGainRate'] * Formulas::getHeroExpLevelMultiplier();
                 break;
-            case 11:
+            case ItemBtype::OINTMENT:
                 $result['reg'] = 1;
                 $result['attributes'] = sprintf($result['attributes'], 100);
                 break;
-            case 12:
+            case ItemBtype::BUCKET:
                 break;
-            case 13:
+            case ItemBtype::BOOK_OF_WISDOM:
                 break;
-            case 14:
+            case ItemBtype::TABLET_OF_LAW:
                 $result['loyalty'] = 1;
                 $result['attributes'] = sprintf($result['attributes'], $result['loyalty'], 125);
                 break;
-            case 15:
+            case ItemBtype::ARTWORK:
                 $artwork = Artwork::rules((int)getGameSpeed());
                 $result['cp'] = $artwork['limit'];
                 $result['attributes'] = sprintf(
                     $result['attributes'],
                     rtrim(rtrim(number_format(100 * $artwork['numerator'] / $artwork['denominator'], 2, '.', ''), '0'), '.'),
                     $artwork['limit'],
-                    intdiv($artwork['cooldown'], 3600)
+                    intdiv($artwork['cooldown'], Time::HOUR)
                 );
                 break;
         }

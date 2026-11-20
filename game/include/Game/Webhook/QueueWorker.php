@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\Webhook;
 
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Posts queued events to Discord, at most one per engine tick (the job runs every five seconds, so at most twelve
@@ -17,7 +18,7 @@ final class QueueWorker
     private const LEASE_SECONDS = 30;
     private const MAX_ATTEMPTS = 8;
     private const RETRY_BASE_SECONDS = 30;
-    private const RETRY_MAX_SECONDS = 3600;
+    private const RETRY_MAX_SECONDS = Time::HOUR;
 
     public function __construct(
         private readonly ?WebhookConfig $config = null,
@@ -57,7 +58,7 @@ final class QueueWorker
             return 1;
         }
         if ($result['status'] === 429) {
-            $wait = min(600, max(1, $result['retryAfter']));
+            $wait = min(10 * Time::MINUTE, max(1, $result['retryAfter']));
             $db->run('UPDATE webhook_queue SET next_attempt_at=?, lease_until=0 WHERE id=?', [time() + $wait, $id]);
 
             return 0;

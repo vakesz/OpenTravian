@@ -126,7 +126,7 @@ final class SilverExchange
         if ($direction === self::GOLD_TO_SILVER) {
             $exchangedFrom = $amount;
             $exchangedTo = $amount * self::SILVER_PER_GOLD_SPENT;
-            (new DailyQuestModel())->setQuestAsCompleted($session->getPlayerId(), 5);
+            (new DailyQuestModel())->setQuestAsCompleted($session->getPlayerId(), DailyQuestModel::QUEST_GOLD);
         } else {
             $exchangedFrom = $gold * self::SILVER_PER_GOLD;
             $exchangedTo = $gold;

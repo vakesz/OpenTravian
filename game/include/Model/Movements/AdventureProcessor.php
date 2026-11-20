@@ -6,14 +6,20 @@ namespace Model\Movements;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\Hero\Artwork;
 use Game\Hero\HeroExperience;
 use Game\Helpers\HeroHealthHelper;
 use Game\Hero\HeroHelper;
+use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\NoticeHelper;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Game\SpeedCalculator;
+use Game\Tribes;
+use Game\Unit;
 use Model\AdventureModel;
 use Model\ArtefactsModel;
 use Model\AuctionModel;
@@ -32,7 +38,7 @@ class AdventureProcessor
      */
     public function __construct(array $row)
     {
-        $row['end_time_seconds'] = (int) ceil($row['end_time'] / 1000);
+        $row['end_time_seconds'] = (int) ceil($row['end_time'] / Time::SECOND_MS);
 
         $db = DB::getInstance();
         $owner = $db->fetchScalar("SELECT owner FROM vdata WHERE kid={$row['kid']}");
@@ -46,7 +52,7 @@ class AdventureProcessor
             return;
         }
         $config = Config::getInstance();
-        (new DailyQuestModel())->setQuestAsCompleted($owner, 1);
+        (new DailyQuestModel())->setQuestAsCompleted($owner, DailyQuestModel::QUEST_ADVENTURE);
         $stmt = $db->query("SELECT dif, id, created FROM adventure WHERE uid=$owner AND end=0 AND kid={$row['to_kid']}");
         if (!$stmt->num_rows) {
             $this->returnHero($owner, $row);
@@ -76,7 +82,7 @@ class AdventureProcessor
         if ($success_adventures < 20) {
             $rate /= 2.7;
         }
-        $sgh *= abs((time() - $user['signupTime']) / ($config->game->round_length * 86400)) + 1;
+        $sgh *= abs((time() - $user['signupTime']) / ($config->game->round_length * Time::DAY)) + 1;
         $exp = (int) round($heroPureExp * ((100 + $helper->calcMoreExp($inventory['helmet'])) / 100));
         $expMul = Formulas::getHeroExpLevelMultiplier();
         if ($expMul > 1) {
@@ -126,7 +132,7 @@ class AdventureProcessor
                 case 1://pomad
                     $num = mt_rand(20, 25);
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 11, 106, $num);
+                    $auction->addItemToUser($owner, ItemBtype::OINTMENT, ItemType::OINTMENT, $num);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -161,7 +167,7 @@ class AdventureProcessor
                     break;
                 case 4://asb
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 6, 103, 1);
+                    $auction->addItemToUser($owner, ItemBtype::HORSE, 103, 1);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -179,7 +185,7 @@ class AdventureProcessor
                 case 8://ghafas
                     $num = 6 * $config->game->cage_multiplier;
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 9, 114, $num);
+                    $auction->addItemToUser($owner, ItemBtype::CAGE, ItemType::CAGE, $num);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -267,7 +273,7 @@ class AdventureProcessor
                 case 512:
                     //ketab
                     $auction = new AuctionModel();
-                    $auction->addItemToUser($owner, 13, 110, 1);
+                    $auction->addItemToUser($owner, ItemBtype::BOOK_OF_WISDOM, ItemType::BOOK_OF_WISDOM, 1);
                     NoticeHelper::addNotice(0,
                         $owner,
                         $row['kid'],
@@ -299,68 +305,68 @@ class AdventureProcessor
             }
             $tearNum = Formulas::heroItemsTierAt((int) $adventureRow['created'] - (int) Config::getInstance()->game->start_time);
             do {
-                if($db->fetchScalar("SELECT COUNT(id) FROM items WHERE uid=$owner AND btype=6 AND type=" . (102+$tearNum))){
+                if($db->fetchScalar("SELECT COUNT(id) FROM items WHERE uid=$owner AND btype=" . ItemBtype::HORSE . " AND type=" . (102+$tearNum))){
                     $bonus = mt_rand(1, max(18, 30 - $success_adventures));
                 } else {
                     break;
                 }
-            } while($bonus == 6);
+            } while($bonus == ItemBtype::HORSE);
             $bonus = self::ungatedAdventureBonus((int)$bonus, $success_adventures);
             switch ($bonus) {
-                case 1:
+                case ItemBtype::HELMET:
                     $rand = [
                         1 => [1 => 1, 4, 7, 10, 13],
                         2 => [1 => 2, 5, 8, 11, 14],
                         3 => [1 => 3, 6, 9, 12, 15],
                     ][$tearNum];
                     break;
-                case 2:
+                case ItemBtype::BODY:
                     $rand = [
                         1 => [1 => 82, 85, 88, 91],
                         2 => [1 => 83, 86, 89, 92],
                         3 => [1 => 84, 87, 90, 93],
                     ][$tearNum];
                     break;
-                case 3:
+                case ItemBtype::LEFT_HAND:
                     $rand = [
                         1 => [1 => 61, 64, 67, 73, 79],
                         2 => [1 => 62, 65, 68, 74, 77, 80],
                         3 => [1 => 63, 66, 69, 75, 78, 81],
                     ][$tearNum];
                     break;
-                case 4:
+                case ItemBtype::RIGHT_HAND:
                     $weapons = [
-                        1 => [
+                        Tribes::ROMANS => [
                             1 => [1 => 16, 19, 22, 25, 28],
                             2 => [1 => 17, 20, 23, 26, 29],
                             3 => [1 => 18, 21, 24, 27, 30],
                         ],
-                        2 => [
+                        Tribes::TEUTONS => [
                             1 => [1 => 46, 49, 52, 55, 58],
                             2 => [1 => 47, 50, 53, 56, 59],
                             3 => [1 => 48, 51, 54, 57, 60],
                         ],
-                        3 => [
+                        Tribes::GAULS => [
                             1 => [1 => 31, 34, 37, 40, 43],
                             2 => [1 => 32, 35, 38, 41, 44],
                             3 => [1 => 33, 36, 39, 42, 45],
                         ],
-                        6 => [
+                        Tribes::EGYPTIANS => [
                             1 => [1 => 115, 118, 121, 124, 127],
                             2 => [1 => 116, 119, 122, 125, 128],
                             3 => [1 => 117, 120, 123, 126, 129],
                         ],
-                        7 => [
+                        Tribes::HUNS => [
                             1 => [1 => 130, 133, 136, 139, 142],
                             2 => [1 => 131, 134, 137, 140, 143],
                             3 => [1 => 132, 135, 138, 141, 144],
                         ],
-                        8 => [
+                        Tribes::SPARTANS => [
                             1 => [1 => 149, 152, 155, 158, 161],
                             2 => [1 => 150, 153, 156, 159, 162],
                             3 => [1 => 151, 154, 157, 160, 163],
                         ],
-                        9 => [
+                        Tribes::VIKINGS => [
                             1 => [1 => 164, 167, 170, 173, 176],
                             2 => [1 => 165, 168, 171, 174, 177],
                             3 => [1 => 166, 169, 172, 175, 178],
@@ -368,46 +374,46 @@ class AdventureProcessor
                     ];
                     $rand = $weapons[(int) $row['race']][$tearNum] ?? 0;
                     break;
-                case 5:
+                case ItemBtype::SHOES:
                     $rand = [
                         1 => [1 => 94, 97, 100],
                         2 => [1 => 95, 98, 101],
                         3 => [1 => 96, 99, 102],
                     ][$tearNum];
                     break;
-                case 6:
+                case ItemBtype::HORSE:
                     $rand = [
                         1 => [1 => 103],
                         2 => [1 => 104],
                         3 => [1 => 105],
                     ][$tearNum];
                     break;
-                case 7:
-                    $rand = [1 => 112];
+                case ItemBtype::SMALL_BANDAGE:
+                    $rand = [1 => ItemType::SMALL_BANDAGE];
                     break;
-                case 8:
-                    $rand = [1 => 113];
+                case ItemBtype::BANDAGE:
+                    $rand = [1 => ItemType::BANDAGE];
                     break;
-                case 9:
-                    $rand = [1 => 114];
+                case ItemBtype::CAGE:
+                    $rand = [1 => ItemType::CAGE];
                     break;
-                case 10:
-                    $rand = [1 => 107];
+                case ItemBtype::SCROLL:
+                    $rand = [1 => ItemType::SCROLL];
                     break;
-                case 11:
-                    $rand = [1 => 106];
+                case ItemBtype::OINTMENT:
+                    $rand = [1 => ItemType::OINTMENT];
                     break;
-                case 12:
-                    $rand = [1 => 108];
+                case ItemBtype::BUCKET:
+                    $rand = [1 => ItemType::BUCKET];
                     break;
-                case 13:
-                    $rand = [1 => 110];
+                case ItemBtype::BOOK_OF_WISDOM:
+                    $rand = [1 => ItemType::BOOK_OF_WISDOM];
                     break;
-                case 14:
-                    $rand = [1 => 109];
+                case ItemBtype::TABLET_OF_LAW:
+                    $rand = [1 => ItemType::TABLET_OF_LAW];
                     break;
-                case 15:
-                    $rand = Artwork::canDrop((int)$success_adventures) ? [1 => 111] : 0;
+                case ItemBtype::ARTWORK:
+                    $rand = Artwork::canDrop((int)$success_adventures) ? [1 => ItemType::ARTWORK] : 0;
                     break;
                 default:
                     $rand = 0;
@@ -540,7 +546,7 @@ class AdventureProcessor
         $calc->setLeftHand($inventory['leftHand']);
         $calc->setShoes($inventory['shoes']);
         $calc->setArtefactEffect($artifact_effect);
-        $units = array_fill(1, 11, 0);
+        $units = array_fill(1, Unit::LAST, 0);
         $units[11] = 1;
         $timeNeeded = $calc->calc();
         (new MovementsModel())->addMovement((int) $row['to_kid'],
@@ -551,10 +557,10 @@ class AdventureProcessor
             0,
             0,
             0,
-            1,
+            MovementsModel::MODE_RETURN,
             (int) $row['attack_type'],
             $row['end_time'],
-            $row['end_time'] + 1000 * $timeNeeded,
+            $row['end_time'] + Time::SECOND_MS * $timeNeeded,
             $row['data'] === null ? null : (string) $row['data']);
     }
 
@@ -590,12 +596,12 @@ class AdventureProcessor
         $calc->setFrom($row['to_kid']);
         $calc->setTo($row['kid']);
         $calc->isReturn();
-        $units = array_fill(1, 11, 0);
+        $units = array_fill(1, Unit::LAST, 0);
         $units[$nr] = $num;
         $speeds[] = Formulas::uSpeed(nrToUnitId($nr, $row['race']));
         $db = DB::getInstance();
         $buildings = $db->query("SELECT * FROM fdata WHERE kid={$row['kid']}")->fetch_assoc();
-        for ($i = 19; $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
             if ($buildings['f' . $i . 't'] == 14) {
                 $calc->setTournamentSqLvl($buildings['f' . $i]);
                 break;
@@ -612,10 +618,10 @@ class AdventureProcessor
             0,
             0,
             0,
-            1,
+            MovementsModel::MODE_RETURN,
             (int) $row['attack_type'],
             $row['end_time'],
-            $row['end_time'] + 1000 * $calc->calc(),
+            $row['end_time'] + Time::SECOND_MS * $calc->calc(),
             null
         );
     }

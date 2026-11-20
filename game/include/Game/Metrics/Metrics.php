@@ -8,6 +8,7 @@ use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Jobs\EngineHeartbeat;
 use Core\Jobs\QueueDepths;
+use Core\Time;
 
 /**
  * The Prometheus text exposition of the engine and the world: heartbeat, queues, mail, players,
@@ -18,7 +19,7 @@ use Core\Jobs\QueueDepths;
 final class Metrics
 {
     /** Players count as online when they were active this many seconds ago (the admin panel's 10 minutes). */
-    public const ONLINE_SECONDS = 600;
+    public const ONLINE_SECONDS = 10 * Time::MINUTE;
     public const REQUEST_COUNTER_KEY = 'metrics:requests';
 
     private const REQUEST_CLASSES = ['1xx', '2xx', '3xx', '4xx', '5xx'];
@@ -51,7 +52,7 @@ final class Metrics
             'heartbeatAge' => $beat !== null && isset($beat['ts']) ? max(0, $now - (int) $beat['ts']) : null,
             'engineStarted' => $beat !== null && isset($beat['started_at']) ? (int) $beat['started_at'] : null,
             'roundEnd' => $round['ended_at'] ?? null,
-            'roundDuration' => isset($round['duration_ms']) ? $round['duration_ms'] / 1000 : null,
+            'roundDuration' => isset($round['duration_ms']) ? $round['duration_ms'] / Time::SECOND_MS : null,
             'queues' => QueueDepths::read($now),
             'playersOnline' => self::scalar($world, 'SELECT COUNT(*) FROM users WHERE last_login_time > ' . ($now - self::ONLINE_SECONDS)),
             'playersTotal' => self::scalar($world, 'SELECT COUNT(*) FROM users'),

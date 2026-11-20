@@ -6,9 +6,11 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\ResourcesHelper;
 use Game\Ships;
+use Game\Unit;
 use mysqli_result;
 
 use function nanoseconds;
@@ -86,7 +88,7 @@ class TrainingModel
         if (Config::getProperty('game', 'useNanoseconds')) {
             $rate = 1e9;
         } elseif (Config::getProperty('game', 'useMilSeconds')) {
-            $rate = 1000;
+            $rate = Time::SECOND_MS;
         }
         $totalTrainingTime = (int) DB::getInstance()->fetchScalar(
             'SELECT SUM(training_time*num) FROM training WHERE kid=?',
@@ -167,7 +169,7 @@ class TrainingModel
         if ($commence > $current) {
             return;
         }
-        if ($nr === 11) {
+        if ($nr === Unit::HERO) {
             $trained = 1;
         } else {
             if ($trainingTime === 0 || $endTime === 0 || $commence === 0) {
@@ -187,7 +189,7 @@ class TrainingModel
             $newCommence = $endTime - (($leftOnTraining - 1) * $trainingTime);
             $db->run('UPDATE training SET num=?, commence=? WHERE id=?', [$leftOnTraining, $newCommence, $id]);
         }
-        if ($nr === 11) {
+        if ($nr === Unit::HERO) {
             $this->regenerateHero(-1, $kid);
             return;
         }

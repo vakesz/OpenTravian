@@ -172,7 +172,7 @@ final class AllianceDonation
             }
 
             if ($triple) {
-                (new DailyQuestModel())->setQuestAsCompleted($uid, 5);
+                (new DailyQuestModel())->setQuestAsCompleted($uid, DailyQuestModel::QUEST_GOLD);
             }
             if (!$db->commit()) {
                 throw new \RuntimeException('unavailable');

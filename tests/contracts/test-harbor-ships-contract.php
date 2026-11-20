@@ -87,7 +87,7 @@ foreach ([
 assertShips(!str_contains($html, 'Warning') && !str_contains($html, 'Notice'), 'The Harbor page renders without PHP notices.');
 
 foreach ([
-    'game/include/Controller/BuildCtrl.php' => ['case 49:', 'new HarborCtrl', 'Ships::maxShips($lvl)'],
+    'game/include/Controller/BuildCtrl.php' => ['case Gid::HARBOR:', 'new HarborCtrl', 'Ships::maxShips($lvl)'],
     'game/include/Game/Buildings/BuildingAction.php' => ['Ships::HARBOR_GID && $complete', 'ship1=0'],
     'game/include/Game/FarmList/FarmListSender.php' => ['Ships::boardRaid'],
     'game/include/Game/FarmList/FarmListStore.php' => ['Ships::hasHarbor', "'useShip'"],

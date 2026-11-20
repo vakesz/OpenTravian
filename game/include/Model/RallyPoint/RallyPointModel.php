@@ -7,7 +7,9 @@ namespace Model\RallyPoint;
 use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Core\Village;
+use Game\Formulas;
 use InvalidArgumentException;
 use Model\MovementsModel;
 use mysqli_result;
@@ -93,20 +95,22 @@ class RallyPointModel
         $attackType = (int) $task['attack_type'];
 
         if (getCustom('realCancelAttack')) {
-            $abort = ($miliseconds - (int) $task['start_time']) <= 90 * 1000;
+            $abort = ($miliseconds - (int) $task['start_time']) <= 90 * Time::SECOND_MS;
         } else {
             $abort = ($miliseconds - (int) $task['start_time']) <= (round((int) $task['end_time'] - (int) $task['start_time'])) / 3;
         }
         if ($abort || $attackType === MovementsModel::ATTACKTYPE_EVASION) {
-            $db->query("UPDATE movement SET kid=$toKid, to_kid=$taskKid, mode=1, end_time=(" . (2 * $miliseconds) . "-start_time), start_time=$miliseconds WHERE id=$taskId");
+            $db->query("UPDATE movement SET kid=$toKid, to_kid=$taskKid, mode=" . MovementsModel::MODE_RETURN . ", end_time=(" . (2 * $miliseconds) . "-start_time), start_time=$miliseconds WHERE id=$taskId");
             if ($attackType === MovementsModel::ATTACKTYPE_RAID || $attackType === MovementsModel::ATTACKTYPE_NORMAL) {
                 Caching::getInstance()->delete('attacks' . $toKid);
             }
         }
 
-        if ($attackType === MovementsModel::ATTACKTYPE_SETTLERS && (int) $task['mode'] === 0) {
+        if ($attackType === MovementsModel::ATTACKTYPE_SETTLERS && (int) $task['mode'] === MovementsModel::MODE_GOING) {
             // Add resources
-            $db->query("UPDATE vdata SET wood=wood+750, clay=clay+750, iron=iron+750, crop=crop+750 WHERE kid=$taskKid");
+            // Refund exactly the founding payment procSettlers() took.
+            $cost = Formulas::newVillageCost();
+            $db->query("UPDATE vdata SET wood=wood+$cost, clay=clay+$cost, iron=iron+$cost, crop=crop+$cost WHERE kid=$taskKid");
         }
     }
 
@@ -261,7 +265,7 @@ class RallyPointModel
     public function checkMaxAttacks(int $kid): bool
     {
         $result = DB::getInstance()->query(
-            "SELECT (SELECT COUNT(id) FROM movement WHERE mode=0 AND kid=$kid) as `outGoing`, (SELECT COUNT(id) FROM movement WHERE mode=1 AND to_kid=$kid) as `inComing`"
+            "SELECT (SELECT COUNT(id) FROM movement WHERE mode=" . MovementsModel::MODE_GOING . " AND kid=$kid) as `outGoing`, (SELECT COUNT(id) FROM movement WHERE mode=" . MovementsModel::MODE_RETURN . " AND to_kid=$kid) as `inComing`"
         );
         $counts = $result instanceof mysqli_result ? $result->fetch_assoc() : null;
 
@@ -291,10 +295,10 @@ class RallyPointModel
     {
         $other = [];
         if ($subFilters[4]) {
-            $other[] = '(mode=0 AND attack_type!=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ')';
+            $other[] = '(mode=' . MovementsModel::MODE_GOING . ' AND attack_type!=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ')';
         }
         if ($subFilters[5]) {
-            $other[] = '(mode=0 AND attack_type=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ')';
+            $other[] = '(mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ')';
         }
 
         return $other === [] ? '' : 'AND (' . implode(' OR ', $other) . ')';
@@ -307,13 +311,13 @@ class RallyPointModel
     {
         $other = [];
         if ($subFilters[1]) {
-            $other[] = '(mode=0 AND (attack_type=' . MovementsModel::ATTACKTYPE_NORMAL . ' OR attack_type=' . MovementsModel::ATTACKTYPE_RAID . '))';
+            $other[] = '(mode=' . MovementsModel::MODE_GOING . ' AND (attack_type=' . MovementsModel::ATTACKTYPE_NORMAL . ' OR attack_type=' . MovementsModel::ATTACKTYPE_RAID . '))';
         }
         if ($subFilters[2]) {
-            $other[] = '(mode=1)';
+            $other[] = '(mode=' . MovementsModel::MODE_RETURN . ')';
         }
         if ($subFilters[3]) {
-            $other[] = '(mode=0 AND attack_type=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ')';
+            $other[] = '(mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ')';
         }
 
         return $other === [] ? '' : 'AND (' . implode(' OR ', $other) . ')';

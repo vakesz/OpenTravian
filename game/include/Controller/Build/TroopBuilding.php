@@ -11,12 +11,15 @@ use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\ExtraModules;
 use Game\Formulas;
+use Game\Gid;
 use Game\GoldHelper;
 use Game\Hero\HeroHelper;
 use Game\Hero\SessionHero;
 use Game\SpeedShortcuts;
 use Game\TrainingHelper;
 use Game\TrainingQueueView;
+use Game\Tribes;
+use Game\Unit;
 use function getDisplay;
 use Model\ArtefactsModel;
 use Model\DailyQuestModel;
@@ -29,7 +32,7 @@ class TroopBuilding extends AnyCtrl
     /** @var mixed */
     private $hero_percents = [0, 0];
     /** @var mixed */
-    private $building_id = 19;
+    private $building_id = Gid::BARRACKS;
     /** @var mixed */
     private $building_level = 1;
     /** @var float|int */
@@ -56,7 +59,7 @@ class TroopBuilding extends AnyCtrl
         $this->building_level = Village::getInstance()->getField($index)['level'];
         $this->art_eff = ArtefactsModel::getArtifactEffectByType(Session::getInstance()->getPlayerId(), Village::getInstance()->getKid(), ArtefactsModel::ARTIFACT_INCREASE_TRAINING_SPEED);
         $m = new TrainingModel();
-        if (!in_array($this->building_id, [25, 26, 44, 36]) && $this->session->hero->getHeroHealth() > 0) {
+        if (!in_array($this->building_id, [Gid::RESIDENCE, Gid::PALACE, Gid::COMMAND_CENTER, Gid::TRAPPER]) && $this->session->hero->getHeroHealth() > 0) {
             //hero items here.
             if (
                 Config::getProperty('heroConfig', 'allowHeroTrainingHelmetsInAllVillages') ||
@@ -82,13 +85,13 @@ class TroopBuilding extends AnyCtrl
             }
         }
         $this->units = $m->getUnits(Session::getInstance()->getKid());
-        if ($this->building_id == 36) {
+        if ($this->building_id == Gid::TRAPPER) {
             $this->view->vars['trap_desc'] = '<p>' . sprintf(T("inGame", "trap_desc"),
                     "<b>" . $this->units['u99'] . "</b>",
                     "<b>" . $m->getFilledTrapCount(Village::getInstance()->getKid()) . "</b>");
         }
         $troopsCanTrain = $this->researched = $this->researchedTroops($technology);
-        $expansion = in_array($this->building_id, [25, 26, 44]);
+        $expansion = in_array($this->building_id, Gid::EXPANSION);
         if ($expansion) {
             $troopsCanTrain = array_map('unitIdToNr', $this->_getTroopBuildingTroops());
             // The reference lists the settlers and chief with the reason they cannot be trained yet.
@@ -131,7 +134,7 @@ class TroopBuilding extends AnyCtrl
                     return '<img class="unit u' . $unitId . '" src="/img/spacer.gif" alt="' . $title . '" title="' . $title . '" /> '
                         . $count . ' ' . $title;
                 },
-                $this->building_id == 36 ? 'next_creating' : 'next_training'
+                $this->building_id == Gid::TRAPPER ? 'next_creating' : 'next_training'
             ) . '<div class="clear"></div>';
         }
         if (!empty($this->view->vars['training']) && $this->view->vars['canTrain']) {
@@ -149,7 +152,7 @@ class TroopBuilding extends AnyCtrl
     private function researchedTroops($technology): array
     {
         $numbers = array_map('unitIdToNr', $this->_getTroopBuildingTroops());
-        $researched = array_filter($numbers, static fn (int $nr): bool => in_array($nr, [1, 10, 99], true) || !empty($technology['u' . $nr]));
+        $researched = array_filter($numbers, static fn (int $nr): bool => in_array($nr, [Unit::FIRST, Unit::SETTLER, Unit::TRAP], true) || !empty($technology['u' . $nr]));
         sort($researched, SORT_NUMERIC);
 
         return $researched;
@@ -167,7 +170,7 @@ class TroopBuilding extends AnyCtrl
             return;
         }
         $helper = new TrainingHelper();
-        $great = $this->building_id == 30 || $this->building_id == 29;
+        $great = $this->building_id == Gid::GREAT_STABLE || $this->building_id == Gid::GREAT_BARRACKS;
         // "Train maximum" (a speed-world shortcut) orders everything one troop can be afforded; otherwise the typed amounts.
         $maximum = SpeedShortcuts::enabled() && isset($_POST['trainMaximum']) && is_scalar($_POST['trainMaximum']) ? (int)$_POST['trainMaximum'] : null;
         $orders = [];
@@ -192,13 +195,13 @@ class TroopBuilding extends AnyCtrl
     {
         $dailyQuest = new DailyQuestModel();
         $quest = Quest::getInstance();
-        if ($num >= 20 && ($this->building_id == 19 || $this->building_id == 29)) {
-            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), 8);
-        } else if ($num >= 20 && ($this->building_id == 20 || $this->building_id == 30)) {
-            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), 9);
+        if ($num >= 20 && ($this->building_id == Gid::BARRACKS || $this->building_id == Gid::GREAT_BARRACKS)) {
+            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), DailyQuestModel::QUEST_TRAIN_INFANTRY);
+        } else if ($num >= 20 && ($this->building_id == Gid::STABLE || $this->building_id == Gid::GREAT_STABLE)) {
+            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), DailyQuestModel::QUEST_TRAIN_CAVALRY);
         }
-        if ($this->building_id == 19 && $num >= 2) {
-            $quest->setQuestBitwise('battle', 5, 1);
+        if ($this->building_id == Gid::BARRACKS && $num >= 2) {
+            $quest->setQuestBitwise('battle', Quest::BATTLE_TRAIN_TROOPS, 1);
         }
         $cost = Formulas::uTrainingCost(nrToUnitId($u, Session::getInstance()->getRace()), $great);
         foreach ($cost as &$v) {
@@ -211,7 +214,12 @@ class TroopBuilding extends AnyCtrl
         $buildingId = $this->building_id;
         $trainingTime = $this->_getTroopTrainingTime(nrToUnitId($u, Session::getInstance()->getRace()));
 
-        return $village->transaction(static function () use ($village, $m, $cost, $buildingId, $u, $num, $trainingTime): bool {
+        return $village->transaction(static function () use ($village, $m, $cost, $buildingId, $u, $num, $trainingTime, $great): bool {
+            // Chiefs, settlers and traps are capped by free expansion slots and trap capacity. Recount them under the
+            // village lock: an order from another tab may have queued some since the form's limit was computed.
+            if ($u >= Unit::CHIEF && $num > (int)(new TrainingHelper())->getMaxUnitByNr($u, $great)) {
+                return false;
+            }
             if (!$village->spend($cost)) {
                 return false;
             }
@@ -236,8 +244,8 @@ class TroopBuilding extends AnyCtrl
      */
     public static function _getTroopBuildingTroopsStatic($race, $building_id)
     {
-        if ($building_id == 36) {
-            return (int)$race === 3 ? [99] : [];
+        if ($building_id == Gid::TRAPPER) {
+            return (int)$race === Tribes::GAULS ? [Unit::TRAP] : [];
         }
 
         return \Game\Tribes::trainingUnitIds((int)$race, (int)$building_id);
@@ -273,7 +281,7 @@ class TroopBuilding extends AnyCtrl
         $view->vars['index'] = $nr;
         $view->vars['nr'] = $nr;
         $view->vars['troopKey'] = 't' . (int) $nr;
-        $view->vars['showFavourite'] = (int) $this->building_id !== 36;
+        $view->vars['showFavourite'] = (int) $this->building_id !== Gid::TRAPPER;
         $view->vars['available'] = $this->units['u' . $nr] ?? 0;
         $view->vars['smithyLevel'] = $this->smithyLevels['u' . (int) $nr] ?? 0;
 
@@ -289,14 +297,14 @@ class TroopBuilding extends AnyCtrl
         ][$this->building_id];
 
         $view->vars['unitId'] = nrToUnitId($nr, Session::getInstance()->getRace());
-        $view->vars['cost'] = Formulas::uTrainingCost($view->vars['unitId'], $this->building_id == 30 || $this->building_id == 29);
+        $view->vars['cost'] = Formulas::uTrainingCost($view->vars['unitId'], $this->building_id == Gid::GREAT_STABLE || $this->building_id == Gid::GREAT_BARRACKS);
         $view->vars['upkeep'] = Formulas::uUpkeep($view->vars['unitId'], Village::getInstance()->getHorseDrinkingPoolLvl());
-        $view->vars['max'] = $training->getMaxUnitByNr($nr, $this->building_id == 30 || $this->building_id == 29);
+        $view->vars['max'] = $training->getMaxUnitByNr($nr, $this->building_id == Gid::GREAT_STABLE || $this->building_id == Gid::GREAT_BARRACKS);
         $view->vars['duration'] = secondsToString($this->_getTroopTrainingTime($view->vars['unitId']), true);
-        $view->vars['npc'] = $helper->getExchangeResourcesButtonByNr($nr, $this->building_id == 30 || $this->building_id == 29);
+        $view->vars['npc'] = $helper->getExchangeResourcesButtonByNr($nr, $this->building_id == Gid::GREAT_STABLE || $this->building_id == Gid::GREAT_BARRACKS);
         $view->vars['maximumShortcut'] = SpeedShortcuts::enabled();
         $view->vars['none_status'] = '';
-        $view->vars['expansion'] = in_array($this->building_id, [25, 26, 44]);
+        $view->vars['expansion'] = in_array($this->building_id, Gid::EXPANSION);
         $view->vars['notResearched'] = false;
         $view->vars['slotNeeded'] = null;
         if ($view->vars['expansion']) {

@@ -270,7 +270,7 @@ class ExtraModules
             }
         }
         $maxLvl = Formulas::buildingMaxLvl($itemId, $village->isCapital());
-        if ((int)$building_field <= 18 && $village->isCapital()) {
+        if ((int)$building_field <= Slot::LAST_FIELD && $village->isCapital()) {
             $maxLvl = 20;
         }
         if ($lvl >= $maxLvl) {
@@ -421,7 +421,7 @@ class ExtraModules
         $kid = Session::getInstance()->getSelectedVillageID();
         $db = DB::getInstance();
         $db->begin_transaction();
-        $db->query("DELETE FROM research WHERE mode=1 AND kid={$kid}");
+        $db->query("DELETE FROM research WHERE mode=" . ResearchMode::ACADEMY . " AND kid={$kid}");
         $db->query("UPDATE tdata SET u2=1, u3=1, u4=1, u5=1, u6=1, u7=1, u8=1, u9=1 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
         if (!$db->affectedRows()) {
             $db->rollback();
@@ -444,7 +444,7 @@ class ExtraModules
         $db = DB::getInstance();
         $kid = Session::getInstance()->getSelectedVillageID();
         $db->begin_transaction();
-        $db->query("DELETE FROM research WHERE mode=0 AND kid={$kid}");
+        $db->query("DELETE FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid={$kid}");
         $db->query("UPDATE smithy SET u1=20, u2=20, u3=20, u4=20, u5=20, u6=20, u7=20, u8=20 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
         if (!$db->affectedRows()) {
             $db->rollback();
@@ -499,7 +499,7 @@ class ExtraModules
             return self::ACTION_UNAVAILABLE;
         }
         $db->begin_transaction();
-        $db->query("DELETE FROM research WHERE mode=0 AND kid={$kid} AND nr=$nr");
+        $db->query("DELETE FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid={$kid} AND nr=$nr");
         $db->query("UPDATE smithy SET u{$nr}=20 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
         if (!$db->affectedRows()) {
             $db->rollback();
@@ -530,7 +530,7 @@ class ExtraModules
             return self::ACTION_UNAVAILABLE;
         }
         $buildingField = (int)$additionalData['gid'];
-        if ($buildingField > 40 || $buildingField < 1) {
+        if ($buildingField > Slot::LAST || $buildingField < 1) {
             return self::ACTION_UNAVAILABLE;
         }
         $village = Village::getInstance();
@@ -555,7 +555,7 @@ class ExtraModules
             }
         }
         $maxLvl = Formulas::buildingMaxLvl($itemId, $village->isCapital());
-        if ($buildingField <= 18 && $village->isCapital()) {
+        if ($buildingField <= Slot::LAST_FIELD && $village->isCapital()) {
             $maxLvl = 20;
         }
         if ($lvl >= $maxLvl) {
@@ -573,7 +573,7 @@ class ExtraModules
         $db->query("DELETE FROM building_upgrade WHERE kid={$village->getKid()} AND building_field={$buildingField}");
         $db->query("DELETE FROM demolition WHERE kid={$village->getKid()} AND building_field={$buildingField}");
         $response['data'] = [];
-        $response['redirectTo'] = 'dorf' . ($buildingField <= 18 ? 1 : 2) . '.php';
+        $response['redirectTo'] = 'dorf' . ($buildingField <= Slot::LAST_FIELD ? 1 : 2) . '.php';
 
         return self::ACTION_COMPLETED;
     }

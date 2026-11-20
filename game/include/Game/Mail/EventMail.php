@@ -7,6 +7,8 @@ namespace Game\Mail;
 use Core\Database\DB;
 use Core\Database\DBI;
 use Core\Helper\TimezoneHelper;
+use Core\Time;
+use Game\UserId;
 use Model\MovementsModel;
 
 use function T;
@@ -30,12 +32,12 @@ final class EventMail
             $db = DBI::getInstance();
             $village = $db->fetchSingleRow('SELECT owner, name FROM vdata WHERE kid=?', [$toKid]);
             $attacker = (int) $db->fetchScalar('SELECT owner FROM vdata WHERE kid=?', [$fromKid], 0);
-            if (!is_array($village) || (int) $village['owner'] <= 2 || (int) $village['owner'] === $attacker) {
+            if (!is_array($village) || (int) $village['owner'] <= UserId::LAST_SYSTEM || (int) $village['owner'] === $attacker) {
                 return;
             }
             // Read over the game's own connection: the movement that triggered this may not be committed yet.
             $incoming = DB::getInstance()->run(
-                'SELECT COUNT(id) AS amount, MIN(end_time) AS first FROM movement WHERE to_kid=? AND mode=0 AND attack_type IN (?, ?)',
+                'SELECT COUNT(id) AS amount, MIN(end_time) AS first FROM movement WHERE to_kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type IN (?, ?)',
                 [$toKid, MovementsModel::ATTACKTYPE_NORMAL, MovementsModel::ATTACKTYPE_RAID]
             )->get_result()->fetch_assoc();
             $amount = is_array($incoming) ? (int) $incoming['amount'] : 0;
@@ -44,7 +46,7 @@ final class EventMail
             }
             $owner = (int) $village['owner'];
             $name = self::escape(htmlspecialchars_decode((string) $village['name'], ENT_QUOTES));
-            $arrival = self::time($owner, intdiv((int) $incoming['first'], 1000));
+            $arrival = self::time($owner, intdiv((int) $incoming['first'], Time::SECOND_MS));
             $body = $amount === 1
                 ? sprintf((string) T('Mail', 'An incoming attack on %s arrives at %s.'), $name, $arrival)
                 : sprintf((string) T('Mail', '%d incoming attacks on %s. The first arrives at %s.'), $amount, $name, $arrival);
@@ -57,7 +59,7 @@ final class EventMail
     {
         self::guard(static function () use ($kid, $gid, $level): void {
             $village = DBI::getInstance()->fetchSingleRow('SELECT owner, name FROM vdata WHERE kid=?', [$kid]);
-            if (!is_array($village) || (int) $village['owner'] <= 2) {
+            if (!is_array($village) || (int) $village['owner'] <= UserId::LAST_SYSTEM) {
                 return;
             }
             $body = sprintf(

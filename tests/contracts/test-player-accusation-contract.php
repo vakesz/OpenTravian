@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 
+require_once dirname(__DIR__, 2) . '/game/include/Core/Time.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/UserId.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/AccessLevel.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Slot.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/ResearchMode.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Conquest/CaptureResult.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Unit.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Tribes.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemBtype.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemType.php';
 require_once dirname(__DIR__, 2) . '/game/include/Model/PlayerAccusationModel.php';
 
 use Model\PlayerAccusationModel;
@@ -29,7 +41,7 @@ if (!preg_match('/CREATE TABLE `player_accusation` \((.*?)\) ENGINE/s', $schema,
 }
 
 $ajax = $read('game/include/Controller/Ajax/player/accuse.php');
-foreach (['isSitter()', 'banned()', 'remainingToday($reporter) === 0', '->file($reporter, $uid, $reason, $message)', '$uid <= 2', '$uid === $reporter'] as $needle) {
+foreach (['isSitter()', 'banned()', 'remainingToday($reporter) === 0', '->file($reporter, $uid, $reason, $message)', '$uid <= UserId::LAST_SYSTEM', '$uid === $reporter'] as $needle) {
     if (!str_contains($ajax, $needle)) {
         failPlayerAccusationContract("The report endpoint must guard {$needle}.");
     }

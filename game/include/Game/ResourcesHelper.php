@@ -10,8 +10,10 @@ namespace Game;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Model\ArtefactsModel;
 use Model\MasterBuilder;
+use Model\MovementsModel;
 use Model\VillageModel;
 
 class ResourcesHelper
@@ -105,12 +107,12 @@ class ResourcesHelper
         if (getGame("starvation")) {
             $units = $db->query("SELECT * FROM units WHERE kid=$kid")->fetch_assoc();
             $heroHealth = (int)$db->fetchScalar("SELECT health FROM hero WHERE uid=$uid AND kid=$kid");
-            for ($i = 1; $i <= 11; ++$i) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
                 if (!$units['u' . $i]) {
                     continue;
                 }
                 // A dead hero keeps the flat 6 crop production and does not eat.
-                if ($i === 11 && $heroHealth <= 0) {
+                if ($i === Unit::HERO && $heroHealth <= 0) {
                     continue;
                 }
                 $upkeep += Formulas::uUpkeep(nrToUnitId($i, $units['race']), $hdp) * $units['u' . $i];
@@ -123,7 +125,7 @@ class ResourcesHelper
             $oasesArray[] = $kid;
             $toMeReinforcements = $db->query("SELECT * FROM enforcement WHERE to_kid IN(" . implode(",", $oasesArray) . ")");
             while ($un = $toMeReinforcements->fetch_assoc()) {
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if (!$un['u' . $i]) {
                         continue;
                     }
@@ -133,16 +135,16 @@ class ResourcesHelper
             //own trapped units
             $trapped = $db->query($q = "SELECT * FROM trapped WHERE kid=$kid");
             while ($un = $trapped->fetch_assoc()) {
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if (!$un['u' . $i]) {
                         continue;
                     }
                     $upkeep += Formulas::uUpkeep(nrToUnitId($i, $un['race']), $hdp) * $un['u' . $i];
                 }
             }
-            $movements = $db->query("SELECT race, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11 FROM movement WHERE (kid=$kid AND mode=0) OR (to_kid=$kid AND mode=1)");
+            $movements = $db->query("SELECT race, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11 FROM movement WHERE (kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")");
             while ($un = $movements->fetch_assoc()) {
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if (!$un['u' . $i]) {
                         continue;
                     }
@@ -205,7 +207,7 @@ class ResourcesHelper
      */
     public static function getTotalCropConsumption($race, $units, $hdp)
     {
-        if ($race == 4) {
+        if ($race == Tribes::NATURE) {
             return 0;
         }
         $total = 0;
@@ -213,7 +215,7 @@ class ResourcesHelper
             if ($nr <= 10) {
                 $unitId = nrToUnitId($nr, $race);
             } else {
-                $unitId = 98;
+                $unitId = Unit::HERO_ID;
             }
             $total += $amount * Formulas::uUpkeep($unitId, $hdp);
         }
@@ -247,10 +249,10 @@ class ResourcesHelper
             $production = [$row['woodp'], $row['clayp'], $row['ironp'], $row['cropp'] - $row['upkeep'] - $row['pop']];
             $cur_res = [$row['wood'], $row['clay'], $row['iron'], $row['crop']];
             $resources = [
-                (($production[0] / 3600000) * $diff_time),
-                (($production[1] / 3600000) * $diff_time),
-                (($production[2] / 3600000) * $diff_time),
-                (($production[3] / 3600000) * $diff_time),
+                (($production[0] / Time::HOUR_MS) * $diff_time),
+                (($production[1] / Time::HOUR_MS) * $diff_time),
+                (($production[2] / Time::HOUR_MS) * $diff_time),
+                (($production[3] / Time::HOUR_MS) * $diff_time),
             ];
             foreach ($resources as $key => $res) {
                 $nextValue = $res + $cur_res[$key];
@@ -260,16 +262,20 @@ class ResourcesHelper
                 }
                 $resources[$key] = round($resources[$key], 4);
             }
-            $crop = $row['crop'];
-            if ($row['owner'] == 1 && $row['crop'] + $resources[3] < 0) {
+            $absoluteCrop = false;
+            if ($row['owner'] == UserId::NATARS && $row['crop'] + $resources[3] < 0) {
                 $resources[3] = $row['maxcrop'] * 2 / 3;
-                $crop = 0;
+                $absoluteCrop = true;
             }
             if (!getGame("starvation") && ($row['crop'] + $resources[3]) <= 0) {
                 $resources[3] = -($row['crop'] + $resources[3]) + 1000;
-                $crop = 0;
+                $absoluteCrop = true;
             }
-            $db->query("UPDATE vdata SET wood=wood+{$resources[0]}, clay=clay+{$resources[1]}, iron=iron+{$resources[2]}, crop={$crop}+{$resources[3]}, lastmupdate=$lastmupdate WHERE kid={$row['kid']}");
+            // Relative credits, so a debit committed after our read is kept. The lastmupdate guard makes sure
+            // only one writer credits a given interval: when it matches nothing, another writer has already
+            // accrued up to its own lastmupdate and there is nothing left to add.
+            $cropSql = $absoluteCrop ? "crop={$resources[3]}" : "crop=LEAST(maxcrop, crop+{$resources[3]})";
+            $db->query("UPDATE vdata SET wood=LEAST(maxstore, wood+{$resources[0]}), clay=LEAST(maxstore, clay+{$resources[1]}), iron=LEAST(maxstore, iron+{$resources[2]}), $cropSql, lastmupdate=$lastmupdate WHERE kid={$row['kid']} AND lastmupdate=" . (int)$row['lastmupdate']);
             $master = new MasterBuilder();
             $master->updateCommence($row['kid'], FALSE);
             return;
@@ -280,8 +286,8 @@ class ResourcesHelper
         $plusBonusPercent = [0, 0, 0, 0];
         $waterWorks = 0;
         $productionFields = [];
-        for ($i = 1; $i <= 38; ++$i) {
-            if ((!$fields['f' . $i . 't'] || !$fields['f' . $i]) && $i > 18) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_BUILDING; ++$i) {
+            if ((!$fields['f' . $i . 't'] || !$fields['f' . $i]) && $i > Slot::LAST_FIELD) {
                 continue;
             }
             if ($fields['f' . $i . 't'] <= 4) {
@@ -324,7 +330,7 @@ class ResourcesHelper
             $i = $field['item_id'] - 1;
             $bonusMultiplier = (($bonusPercent[$i] + ($oasisBonusPercent[$i] * $waterWorksEffect)) / 100);
             $prod = Formulas::fieldProduction($field['level']);
-            if ($row['owner'] == 1 && $field['item_id'] == 4) {
+            if ($row['owner'] == UserId::NATARS && $field['item_id'] == Gid::CROPLAND) {
                 $prod *= 2;
             }
             $totalProd[$i] += $prod + round5($prod * $bonusMultiplier);
@@ -360,10 +366,10 @@ class ResourcesHelper
         $diff_time = ($lastmupdate - $row['lastmupdate']);
         $cur_res = [$row['wood'], $row['clay'], $row['iron'], $row['crop']];
         $resources = [
-            (($production[0] / 3600000) * $diff_time),
-            (($production[1] / 3600000) * $diff_time),
-            (($production[2] / 3600000) * $diff_time),
-            ((($production[3] - $row['pop'] - $upkeep) / 3600000) * $diff_time),
+            (($production[0] / Time::HOUR_MS) * $diff_time),
+            (($production[1] / Time::HOUR_MS) * $diff_time),
+            (($production[2] / Time::HOUR_MS) * $diff_time),
+            ((($production[3] - $row['pop'] - $upkeep) / Time::HOUR_MS) * $diff_time),
         ];
         foreach ($resources as $key => $res) {
             $nextValue = $res + $cur_res[$key];
@@ -381,26 +387,35 @@ class ResourcesHelper
             ])) {
             $updateWithMaster = TRUE;
         }
-        $crop = $row['crop'];
-        if ($row['owner'] == 1 && $row['crop'] + $resources[3] < 0) {
+        $absoluteCrop = false;
+        if ($row['owner'] == UserId::NATARS && $row['crop'] + $resources[3] < 0) {
             $resources[3] = $row['maxcrop'] * 2 / 3;
-            $crop = 0;
+            $absoluteCrop = true;
         }
         if (!getGame("starvation") && ($row['crop'] + $resources[3]) <= 0) {
             $resources[3] = -($row['crop'] + $resources[3]) + 1000;
-            $crop = 0;
+            $absoluteCrop = true;
         }
 //        else if (getGame("starvation") && ($row['crop'] + $resources[3]) <= 0 && $upkeep <= 0) {
 //            $resources[3] = -($row['crop'] + $resources[3]) + 1000;
 //            $crop = 0;
 //        }
 
+        // Same relative, guarded credit as the simple mode above. The new production must be stored even when the
+        // guard misses (another writer accrued first, at the old rate, up to its own lastmupdate): otherwise the
+        // village would keep a stale rate after a building, hero or item change.
+        // affected_rows counts changed rows, so it is also 0 when the guard matched but nothing changed (same
+        // millisecond, same production). The production-only write is then a no-op, so that case is harmless.
+        $cropSql = $absoluteCrop ? "crop={$resources[3]}" : "crop=LEAST(maxcrop, crop+{$resources[3]})";
         $db->query("UPDATE vdata SET
-                                            wood=wood+{$resources[0]}, woodp={$production[0]},
-                                            clay=clay+{$resources[1]}, clayp={$production[1]},
-                                            iron=iron+{$resources[2]}, ironp={$production[2]},
-                                            crop={$crop}+{$resources[3]}, cropp={$production[3]},
-                                            lastmupdate=$lastmupdate WHERE kid=$kid");
+                                            wood=LEAST(maxstore, wood+{$resources[0]}), woodp={$production[0]},
+                                            clay=LEAST(maxstore, clay+{$resources[1]}), clayp={$production[1]},
+                                            iron=LEAST(maxstore, iron+{$resources[2]}), ironp={$production[2]},
+                                            $cropSql, cropp={$production[3]},
+                                            lastmupdate=$lastmupdate WHERE kid=$kid AND lastmupdate=" . (int)$row['lastmupdate']);
+        if ((int)$db->affectedRows() === 0) {
+            $db->query("UPDATE vdata SET woodp={$production[0]}, clayp={$production[1]}, ironp={$production[2]}, cropp={$production[3]} WHERE kid=$kid");
+        }
         if ($updateWithMaster) {
             $master = new MasterBuilder();
             $master->updateCommence($kid, FALSE);

@@ -13,10 +13,12 @@ use Core\Session;
 use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
+use Game\Gid;
 use Game\ResourcesHelper;
 use Game\Ships;
 use Model\MarketModel;
 use Model\Quest;
+use Model\MovementsModel;
 
 /**
  * Validates marketplace shipments and atomically deducts an approved shipment.
@@ -56,7 +58,7 @@ final class prepare extends AjaxBase
         }
 
         $village = Village::getInstance();
-        $merchantCount = max($village->getTypeLevel(17));
+        $merchantCount = max($village->getTypeLevel(Gid::MARKETPLACE));
         if ($merchantCount < 1) {
             $this->response['errorMessage'] = T('MarketPlace', 'not enough merchants');
             return;
@@ -140,7 +142,7 @@ final class prepare extends AjaxBase
             return;
         }
 
-        Quest::getInstance()->setQuestBitwise('economy', 7, 1);
+        Quest::getInstance()->setQuestBitwise('economy', Quest::ECONOMY_TRADE, 1);
         $this->response['notice'] = T('MarketPlace', 'resourcesSent');
         $this->response['checker'] = $this->session->getChecker();
     }
@@ -303,7 +305,7 @@ final class prepare extends AjaxBase
             ? AllianceBonus::getTradersBonus($this->session->getAllianceId(), $this->session->getAllianceJoinTime())
             : 1;
 
-        return max(1, Ships::tradeCapacity((int)$this->session->getRace(), (int)max($village->getTypeLevel(28)), (float)$allianceBonus));
+        return max(1, Ships::tradeCapacity((int)$this->session->getRace(), (int)max($village->getTypeLevel(Gid::TRADE_OFFICE)), (float)$allianceBonus));
     }
 
     private function merchantCapacity(Village $village): int
@@ -314,7 +316,7 @@ final class prepare extends AjaxBase
 
         return max(1, (int)floor(Formulas::merchantCAP(
             $this->session->getRace(),
-            max($village->getTypeLevel(28)),
+            max($village->getTypeLevel(Gid::TRADE_OFFICE)),
             $allianceBonus
         )));
     }
@@ -409,7 +411,7 @@ final class prepare extends AjaxBase
 
             $arrival = time() + Ships::tradeTravelSeconds($sourceKid, $targetKid, (int)$this->session->getRace(), $byShip);
             $shipment = $db->run(
-                'INSERT INTO send (kid, to_kid, wood, clay, iron, crop, x, ships, mode, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)',
+                'INSERT INTO send (kid, to_kid, wood, clay, iron, crop, x, ships, mode, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ' . MovementsModel::MODE_GOING . ', ?)',
                 [$sourceKid, $targetKid, $resources[0], $resources[1], $resources[2], $resources[3], $repeat, $byShip ? $shipsNeeded : 0, $arrival]
             );
             if (!$shipment || $db->affectedRows() !== 1 || !$db->commit()) {

@@ -31,6 +31,18 @@ foreach (['Useful tips & information', 'This is your new home.', 'Consult the Ta
 }
 
 // An answer's subject counts like the reference's: RE:, RE^2:, RE^3: ... (a pure function, so it can be pinned here).
+require_once $root . '/game/include/Core/Time.php';
+require_once $root . '/game/include/Game/UserId.php';
+require_once $root . '/game/include/Game/AccessLevel.php';
+require_once $root . '/game/include/Game/Slot.php';
+require_once $root . '/game/include/Game/ResearchMode.php';
+require_once $root . '/game/include/Game/Conquest/CaptureResult.php';
+require_once $root . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Unit.php';
+require_once $root . '/game/include/Game/Tribes.php';
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
+require_once $root . '/game/include/Game/Hero/ItemType.php';
 require_once $root . '/game/include/Model/MessageModel.php';
 expectMessagesReference(\Model\MessageModel::answerSubject('Parity walk test') === 'RE: Parity walk test', 'The first answer is "RE: subject".');
 expectMessagesReference(\Model\MessageModel::answerSubject('RE: Parity walk test') === 'RE^2: Parity walk test', 'The second answer is "RE^2: subject".');

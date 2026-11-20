@@ -7,9 +7,11 @@ namespace Controller\Ajax\troop;
 use Controller\Ajax\AjaxBase;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
+use Core\Time;
 use Game\Formulas;
 use Game\Hero\HeroHelper;
 use Game\SpeedCalculator;
+use Game\Unit;
 use Model\ArtefactsModel;
 use Model\VillageModel;
 
@@ -55,7 +57,7 @@ final class distanceSpeedAndDuration extends AjaxBase
 
         $speeds = [];
         $unitIds = [];
-        for ($number = 1; $number <= 10; ++$number) {
+        for ($number = 1; $number <= Unit::LAST_TROOP; ++$number) {
             if (($selectedTroops[$number] ?? 0) > 0) {
                 $unitId = nrToUnitId($number, $this->session->getRace());
                 $speeds[] = Formulas::uSpeed($unitId);
@@ -104,7 +106,7 @@ final class distanceSpeedAndDuration extends AjaxBase
     private function selectedTroops(array $troops): ?array
     {
         $selected = [];
-        for ($number = 1; $number <= 11; ++$number) {
+        for ($number = 1; $number <= Unit::LAST; ++$number) {
             $value = $troops['t' . $number] ?? 0;
             if (!is_scalar($value) || !preg_match('/^(?:0|[1-9][0-9]{0,8})$/', (string)$value)) {
                 return null;
@@ -133,7 +135,7 @@ final class distanceSpeedAndDuration extends AjaxBase
     private function displayTimeOffset(): int
     {
         $date = new \DateTimeImmutable('now', new \DateTimeZone(TimezoneHelper::getTimezone()));
-        return ((int)$date->format('G') * 3600) + ((int)$date->format('i') * 60) + (int)$date->format('s');
+        return ((int)$date->format('G') * Time::HOUR) + ((int)$date->format('i') * Time::MINUTE) + (int)$date->format('s');
     }
 
     private function positiveInteger($value): ?int

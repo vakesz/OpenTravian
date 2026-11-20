@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\GoldHelper;
 
 class AutoExtendModel
@@ -18,7 +19,7 @@ class AutoExtendModel
         $boostRenewalWindow = (int)ceil($config->gold->productionBoostDurationSeconds / 7);
         $m = new InfoBoxModel();
         $now = time();
-        $time = $now - 3600;
+        $time = $now - Time::HOUR;
         $village = new VillageModel();
         $result = $db->query(
             "SELECT * FROM autoExtend WHERE finished=0 AND lastChecked < $time"
@@ -47,7 +48,7 @@ class AutoExtendModel
             $enough = $type === 1 ? $gold >= $config->gold->plusGold : $gold >= $config->gold->productionBoostGold;
             if (!$enough) {
                 if (!$m->hasInfoByType($uid, $type)) {
-                    $m->addInfo($uid, 0, $type, '', $commence - 86400, $commence + 86400);
+                    $m->addInfo($uid, 0, $type, '', $commence - Time::DAY, $commence + Time::DAY);
                 }
             } elseif ($type === 1) {
                 $this->extendPlus($uid, $commence);
@@ -144,7 +145,7 @@ class AutoExtendModel
         $m = new InfoBoxModel();
         $m->deleteInfoByType($uid, $type);
         if (!$result) {
-            $m->addInfo($uid, 0, $type, '', $endTime - 86400, $endTime + 86400);
+            $m->addInfo($uid, 0, $type, '', $endTime - Time::DAY, $endTime + Time::DAY);
         }
 
         return $this->set($uid, $type, $endTime, (bool) $result);

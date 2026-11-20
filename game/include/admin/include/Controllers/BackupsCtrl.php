@@ -8,10 +8,11 @@ use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
 use Core\Jobs\EngineHeartbeat;
+use Core\Time;
 
 class BackupsCtrl
 {
-    private const LOCK_TTL = 21600;
+    private const LOCK_TTL = 6 * Time::HOUR;
 
     public function __construct()
     {
@@ -245,7 +246,7 @@ class BackupsCtrl
             return null;
         }
 
-        return (int)floor(((int)$matches[1]) / 1000);
+        return (int)floor(((int)$matches[1]) / Time::SECOND_MS);
     }
 
     private function isMutationRequest(): bool

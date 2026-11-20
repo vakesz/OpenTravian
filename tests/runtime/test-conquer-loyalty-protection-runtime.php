@@ -66,6 +66,8 @@ register_shutdown_function(static function () use ($buildings, $defender): void 
 for ($slot = 19; $slot <= 40; ++$slot) {
     $pdo->run("UPDATE fdata SET f{$slot}=0, f{$slot}t=0 WHERE kid=? AND f{$slot}t IN (25, 26, 44)", [$defender['kid']]);
 }
+// Chiefs need a free expansion slot in the village they come from: a level-10 Residence gives the attacker one.
+$pdo->run('UPDATE fdata SET f30t=25, f30=10 WHERE kid=?', [$attacker['kid']]);
 
 /**
  * Sends 600 troops and three chiefs at the defender village once; returns [owner, loyalty, report captureResult].
@@ -75,7 +77,8 @@ for ($slot = 19; $slot <= 40; ++$slot) {
 $conquer = static function (string $label) use ($pdo, $db, $attacker, $defender, $race, $fail): array {
     $pdo->run('DELETE FROM ndata WHERE uid IN (?, ?)', [$attacker['id'], $defender['id']]);
     $pdo->run('UPDATE units SET u1=40, u2=0, u3=0, u4=0, u5=0, u6=0, u7=0, u8=0, u9=0, u10=0, u11=0, u99=0 WHERE kid=?', [$defender['kid']]);
-    $pdo->run('UPDATE vdata SET loyalty=10, owner=?, capital=0 WHERE kid=?', [$defender['id'], $defender['kid']]);
+    // A capture records the attacker's village as the expansion source; give the slot back for the next attempt.
+    $pdo->run('UPDATE vdata SET loyalty=10, owner=?, capital=0, expandedfrom=0 WHERE kid=?', [$defender['id'], $defender['kid']]);
     $pdo->run('DELETE FROM enforcement WHERE to_kid=?', [$defender['kid']]);
     $pdo->run('UPDATE users SET cp=1000000 WHERE id=?', [$attacker['id']]);
     $units = array_fill(1, 11, 0);

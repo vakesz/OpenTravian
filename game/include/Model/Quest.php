@@ -8,6 +8,7 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Locale;
 use Core\Session;
+use Core\Time;
 use Game\Formulas;
 use Game\PremiumDuration;
 use Game\WorldSpeedProfile;
@@ -35,18 +36,120 @@ class Quest
     /** The active quest-progress writers use this completed-state marker. */
     public const QUEST_FINISHED = 1;
 
+    /** Number of quests per group: the entries in users.qst_battle, qst_economy and qst_world. */
+    public const QUEST_COUNT_BATTLE = 15;
+    public const QUEST_COUNT_ECONOMY = 12;
+    public const QUEST_COUNT_WORLD = 16;
+
+    /*
+     * Quest ids for setQuestBitwise()/getQuest(): 1-based positions in users.qst_battle,
+     * qst_economy and qst_world. Names follow the en-US Quest.{battle,economy,world}_NN_name texts.
+     */
+    /** Next adventure. */
+    public const BATTLE_NEXT_ADVENTURE = 1;
+    /** Build a cranny. */
+    public const BATTLE_BUILD_CRANNY = 2;
+    /** Build barracks. */
+    public const BATTLE_BUILD_BARRACKS = 3;
+    /** Hero level. */
+    public const BATTLE_HERO_LEVEL = 4;
+    /** Train troops. */
+    public const BATTLE_TRAIN_TROOPS = 5;
+    /** Build a wall ("Earth Wall"; any wall at level 1). */
+    public const BATTLE_BUILD_WALL = 6;
+    /** Attack an oasis. */
+    public const BATTLE_ATTACK_OASIS = 7;
+    /** 10 adventures. */
+    public const BATTLE_TEN_ADVENTURES = 8;
+    /** Auctions. */
+    public const BATTLE_AUCTIONS = 9;
+    /** Upgrade barracks. */
+    public const BATTLE_UPGRADE_BARRACKS = 10;
+    /** Construct an academy. */
+    public const BATTLE_BUILD_ACADEMY = 11;
+    /** Research a unit. */
+    public const BATTLE_RESEARCH_UNIT = 12;
+    /** Construct a smithy. */
+    public const BATTLE_BUILD_SMITHY = 13;
+    /** Improve units. */
+    public const BATTLE_IMPROVE_UNITS = 14;
+    /** Complete 5 adventures. */
+    public const BATTLE_FIVE_ADVENTURES = 15;
+    /** Iron mine. */
+    public const ECONOMY_IRON_MINE = 1;
+    /** More resources. */
+    public const ECONOMY_MORE_RESOURCES = 2;
+    /** Granary. */
+    public const ECONOMY_GRANARY = 3;
+    /** All fields to level 1. */
+    public const ECONOMY_ALL_FIELDS_TO_1 = 4;
+    /** To 2!. */
+    public const ECONOMY_FIELDS_TO_2 = 5;
+    /** Marketplace. */
+    public const ECONOMY_MARKETPLACE = 6;
+    /** Trade. */
+    public const ECONOMY_TRADE = 7;
+    /** All fields to level 2. */
+    public const ECONOMY_ALL_FIELDS_TO_2 = 8;
+    /** Warehouse level 3. */
+    public const ECONOMY_WAREHOUSE_3 = 9;
+    /** Granary level 3. */
+    public const ECONOMY_GRANARY_3 = 10;
+    /** Grain mill. */
+    public const ECONOMY_GRAIN_MILL = 11;
+    /** All fields to level 5. */
+    public const ECONOMY_ALL_FIELDS_TO_5 = 12;
+    /** View statistics. */
+    public const WORLD_VIEW_STATISTICS = 1;
+    /** Change the village name. */
+    public const WORLD_RENAME_VILLAGE = 2;
+    /** Main building level 3. */
+    public const WORLD_MAIN_BUILDING_3 = 3;
+    /** Construct an embassy. */
+    public const WORLD_BUILD_EMBASSY = 4;
+    /** Open the map. */
+    public const WORLD_OPEN_MAP = 5;
+    /** Read a message. */
+    public const WORLD_READ_MESSAGE = 6;
+    /** Bonus gold. */
+    public const WORLD_BONUS_GOLD = 7;
+    /** Alliance. */
+    public const WORLD_ALLIANCE = 8;
+    /** Main building level 5. */
+    public const WORLD_MAIN_BUILDING_5 = 9;
+    /** Seat of government. */
+    public const WORLD_SEAT_OF_GOVERNMENT = 10;
+    /** Culture points. */
+    public const WORLD_CULTURE_POINTS = 11;
+    /** Warehouse level 7. */
+    public const WORLD_WAREHOUSE_7 = 12;
+    /** Surroundings report. */
+    public const WORLD_SURROUNDINGS_REPORT = 13;
+    /** Residence or palace level 10. */
+    public const WORLD_RESIDENCE_10 = 14;
+    /** 3 settlers. */
+    public const WORLD_THREE_SETTLERS = 15;
+    /** New village. */
+    public const WORLD_NEW_VILLAGE = 16;
+
     public function __construct()
     {
         $session = Session::getInstance();
-        $this->qst_battle = explode(',', (string) ($session->isValid() ? $session->getQuestBattle() : '0,0,0,0,0,0,0,0,0,0,0,0,0,0'));
-        $this->qst_economy = explode(',', (string) ($session->isValid() ? $session->getQuestEconomy() : '0,0,0,0,0,0,0,0,0,0,0,0'));
-        $this->qst_world = explode(',', (string) ($session->isValid() ? $session->getQuestWorld() : '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'));
+        $this->qst_battle = explode(',', (string) ($session->isValid() ? $session->getQuestBattle() : self::unstarted(self::QUEST_COUNT_BATTLE)));
+        $this->qst_economy = explode(',', (string) ($session->isValid() ? $session->getQuestEconomy() : self::unstarted(self::QUEST_COUNT_ECONOMY)));
+        $this->qst_world = explode(',', (string) ($session->isValid() ? $session->getQuestWorld() : self::unstarted(self::QUEST_COUNT_WORLD)));
         if ($session->isValid() && $session->getSuccessAdventuresCount() >= 10) {
-            $this->setQuestBitwise('battle', 8, 1);
+            $this->setQuestBitwise('battle', self::BATTLE_TEN_ADVENTURES, 1);
         }
         if ($session->isValid() && $session->getSuccessAdventuresCount() >= 5) {
-            $this->setQuestBitwise('battle', 15, 1);
+            $this->setQuestBitwise('battle', self::BATTLE_FIVE_ADVENTURES, 1);
         }
+    }
+
+    /** Progress of a player with no quest done: one '0' per quest, as the users.qst_* column defaults in world.sql. */
+    private static function unstarted(int $count): string
+    {
+        return implode(',', array_fill(0, $count, '0'));
     }
 
     public function setQuestBitwise(string $type, int $id, int $x): void
@@ -144,12 +247,12 @@ class Quest
                 return number_format_x($eff);
             case 'plus':
             case 'productionBoost':
-                if ($eff >= 86400) {
-                    return round($eff / 86400, 1) . ' ' . Locale::units(get_locale())['days'];
-                } elseif ($eff >= 3600) {
-                    return round($eff / 3600, 1) . ' ' . Locale::units(get_locale())['hours'];
+                if ($eff >= Time::DAY) {
+                    return round($eff / Time::DAY, 1) . ' ' . Locale::units(get_locale())['days'];
+                } elseif ($eff >= Time::HOUR) {
+                    return round($eff / Time::HOUR, 1) . ' ' . Locale::units(get_locale())['hours'];
                 }
-                return round($eff / 60, 1) . ' ' . Locale::units(get_locale())['minutes'];
+                return round($eff / Time::MINUTE, 1) . ' ' . Locale::units(get_locale())['minutes'];
         }
         return $eff;
     }

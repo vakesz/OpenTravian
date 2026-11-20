@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Game;
 
+use Core\Time;
 use Core\Village;
 
 use function secondsToString;
@@ -68,13 +69,13 @@ final class StockBar
             return $current >= $maxStore ? T('inGame', 'stockBar.fullNow') : secondsToString(0);
         }
 
-        return secondsToString(round((($maxStore - $current) / $production) * 3600));
+        return secondsToString(round((($maxStore - $current) / $production) * Time::HOUR));
     }
 
     private static function cropEmptyTime(Village $village): string
     {
         $cropProduction = $village->getProduction(3);
 
-        return secondsToString(round(($village->village['crop'] / abs($cropProduction == 0 ? 0.01 : $cropProduction)) * 3600));
+        return secondsToString(round(($village->village['crop'] / abs($cropProduction == 0 ? 0.01 : $cropProduction)) * Time::HOUR));
     }
 }

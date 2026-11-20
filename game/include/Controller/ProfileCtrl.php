@@ -9,9 +9,11 @@ use Core\Helper\BBCode;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Core\Village;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\ProfileLanguages;
 use Core\Locale;
+use Game\UserId;
 use Model\AutomationModel;
 use Model\ClubApi;
 use Model\FarmListModel;
@@ -536,7 +538,7 @@ class ProfileCtrl extends GameCtrl
             false,
             $this->selectedPlayerID
         );
-        if ($this->selectedPlayerData['access'] == 0 && $this->selectedPlayerID > 2) {
+        if ($this->selectedPlayerData['access'] == AccessLevel::BANNED && $this->selectedPlayerID > UserId::LAST_SYSTEM) {
             $view->vars['desc1'] = $view->vars['desc2'] = T('Profile', 'This player messages are banned');
         }
         $cache = new ProfileCache($this->selectedPlayerData['profileCacheVersion']);

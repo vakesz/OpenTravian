@@ -4,7 +4,11 @@ namespace Game\Buildings;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
+use Game\Tribes;
 use const SORT_ASC;
 use function in_array;
 
@@ -68,15 +72,15 @@ class AutoUpgradeAI
         $this->cropProduction = $village['cropp'];
         $this->upkeep = $village['upkeep'];
         $this->owner = (int) ($village['owner'] ?? 0);
-        for ($i = 19; $i <= 38; ++$i) {
-            if ($this->buildings[$i]['item_id'] == 15) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
+            if ($this->buildings[$i]['item_id'] == Gid::MAIN_BUILDING) {
                 $this->main_building_lvl = $this->buildings[$i]['level'];
             }
         }
         $db = DB::getInstance();
         $this->workers = [
-            'fieldsNum' => (int)$db->fetchScalar("SELECT COUNT(id) FROM building_upgrade WHERE kid=$kid AND building_field <= 18 AND isMaster=0"),
-            'buildsNum' => (int)$db->fetchScalar("SELECT COUNT(id) FROM building_upgrade WHERE kid=$kid AND building_field > 18 AND isMaster=0"),
+            'fieldsNum' => (int)$db->fetchScalar("SELECT COUNT(id) FROM building_upgrade WHERE kid=$kid AND building_field <= " . Slot::LAST_FIELD . " AND isMaster=0"),
+            'buildsNum' => (int)$db->fetchScalar("SELECT COUNT(id) FROM building_upgrade WHERE kid=$kid AND building_field > " . Slot::LAST_FIELD . " AND isMaster=0"),
             'master' => (int)$db->fetchScalar("SELECT COUNT(id) FROM building_upgrade WHERE kid=$kid AND isMaster=1"),
             'WW' => (int)$db->fetchScalar("SELECT COUNT(id) FROM building_upgrade WHERE kid=$kid AND building_field=99"),
         ];
@@ -98,7 +102,7 @@ class AutoUpgradeAI
         if($isWWQueue){
             $maxTasks = 2;
         }
-        if ($this->race == 1) {
+        if ($this->race == Tribes::ROMANS) {
             return [
                 'isMasterBusy' => $master >= ($this->isWW ? $config->masterBuilder->maxTasksInWonder : $config->masterBuilder->maxTasksInNoneWonder),
                 'isBusy' => (($isField) ? ($fieldsNum >= $maxTasks) : ($buildsNum >= $maxTasks)) || ($fieldsNum + $buildsNum) >= 3,
@@ -134,14 +138,14 @@ class AutoUpgradeAI
      */
     public function newBuilding($rand_field, $gid = false): bool
     {
-        if (!$this->skipWorkers && $this->isWorkersBusy($rand_field <= 18)['isBusy']) return false;
+        if (!$this->skipWorkers && $this->isWorkersBusy($rand_field <= Slot::LAST_FIELD)['isBusy']) return false;
         $db = DB::getInstance();
         $helper = new BuildingHelper();
-        if ($rand_field == 39) {
-            $hasResources = $this->isBuildingResourcesAvailable(16, 1);
-            if ($hasResources && $helper->canCreateNewBuild($this->capital, $this->race, 16, $this->buildings) == 1) {
+        if ($rand_field == Slot::RALLY_POINT) {
+            $hasResources = $this->isBuildingResourcesAvailable(Gid::RALLY_POINT, 1);
+            if ($hasResources && $helper->canCreateNewBuild($this->capital, $this->race, Gid::RALLY_POINT, $this->buildings) == 1) {
                 if (!$this->buildings[$rand_field]['item_id']) {
-                    $this->buildings[$rand_field]['item_id'] = 16;
+                    $this->buildings[$rand_field]['item_id'] = Gid::RALLY_POINT;
                     $db->query("UPDATE fdata SET f{$rand_field}t=16 WHERE kid=" . $this->kid);
                     $this->addUpgrade($rand_field);
                     return true;
@@ -150,7 +154,7 @@ class AutoUpgradeAI
             }
             return false;
         }
-        if ($rand_field == 40) {
+        if ($rand_field == Slot::WALL) {
             $buildingGID = Formulas::getWallID($this->race);
             $hasResources = $this->isBuildingResourcesAvailable($buildingGID, 1);
             if ($hasResources && $helper->canCreateNewBuild($this->capital, $this->race, $buildingGID, $this->buildings) == 1) {
@@ -165,17 +169,17 @@ class AutoUpgradeAI
             return false;
         }
         $rand_arr = [
-            5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, /*more crannies*/
-            23, 23, 23, 23, 23, 23,/*more crannies*/
-            24, 25, /*26, */27, 28,/*29, 30,*/
-            34, 35, 36, 37, /*38, 39,*/ 44, 45
+            Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::GRAIN_MILL, Gid::BAKERY, Gid::WAREHOUSE, Gid::GRANARY, Gid::SMITHY, Gid::TOURNAMENT_SQUARE, Gid::MAIN_BUILDING, Gid::RALLY_POINT, Gid::MARKETPLACE, Gid::EMBASSY, Gid::BARRACKS, Gid::STABLE, Gid::WORKSHOP, Gid::ACADEMY, Gid::CRANNY, /*more crannies*/
+            Gid::CRANNY, Gid::CRANNY, Gid::CRANNY, Gid::CRANNY, Gid::CRANNY, Gid::CRANNY,/*more crannies*/
+            Gid::TOWN_HALL, Gid::RESIDENCE, /*26, */Gid::TREASURY, Gid::TRADE_OFFICE,/*29, 30,*/
+            Gid::STONEMASON, Gid::BREWERY, Gid::TRAPPER, Gid::HEROS_MANSION, /*38, 39,*/ Gid::COMMAND_CENTER, Gid::WATERWORKS
         ];
         if ($gid) {
             $rand_arr = [$gid];
         }
         shuffle($rand_arr);
         foreach ($rand_arr as $gid) {
-            if ($gid == 16 && $rand_field != 39) {
+            if ($gid == Gid::RALLY_POINT && $rand_field != Slot::RALLY_POINT) {
                 continue;
             }
             $hasResources = $this->isBuildingResourcesAvailable($gid, 1);
@@ -211,8 +215,8 @@ class AutoUpgradeAI
      */
     private function addUpgrade($field, ?int $nextLevel = null): void
     {
-        $this->workers[$field <= 18 ? 'fieldsNum' : 'buildsNum']++;
-        if($this->buildings[$field]['item_id'] == 40){
+        $this->workers[$field <= Slot::LAST_FIELD ? 'fieldsNum' : 'buildsNum']++;
+        if($this->buildings[$field]['item_id'] == Gid::WONDER_OF_THE_WORLD){
             $this->workers['WW']++;
         }
         // Charge the level this order will finish, including rows already queued.
@@ -234,7 +238,7 @@ class AutoUpgradeAI
      */
     private function getLastCommence($field): int
     {
-        [$min, $max] = $this->race == 1 ? ($field <= 18 ? [1, 18] : [19, 99]) : [0, 99];
+        [$min, $max] = $this->race == Tribes::ROMANS ? ($field <= Slot::LAST_FIELD ? [Slot::FIRST_FIELD, Slot::LAST_FIELD] : [Slot::FIRST_BUILDING, Slot::WONDER]) : [0, Slot::WONDER];
         $commence = (int)DB::getInstance()->fetchScalar("SELECT MAX(commence) FROM building_upgrade WHERE kid={$this->kid} AND isMaster=0 AND building_field BETWEEN $min AND $max");
 
         return max(time(), $commence);
@@ -262,8 +266,8 @@ class AutoUpgradeAI
                 10 => [],
                 38 => [],
             ];
-            for ($i = 19; $i <= 38; ++$i) {
-                if ($this->buildings[$i]['item_id'] == 10 || $this->buildings[$i]['item_id'] == 38) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
+                if ($this->buildings[$i]['item_id'] == Gid::WAREHOUSE || $this->buildings[$i]['item_id'] == Gid::GREAT_WAREHOUSE) {
                     $warehouses[$this->buildings[$i]['item_id']][] = $i;
                 }
             }
@@ -284,10 +288,10 @@ class AutoUpgradeAI
             //need to increase warehouse level
         } else if ($dependency == 22) {
             //create warehouse
-            for ($i = 19; $i <= 38; ++$i) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
                 if ($this->buildings[$i]['item_id'] == 0) {
-                    if (!$this->newBuildingAtIndex($i, 10)) {
-                        $this->newBuildingAtIndex($i, 38);
+                    if (!$this->newBuildingAtIndex($i, Gid::WAREHOUSE)) {
+                        $this->newBuildingAtIndex($i, Gid::GREAT_WAREHOUSE);
                     }
                     break;
                 }
@@ -298,8 +302,8 @@ class AutoUpgradeAI
                 11 => [],
                 39 => [],
             ];
-            for ($i = 19; $i <= 38; ++$i) {
-                if ($this->buildings[$i]['item_id'] == 11 || $this->buildings[$i]['item_id'] == 39) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
+                if ($this->buildings[$i]['item_id'] == Gid::GRANARY || $this->buildings[$i]['item_id'] == Gid::GREAT_GRANARY) {
                     $warehouses[$this->buildings[$i]['item_id']][] = $i;
                 }
             }
@@ -319,10 +323,10 @@ class AutoUpgradeAI
             }
         } else if ($dependency == 33) {
             //create granny
-            for ($i = 19; $i <= 38; ++$i) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
                 if ($this->buildings[$i]['item_id'] == 0) {
-                    if (!$this->newBuildingAtIndex($i, 11)) {
-                        $this->newBuildingAtIndex($i, 39);
+                    if (!$this->newBuildingAtIndex($i, Gid::GRANARY)) {
+                        $this->newBuildingAtIndex($i, Gid::GREAT_GRANARY);
                     }
                     break;
                 }
@@ -348,7 +352,7 @@ class AutoUpgradeAI
      */
     private function upgradeIndex($field, $resolveDependencies = true)
     {
-        if (!$this->skipWorkers && $this->isWorkersBusy($field <= 18)['isBusy']) return false;
+        if (!$this->skipWorkers && $this->isWorkersBusy($field <= Slot::LAST_FIELD)['isBusy']) return false;
         $helper = new BuildingHelper();
         $max = Formulas::buildingMaxLvl($this->buildings[$field]['item_id'], $this->capital, false);
         $level = $this->buildings[$field]['level'];
@@ -402,10 +406,10 @@ class AutoUpgradeAI
      */
     public function upgrade()
     {
-        if ((time()-$this->creationTime) < 5400) {
-            $rand_field = mt_rand(1, 18);
+        if ((time()-$this->creationTime) < 90 * Time::MINUTE) {
+            $rand_field = mt_rand(Slot::FIRST_FIELD, Slot::LAST_FIELD);
         } else {
-            $rand_field = mt_rand(1, 5) <= 3 ? mt_rand(1, 18) : mt_rand(19, 40);
+            $rand_field = mt_rand(1, 5) <= 3 ? mt_rand(Slot::FIRST_FIELD, Slot::LAST_FIELD) : mt_rand(Slot::FIRST_BUILDING, Slot::LAST);
         }
         if ($this->isWW && in_array($rand_field, \Model\WonderOfTheWorldModel::RESERVED_SLOTS)) return false;
         if ($this->buildings[$rand_field]['item_id'] <= 0) {
@@ -413,7 +417,7 @@ class AutoUpgradeAI
         }
         $levels = [];
         foreach($this->buildings as $index => $build){
-            if($build['item_id'] == 0 || ($build['level'] == 0 && $index > 18)) continue;
+            if($build['item_id'] == 0 || ($build['level'] == 0 && $index > Slot::LAST_FIELD)) continue;
             if(!isset($levels[$build['level']])){
                 $levels[$build['level']] = [];
             }

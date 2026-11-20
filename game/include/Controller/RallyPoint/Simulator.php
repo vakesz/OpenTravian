@@ -132,6 +132,10 @@ class Simulator
                 $off_pop = $this->battle->int_check_limit($wave, 'p', 1, 199999);
                 $def_pop = max($def_pop, 1);
                 $pop_ratio = $off_pop / $def_pop;
+                if ($def_nature_only) {
+                    // No morale against nature, as in battles.
+                    $pop_ratio = 1;
+                }
                 if (getGame("ignoreMoralPointsInAttacks")) {
                     $pop_ratio = 1;
                 }
@@ -228,7 +232,8 @@ class Simulator
                     $up = $wave['U'][6];
                     $rams = $wave['u'][6];
                     $mwl = $this->battle->early_ramming($wl, $rams, $siege_percent, $up, $d, $wall_dur);
-                    // recalc wall effect
+                    // recalc wall effect: the flat defence follows the level the rams leave, as in battles
+                    $defense['t'] -= BattleModel::WALL_EXTRA[$pob + 1] * ($wl - $mwl);
                     $wall_bonus = round(pow($wall_b, $mwl), 3);
                     $pts_ratio = $this->battle->remorale($offense['t'],
                         $defense['t'],

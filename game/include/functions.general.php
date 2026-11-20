@@ -103,7 +103,7 @@ function getGameElapsedSeconds()
 function getGameElapsedMiliSeconds()
 {
     $config = Config::getInstance();
-    return miliseconds() - $config->game->start_time * 1000;
+    return miliseconds() - $config->game->start_time * \Core\Time::SECOND_MS;
 }
 
 /**
@@ -185,7 +185,7 @@ function login_throttle_reserve(array $buckets)
 function login_throttle_complete(array $reservation, $failed, $clearPairKey = null): bool
 {
     try {
-        return LoginAttemptLimiter::complete(Caching::singleton(), $reservation, (bool) $failed, 900, $clearPairKey);
+        return LoginAttemptLimiter::complete(Caching::singleton(), $reservation, (bool) $failed, 15 * \Core\Time::MINUTE, $clearPairKey);
     } catch (\Throwable $e) {
         error_log('login throttle unavailable: ' . $e->getMessage());
         return false;
@@ -216,7 +216,7 @@ function throttle_is_limited(array $buckets, $failClosed = true): bool
  * @param array<mixed> $buckets
  * @param int $window
  */
-function throttle_hit(array $buckets, $window = 900): void
+function throttle_hit(array $buckets, $window = 15 * \Core\Time::MINUTE): void
 {
     try {
         $cache = Caching::getInstance();
@@ -248,7 +248,7 @@ function throttle_clear($key): void
  * @param int $max
  * @param int $window
  */
-function throttle_public_form($scope, $max = 5, $window = 3600): bool
+function throttle_public_form($scope, $max = 5, $window = \Core\Time::HOUR): bool
 {
     try {
         return Caching::getInstance()->incrementWithinLimit(
@@ -492,7 +492,7 @@ function buildTabUrl(int $slot, int $gid, string $param, $tab): string
  */
 function embassyTabUrl(string $tab, array $extra = []): string
 {
-    return '/build.php?gid=18&tt=' . $tab . ($extra ? '&' . http_build_query($extra) : '');
+    return '/build.php?gid=' . \Game\Gid::EMBASSY . '&tt=' . $tab . ($extra ? '&' . http_build_query($extra) : '');
 }
 
 /**
@@ -695,7 +695,7 @@ function multiply_packages($rate, $type = 7): void
 function miliseconds($fixed = false)
 {
     if ($fixed) {
-        return time() * 1000;
+        return time() * \Core\Time::SECOND_MS;
     }
     $microtime = microtime();
     $comps = explode(' ', $microtime);
@@ -708,7 +708,7 @@ function miliseconds($fixed = false)
  */
 function getDifMilisecondsToSeconds($miliseconds): float
 {
-    return ceil(($miliseconds - miliseconds()) / 1000);
+    return ceil(($miliseconds - miliseconds()) / \Core\Time::SECOND_MS);
 }
 
 function nanoseconds(): string
@@ -766,11 +766,11 @@ function round10($value): float
 function nrToUnitId($nr, $tribe)
 {
     // Exeption for the hero: Every time id 98
-    if ($nr == 11) {
-        return 98;
+    if ($nr == \Game\Unit::HERO) {
+        return \Game\Unit::HERO_ID;
     }
-    if ($nr == 99) {
-        return 99;
+    if ($nr == \Game\Unit::TRAP) {
+        return \Game\Unit::TRAP;
     }
 
     return ($tribe - 1) * 10 + $nr * 1;
@@ -816,11 +816,11 @@ function unitIdToTribe($unitId): int
  */
 function unitIdToNr($a): int
 {
-    if ($a == 99) {
-        return 99;
+    if ($a == \Game\Unit::TRAP) {
+        return \Game\Unit::TRAP;
     }
-    if ($a == 98 || $a == 'hero') {
-        return 11;
+    if ($a == \Game\Unit::HERO_ID || $a == 'hero') {
+        return \Game\Unit::HERO;
     }
 
     return 1 + (($a - 1) % 10);
@@ -1139,9 +1139,9 @@ function secondsToString($seconds, $isTrainingTime = false)
     if ($seconds == time()) {
         return TimezoneHelper::date('H:i:s');
     }
-    $h = (int) floor($seconds / 3600);
-    $m = (int) floor(($seconds % 3600) / 60);
-    $s = (int) floor($seconds % 60);
+    $h = (int) floor($seconds / \Core\Time::HOUR);
+    $m = (int) floor(($seconds % \Core\Time::HOUR) / \Core\Time::MINUTE);
+    $s = (int) floor($seconds % \Core\Time::MINUTE);
     return $h . ':' . ($m < 10 ? '0' : '') . $m . ':' . ($s < 10 ? '0' : '') . $s;
 }
 
@@ -1151,15 +1151,15 @@ function secondsToString($seconds, $isTrainingTime = false)
  */
 function milisecondsToString($ms)
 {
-    if ($ms % 1000 == 0) {
-        return secondsToString($ms / 1000);
+    if ($ms % \Core\Time::SECOND_MS == 0) {
+        return secondsToString($ms / \Core\Time::SECOND_MS);
     }
-    $sec = (int) floor($ms / 1000);
-    $ms = $ms % 1000;
-    $min = (int) floor($sec / 60);
-    $sec = $sec % 60;
-    $hr = (int) floor($min / 60);
-    $min = $min % 60;
+    $sec = (int) floor($ms / \Core\Time::SECOND_MS);
+    $ms = $ms % \Core\Time::SECOND_MS;
+    $min = (int) floor($sec / \Core\Time::MINUTE);
+    $sec = $sec % \Core\Time::MINUTE;
+    $hr = (int) floor($min / (\Core\Time::HOUR / \Core\Time::MINUTE));
+    $min = $min % (\Core\Time::HOUR / \Core\Time::MINUTE);
     $res = sprintf('%d:%02d:%02d (+%d ' . T('Global', 'ms') . ')', $hr, $min, $sec, $ms);
     return $res;
 }
@@ -1175,10 +1175,10 @@ function nanosecondsToString($ns)
     }
     $sec = (int) floor($ns / 1e9);
     $ns = $ns % 1e9;
-    $min = (int) floor($sec / 60);
-    $sec = $sec % 60;
-    $hr = (int) floor($min / 60);
-    $min = $min % 60;
+    $min = (int) floor($sec / \Core\Time::MINUTE);
+    $sec = $sec % \Core\Time::MINUTE;
+    $hr = (int) floor($min / (\Core\Time::HOUR / \Core\Time::MINUTE));
+    $min = $min % (\Core\Time::HOUR / \Core\Time::MINUTE);
     $res = sprintf('%d:%02d:%02d (+%s ' . T('Global', 'ms') . ')', $hr, $min, $sec, round($ns / 1e6, 3));
     return $res;
 }
@@ -1478,7 +1478,7 @@ function filemtime_remote_key($uri, $cacheKey)
     }
     fclose($handle);
     $result = substr(sha1((string) $result), -5);
-    $cache->add($cacheKey, $result, 7200);
+    $cache->add($cacheKey, $result, 2 * \Core\Time::HOUR);
     return $result;
 }
 
@@ -1542,12 +1542,12 @@ function get_gpack_link_and_hash($fileName, $useLang = false, ?string $direction
  */
 function getTradeRouteTimeText($value): string
 {
-    if ($value < 3600) {
-        $text = sprintf(T('MarketPlace', 'every %s minutes'), floor($value / 60));
-    } elseif ($value < 86400) {
-        $text = sprintf(T('MarketPlace', 'every %s hours'), floor($value / 3600));
+    if ($value < \Core\Time::HOUR) {
+        $text = sprintf(T('MarketPlace', 'every %s minutes'), floor($value / \Core\Time::MINUTE));
+    } elseif ($value < \Core\Time::DAY) {
+        $text = sprintf(T('MarketPlace', 'every %s hours'), floor($value / \Core\Time::HOUR));
     } else {
-        $text = sprintf(T('MarketPlace', 'every %s days'), floor($value / 86400));
+        $text = sprintf(T('MarketPlace', 'every %s days'), floor($value / \Core\Time::DAY));
     }
     return $text;
 }
@@ -1559,7 +1559,7 @@ function getTradeRouteTimeText($value): string
 function array_filter_units($row)
 {
     $units = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= \Game\Unit::LAST; ++$i) {
         if (!isset($row['u' . $i])) {
             continue;
         }
@@ -1582,7 +1582,7 @@ function is_new_gpack()
  */
 function game_progress()
 {
-    $rate = getGameElapsedSeconds() / (getGame('round_length') * 86400);
+    $rate = getGameElapsedSeconds() / (getGame('round_length') * \Core\Time::DAY);
     if ($rate < 0) {
         $rate = 0;
     } elseif ($rate > 1) {

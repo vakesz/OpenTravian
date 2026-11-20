@@ -7,6 +7,7 @@ use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Game\Formulas;
+use Game\Unit;
 use Model\ArtefactsModel;
 use Model\ReportsModel;
 use Model\MapPageModel;
@@ -133,7 +134,7 @@ class position extends AjaxBase
     {
         $units = DB::getInstance()->query("SELECT * FROM units WHERE kid=$kid")->fetch_assoc() ?: [];
         $html = '';
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             if (!empty($units['u' . $i])) {
                 $html .= '<div class="inlineIcon tooltipUnit" title=""><i class="unit u' . nrToUnitId($i, 4) . '"></i><span class="value ">' . (int)$units['u' . $i] . '</span></div>';
             }

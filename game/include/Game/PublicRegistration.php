@@ -9,6 +9,7 @@ use Core\Database\DB;
 use Core\Database\GlobalDB;
 use Core\Helper\WebService;
 use Core\Security\Password;
+use Core\Time;
 use Game\SocialAuth\IdentityClaims;
 use Game\SocialAuth\PendingSignup;
 use Model\OptionModel;
@@ -133,7 +134,7 @@ final class PublicRegistration
 
         $this->showAccountStep = true;
 
-        if (!throttle_public_form('register', 10, 3600)) {
+        if (!throttle_public_form('register', 10, Time::HOUR)) {
             $this->formError = T('Login', 'tooManyRequests');
 
             return;
@@ -180,7 +181,7 @@ final class PublicRegistration
         if ($_POST['stage'] !== 'account') {
             return;
         }
-        if (!throttle_public_form('register', 10, 3600)) {
+        if (!throttle_public_form('register', 10, Time::HOUR)) {
             $this->formError = T('Login', 'tooManyRequests');
 
             return;
@@ -337,7 +338,7 @@ final class PublicRegistration
 
         return $this->exists(
             DB::getInstance(),
-            'SELECT COUNT(id) FROM users WHERE id=? AND id>2',
+            'SELECT COUNT(id) FROM users WHERE id=? AND id>' . UserId::LAST_SYSTEM,
             [(int)$match[2]],
         ) ? (int)$match[2] : 0;
     }

@@ -6,6 +6,7 @@ namespace Controller;
 
 use Core\Helper\WebService;
 use Core\Session;
+use Core\Time;
 use resources\View\OutOfGameView;
 use resources\View\PHPBatchView;
 use Securimage;
@@ -45,7 +46,7 @@ class RecaptchaCtrl extends GameCtrl
             $secureImage = new Securimage(['namespace' => self::CAPTCHA_NAMESPACE]);
             if (!Session::validateChecker()) {
                 $error = T('Login', 'tooManyRequests');
-            } elseif (!throttle_public_form('clickunblock', 5, 3600)) {
+            } elseif (!throttle_public_form('clickunblock', 5, Time::HOUR)) {
                 $error = T('Login', 'tooManyRequests');
             } elseif ($code === '' || !$secureImage->check($code)) {
                 $error = T('reCaptcha', 'Sorry you submitted wrong answer');

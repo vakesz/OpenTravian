@@ -175,7 +175,7 @@ foreach ([
     'game/include/Model/BattleModel.php' => ["'redeployHero', 'ship',", "setShip(\$this->row['ship'], (int)\$this->row['race'])", "NULL, \$this->row['ship']);"],
     'game/include/Controller/RallyPoint/SendTroops.php' => ['Ships::pickForArmy', 'Ships::take', 'Ships::restore', 'shipChoice'],
     'game/include/Controller/Ajax/marketplace/prepare.php' => ['Ships::tradeTravelSeconds', 'not enough trade ships'],
-    'game/include/Model/MarketModel.php' => ['ships=0 AND ((kid=? AND mode=0)'],
+    'game/include/Model/MarketModel.php' => ['ships=0 AND ((kid=? AND mode=\' . MovementsModel::MODE_GOING'],
     'game/include/Model/MarketPlaceProcessor.php' => ['dockTradeShips', 'tradeTravelSeconds', "(int) \$row['ships']"],
     'game/include/resources/Templates/build/building/MarketplaceSendResources.php' => ['data-market-use-ship', 'useShip: state.useShip ? 1 : 0'],
     'game/include/resources/Templates/rallypoint/prepareSend.php' => ['name="useShip"', 'class="useShip"', 'class="shipAvailability"'],

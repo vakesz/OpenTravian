@@ -6,8 +6,10 @@ namespace Controller\Ajax\village;
 
 use Controller\Ajax\AjaxBase;
 use Core\Database\DB;
+use Game\AccessLevel;
 use Game\FarmList\FarmListData;
 use Game\Formulas;
+use Game\UserId;
 
 use const MAP_SIZE;
 
@@ -27,7 +29,7 @@ final class target extends AjaxBase
         $kid = (int)Formulas::xy2kid($x, $y);
         $statement = DB::getInstance()->run(
             'SELECT w.id, w.x, w.y, v.name, v.capital, u.id AS uid, u.name AS playerName, a.id AS aid, a.name AS allianceName FROM wdata w'
-            . ' LEFT JOIN vdata v ON v.kid = w.id LEFT JOIN users u ON u.id = v.owner AND u.id > 1 AND u.hidden = 0 AND u.access > 0'
+            . ' LEFT JOIN vdata v ON v.kid = w.id LEFT JOIN users u ON u.id = v.owner AND u.id > ' . UserId::NATARS . ' AND u.hidden = 0 AND u.access > ' . AccessLevel::BANNED
             . ' LEFT JOIN alidata a ON a.id = u.aid WHERE w.id = ? AND (w.oasistype > 0 OR (w.occupied = 1 AND w.fieldtype > 0)) LIMIT 1',
             [$kid]
         );

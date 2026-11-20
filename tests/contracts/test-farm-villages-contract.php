@@ -8,6 +8,17 @@ use Model\NatarsModel;
 // Natar farm villages: the install option, the headless variable, the spread, and the Natar AI rules.
 
 $root = dirname(__DIR__, 2);
+require_once $root . '/game/include/Core/Time.php';
+require_once $root . '/game/include/Game/UserId.php';
+require_once $root . '/game/include/Game/AccessLevel.php';
+require_once $root . '/game/include/Game/Slot.php';
+require_once $root . '/game/include/Game/ResearchMode.php';
+require_once $root . '/game/include/Game/Conquest/CaptureResult.php';
+require_once $root . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Unit.php';
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
+require_once $root . '/game/include/Game/Hero/ItemType.php';
 foreach (['WorldSpeedProfile', 'FinishConstruction', 'Tribes', 'WorldOverrides', 'SupportContact', 'SmtpConfig', 'Installer/InstallInput'] as $class) {
     require_once $root . '/game/include/Game/' . $class . '.php';
 }
@@ -43,7 +54,7 @@ foreach ([1, 7, 40, 150, 400, 1000] as $count) {
 
 $natars = (string) file_get_contents($root . '/game/include/Model/NatarsModel.php');
 expectFarmVillages(str_contains($natars, 'v.isFarm=0 AND (SELECT COUNT(id) FROM artefacts'), 'Farm villages do not count toward the Natar expansion target.');
-expectFarmVillages(str_contains($natars, 'owner=1 AND isWW=0 AND isFarm=0 AND isArtifact=0'), 'The Natar AI skips farm villages.');
+expectFarmVillages(str_contains($natars, 'owner=" . UserId::NATARS . " AND isWW=0 AND isFarm=0 AND isArtifact=0'), 'The Natar AI skips farm villages.');
 expectFarmVillages(substr_count($natars, 'addMovement(') === 1 && str_contains($natars, '$cap_kid,'), 'The only Natar attack leaves the Natar capital.');
 
 $register = (string) file_get_contents($root . '/game/include/Model/RegisterModel.php');

@@ -15,16 +15,16 @@ if ($source === false) {
 
 foreach ([
     'private const WALL_GID_BY_RACE',
-    '1 => 31,',
-    '2 => 32,',
-    '3 => 33,',
-    '6 => 42,',
-    '7 => 43,',
-    '8 => 47,',
-    '9 => 50,',
+    'Tribes::ROMANS => Gid::CITY_WALL,',
+    'Tribes::TEUTONS => Gid::EARTH_WALL,',
+    'Tribes::GAULS => Gid::PALISADE,',
+    'Tribes::EGYPTIANS => Gid::STONE_WALL,',
+    'Tribes::HUNS => Gid::MAKESHIFT_WALL,',
+    'Tribes::SPARTANS => Gid::DEFENSIVE_WALL,',
+    'Tribes::VIKINGS => Gid::BARRICADE,',
     'u.race AS player_race',
     "T('Buildings', \$imageGid . '.title', \$fallbackLabel)",
-    "count(\$gids) === 1 || !in_array(31, \$gids, true) ? 'building-' . \$gids[0] : 'building-city-wall'",
+    "count(\$gids) === 1 || !in_array(Gid::CITY_WALL, \$gids, true) ? 'building-' . \$gids[0] : 'building-city-wall'",
 ] as $needle) {
     if (!str_contains($source, $needle)) {
         failTaskBuildingTitleContract('Task building labels must use each tribe\'s actual defensive building without changing existing claim keys.');

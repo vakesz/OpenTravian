@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\Map\Map;
+use Game\Slot;
 use InvalidArgumentException;
 use mysqli_result;
 
@@ -106,7 +108,7 @@ class AllianceModel
             return null;
         }
         $fieldId = 0;
-        for ($i = 19; $i <= 40; $i++) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; $i++) {
             if ((int) ($row['f' . $i . 't'] ?? 0) === 18) {
                 $fieldId = $i;
                 break;
@@ -151,7 +153,7 @@ class AllianceModel
         $ToAllianceName = $db->fetchScalar("SELECT name FROM alidata WHERE id=$aid");
         $now = time();
         if ($db->fetchScalar("SELECT allianceNotificationEnabled FROM users WHERE id=$uid")) {
-            $sentBefore = $db->fetchScalar("SELECT COUNT(id) FROM alliance_notification WHERE aid=$aid AND to_uid=$uid AND type=1 AND $now-time <= 86400*2");
+            $sentBefore = $db->fetchScalar("SELECT COUNT(id) FROM alliance_notification WHERE aid=$aid AND to_uid=$uid AND type=1 AND $now-time <= " . Time::DAY . "*2");
             if (!$sentBefore) {
                 $data = [$ToPlayerName, $FromPlayerName, $ToAllianceName];
                 (new MessageModel())->sendMessage(1, $uid, '', serialize($data), 1);

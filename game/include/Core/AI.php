@@ -8,9 +8,12 @@ use Controller\Build\TroopBuilding;
 use Core\Database\DB;
 use Game\Buildings\AutoUpgradeAI;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use function getGameSpeed;
 use function method_exists;
+use Game\ResearchMode;
+use Game\Slot;
 use Model\ArtefactsModel;
 use Model\TrainingModel;
 use Model\VillageModel;
@@ -73,7 +76,7 @@ class AI_MAIN
         $this->art_eff = ArtefactsModel::getArtifactEffectByType($this->village['owner'], $kid, ArtefactsModel::ARTIFACT_INCREASE_TRAINING_SPEED);
 
         $this->researches = $db->query("SELECT * FROM tdata WHERE kid=$kid")->fetch_assoc();
-        $this->smithyUpgradesCount = (int)$db->fetchScalar("SELECT COUNT(id) FROM research WHERE mode=0 AND kid=$kid");
+        $this->smithyUpgradesCount = (int)$db->fetchScalar("SELECT COUNT(id) FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid=$kid");
 
         $this->buildings = (new VillageModel())->getBuildingsAssoc($kid);
         $this->populateTrainingBuildings();
@@ -97,32 +100,32 @@ class AI_MAIN
 
     private function populateTrainingBuildings(): void
     {
-        for ($i = 19; $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
             $build = $this->buildings[$i];
             if (!$build['item_id'] || $build['level'] <= 0) continue;
-            if ($build['item_id'] == 19 || $build['item_id'] == 29) {
+            if ($build['item_id'] == Gid::BARRACKS || $build['item_id'] == Gid::GREAT_BARRACKS) {
                 $this->training_buildings['barracks'][] = $build;
-            } else if ($build['item_id'] == 20 || $build['item_id'] == 30) {
+            } else if ($build['item_id'] == Gid::STABLE || $build['item_id'] == Gid::GREAT_STABLE) {
                 $this->training_buildings['stable'][] = $build;
-            } else if ($build['item_id'] == 21) {
+            } else if ($build['item_id'] == Gid::WORKSHOP) {
                 $this->training_buildings['workshop'][] = $build;
-            } else if ($build['item_id'] == 41) {
+            } else if ($build['item_id'] == Gid::HORSE_DRINKING_TROUGH) {
                 $this->training_buildings['horseDrinking'] = $build['level'];
-            } else if ($build['item_id'] == 13) {
+            } else if ($build['item_id'] == Gid::SMITHY) {
                 $this->training_buildings['smithyLevel'] = $build['level'];
-            } else if ($build['item_id'] == 22) {
+            } else if ($build['item_id'] == Gid::ACADEMY) {
                 $this->training_buildings['academyLevel'] = $build['level'];
             }
         }
         $available = [];
         if (sizeof($this->training_buildings['barracks'])) {
-            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], 19));
+            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], Gid::BARRACKS));
         }
         if (sizeof($this->training_buildings['stable'])) {
-            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], 20));
+            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], Gid::STABLE));
         }
         if (sizeof($this->training_buildings['workshop'])) {
-            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], 21));
+            $available = array_merge($available, TroopBuilding::_getTroopBuildingTroopsStatic($this->user['race'], Gid::WORKSHOP));
         }
         $this->training_buildings['available'] = array_map("unitIdToNr", $available);
     }
@@ -151,10 +154,10 @@ class AI_MAIN
         $stable = $this->training_buildings['stable'];
         $workshop = $this->training_buildings['workshop'];
         $arr = [];
-        $barracksUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, 19));
-        $stableUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, 20));
-        $onlyGreatBarracks = sizeof($this->training_buildings['barracks']) == 1 && $this->training_buildings['barracks'][0]['item_id'] == 29;
-        $onlyGreatStable = sizeof($stable) == 1 && $stable[0]['item_id'] == 30;
+        $barracksUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, Gid::BARRACKS));
+        $stableUnits = array_map("unitIdToNr", TroopBuilding::_getTroopBuildingTroopsStatic($race, Gid::STABLE));
+        $onlyGreatBarracks = sizeof($this->training_buildings['barracks']) == 1 && $this->training_buildings['barracks'][0]['item_id'] == Gid::GREAT_BARRACKS;
+        $onlyGreatStable = sizeof($stable) == 1 && $stable[0]['item_id'] == Gid::GREAT_STABLE;
         foreach ($this->training_buildings['available'] as $i) {
             $isGreat = false;
             $isBarracks = in_array($i, $barracksUnits);
@@ -285,7 +288,7 @@ class AI_MAIN
         $selected = $arr[mt_rand(0, sizeof($arr) - 1)];
         $this->takeResources($selected['costs']);
         $db = DB::getInstance();
-        $db->query("INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES ($kid, 1, " . $selected['nr'] . ", " . (time() + $selected['duration']) . ")");
+        $db->query("INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES ($kid, " . ResearchMode::ACADEMY . ", " . $selected['nr'] . ", " . (time() + $selected['duration']) . ")");
         return true;
     }
 
@@ -309,12 +312,12 @@ class AI_MAIN
     private function getTypeLevel($gid)
     {
         $buildingsAssoc = $this->buildings;
-        if ($gid == 16) {
+        if ($gid == Gid::RALLY_POINT) {
             return [$buildingsAssoc[39]['level']];
         }
         $lvl = [];
-        if ($gid <= 4) {
-            for ($i = 1; $i <= 18; ++$i) {
+        if ($gid <= Gid::LAST_RESOURCE_FIELD) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 if ($buildingsAssoc[$i]['item_id'] == $gid) {
                     $lvl[] = $buildingsAssoc[$i]['level'];
                 }
@@ -328,7 +331,7 @@ class AI_MAIN
         if (isset(Formulas::$data['buildings'][$gid - 1]['req']) && isset(Formulas::$data['buildings'][$gid - 1]['req']['multi'])) {
             $multi = Formulas::$data['buildings'][$gid - 1]['req']['multi'] == 'true';
         }
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             if ($buildingsAssoc[$i]['item_id'] == $gid) {
                 $lvl[] = $buildingsAssoc[$i]['level'];
                 if (!$multi) {
@@ -354,7 +357,7 @@ class AI_MAIN
         $commence = time();
         $db = DB::getInstance();
         if ($this->smithyUpgradesCount == 1) {
-            $lastUpgrade = $db->query("SELECT nr, end_time FROM research WHERE mode=0 AND kid=$kid")->fetch_assoc();
+            $lastUpgrade = $db->query("SELECT nr, end_time FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid=$kid")->fetch_assoc();
             $researchUP = $lastUpgrade['nr'];
             $commence = $lastUpgrade['end_time'];
         }
@@ -382,7 +385,7 @@ class AI_MAIN
         $selected = $arr[mt_rand(0, sizeof($arr) - 1)];
         $this->takeResources($selected['costs']);
         $this->smithyUpgradesCount++;
-        $db->query("INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES ($kid, 0, " . $selected['nr'] . ", " . ($commence + $selected['duration']) . ")");
+        $db->query("INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES ($kid, " . ResearchMode::SMITHY . ", " . $selected['nr'] . ", " . ($commence + $selected['duration']) . ")");
         return true;
     }
 }
@@ -398,7 +401,7 @@ class AI
         $seconds_past = getGameElapsedSeconds();
         $ai = new AI_MAIN($kid);
         for ($i = 1; $i <= $count; ++$i) {
-            if (getGameSpeed() <= 10 && $seconds_past <= 1.5 * 86400) {
+            if (getGameSpeed() <= 10 && $seconds_past <= 1.5 * Time::DAY) {
                 $rnd = mt_rand(1, 5);
                 if ($rnd <= 3) {
                     $ai->upgradeBuilding();

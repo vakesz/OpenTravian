@@ -6,7 +6,10 @@ namespace Model;
 
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroExperience;
+use Game\Slot;
+use Game\Tribes;
 
 use function T;
 use function getGameSpeed;
@@ -23,13 +26,13 @@ class TasksModel
     public const FREE_GOLD_KEY = 'free-gold';
     public const FREE_GOLD_REWARD_GOLD = 100;
     private const WALL_GID_BY_RACE = [
-        1 => 31,
-        2 => 32,
-        3 => 33,
-        6 => 42,
-        7 => 43,
-        8 => 47,
-        9 => 50,
+        Tribes::ROMANS => Gid::CITY_WALL,
+        Tribes::TEUTONS => Gid::EARTH_WALL,
+        Tribes::GAULS => Gid::PALISADE,
+        Tribes::EGYPTIANS => Gid::STONE_WALL,
+        Tribes::HUNS => Gid::MAKESHIFT_WALL,
+        Tribes::SPARTANS => Gid::DEFENSIVE_WALL,
+        Tribes::VIKINGS => Gid::BARRICADE,
     ];
     /** @var array<int, RewardState> */
     private array $rewardState = [];
@@ -173,25 +176,25 @@ class TasksModel
         /** @var list<array{list<int>, string, list<int>}> $buildingCatalog */
         if ($kind === 'spawn') {
             $buildingCatalog = [
-                [[10], 'Warehouse', [1, 10, 20]], [[11], 'Granary', [1, 10, 20]],
-                [[15], 'Main Building', [1, 3, 7, 12, 20]], [[16], 'Rally Point', [1, 10, 20]],
-                [[17], 'Marketplace', [1, 3, 7, 12, 20]], [[19], 'Barracks', [1, 3, 7, 12, 20]],
-                [[20], 'Stable', [1]], [[22], 'Academy', [1]], [[13], 'Smithy', [1]],
-                [[24], 'Town Hall', [1]], [[21], 'Workshop', [1]],
-                [[25, 26, 44], 'Residence', [1, 3, 7, 10, 20]],
-                [[5], 'Sawmill', [1, 5]], [[6], 'Brickyard', [1, 5]], [[7], 'Iron Foundry', [1, 5]],
-                [[8, 9], 'Bakery', [1, 5]], [[23], 'Cranny', [1, 10]],
-                [[31, 32, 33, 42, 43, 47, 50], 'City Wall', [1, 3, 7, 12, 20]],
+                [[Gid::WAREHOUSE], 'Warehouse', [1, 10, 20]], [[Gid::GRANARY], 'Granary', [1, 10, 20]],
+                [[Gid::MAIN_BUILDING], 'Main Building', [1, 3, 7, 12, 20]], [[Gid::RALLY_POINT], 'Rally Point', [1, 10, 20]],
+                [[Gid::MARKETPLACE], 'Marketplace', [1, 3, 7, 12, 20]], [[Gid::BARRACKS], 'Barracks', [1, 3, 7, 12, 20]],
+                [[Gid::STABLE], 'Stable', [1]], [[Gid::ACADEMY], 'Academy', [1]], [[Gid::SMITHY], 'Smithy', [1]],
+                [[Gid::TOWN_HALL], 'Town Hall', [1]], [[Gid::WORKSHOP], 'Workshop', [1]],
+                [Gid::EXPANSION, 'Residence', [1, 3, 7, 10, 20]],
+                [[Gid::SAWMILL], 'Sawmill', [1, 5]], [[Gid::BRICKYARD], 'Brickyard', [1, 5]], [[Gid::IRON_FOUNDRY], 'Iron Foundry', [1, 5]],
+                [[Gid::GRAIN_MILL, Gid::BAKERY], 'Bakery', [1, 5]], [[Gid::CRANNY], 'Cranny', [1, 10]],
+                [Gid::WALLS, 'City Wall', [1, 3, 7, 12, 20]],
             ];
         } else {
             $buildingCatalog = [
-                [[10], 'Warehouse', [1, 10, 20]], [[11], 'Granary', [1, 10, 20]],
-                [[15], 'Main Building', [1, 10, 20]], [[16], 'Rally Point', [1, 10]],
-                [[23], 'Cranny', [1, 10]],
+                [[Gid::WAREHOUSE], 'Warehouse', [1, 10, 20]], [[Gid::GRANARY], 'Granary', [1, 10, 20]],
+                [[Gid::MAIN_BUILDING], 'Main Building', [1, 10, 20]], [[Gid::RALLY_POINT], 'Rally Point', [1, 10]],
+                [[Gid::CRANNY], 'Cranny', [1, 10]],
             ];
             if ($kind !== 'conquered') {
-                $buildingCatalog[] = [[25, 26, 44], 'Residence', [1, 10]];
-                $buildingCatalog[] = [[31, 32, 33, 42, 43, 47, 50], 'City Wall', [1]];
+                $buildingCatalog[] = [Gid::EXPANSION, 'Residence', [1, 10]];
+                $buildingCatalog[] = [Gid::WALLS, 'City Wall', [1]];
             }
         }
         foreach ($buildingCatalog as [$gids, $fallbackLabel, $levels]) {
@@ -203,7 +206,7 @@ class TasksModel
             }
             // The current tribe determines a wall's title before it has been
             // built. Once present, use the actual structure in the field.
-            $imageGid = in_array(31, $gids, true)
+            $imageGid = in_array(Gid::CITY_WALL, $gids, true)
                 ? (self::WALL_GID_BY_RACE[(int)$village['player_race']] ?? $gids[0])
                 : $gids[0];
             foreach ($buildings as $building) {
@@ -215,7 +218,7 @@ class TasksModel
             }
             // Keep the pre-existing key for wall claims. It is persistence,
             // whereas the label is player-facing and tribe-specific.
-            $key = count($gids) === 1 || !in_array(31, $gids, true) ? 'building-' . $gids[0] : 'building-city-wall';
+            $key = count($gids) === 1 || !in_array(Gid::CITY_WALL, $gids, true) ? 'building-' . $gids[0] : 'building-city-wall';
             $label = T('Buildings', $imageGid . '.title', $fallbackLabel);
             $this->appendMilestoneTasks($tasks, $key, $label, $level, $levels, 'building', 150, 10, 'g' . $imageGid);
         }
@@ -462,7 +465,7 @@ class TasksModel
     private function readResourceFields(array $row): array
     {
         $fields = [];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $fields[] = ['type' => (int)$row['f' . $i . 't'], 'level' => (int)$row['f' . $i]];
         }
         return $fields;
@@ -475,7 +478,7 @@ class TasksModel
     private function readBuildings(array $row): array
     {
         $buildings = [];
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             $type = (int)$row['f' . $i . 't'];
             if ($type > 0) {
                 $buildings[] = ['types' => [$type], 'level' => (int)$row['f' . $i]];

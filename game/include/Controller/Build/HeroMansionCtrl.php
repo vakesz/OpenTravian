@@ -14,6 +14,8 @@ use Core\Locale;
 use Game\Helpers\LoyaltyHelper;
 use Model\OasesModel;
 use resources\View\PHPBatchView;
+use Core\Time;
+use Game\Gid;
 
 class HeroMansionCtrl extends AnyCtrl
 {
@@ -45,7 +47,7 @@ class HeroMansionCtrl extends AnyCtrl
         if (isset($_GET['del']) && Session::claimAction($_GET['c'] ?? null)) {
             $isMine = $db->fetchScalar("SELECT COUNT(kid) FROM odata WHERE did=" . Village::getInstance()->getKid() . " AND kid=" . (int)$_GET['del']) > 0;
             if ($isMine && !$this->isInDeletion($_GET['del'])) {
-                $duration = max(6 * 3600 / getGameSpeed(), 600);
+                $duration = max(6 * Time::HOUR / getGameSpeed(), 10 * Time::MINUTE);
                 $db->query("INSERT INTO odelete (`kid`, `oid`, `end_time`) VALUES (" . Village::getInstance()->getKid() . "," . (int)$_GET['del'] . "," . (time() + $duration) . ")");
                 $this->abandoning[(int)$_GET['del']] = [
                     "id"       => $db->lastInsertId(),
@@ -107,12 +109,12 @@ class HeroMansionCtrl extends AnyCtrl
             $direction = strtolower(getDirection());
             while ($oasis = $oases->fetch_assoc()) {
                 $oasis['loyalty'] = min(100,
-                    $oasis['loyalty'] + $points * ((time() - $oasis['last_loyalty_update']) / 3600));
+                    $oasis['loyalty'] + $points * ((time() - $oasis['last_loyalty_update']) / Time::HOUR));
                 $xy = Formulas::kid2xy($oasis['kid']);
                 $this->view->vars['OwnOasis'] .= '<tr>';
                 $this->view->vars['OwnOasis'] .= '<td class="type">';
                 if (!$this->isInDeletion($oasis['kid'])) {
-                    $this->view->vars['OwnOasis'] .= '<a href="/build.php?gid=37&amp;c=' . (Session::getInstance()->getChecker()) . '&amp;del=' . $oasis['kid'] . '"><img class="del" src="img/spacer.gif" alt="' . T("HeroMansion", "del") . '" title="' . T("HeroMansion", "del") . '"></a>';
+                    $this->view->vars['OwnOasis'] .= '<a href="/build.php?gid=' . Gid::HEROS_MANSION . '&amp;c=' . (Session::getInstance()->getChecker()) . '&amp;del=' . $oasis['kid'] . '"><img class="del" src="img/spacer.gif" alt="' . T("HeroMansion", "del") . '" title="' . T("HeroMansion", "del") . '"></a>';
                 }
                 $this->view->vars['OwnOasis'] .= '<a href="/karte.php?d=' . $oasis['kid'] . '">' . $this->getOasisNameByType($oasis['type']) . '</a></td>';
                 $this->view->vars['OwnOasis'] .= '<td class="loy">' . round($oasis['loyalty']) . '%</td>';
@@ -194,7 +196,7 @@ class HeroMansionCtrl extends AnyCtrl
         }
         $cache->add('getNearDistanceOasisIds' . $kid,
             $kids = $this->getNearByFieldOasisPercent($kid, 4.9497474683058326708059105347339),
-            3600);
+            Time::HOUR);
         return $kids;
     }
 
@@ -283,7 +285,7 @@ class HeroMansionCtrl extends AnyCtrl
         $this->view->vars['abandon']['size'] = sizeof($this->abandoning);
         $db = DB::getInstance();
         foreach ($this->abandoning as $row) {
-            $url = '/build.php?gid=37&amp;c=' . (Session::getInstance()->getChecker()) . '&amp;cancel=' . $row['id'];
+            $url = '/build.php?gid=' . Gid::HEROS_MANSION . '&amp;c=' . (Session::getInstance()->getChecker()) . '&amp;cancel=' . $row['id'];
             $xy = Formulas::kid2xy($row['oid']);
             $this->view->vars['abandon']['html'] .= '<tr>';
             $this->view->vars['abandon']['html'] .= '<td class="type">';

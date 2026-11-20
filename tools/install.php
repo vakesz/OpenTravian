@@ -30,6 +30,11 @@ if (PHP_SAPI !== 'cli') {
 
 require_once dirname(__DIR__) . '/game/deployment/include/env.php';
 $gameInclude = dirname(__DIR__) . '/game/include/Game/';
+// No autoloader before installation: load the constant classes the classes below use first.
+require_once dirname(__DIR__) . '/game/include/Core/Time.php';
+foreach (['Gid', 'Unit'] as $gameClass) {
+    require_once $gameInclude . $gameClass . '.php';
+}
 foreach (['WorldSpeedProfile', 'FinishConstruction', 'Tribes', 'WorldOverrides', 'WorldSchemaVersion', 'SupportContact', 'SmtpConfig', 'Installer/AppDatabaseGrants', 'Installer/InstallInput', 'Installer/WorldInstaller'] as $gameClass) {
     require_once $gameInclude . $gameClass . '.php';
 }

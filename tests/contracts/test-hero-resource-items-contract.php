@@ -26,7 +26,7 @@ foreach ([$inventory, $model, $ctrl, $template, $heroItems] as $source) {
     }
 }
 
-if (!str_contains($inventory, 'ITEM_BTYPE = 16')
+if (!str_contains($inventory, 'ITEM_BTYPE = ItemBtype::RESOURCES')
     || !str_contains($inventory, '145')
     || !str_contains($inventory, 'function syncInventoryItems')) {
     failHeroResourceItemsContract('HeroResourceInventory must define btype 16 item145–148 sync.');
@@ -56,7 +56,7 @@ if ($fixes === false || !str_contains($fixes, '#content.heroV2Inventory .invento
     failHeroResourceItemsContract('Hero inventory items must remain pointer-interactive for native use and drag handlers.');
 }
 
-if (!str_contains($heroItems, 'btype === 16')
+if (!str_contains($heroItems, 'btype === ItemBtype::RESOURCES')
     || !str_contains($heroItems, '145')
     || !str_contains($heroItems, "['attributes'] = [")) {
     failHeroResourceItemsContract('HeroItems must describe btype 16 resource tiles with attributes as a string array for Inventory JS.');

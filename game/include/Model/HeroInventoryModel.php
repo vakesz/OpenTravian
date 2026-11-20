@@ -6,11 +6,14 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Hero\Artwork;
 use Game\Hero\HeroExperience;
 use Game\Hero\HeroHelper;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
 use Game\ResourcesHelper;
+use Game\Unit;
 
 /**
  * Owns the database boundary for hero inventory movement and item use.
@@ -23,12 +26,12 @@ class HeroInventoryModel
 
     /** @var array<string, int> */
     private const LEGACY_EQUIPMENT_SLOT_TYPES = [
-        'helmet' => 1,
-        'body' => 2,
-        'leftHand' => 3,
-        'rightHand' => 4,
-        'shoes' => 5,
-        'horse' => 6,
+        'helmet' => ItemBtype::HELMET,
+        'body' => ItemBtype::BODY,
+        'leftHand' => ItemBtype::LEFT_HAND,
+        'rightHand' => ItemBtype::RIGHT_HAND,
+        'shoes' => ItemBtype::SHOES,
+        'horse' => ItemBtype::HORSE,
     ];
 
     /**
@@ -346,7 +349,7 @@ class HeroInventoryModel
         if ($targetItem !== null && $amount === (int)$item['num']
             && (int)$targetItem['btype'] === (int)$item['btype']
             && (int)$targetItem['type'] === (int)$item['type']
-            && (int)$item['btype'] >= 7 && !in_array((int)$item['btype'], [12, 13], true)) {
+            && (int)$item['btype'] >= ItemBtype::FIRST_CONSUMABLE && !in_array((int)$item['btype'], ItemBtype::MATERIALS, true)) {
             $merged = $db->run('UPDATE items SET num=num+? WHERE id=? AND uid=? AND proc=0', [$amount, (int)$targetItem['id'], $uid]);
             $removed = $db->run('DELETE FROM items WHERE id=? AND uid=? AND proc=0 AND num=?', [$itemId, $uid, (int)$item['num']]);
             if (!$merged || !$removed || $db->affectedRows() !== 1) {
@@ -451,7 +454,7 @@ class HeroInventoryModel
             case 12:
                 $now = time();
                 $rate = max(1, (int)Config::getInstance()->heroConfig->waterBucketsPerDay);
-                $nextUse = (int)$inventory['lastWaterBucketUse'] + intdiv(86400, $rate);
+                $nextUse = (int)$inventory['lastWaterBucketUse'] + intdiv(Time::DAY, $rate);
                 if ((float)$hero['health'] > 0) {
                     throw new \DomainException('A water bucket can only revive a dead or reviving hero.');
                 }
@@ -460,7 +463,7 @@ class HeroInventoryModel
                 }
                 $oldKid = (int)$hero['kid'];
                 ResourcesHelper::updateVillageResources($oldKid, true);
-                if (!$db->run('DELETE FROM training WHERE kid=? AND nr=11', [(int)$hero['kid']])
+                if (!$db->run('DELETE FROM training WHERE kid=? AND nr=' . Unit::HERO, [(int)$hero['kid']])
                     || !$db->run('UPDATE hero SET health=100, kid=?, lastupdate=? WHERE uid=?', [$villageId, $now, $uid])
                     || !$db->run('UPDATE units SET u11=1 WHERE kid=?', [$villageId])
                     || !$db->run('UPDATE inventory SET lastWaterBucketUse=? WHERE uid=?', [$now, $uid])
@@ -479,6 +482,8 @@ class HeroInventoryModel
                     || !$this->consumeItem($uid, $item, 1)) {
                     throw new \RuntimeException('Could not use the Book of Wisdom.');
                 }
+                // The hero's production points are gone: settle at the old rate, then cache the new one.
+                ResourcesHelper::updateVillageResources((int)$hero['kid'], false);
                 return;
 
             case 14:
@@ -580,7 +585,7 @@ class HeroInventoryModel
         $elapsed = max(0, time() - (int)$hero['lastupdate']);
         $rate = (new HeroHelper())->calcHealth() + (float)$hero['itemHealth'];
         $rate *= max(1, (float)Config::getProperty('game', 'heroRegenerationMultiplier'));
-        return min(100, (float)$hero['health'] + ($rate / 86400 * $elapsed));
+        return min(100, (float)$hero['health'] + ($rate / Time::DAY * $elapsed));
     }
 
     /**

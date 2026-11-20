@@ -6,6 +6,7 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\Buildings\BuildingAction;
 use Model\AutoExtendModel;
@@ -109,7 +110,7 @@ class GoldHelper
             self::syncSessionGold($uid, $boughtGold, $giftGold);
         }
         $dailyQuest = new DailyQuestModel();
-        $dailyQuest->setQuestAsCompleted($uid, 5);
+        $dailyQuest->setQuestAsCompleted($uid, DailyQuestModel::QUEST_GOLD);
         return true;
     }
 
@@ -166,7 +167,7 @@ class GoldHelper
             (new VillageModel())->updateUserVillageResources($session->getPlayerId(), false);
         }
         $uid = (int)$session->getPlayerId();
-        if ($uid > 2) {
+        if ($uid > UserId::LAST_SYSTEM) {
             (new SeasonPassModel())->onMissionEvent($uid, 'resourceBoost');
         }
         InfoBoxModel::invalidateUserInfoBoxCache(Session::getInstance()->getPlayerId());
@@ -352,9 +353,9 @@ class GoldHelper
             foreach ($researchRows as $row) {
                 $nr = (int)$row['nr'];
                 $mode = (int)$row['mode'];
-                if ($mode === 1 && $nr >= 2 && $nr <= 9) {
+                if ($mode === ResearchMode::ACADEMY && $nr >= 2 && $nr <= 9) {
                     $db->query("UPDATE tdata SET u$nr=1 WHERE kid=$kid");
-                } elseif ($mode === 0 && $nr >= 1 && $nr <= 8) {
+                } elseif ($mode === ResearchMode::SMITHY && $nr >= 1 && $nr <= 8) {
                     $db->query("UPDATE smithy SET u$nr=IF(u$nr+1>20, 20, u$nr+1) WHERE kid=$kid");
                 } else {
                     throw new \RuntimeException('Malformed research task during finishNow.');
@@ -626,10 +627,10 @@ class GoldHelper
      */
     public function getTime($time): string
     {
-        if ($time >= 86400) {
-            return '<span class="bold">' . round($time / 86400, 1) . '</span> ' . T("PaymentWizard", "Days");
+        if ($time >= Time::DAY) {
+            return '<span class="bold">' . round($time / Time::DAY, 1) . '</span> ' . T("PaymentWizard", "Days");
         }
-        return '<span class="bold">' . round($time / 3600, 1) . '</span> ' . T("PaymentWizard", "hour");
+        return '<span class="bold">' . round($time / Time::HOUR, 1) . '</span> ' . T("PaymentWizard", "hour");
     }
 
     /**
@@ -641,13 +642,13 @@ class GoldHelper
      */
     public function getDurationText(int|float $seconds): string
     {
-        return "\u{202D}" . (int)round($seconds / 3600) . ' ' . T('Statistics', 'hours') . "\u{202C}";
+        return "\u{202D}" . (int)round($seconds / Time::HOUR) . ' ' . T('Statistics', 'hours') . "\u{202C}";
     }
 
     /** The duration in days for the "Bonus duration in days: %s" texts: a number with at most one decimal. */
     public function getDurationDays(int|float $seconds): string
     {
-        return (string)round($seconds / 86400, 1);
+        return (string)round($seconds / Time::DAY, 1);
     }
 
     /**
@@ -676,7 +677,7 @@ class GoldHelper
                 $number = preg_replace('/[^0-9]/', '', $featureKey);
                 $db = DB::getInstance();
                 $session = Session::getInstance();
-                if ((time() - $session->get("protectionLastExtend")) > 86400) {
+                if ((time() - $session->get("protectionLastExtend")) > Time::DAY) {
                     $session->set("protectionLastExtend", 0);
                     $session->set("protectionBoughtHours", 0);
                     $db->query("UPDATE users SET protectionLastExtend=0, protectionBoughtHours=0 WHERE id={$session->getPlayerId()}");
@@ -687,7 +688,7 @@ class GoldHelper
                 } else {
                     $feature = $config->extraSettings->moreProtection->packages[$number];
                     $maxDuration = $config->extraSettings->moreProtection->maxPerDay;
-                    if ((time() - $session->get("protectionLastExtend")) < 86400 && ($feature['duration'] + $session->get("protectionBoughtHours")) > $maxDuration) {
+                    if ((time() - $session->get("protectionLastExtend")) < Time::DAY && ($feature['duration'] + $session->get("protectionBoughtHours")) > $maxDuration) {
                         $disabled = true;
                         $title = T("PaymentWizard", "Protection daily limit reached");
                     }
@@ -989,7 +990,7 @@ class GoldHelper
         $config = Config::getInstance();
         $gold = $village->isWW() ? 0 : $config->gold->masterBuilderGold;
         $hasPerm = $session->checkSitterPermission(Session::SITTER_CAN_BUY_OR_SPEND_GOLD);
-        $class = $item_id == 40 ? 'green' : 'gold';
+        $class = $item_id == Gid::WONDER_OF_THE_WORLD ? 'green' : 'gold';
         if (!$hasPerm) {
             return getButton(
                 [

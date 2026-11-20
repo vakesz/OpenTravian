@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Model;
 
+use Core\Time;
 use Game\FarmList\FarmListInbox;
 use Core\Database\DB;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Gid;
 use Game\Map\Map;
 use Game\ResourcesHelper;
+use Game\Tribes;
+use Game\Slot;
+use Game\Unit;
+use Game\UserId;
 use function logError;
 
 class VillageModel
@@ -47,7 +53,7 @@ class VillageModel
         $Troops = min(abs($Troops), 100);
         $punishBuildings = min(abs($punishBuildings), 20);
         ignore_user_abort(TRUE);
-        set_time_limit(600);
+        set_time_limit(10 * Time::MINUTE);
         $db = DB::getInstance();
         if ($resources) {
             if ($kid > 0) {
@@ -76,7 +82,7 @@ class VillageModel
             $result = $db->query("SELECT u.* FROM units u, vdata v WHERE u.kid=v.kid AND v.owner={$uid}");
             while ($row = $result->fetch_assoc()) {
                 $modify = [];
-                for ($i = 1; $i <= 10; ++$i) {
+                for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                     $num = $row['u' . $i] - ceil($row['u' . $i] * $Troops / 100);
                     $modify[] = "u{$i}=$num";
                 }
@@ -87,7 +93,7 @@ class VillageModel
             while ($row = $result->fetch_assoc()) {
                 $modify = [];
                 $total = $row['u11'];
-                for ($i = 1; $i <= 10; ++$i) {
+                for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                     $num = $row['u' . $i] - ceil($row['u' . $i] * $Troops / 100);
                     $modify[] = "u{$i}=$num";
                     $total += $num;
@@ -103,7 +109,7 @@ class VillageModel
             while ($row = $result->fetch_assoc()) {
                 $modify = [];
                 $total = $row['u11'];
-                for ($i = 1; $i <= 10; ++$i) {
+                for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                     $num = $row['u' . $i] - ceil($row['u' . $i] * $Troops / 100);
                     $modify[] = "u{$i}=$num";
                     $total += $num;
@@ -126,7 +132,7 @@ class VillageModel
             while ($row = $result->fetch_assoc()) {
                 $buildings = $this->getBuildingsAssoc((int) $row['kid']);
                 foreach ($buildings as $index => $build) {
-                    $level = $index <= 18 ? $punishResourcesBuildings : $punishBuildings;
+                    $level = $index <= Slot::LAST_FIELD ? $punishResourcesBuildings : $punishBuildings;
                     if ($level > 0 && $build['item_id'] && $build['level']) {
                         BuildingAction::downgrade($row['kid'], $index, $level);
                     }
@@ -146,7 +152,7 @@ class VillageModel
     /** Horse Drinking Trough level (Romans only), 0 when the village has none. */
     public static function getHDP(int $kid, int|string|null $race = null): int
     {
-        if ($race !== null && (int) $race !== 1) {
+        if ($race !== null && (int) $race !== Tribes::ROMANS) {
             return 0;
         }
 
@@ -166,7 +172,7 @@ class VillageModel
         }
         $buildings = $buildings->fetch_assoc();
         $assoc = [];
-        for ($i = 1; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST; ++$i) {
             $assoc[$i] = [
                 "item_id" => (int)$buildings['f' . $i . 't'],
                 'level' => (int)$buildings['f' . $i],
@@ -191,7 +197,7 @@ class VillageModel
     /** Brewery level of the capital while its festival runs, 0 otherwise. */
     public function getCapBrewery(int $uid): int
     {
-        if ($uid === 1) {
+        if ($uid === UserId::NATARS) {
             return 0;
         }
         $result = DB::getInstance()->query("SELECT kid, festival FROM vdata WHERE owner=$uid AND capital=1");
@@ -200,7 +206,7 @@ class VillageModel
             return 0;
         }
 
-        return self::findBuildingLevel((int) $capVillage['kid'], 19, 35);
+        return self::findBuildingLevel((int) $capVillage['kid'], 19, Gid::BREWERY);
     }
 
     public function changeCapital(int $uid, int $new_capital_kid): bool
@@ -211,19 +217,19 @@ class VillageModel
             return false;
         }
         $buildings = $this->getBuildingsAssoc($new_capital_kid);
-        for ($i = 19; $i <= 40; ++$i) {
-            if (in_array($buildings[$i]['item_id'], [29, 30])) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
+            if (in_array($buildings[$i]['item_id'], [Gid::GREAT_BARRACKS, Gid::GREAT_STABLE])) {
                 BuildingAction::downgrade($new_capital_kid, $i, 0, true);
             }
         }
         ResourcesHelper::updateVillageResources($new_capital_kid, FALSE);
         $buildings = $this->getBuildingsAssoc($capital_kid);
-        for ($i = 19; $i <= 40; ++$i) {
-            if (in_array($buildings[$i]['item_id'], [34, 35])) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
+            if (in_array($buildings[$i]['item_id'], [Gid::STONEMASON, Gid::BREWERY])) {
                 BuildingAction::downgrade($capital_kid, $i, 0, true);
             }
         }
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             if ($buildings[$i]['level'] > 10) {
                 BuildingAction::downgrade($capital_kid, $i, $buildings[$i]['level'] - 10);
             }
@@ -246,7 +252,7 @@ class VillageModel
             return;
         }
         $tribeSpecificArray = \Game\Formulas::TRIBE_SPECIFIC_BUILDINGS;
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             if (isset($buildings[$i]['item_id']) && in_array($buildings[$i]['item_id'], $tribeSpecificArray)) {
                 BuildingAction::downgrade($kid, $i, 0, true);
             }
@@ -262,7 +268,7 @@ class VillageModel
         $db->query("DELETE FROM training WHERE kid=$kid");
         \Game\Wounded::purge($kid);
         $db->query("DELETE FROM traderoutes WHERE (kid=$kid OR to_kid=$kid)");
-        $db->query("DELETE FROM movement WHERE ((kid=$kid AND mode=0) OR (to_kid=$kid AND mode=1)) OR (race=4 AND to_kid={$kid})");
+        $db->query("DELETE FROM movement WHERE ((kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")) OR (race=" . Tribes::NATURE . " AND to_kid={$kid})");
         $db->query("DELETE FROM enforcement WHERE kid=$kid");
         $db->query("DELETE FROM trapped WHERE kid=$kid");
         $db->query("DELETE FROM research WHERE kid=$kid");
@@ -273,7 +279,7 @@ class VillageModel
         $db->query("DELETE FROM building_upgrade WHERE kid=$kid");
         $db->query("DELETE FROM demolition WHERE kid=$kid");
         $db->run('DELETE FROM village_group_villages WHERE uid=? AND kid=?', [$uid, $kid]);
-        $db->query("DELETE FROM send WHERE kid=$kid OR (to_kid=$kid AND mode=1)");
+        $db->query("DELETE FROM send WHERE kid=$kid OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")");
         $ownedOases = $db->query("SELECT kid FROM odata WHERE did=$kid");
         while ($ownedOases && ($oasis = $ownedOases->fetch_assoc())) {
             \Model\OasesModel::releaseOasis((int)$oasis['kid'], $kid);
@@ -289,7 +295,7 @@ class VillageModel
         }
         $oldRace = (int)$db->fetchScalar("SELECT race FROM users WHERE id=$uid");
         $tribeSpecificArray = $oldRace === (int)$newRace ? [] : \Game\Formulas::TRIBE_SPECIFIC_BUILDINGS;
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             if (!isset($buildings[$i])) {
                 continue;
             }
@@ -302,7 +308,7 @@ class VillageModel
         if ($newUidPop > $pop) {
             foreach ($buildings as $index => $build) {
                 if ($build['item_id'] && $build['level']) {
-                    if ($build['item_id'] > 4 && ($build['level'] - 1) == 0) {
+                    if ($build['item_id'] > Gid::LAST_RESOURCE_FIELD && ($build['level'] - 1) == 0) {
                         $build['item_id'] = 0;
                     }
                     $build['level']--;
@@ -376,8 +382,8 @@ class VillageModel
         if (!is_array($buildings)) {
             return false;
         }
-        $tribeSpecificArray = [34, 29, 30, 35];
-        for ($i = 19; $i <= 40; $i++) {
+        $tribeSpecificArray = [Gid::STONEMASON, Gid::GREAT_BARRACKS, Gid::GREAT_STABLE, Gid::BREWERY];
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; $i++) {
             if (in_array((int) $buildings['f' . $i . 't'], $tribeSpecificArray, true)) {
                 BuildingAction::downgrade($kid, $i, 0, true);
             }
@@ -401,7 +407,7 @@ class VillageModel
         if (!is_array($buildings)) {
             return 0;
         }
-        for ($i = $firstSlot; $i <= 38; ++$i) {
+        for ($i = $firstSlot; $i <= Slot::LAST_BUILDING; ++$i) {
             if ((int) $buildings['f' . $i . 't'] === $itemId) {
                 return (int) $buildings['f' . $i];
             }

@@ -9,6 +9,7 @@ use Core\Session;
 use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
+use Game\Gid;
 use Model\MarketModel;
 
 /** Refreshes marketplace capacity and movements after a resource shipment. */
@@ -22,7 +23,7 @@ final class reload extends AjaxBase
         }
 
         $village = Village::getInstance();
-        $merchantCount = max($village->getTypeLevel(17));
+        $merchantCount = max($village->getTypeLevel(Gid::MARKETPLACE));
         if ($merchantCount < 1) {
             $this->error('The selected village has no marketplace.', 404);
             return;
@@ -51,7 +52,7 @@ final class reload extends AjaxBase
 
         return max(1, (int)floor(Formulas::merchantCAP(
             $session->getRace(),
-            max($village->getTypeLevel(28)),
+            max($village->getTypeLevel(Gid::TRADE_OFFICE)),
             $allianceBonus
         )));
     }

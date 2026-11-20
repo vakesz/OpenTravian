@@ -97,4 +97,10 @@ if (!str_contains($ctrl, '(new GoldHelper())->finishImmediatelyBuildings()')
     failFinishNowPopupContract('A stale finish-now confirmation must return an error instead of a successful no-op reload.');
 }
 
+// research.mode 1 is the academy and 0 the smithy (Game\ResearchMode); each order carries its own building's label.
+if (!str_contains($ctrl, "=== ResearchMode::ACADEMY\n                ? (string)T('finishNowPopup', 'academy')\n                : (string)T('finishNowPopup', 'smithy')")
+    || !str_contains($en, "\$Definition['finishNowPopup']['academy'] = 'Research (Academy)'")) {
+    failFinishNowPopupContract('Research orders must label academy research as Academy and smithy upgrades as smithy.');
+}
+
 echo "Finish-now popup contract passed.\n";

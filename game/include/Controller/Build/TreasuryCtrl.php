@@ -397,7 +397,7 @@ class TreasuryCtrl extends AnyCtrl
         $view = new PHPBatchView("build/building/TreasuryArtTable");
         $view->vars['content'] = '';
         $db = DB::getInstance();
-        $art = $db->query("SELECT * FROM artefacts WHERE type=11 AND effecttype=$type AND " . ($size == 1 ? 'size=1' : 'size=3') . " ORDER BY id");
+        $art = $db->query("SELECT * FROM artefacts WHERE type=" . ArtefactsModel::ART_FOOL . " AND effecttype=$type AND " . ($size == 1 ? 'size=1' : 'size=3') . " ORDER BY id");
         while ($row = $art->fetch_assoc()) {
             $view->vars['content'] .= $this->renderArtifactOverview($row);
         }

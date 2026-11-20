@@ -17,29 +17,39 @@ use Core\Config;
  */
 final class Tribes
 {
+    public const ROMANS = 1;
+    public const TEUTONS = 2;
+    public const GAULS = 3;
+    public const NATURE = 4;
+    public const NATARS = 5;
+    public const EGYPTIANS = 6;
+    public const HUNS = 7;
+    public const SPARTANS = 8;
+    public const VIKINGS = 9;
+
     /** Tribes a world may offer to players. */
-    public const SELECTABLE = [1, 2, 3, 6, 7, 8, 9];
+    public const SELECTABLE = [self::ROMANS, self::TEUTONS, self::GAULS, self::EGYPTIANS, self::HUNS, self::SPARTANS, self::VIKINGS];
 
     /** Default playable tribes, including Vikings. */
-    public const DEFAULT_PLAYABLE = [1, 2, 3, 6, 7, 8, 9];
+    public const DEFAULT_PLAYABLE = [self::ROMANS, self::TEUTONS, self::GAULS, self::EGYPTIANS, self::HUNS, self::SPARTANS, self::VIKINGS];
 
     /** Display names for the tribes a world may offer. */
-    public const NAMES = [1 => 'Romans', 2 => 'Teutons', 3 => 'Gauls', 6 => 'Egyptians', 7 => 'Huns', 8 => 'Spartans', 9 => 'Vikings'];
+    public const NAMES = [self::ROMANS => 'Romans', self::TEUTONS => 'Teutons', self::GAULS => 'Gauls', self::EGYPTIANS => 'Egyptians', self::HUNS => 'Huns', self::SPARTANS => 'Spartans', self::VIKINGS => 'Vikings'];
 
     /** Order of the activation tribe picker (Gauls are the recommended first card). */
-    public const PICKER_ORDER = [3, 1, 2, 6, 7, 8, 9];
+    public const PICKER_ORDER = [self::GAULS, self::ROMANS, self::TEUTONS, self::EGYPTIANS, self::HUNS, self::SPARTANS, self::VIKINGS];
 
     /** Slug used by Gpack classes and assets. */
     private const SLUGS = [
-        1 => 'roman',
-        2 => 'teuton',
-        3 => 'gaul',
-        4 => 'nature',
-        5 => 'natar',
-        6 => 'egyptian',
-        7 => 'hun',
-        8 => 'spartan',
-        9 => 'viking',
+        self::ROMANS => 'roman',
+        self::TEUTONS => 'teuton',
+        self::GAULS => 'gaul',
+        self::NATURE => 'nature',
+        self::NATARS => 'natar',
+        self::EGYPTIANS => 'egyptian',
+        self::HUNS => 'hun',
+        self::SPARTANS => 'spartan',
+        self::VIKINGS => 'viking',
     ];
 
     /**
@@ -48,17 +58,27 @@ final class Tribes
      * Pathfinders, Roman Equites Legati and Egyptian Sopdu Explorers ride; Teuton,
      * Spartan and Viking scouts walk.
      */
-    public const CAVALRY_START = [1 => 3, 2 => 4, 3 => 2, 4 => -1, 5 => 4, 6 => 3, 7 => 2, 8 => 4, 9 => 4];
+    public const CAVALRY_START = [
+        self::ROMANS => 3,
+        self::TEUTONS => 4,
+        self::GAULS => 2,
+        self::NATURE => -1,
+        self::NATARS => 4,
+        self::EGYPTIANS => 3,
+        self::HUNS => 2,
+        self::SPARTANS => 4,
+        self::VIKINGS => 4,
+    ];
 
     /** summary table column prefix per selectable tribe. */
     private const SUMMARY_COLUMNS = [
-        1 => 'roman',
-        2 => 'teuton',
-        3 => 'gaul',
-        6 => 'egyptians',
-        7 => 'huns',
-        8 => 'spartans',
-        9 => 'vikings',
+        self::ROMANS => 'roman',
+        self::TEUTONS => 'teuton',
+        self::GAULS => 'gaul',
+        self::EGYPTIANS => 'egyptians',
+        self::HUNS => 'huns',
+        self::SPARTANS => 'spartans',
+        self::VIKINGS => 'vikings',
     ];
 
     /** @return int[] tribe ids players may currently pick, in picker order */
@@ -77,7 +97,7 @@ final class Tribes
     /** True when Vikings are among the playable tribes. */
     public static function vikingsEnabled(): bool
     {
-        return self::isPlayable(9);
+        return self::isPlayable(self::VIKINGS);
     }
 
     /**
@@ -161,14 +181,14 @@ final class Tribes
     public static function trainingUnitIds(int $tribe, int $buildingId): array
     {
         $start = self::CAVALRY_START[$tribe] ?? null;
-        if ($start === null || $tribe === 4) {
+        if ($start === null || $tribe === self::NATURE) {
             return [];
         }
         $numbers = match ($buildingId) {
-            19, 29 => range(1, $start),
-            20, 30 => range($start + 1, 6),
-            21 => [7, 8],
-            25, 26, 44 => [9, 10],
+            Gid::BARRACKS, Gid::GREAT_BARRACKS => range(1, $start),
+            Gid::STABLE, Gid::GREAT_STABLE => range($start + 1, 6),
+            Gid::WORKSHOP => [Unit::RAM, Unit::CATAPULT],
+            Gid::RESIDENCE, Gid::PALACE, Gid::COMMAND_CENTER => [Unit::CHIEF, Unit::SETTLER],
             default => [],
         };
 

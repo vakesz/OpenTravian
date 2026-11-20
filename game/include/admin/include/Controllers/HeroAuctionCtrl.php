@@ -1,6 +1,7 @@
 <?php
 
 use Core\Helper\WebService;
+use Core\Time;
 use Model\AuctionModel;
 
 class HeroAuctionCtrl
@@ -16,7 +17,7 @@ class HeroAuctionCtrl
             $repeat = min($int('repeat'), 100);
             $time = $int('time');
             $silver = $int('silver');
-            if ($time >= 60 && $time <= 86400 && $btype > 0 && $type > 0) {
+            if ($time >= Time::MINUTE && $time <= Time::DAY && $btype > 0 && $type > 0) {
                 $m = new AuctionModel();
                 for ($i = 1; $i <= $repeat; ++$i) {
                     $m->addAuction(false, 0, $btype, $type, $package_amount, time() + $time, $silver);

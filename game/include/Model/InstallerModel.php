@@ -6,8 +6,13 @@ namespace Model;
 
 use Core\Database\DB;
 use Core\Security\Password;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\Map\WaterGenerator;
+use Game\OasisType;
+use Game\Tribes;
+use Game\Unit;
+use Game\UserId;
 use const INCLUDE_PATH;
 use const MAP_SIZE;
 use function getGameSpeed;
@@ -440,7 +445,7 @@ class InstallerModel
      */
     private function initialOasisAnimals(int $type): string
     {
-        $counts = array_fill(1, 10, 0);
+        $counts = array_fill(1, Unit::LAST_TROOP, 0);
         $troops = OasesModel::ANIMALS_BY_TYPE[$type] ?? [];
         if ($troops !== []) {
             $speed = max(1, (int)getGameSpeed());
@@ -1269,16 +1274,16 @@ class InstallerModel
             case 1:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = 4;
+                        $this->map[$kid]['oasistype'] = OasisType::WOOD_50;
                     } else {
                         $this->map[$kid]['landscape'] = 1;
                     }
                     break;
                 }
                 if ($r <= 3) {
-                    $this->map[$kid]['oasistype'] = 2;
+                    $this->map[$kid]['oasistype'] = OasisType::WOOD_25;
                 } else if ($r <= 5) {
-                    $this->map[$kid]['oasistype'] = 3;
+                    $this->map[$kid]['oasistype'] = OasisType::WOOD_25_CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 1;
                 }
@@ -1286,16 +1291,16 @@ class InstallerModel
             case 2:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = 8;
+                        $this->map[$kid]['oasistype'] = OasisType::CLAY_50;
                     } else {
                         $this->map[$kid]['landscape'] = 2;
                     }
                     break;
                 }
                 if ($r <= 3) {
-                    $this->map[$kid]['oasistype'] = 6;
+                    $this->map[$kid]['oasistype'] = OasisType::CLAY_25;
                 } else if ($r <= 5) {
-                    $this->map[$kid]['oasistype'] = 7;
+                    $this->map[$kid]['oasistype'] = OasisType::CLAY_25_CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 2;
                 }
@@ -1303,16 +1308,16 @@ class InstallerModel
             case 3:
                 if ($isGrayArea) {
                     if ($r <= 3) {
-                        $this->map[$kid]['oasistype'] = 12;
+                        $this->map[$kid]['oasistype'] = OasisType::IRON_50;
                     } else {
                         $this->map[$kid]['landscape'] = 3;
                     }
                     break;
                 }
                 if ($r <= 3) {
-                    $this->map[$kid]['oasistype'] = 10;
+                    $this->map[$kid]['oasistype'] = OasisType::IRON_25;
                 } else if ($r <= 5) {
-                    $this->map[$kid]['oasistype'] = 11;
+                    $this->map[$kid]['oasistype'] = OasisType::IRON_25_CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 3;
                 }
@@ -1320,16 +1325,16 @@ class InstallerModel
             case 4:
                 if ($isGrayArea) {
                     if ($r <= 10) {
-                        $this->map[$kid]['oasistype'] = 15;
+                        $this->map[$kid]['oasistype'] = OasisType::CROP_50;
                     } else {
                         $this->map[$kid]['landscape'] = 4;
                     }
                     break;
                 }
                 if ($r <= 2.5) {
-                    $this->map[$kid]['oasistype'] = 15;
+                    $this->map[$kid]['oasistype'] = OasisType::CROP_50;
                 } else if ($r <= 7) {
-                    $this->map[$kid]['oasistype'] = 14;
+                    $this->map[$kid]['oasistype'] = OasisType::CROP_25;
                 } else {
                     $this->map[$kid]['landscape'] = 4;
                 }
@@ -1540,9 +1545,9 @@ class InstallerModel
         $natars = $register->addUser(T("Global", "NatarsName"),
             Password::hash(bin2hex(random_bytes(16))),
             '',
-            5,
+            Tribes::NATARS,
             $natar_kid,
-            1,
+            AccessLevel::PLAYER,
             false,
             TRUE);
         $db->query("UPDATE users SET protection=0, kid=$natar_kid, desc1='[#natars]' WHERE id=$natars");
@@ -1550,7 +1555,7 @@ class InstallerModel
         $multihunter = $register->addUser("Multihunter",
             Password::hash($multihunterPassword),
             '',
-            1,
+            Tribes::ROMANS,
             Formulas::xy2kid(1, 0),
             0,
             false,
@@ -1562,20 +1567,20 @@ class InstallerModel
         $db->query("UPDATE users SET id=1 WHERE id=2");
         $db->query("UPDATE users SET id=2 WHERE id=3");
 
-        $register->addHero(1, Formulas::xy2kid(0, 0));
-        $register->addHeroFace(1);
-        $register->addHeroInventory(1);
+        $register->addHero(UserId::NATARS, Formulas::xy2kid(0, 0));
+        $register->addHeroFace(UserId::NATARS);
+        $register->addHeroInventory(UserId::NATARS);
 
-        $register->addHero(2, Formulas::xy2kid(1, 0));
-        $register->addHeroFace(2);
-        $register->addHeroInventory(2);
-        $db->query("DELETE FROM infobox WHERE uid <= 2");
+        $register->addHero(UserId::MULTIHUNTER, Formulas::xy2kid(1, 0));
+        $register->addHeroFace(UserId::MULTIHUNTER);
+        $register->addHeroInventory(UserId::MULTIHUNTER);
+        $db->query("DELETE FROM infobox WHERE uid <= " . UserId::LAST_SYSTEM);
         //natars
         $register->createNatarsBaseVillage($natar_kid);
         $WonderOfTheWorld = new \Model\WonderOfTheWorldModel();
         $WonderOfTheWorld->createWWVillages();
         //multihunter
-        $register->createBaseVillage(2, "Multihunter", 1, Formulas::xy2kid(1, 0));
+        $register->createBaseVillage(UserId::MULTIHUNTER, "Multihunter", Tribes::ROMANS, Formulas::xy2kid(1, 0));
         $db->query("UPDATE config SET installed=1, installationTime=" . time() . ", patchVersion=" . \Game\WorldSchemaVersion::CURRENT);
     }
 }

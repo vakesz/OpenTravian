@@ -7,14 +7,19 @@ namespace Model;
 use Controller\Ajax\heroAuction;
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
+use Game\AccessLevel;
 use Game\Formulas;
 use Game\Hero\AuctionFee;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
+use Game\UserId;
 use mysqli_result;
 
 use function getCustom;
 use function getGameElapsedSeconds;
 use function getGameSpeed;
+use function logError;
 
 /**
  * Hero auctions and the hero inventory slots. Only ints are interpolated into SQL (everything else is bound), and
@@ -27,11 +32,11 @@ class AuctionModel
     public const HERO_INVENTORY_MAX_SLOTS = self::HERO_INVENTORY_COLUMNS * self::HERO_INVENTORY_MAX_ROWS;
 
     /** Knowledge Base article 94: a sale can be cancelled within the first five minutes. */
-    public const CANCEL_WINDOW_SECONDS = 300;
+    public const CANCEL_WINDOW_SECONDS = 5 * Time::MINUTE;
 
     /** A new listing stays hidden for a random 1–5 minutes at 1×, then that wait is divided by speed. */
-    public const LISTING_DELAY_MIN = 60;
-    public const LISTING_DELAY_MAX = 300;
+    public const LISTING_DELAY_MIN = Time::MINUTE;
+    public const LISTING_DELAY_MAX = 5 * Time::MINUTE;
 
     /**
      * The multiple is not published. A bid above twice the current price, made
@@ -80,39 +85,69 @@ class AuctionModel
         $dailyQuest = new DailyQuestModel();
         $spread_randomly = Config::getInstance()->auction->fakeAuction->SpreadOutRandomlyBetweenPlayers;
         $spread_timeout = (int) Config::getInstance()->auction->fakeAuction->SpreadOutTimeout;
-        while ($find && ($row = $find->fetch_assoc())) {
-            $auctionId = (int) $row['id'];
-            $activeUid = (int) $row['activeUid'];
-            $owner = (int) $row['uid'];
-            $silver = (int) $row['silver'];
-            $item = [(int) $row['btype'], (int) $row['type'], (int) $row['num']];
-            $db->query("UPDATE auction SET finish=1 WHERE id=$auctionId");
-            if ($spread_randomly) {
-                $uid = $this->getRandomUID($spread_timeout);
-                if ($uid !== false) {
-                    $dailyQuest->setQuestAsCompleted($activeUid, 4);
-                    $this->addItemToUser($uid, ...$item);
-                }
-            } elseif ((int) $row['activeId'] !== 0) {
-                $buyer = $m->getUser($activeUid, 'silver');
-                if ($buyer !== false && $this->updateUserSilver($activeUid, $silver)) {
-                    $dailyQuest->setQuestAsCompleted($activeUid, 4);
-                    $this->addItemToUser($activeUid, ...$item);
-                    $this->addBooking($activeUid, [2, ...$item], -$silver, -$silver + (int) $buyer['silver'], (int) $row['time']);
-                }
+        while ($find && ($candidate = $find->fetch_assoc())) {
+            $auctionId = (int) $candidate['id'];
+            // Each auction settles once and completely: claim it (finish=0 to 1) and settle it in one transaction.
+            if (!$db->begin_transaction()) {
+                continue;
             }
-            if ($owner !== 0) {
-                if ((int) $row['activeId'] === 0 && !Config::getProperty('auction', 'buyInactiveAuctionBySystem')) {
-                    $this->addItemToUser($owner, ...$item);
-                    $db->query("DELETE FROM auction WHERE id=$auctionId AND finish=1");
-                } else {
-                    // The seller is paid the sale price minus the auction house's fee.
-                    $payout = AuctionFee::payout($silver);
-                    $seller = $m->getUser($owner, 'silver');
-                    if ($seller !== false && $this->updateUserSilver($owner, $payout, 1)) {
-                        $this->addBooking($owner, [1, ...$item], $payout, $payout + (int) $seller['silver'], (int) $row['time']);
+            try {
+                // The time check is repeated so an auction a late bid extended is not settled early.
+                $claimed = $db->query("UPDATE auction SET finish=1 WHERE id=$auctionId AND finish=0 AND time <= " . time());
+                if (!$claimed || $db->affectedRows() !== 1) {
+                    $db->rollback();
+                    continue;
+                }
+                // Re-read under the row lock the claim holds: a bid may have landed after the unlocked SELECT above.
+                $locked = $db->query("SELECT * FROM auction WHERE id=$auctionId FOR UPDATE");
+                $row = $locked ? $locked->fetch_assoc() : null;
+                if (!$row) {
+                    $db->rollback();
+                    continue;
+                }
+                $activeUid = (int) $row['activeUid'];
+                $owner = (int) $row['uid'];
+                $silver = (int) $row['silver'];
+                $item = [(int) $row['btype'], (int) $row['type'], (int) $row['num']];
+                $unsold = (int) $row['activeId'] === 0;
+                if ($spread_randomly) {
+                    $uid = $this->getRandomUID($spread_timeout);
+                    if ($uid !== false) {
+                        $dailyQuest->setQuestAsCompleted($activeUid, DailyQuestModel::QUEST_WIN_AUCTION);
+                        $this->addItemToUser($uid, ...$item);
+                    }
+                } elseif (!$unsold) {
+                    $buyer = $m->getUser($activeUid, 'silver');
+                    if ($buyer !== false && $this->updateUserSilver($activeUid, $silver)) {
+                        $dailyQuest->setQuestAsCompleted($activeUid, DailyQuestModel::QUEST_WIN_AUCTION);
+                        $this->addItemToUser($activeUid, ...$item);
+                        $this->addBooking($activeUid, [2, ...$item], -$silver, -$silver + (int) $buyer['silver'], (int) $row['time']);
+                    } else {
+                        // The winner can no longer pay: the item goes back to the seller as if nobody had bid.
+                        $unsold = true;
                     }
                 }
+                if ($owner !== 0) {
+                    if ($unsold && ((int) $row['activeId'] !== 0 || !Config::getProperty('auction', 'buyInactiveAuctionBySystem'))) {
+                        $this->addItemToUser($owner, ...$item);
+                        $db->query("DELETE FROM auction WHERE id=$auctionId AND finish=1");
+                    } else {
+                        // The seller is paid the sale price minus the auction house's fee.
+                        $payout = AuctionFee::payout($silver);
+                        $seller = $m->getUser($owner, 'silver');
+                        if ($seller !== false && $this->updateUserSilver($owner, $payout, 1)) {
+                            $this->addBooking($owner, [1, ...$item], $payout, $payout + (int) $seller['silver'], (int) $row['time']);
+                        }
+                    }
+                }
+                if (!$db->commit()) {
+                    throw new \RuntimeException('Could not commit the auction settlement.');
+                }
+            } catch (\Throwable $exception) {
+                if ($db->inTransaction()) {
+                    $db->rollback();
+                }
+                logError('Auction %d could not be settled: %s', [$auctionId, $exception->getMessage()]);
             }
         }
     }
@@ -121,7 +156,7 @@ class AuctionModel
     {
         $time = time() - $spread_timeout;
         $exclude = self::$given_user_ids === [] ? '' : ' AND id NOT IN(' . implode(',', self::$given_user_ids) . ')';
-        $uid = (int) DB::getInstance()->fetchScalar("SELECT id FROM users WHERE id>2 AND access=1 AND last_login_time >= $time$exclude ORDER BY RAND() LIMIT 1");
+        $uid = (int) DB::getInstance()->fetchScalar("SELECT id FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND access=" . AccessLevel::PLAYER . " AND last_login_time >= $time$exclude ORDER BY RAND() LIMIT 1");
         if ($uid) {
             self::$given_user_ids[] = $uid;
 
@@ -139,7 +174,7 @@ class AuctionModel
     public function addItemToUser(int $uid, int $btype, int $type, int $num): bool
     {
         $db = DB::getInstance();
-        $stackAble = $btype >= 7 && $btype !== 12 && $btype !== 13;
+        $stackAble = $btype >= ItemBtype::FIRST_CONSUMABLE && $btype !== ItemBtype::BUCKET && $btype !== ItemBtype::BOOK_OF_WISDOM;
         if ($stackAble) {
             $itemId = (int) $db->fetchScalar("SELECT id FROM items WHERE uid=$uid AND btype=$btype AND type=$type AND proc=0");
             if ($itemId) {
@@ -234,7 +269,13 @@ class AuctionModel
 
     private function updateUserSilver(int $uid, int $silver, int $mode = 0): bool
     {
-        return (bool) DB::getInstance()->query("UPDATE users SET silver=silver" . ($mode === 0 ? '-' : '+') . "$silver WHERE id=$uid");
+        $db = DB::getInstance();
+        if ($mode === 0) {
+            // A debit never takes the balance below zero.
+            return $db->query("UPDATE users SET silver=silver-$silver WHERE id=$uid AND silver>=$silver") && $db->affectedRows() === 1;
+        }
+
+        return (bool) $db->query("UPDATE users SET silver=silver+$silver WHERE id=$uid");
     }
 
     /**
@@ -288,21 +329,21 @@ class AuctionModel
             return '';
         }
         if ($filter === 'bag') {
-            return ' AND btype IN (7,8,9,10,11,12,13,14,15)';
+            return ' AND btype IN (' . implode(',', range(ItemBtype::FIRST_CONSUMABLE, ItemBtype::ARTWORK)) . ')';
         }
 
         $slotMap = [
-            'helmet' => 1,
-            'body' => 2,
-            'leftHand' => 3,
-            'rightHand' => 4,
-            'shoes' => 5,
-            'horse' => 6,
+            'helmet' => ItemBtype::HELMET,
+            'body' => ItemBtype::BODY,
+            'leftHand' => ItemBtype::LEFT_HAND,
+            'rightHand' => ItemBtype::RIGHT_HAND,
+            'shoes' => ItemBtype::SHOES,
+            'horse' => ItemBtype::HORSE,
         ];
         if (is_string($filter) && isset($slotMap[$filter])) {
             return ' AND btype=' . $slotMap[$filter];
         }
-        if (is_numeric($filter) && (int) $filter >= 1 && (int) $filter <= 15) {
+        if (is_numeric($filter) && (int) $filter >= ItemBtype::HELMET && (int) $filter <= ItemBtype::ARTWORK) {
             return ' AND btype=' . (int) $filter;
         }
 
@@ -348,7 +389,7 @@ class AuctionModel
     public function cancelAuction(int $id): bool
     {
         $db = DB::getInstance();
-        $query = $db->query("UPDATE auction SET finish=1, cancel=1 WHERE id=$id");
+        $query = $db->query("UPDATE auction SET finish=1, cancel=1 WHERE id=$id AND finish=0");
 
         return $query && $db->affectedRows() > 0;
     }
@@ -522,8 +563,9 @@ class AuctionModel
     public function modifyAuction(int $id, int $activeId, int $activeUid, int|float $silver, int|float $maxSilver, int $time, bool $add = true): bool
     {
         $db = DB::getInstance();
-        $time = max($time, time() + 300);
-        $query = $db->query("UPDATE auction SET activeId=$activeId, activeUid=$activeUid, silver = $silver, maxSilver=$maxSilver" . ($add ? ', bids = bids + 1' : '') . ", time = $time where id = $id");
+        $time = max($time, time() + 5 * Time::MINUTE);
+        // A settled auction is never rewritten.
+        $query = $db->query("UPDATE auction SET activeId=$activeId, activeUid=$activeUid, silver = $silver, maxSilver=$maxSilver" . ($add ? ', bids = bids + 1' : '') . ", time = $time where id = $id AND finish=0");
 
         return $query && $db->affectedRows() > 0;
     }
@@ -588,14 +630,14 @@ class AuctionModel
             $rand = $items->getRandomItem();
             $btype = (int) $rand['btype'];
             $type = (int) $rand['type'];
-            if ($btype === 15 && getGameSpeed() <= 100) {
+            if ($btype === ItemBtype::ARTWORK && getGameSpeed() <= 100) {
                 continue;
             }
             $amounts = heroAuction::getPackagesFakeAuctionForItem($btype, $type);
-            if ($highSpeedTrainingHelmets && $btype === 1 && ($type >= 10 && $type <= 15)) {
+            if ($highSpeedTrainingHelmets && $btype === ItemBtype::HELMET && ($type >= 10 && $type <= 15)) {
                 continue;
             }
-            if ($btype <= 6) {
+            if ($btype <= ItemBtype::LAST_EQUIPMENT) {
                 //this has tier
                 $tier = ($type % 3) === 0 ? 3 : ($type % 3 === 1 ? 1 : 2);
                 if ($tierNum !== $tier) {
@@ -625,14 +667,14 @@ class AuctionModel
         if (empty($silver)) {
             if (getCustom('decreaseItemsPriceInAuction')) {
                 $silver = match ($btype) {
-                    14, 11, 10 => 1,
-                    15 => 10,
-                    8 => 0.05,
+                    ItemBtype::TABLET_OF_LAW, ItemBtype::OINTMENT, ItemBtype::SCROLL => 1,
+                    ItemBtype::ARTWORK => 10,
+                    ItemBtype::BANDAGE => 0.05,
                     default => $stackAble ? 0.05 : 100,
                 };
             } else {
-                $silver = ($stackAble && $btype !== 15) ? 1 : 100;
-                if ($btype === 6 || $btype === 13) {
+                $silver = ($stackAble && $btype !== ItemBtype::ARTWORK) ? 1 : 100;
+                if ($btype === ItemBtype::HORSE || $btype === ItemBtype::BOOK_OF_WISDOM) {
                     $silver = 1;
                 }
             }

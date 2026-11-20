@@ -25,7 +25,7 @@ class paymentWizard extends AjaxBase
         }
 
         if (WebService::isPost()) {
-            Quest::getInstance()->setQuestBitwise('world', 7, 1);
+            Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_BONUS_GOLD, 1);
             (new TasksModel())->markFreeGoldShopOpened((int)Session::getInstance()->getPlayerId());
             $view = new PHPBatchView("payment/paymentWizardLayout");
             $defaultTab = 'buyGold';

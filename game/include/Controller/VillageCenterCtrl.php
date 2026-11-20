@@ -11,6 +11,8 @@ use Game\Buildings\BuildingHelper;
 use Game\Buildings\BuildingRearranger;
 use Game\BuildRequest;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
 use Model\WonderOfTheWorldModel;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
@@ -35,7 +37,7 @@ class VillageCenterCtrl extends GameCtrl
         }
         $village = $this->session->village;
         $maps = [];
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             if ($village->isWW() && $i !== WonderOfTheWorldModel::DISPLAY_SLOT && in_array($i, WonderOfTheWorldModel::RESERVED_SLOTS, true)) {
                 continue;
             }
@@ -84,7 +86,7 @@ class VillageCenterCtrl extends GameCtrl
     {
         $html = '';
         $harborLevel = 0;
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             $field = $village->getField($i);
             if ((int)$field['item_id'] === \Game\Ships::HARBOR_GID && (int)$field['level'] > 0) {
                 $harborLevel = (int)$field['level'];
@@ -114,7 +116,7 @@ class VillageCenterCtrl extends GameCtrl
             return false;
         }
         for ($i = BuildingRearranger::FIRST_MOVABLE_SLOT; $i <= BuildingRearranger::LAST_MOVABLE_SLOT; ++$i) {
-            if ((int)$village->getField($i)['item_id'] === 15 && (int)$village->getField($i)['level'] >= 1) {
+            if ((int)$village->getField($i)['item_id'] === Gid::MAIN_BUILDING && (int)$village->getField($i)['level'] >= 1) {
                 return true;
             }
         }
@@ -167,16 +169,16 @@ class VillageCenterCtrl extends GameCtrl
     public function getBuildingImgClass($k): string
     {
         $village = $this->session->village;
-        if ($village->isWW() && $k == 99) {
+        if ($village->isWW() && $k == Slot::WONDER) {
             return 'ww g40 g40_' . WonderOfTheWorldModel::stage((int)$village->getField($k)['level']);
         }
         if ($village->getField($k)['item_id'] == 0) {
-            if ($k == 39) {
+            if ($k == Slot::RALLY_POINT) {
                 return 'g16e';
             }
             return "iso";
         }
-        $res = 'g' . $village->getField($k)['item_id'] . ($village->isWW() && $k == 39 ? "e_ww" : '');
+        $res = 'g' . $village->getField($k)['item_id'] . ($village->isWW() && $k == Slot::RALLY_POINT ? "e_ww" : '');
         if ($village->getField($k)['level'] == 0) {
             //$res .= 'b';
         }
@@ -196,13 +198,13 @@ class VillageCenterCtrl extends GameCtrl
             $item_id = $village->getField($i)['item_id'];
             $lvl = $village->getField($i)['level'] + $village->getField($i)['upgrade_state'] + 1;
             $cost = Formulas::buildingUpgradeCosts($item_id, $lvl);
-            if (!$village->isWorkersBusy(false, $item_id == 40)['isBusy'] && $village->isResourcesAvailable($cost) && !$village->checkArtifactDependencies($item_id) && $village->checkDependencies($item_id, $lvl) == 0) {
+            if (!$village->isWorkersBusy(false, $item_id == Gid::WONDER_OF_THE_WORLD)['isBusy'] && $village->isResourcesAvailable($cost) && !$village->checkArtifactDependencies($item_id) && $village->checkDependencies($item_id, $lvl) == 0) {
                 $color = 'good';
             } else {
                 $color = 'notNow';
             }
         }
-        $aid = $i == 99 ? 'ww' : 'aid' . $i;
+        $aid = $i == Slot::WONDER ? 'ww' : 'aid' . $i;
         if ($village->getField($i)['upgrade_state']) {
             return 'colorLayer ' . "$color $aid underConstruction";
         }

@@ -11,6 +11,8 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once dirname(__DIR__) . '/game/deployment/include/env.php';
+// No autoloader here: Core\Time is the only class WorldSpeedProfile and WorldSpeedRound need.
+require_once dirname(__DIR__) . '/game/include/Core/Time.php';
 require_once dirname(__DIR__) . '/game/include/Game/WorldSpeedProfile.php';
 require_once dirname(__DIR__) . '/game/include/Game/WorldSpeedRound.php';
 

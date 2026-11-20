@@ -6,8 +6,12 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
+use Game\Gid;
 use Game\ResourcesHelper;
+use Game\Slot;
+use Game\UserId;
 use mysqli_result;
 
 use function getGameSpeed;
@@ -32,19 +36,19 @@ class ArtefactsModel
     {
         $rate = (int) getGameSpeed();
         if ($rate <= 1) {
-            return 86400;
+            return Time::DAY;
         } else if ($rate <= 2) {
-            return 86400 * 2 / 3;
+            return Time::DAY * 2 / 3;
         } else if ($rate <= 3) {
-            return 86400 * 1 / 2;
+            return Time::DAY * 1 / 2;
         } else if ($rate <= 5) {
-            return 8 * 3600;
+            return 8 * Time::HOUR;
         } else if ($rate === 10) {
             // OpenTravian publishes a four-hour activation at x10.
-            return 4 * 3600;
+            return 4 * Time::HOUR;
         }
         // Unsupported speeds retain the established local high-speed policy.
-        return max(86400 / $rate, 600);
+        return max(Time::DAY / $rate, 10 * Time::MINUTE);
     }
 
     public static function getFoolArtifactChangeEffectInterval(): int|float
@@ -54,9 +58,9 @@ class ArtefactsModel
         // published OpenTravian speed.  Keep unlisted custom speeds on
         // the existing bounded local curve below.
         if ($rate == 1 || $rate == 2 || $rate == 3 || $rate == 5 || $rate === 10) {
-            return 86400;
+            return Time::DAY;
         }
-        return max(86400 / $rate, 1800);
+        return max(Time::DAY / $rate, 30 * Time::MINUTE);
     }
 
     /**
@@ -117,12 +121,21 @@ class ArtefactsModel
             return 0;
         }
         $effect = $db->fetchScalar(
-            'SELECT effect FROM artefacts a WHERE uid=? AND status=1 AND active=1 AND effecttype=? AND ((aoe=1 AND kid=?) OR aoe>1) ORDER BY size ASC LIMIT 1',
+            'SELECT effect FROM artefacts a WHERE uid=? AND status=1 AND active=1 AND effecttype=? AND ((aoe=1 AND kid=?) OR aoe>1) ORDER BY effect ' . self::strongestFirst($type) . ', size DESC LIMIT 1',
             [$uid, $type, $kid],
             0
         );
 
         return is_numeric($effect) ? $effect + 0 : 0;
+    }
+
+    /**
+     * SQL order that puts the strongest effect of a type first when several artifacts apply. Diet and
+     * training-time effects are multipliers where smaller is stronger; every other effect is stronger when larger.
+     */
+    public static function strongestFirst(int $type): string
+    {
+        return in_array($type, [self::ARTIFACT_DIET, self::ARTIFACT_INCREASE_TRAINING_SPEED], true) ? 'ASC' : 'DESC';
     }
 
     public static function artifactsReleased(): bool
@@ -159,14 +172,14 @@ class ArtefactsModel
         if ((int) $db->fetchScalar('SELECT COUNT(id) FROM artefacts WHERE kid=?', [$atkKid]) >= 1) {
             return -1;
         }
-        for ($i = 19; $i <= 38; $i++) {
-            if ($defBuildings[$i]['item_id'] == 27 && $defBuildings[$i]['level'] > 0) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; $i++) {
+            if ($defBuildings[$i]['item_id'] == Gid::TREASURY && $defBuildings[$i]['level'] > 0) {
                 return -3;
             }
         }
         $needTreasury = $size === 1 ? 10 : 20;
 
-        return $attackerBuildings[27] >= $needTreasury ? true : -1;
+        return $attackerBuildings[Gid::TREASURY] >= $needTreasury ? true : -1;
     }
 
     /**
@@ -347,7 +360,7 @@ class ArtefactsModel
             $this->fixArtifactOrderForPlayer($uid);
             $this->fixArtifactOrderForPlayer($previousOwner);
         } else {
-            $db->query("UPDATE artefacts SET status=2 WHERE type=12 AND uid=$uid");
+            $db->query("UPDATE artefacts SET status=2 WHERE type=" . self::WW_PLAN . " AND uid=$uid");
             $db->query("UPDATE artefacts SET kid=$kid, uid=$uid, conquered=$time, status=1, active=0 WHERE id=$artifactId");
         }
         if ((int) $currentArtifact['type'] === self::ART_FOOL) {
@@ -400,7 +413,7 @@ class ArtefactsModel
         $db = DB::getInstance();
         $db->query('UPDATE config SET ArtifactsReleased=1');
         \Game\Webhook\WorldEvents::record('artifactsReleased');
-        $stmt = $db->query('SELECT kid FROM artefacts WHERE uid=1');
+        $stmt = $db->query('SELECT kid FROM artefacts WHERE uid=' . UserId::NATARS);
         while ($stmt && ($row = $stmt->fetch_assoc())) {
             (new AccountDeleter())->deleteVillage((int) $row['kid']);
         }
@@ -558,7 +571,7 @@ class ArtefactsModel
         $now = time();
         // Article 102: after the interval, the next change waits for a full hour.
         $anchor = 'GREATEST(lastupdate, conquered+' . $changeInterval . '+' . (int) $activationTime . ')';
-        $due = 'FLOOR((' . $anchor . ' + ' . $changeInterval . ' + 3599) / 3600) * 3600';
+        $due = 'FLOOR((' . $anchor . ' + ' . $changeInterval . ' + ' . (Time::HOUR - 1) . ') / ' . Time::HOUR . ') * ' . Time::HOUR;
         $find = $db->query('SELECT * FROM artefacts WHERE type=' . self::ART_FOOL . " AND status=1 AND (lastupdate=0 OR $due <= $now)");
         while ($find && ($row = $find->fetch_assoc())) {
             $this->updateFoolArtifact($row);

@@ -80,6 +80,12 @@ substr_count($html, 'class="cta"') === 1 || $fail('The settlers must be trainabl
 !str_contains($html, 'startTraining disabled') || $fail('The Train button is enabled while the settlers can be trained.');
 $request('POST', ['action' => 'trainTroops', 'checksum' => $token, 's' => '1', 't10' => '3']);
 (int)$pdo->fetchScalar('SELECT COALESCE(SUM(num), 0) FROM training WHERE kid=? AND nr=10', [$kid]) === 3 || $fail('Three settlers must be queued at level 10.');
+// The order itself rechecks the slot under the village lock: a second order computed against the same free slot
+// (another tab) must queue nothing once the first one has taken it.
+$queueOrder = new ReflectionMethod(TroopBuilding::class, 'queueOrder');
+$queued = $queueOrder->invoke($request('GET'), 10, 3, false, new \Model\TrainingModel());
+$queued === false || $fail('A settler order without a free expansion slot must be refused inside the village lock.');
+(int)$pdo->fetchScalar('SELECT COALESCE(SUM(num), 0) FROM training WHERE kid=? AND nr=10', [$kid]) === 3 || $fail('The refused order must not add settlers.');
 
 // Settlers queued in a Command Center count as expansion units, like those of a Residence or Palace.
 $pdo->run('DELETE FROM training WHERE kid=?', [$kid]);

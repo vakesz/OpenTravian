@@ -6,7 +6,12 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
+use Game\Tribes;
+use Game\Unit;
 use mysqli_result;
 
 use function array_filter_units;
@@ -37,7 +42,7 @@ class BattleSetter
         $kid = (int) $kid;
         $row = $this->fetchRow("SELECT * FROM units WHERE kid=$kid");
 
-        return $row === null ? array_fill(1, 11, 0) : array_map('intval', array_filter_units($row));
+        return $row === null ? array_fill(1, Unit::LAST, 0) : array_map('intval', array_filter_units($row));
     }
 
     public function getOwner(int|string $kid): int
@@ -215,7 +220,7 @@ class BattleSetter
     public function get_building_lvl(int|string $kid, int $gid, ?array $buildings = null): int
     {
         if (is_array($buildings)) {
-            for ($i = 19; $i <= 38; ++$i) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
                 if ((int) $buildings[$i]['item_id'] === $gid) {
                     return (int) $buildings[$i]['level'];
                 }
@@ -225,7 +230,7 @@ class BattleSetter
         }
         $kid = (int) $kid;
         $row = $this->fetchRow("SELECT * FROM fdata WHERE kid=$kid");
-        for ($i = 19; $row !== null && $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $row !== null && $i <= Slot::LAST_BUILDING; ++$i) {
             if ((int) $row['f' . $i . 't'] === $gid) {
                 return (int) $row['f' . $i];
             }
@@ -265,6 +270,9 @@ class BattleSetter
     public function move_to_traps(array &$units, int|float &$traps): array
     {
         $atkrs_total = array_sum($units);
+        if ($traps <= 0 || $atkrs_total <= 0) {
+            return array_fill_keys(array_keys($units), 0);
+        }
         $used_traps = min($traps, $atkrs_total);
         $trapped = [];
         $tr = 0;
@@ -383,7 +391,7 @@ class BattleSetter
         }
         if (getGame('checkLastReturnForEvasion')) {
             //check for last troop return.
-            $return = (int) $info['lastReturn'] !== 0 && abs(($end_time / 1000) - (int) $info['lastReturn']) <= 10;
+            $return = (int) $info['lastReturn'] !== 0 && abs(($end_time / Time::SECOND_MS) - (int) $info['lastReturn']) <= 10;
         }
         if (!$info['capital']) {
             return 1; //no escape because it's not ur capital village!.
@@ -404,17 +412,22 @@ class BattleSetter
             0,
             0,
             0,
-            0,
+            MovementsModel::MODE_GOING,
             MovementsModel::ATTACKTYPE_EVASION,
             $end_time,
-            $end_time + $seconds * 1000
+            $end_time + $seconds * Time::SECOND_MS
         );
-        $wave['units']['num'] = array_fill(1, 11, 0);
+        // Only the troops that left: a hidden hero stays at home and is not in the evasion.
         $modify = [];
-        for ($i = 1; $i <= 11; ++$i) {
-            $modify[] = "u{$i}=0";
+        foreach ($wave['units']['num'] as $i => $count) {
+            if ((int)$count > 0) {
+                $modify[] = 'u' . (int)$i . '=u' . (int)$i . '-' . (int)$count;
+            }
         }
-        DB::getInstance()->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid={$kid}");
+        $wave['units']['num'] = array_fill(1, Unit::LAST, 0);
+        if ($modify !== []) {
+            DB::getInstance()->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid={$kid}");
+        }
 
         //no report!
         return 0;
@@ -461,24 +474,24 @@ class BattleSetter
         if (!sizeof($defender['buildings'])) {
             logError('No defender buildings.');
         }
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             if (!isset($defender['buildings'][$i])) {
                 return false;
             }
             $build = $defender['buildings'][$i];
-            if ($build['item_id'] == 34) {
+            if ($build['item_id'] == Gid::STONEMASON) {
                 $defender['stone'] = $build['level'];
-            } elseif (in_array($build['item_id'], [25, 26, 44])) {
+            } elseif (in_array($build['item_id'], Gid::EXPANSION)) {
                 $defender['rp'] = $build['level'];
-            } elseif ($i == 40) {
+            } elseif ($i == Slot::WALL) {
                 $defender['wall'] = $build['level'];
-            } elseif ($race == 3 && $build['item_id'] == 36) {
+            } elseif ($race == Tribes::GAULS && $build['item_id'] == Gid::TRAPPER) {
                 $totalTraps += Formulas::trapperValue($build['level']);
-            } elseif ($build['item_id'] == 23) {
+            } elseif ($build['item_id'] == Gid::CRANNY) {
                 $defender['totalCranny'] += Formulas::crannyCAP($build['level'], $race);
-            } elseif ($build['item_id'] == 41) {
+            } elseif ($build['item_id'] == Gid::HORSE_DRINKING_TROUGH) {
                 $defender['hdp'] = $build['level'];
-            } elseif ($build['item_id'] == 16) {
+            } elseif ($build['item_id'] == Gid::RALLY_POINT) {
                 $defender['rallyPoint'] = $build['level'];
             }
         }
@@ -535,10 +548,10 @@ class BattleSetter
     public function getAttackerNeededBuildings(int|string $kid): array
     {
         $kid = (int) $kid;
-        $result = [14 => 0, 37 => 0, 27 => 0, 41 => 0];
+        $result = [Gid::TOURNAMENT_SQUARE => 0, Gid::HEROS_MANSION => 0, Gid::TREASURY => 0, Gid::HORSE_DRINKING_TROUGH => 0];
         $count = 4;
         $buildings = $this->fetchRow("SELECT * FROM fdata WHERE kid=$kid");
-        for ($i = 19; $buildings !== null && $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $buildings !== null && $i <= Slot::LAST_BUILDING; ++$i) {
             $item_id = (int) $buildings['f' . $i . 't'];
             if (isset($result[$item_id])) {
                 $result[$item_id] = (int) $buildings['f' . $i];
@@ -561,10 +574,10 @@ class BattleSetter
         $tmp = [
             'num' => $units,
             'smithy' => $this->getSmithy($kid),
-            'dead' => array_fill(1, 11, 0),
+            'dead' => array_fill(1, Unit::LAST, 0),
         ];
         if ($isAttacker) {
-            $tmp['trapped'] = array_fill(1, 11, 0);
+            $tmp['trapped'] = array_fill(1, Unit::LAST, 0);
         }
 
         return $tmp;
@@ -580,7 +593,7 @@ class BattleSetter
         $kid = (int) $kid;
         $row = $this->fetchRow("SELECT * FROM smithy WHERE kid=$kid");
 
-        return $row === null ? array_fill(1, 10, 0) : array_map('intval', array_filter_units($row));
+        return $row === null ? array_fill(1, Unit::LAST_TROOP, 0) : array_map('intval', array_filter_units($row));
     }
 
     public function getEnforcement(int|string $kid): mysqli_result
@@ -608,7 +621,7 @@ class BattleSetter
         $uid = (int) $uid;
         $kid = (int) $kid;
         foreach ([ArtefactsModel::ARTIFACT_CRANNY, ArtefactsModel::ARTIFACT_INCREASE_BUILDINGS_STABILITY] as $effectType) {
-            $artifact = $this->fetchRow("SELECT num, type, size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND effecttype=" . $effectType . ' ORDER BY size ASC LIMIT 1');
+            $artifact = $this->fetchRow("SELECT num, type, size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND effecttype=" . $effectType . ' ORDER BY effect ' . ArtefactsModel::strongestFirst($effectType) . ', size DESC LIMIT 1');
             if ($artifact !== null) {
                 $result[] = ['type' => $artifact['type'], 'size' => $artifact['size'], 'num' => $artifact['num']];
             }
@@ -627,7 +640,7 @@ class BattleSetter
         }
         $uid = (int) $uid;
         $kid = (int) $kid;
-        $size = DB::getInstance()->fetchScalar("SELECT size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND type=" . ArtefactsModel::ARTIFACT_CRANNY . ' ORDER BY size ASC LIMIT 1');
+        $size = DB::getInstance()->fetchScalar("SELECT size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND type=" . ArtefactsModel::ARTIFACT_CRANNY . ' ORDER BY size DESC LIMIT 1');
 
         return $size ? (string) $size : false;
     }

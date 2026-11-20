@@ -7,6 +7,7 @@ namespace Core\Jobs;
 use Core\Automation;
 use Core\Database\DB;
 use Core\Mail\QueueWorker;
+use Core\Time;
 use Game\Mail\Reminders;
 use Game\Webhook\QueueWorker as WebhookQueueWorker;
 use Model\AdventureModel;
@@ -58,7 +59,7 @@ class Launcher
         }
         {
             $job = [new AuctionModel(), 'fakeAuction'];
-            $jobs[] = new Job('routineJobs:fakeAuction', 600, $job);
+            $jobs[] = new Job('routineJobs:fakeAuction', 10 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'buildComplete'];
@@ -102,7 +103,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'setUpNewServer'];
-            $jobs[] = new Job('gameProgress:setUpNewServer', 60, $job);
+            $jobs[] = new Job('gameProgress:setUpNewServer', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'boughtGoldMessage'];
@@ -110,7 +111,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'banProgress'];
-            $jobs[] = new Job('gameProgress:banProgress', 120, $job);
+            $jobs[] = new Job('gameProgress:banProgress', 2 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'referenceCheck'];
@@ -126,7 +127,7 @@ class Launcher
         }
         {
             $job = [new StatisticsGeneralModel(), 'snapshotDaily'];
-            $jobs[] = new Job('gameProgress:statisticsSnapshot', 900, $job);
+            $jobs[] = new Job('gameProgress:statisticsSnapshot', 15 * Time::MINUTE, $job);
         }
         {
             $job = [new DailyQuestModel(), 'resetDailyQuest'];
@@ -141,11 +142,11 @@ class Launcher
         }
         {
             $job = [new AutoExtendModel(), 'processAutoExtend'];
-            $jobs[] = new Job('generalProgress:autoExtend', 60, $job);
+            $jobs[] = new Job('generalProgress:autoExtend', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'updateFoolArtifact'];
-            $jobs[] = new Job('generalProgress:updateFoolArtifact', 120, $job);
+            $jobs[] = new Job('generalProgress:updateFoolArtifact', 2 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'checkForArtifactActivation'];
@@ -153,15 +154,15 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'cleanupServer'];
-            $jobs[] = new Job('generalProgress:cleanupServer', 300, $job);
+            $jobs[] = new Job('generalProgress:cleanupServer', 5 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'deleteOasisComplete'];
-            $jobs[] = new Job('loyaltyAndCulturePoint:deleteOasisComplete', 60, $job);
+            $jobs[] = new Job('loyaltyAndCulturePoint:deleteOasisComplete', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'handleAllianceBonusTasks'];
-            $jobs[] = new Job('gameProgress:allianceBonus', 60, $job);
+            $jobs[] = new Job('gameProgress:allianceBonus', Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'zeroPopVillages'];
@@ -187,11 +188,11 @@ class Launcher
         }
         {
             $job = [new Reminders(), 'vacationEnding'];
-            $jobs[] = new Job('routineJobs:vacationEndingReminders', 600, $job);
+            $jobs[] = new Job('routineJobs:vacationEndingReminders', 10 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'cleanupIndex'];
-            $jobs[] = new Job('checkIndexFunctions:cleanupIndex', 600, $job);
+            $jobs[] = new Job('checkIndexFunctions:cleanupIndex', 10 * Time::MINUTE, $job);
         }
         {
             $job = [Automation::getInstance(), 'refreshCountryFlag'];
@@ -207,7 +208,7 @@ class Launcher
         }
         {
             $job = [Automation::getInstance(), 'pruneAuditLog'];
-            $jobs[] = new Job('mayExitJobs:pruneAuditLog', 3600, $job);
+            $jobs[] = new Job('mayExitJobs:pruneAuditLog', Time::HOUR, $job);
         }
         {
             $job = static function () {
@@ -216,7 +217,7 @@ class Launcher
                     EngineHeartbeat::requeueStaleCodeQuarantines($startedAt);
                 }
             };
-            $jobs[] = new Job('routineJobs:requeueStaleCodeQuarantines', 600, $job);
+            $jobs[] = new Job('routineJobs:requeueStaleCodeQuarantines', 10 * Time::MINUTE, $job);
         }
         new Job('routineJobs', 20, $jobs, TRUE);
     }

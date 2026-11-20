@@ -127,7 +127,7 @@ if (str_contains($ctrl, "isset(\$_REQUEST['c'])")
 
 if (!str_contains($ctrl, "jQuery(\\'table#troops\\').find(\\'input[name=")
     || !str_contains($ctrl, ".trigger(\\'focus\\'); return false")
-    || !str_contains($ctrl, '<a href="/build.php?gid=16&amp;tt=2" onclick="')
+    || !str_contains($ctrl, '<a href="/build.php?gid=\' . Gid::RALLY_POINT . \'&amp;tt=2" onclick="')
     || str_contains($ctrl, '<a href="#" onclick="')
     || str_contains($ctrl, 'onclick="this.form.elements')) {
     failSendTroopsEventTypeContract(

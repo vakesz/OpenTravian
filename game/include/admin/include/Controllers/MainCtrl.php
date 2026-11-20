@@ -9,6 +9,7 @@ use Game\Admin\AdminAccounts;
 use Game\Admin\AdminRoles;
 use Game\Admin\SetupChecklist;
 use Game\AdminUi;
+use Game\UserId;
 
 class MainCtrl
 {
@@ -18,7 +19,7 @@ class MainCtrl
         $adminUid = (int) $session->getAdminUid();
         $role = match (true) {
             $adminUid === 0 => 'Administrator',
-            $adminUid === 2 => 'Multihunter',
+            $adminUid === UserId::MULTIHUNTER => 'Multihunter',
             default => AdminRoles::label((string) AdminAccounts::role($adminUid)),
         };
         $rows = [

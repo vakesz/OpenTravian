@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game\SocialAuth;
 
 use Core\Caching\Caching;
+use Core\Time;
 
 final class RedisTransientStore implements TransientStore
 {
@@ -26,7 +27,7 @@ final class RedisTransientStore implements TransientStore
     {
         $cache = Caching::getInstance();
         // SET NX is the atomic claim: only the first caller proceeds.
-        $claim = $cache->lock('social_take_' . $key, 600);
+        $claim = $cache->lock('social_take_' . $key, 10 * Time::MINUTE);
         if ($claim === false) {
             return null;
         }

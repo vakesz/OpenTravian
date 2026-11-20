@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\Caching;
 
 use Core\Database\DB;
+use Core\Time;
 use Model\ProfileModel;
 
 class ProfileCache
@@ -13,7 +14,7 @@ class ProfileCache
     public const PROFILE_VILLAGES_BY_NAME_CACHE_KEY = 'P:V:SN:%s:%s';
     public const PROFILE_VILLAGES_EDIT_CACHE_KEY = 'P:V:E:%s:%s';
     public const PROFILE_MEDALS_CACHE_KEY = 'P:M:%s:%s';
-    private const TTL = 300;
+    private const TTL = 5 * Time::MINUTE;
 
     private Caching $cache;
     private int $version;

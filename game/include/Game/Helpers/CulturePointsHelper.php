@@ -3,6 +3,7 @@
 namespace Game\Helpers;
 
 use Core\Database\DB;
+use Core\Time;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Hero\HeroHelper;
 
@@ -20,7 +21,7 @@ class CulturePointsHelper
             if ($row['aid'] > 0) {
                 $cp_prod *= AllianceBonus::getCulturePointProductionBonus($row['aid'], $row['alliance_join_time']);
             }
-            $cp = $cp_prod / 86400 * (time() - $row['lastupdate']);
+            $cp = $cp_prod / Time::DAY * (time() - $row['lastupdate']);
             self::increaseUserCP(time(), $row['id'], $cp);
         }
     }

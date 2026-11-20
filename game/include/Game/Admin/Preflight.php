@@ -10,6 +10,7 @@ use Core\Database\BackupSets;
 use Core\Database\DB;
 use Core\Database\GlobalDB;
 use Core\Jobs\EngineHeartbeat;
+use Core\Time;
 use Game\Installer\AppDatabaseGrants;
 use Game\SmtpConfig;
 
@@ -33,9 +34,9 @@ final class Preflight
     private const MIN_FREE_BYTES = 536870912;
     private const MIN_FREE_PERCENT = 5;
     /** A scheduled backup older than this means the engine's backups have stopped. */
-    private const STALE_BACKUP_SECONDS = 172800;
+    private const STALE_BACKUP_SECONDS = 2 * Time::DAY;
     /** A new backup may take this long to reach the export directory. */
-    private const EXPORT_GRACE_SECONDS = 300;
+    private const EXPORT_GRACE_SECONDS = 5 * Time::MINUTE;
 
     private function __construct()
     {
@@ -238,9 +239,9 @@ final class Preflight
     private static function age(int $seconds): string
     {
         return match (true) {
-            $seconds < 3600 => intdiv($seconds, 60) . ' min',
-            $seconds < 172800 => intdiv($seconds, 3600) . ' h',
-            default => intdiv($seconds, 86400) . ' days',
+            $seconds < Time::HOUR => intdiv($seconds, Time::MINUTE) . ' min',
+            $seconds < 2 * Time::DAY => intdiv($seconds, Time::HOUR) . ' h',
+            default => intdiv($seconds, Time::DAY) . ' days',
         };
     }
 

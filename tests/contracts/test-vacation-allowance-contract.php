@@ -28,7 +28,19 @@ namespace {
         return \Tests\Stub\VacationAllowanceConfigStub::$speed;
     }
 
+    require_once dirname(__DIR__, 2) . '/game/include/Core/Time.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/UserId.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/AccessLevel.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/Slot.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/ResearchMode.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/Conquest/CaptureResult.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/Conquest/OasisCaptureResult.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemBtype.php';
+    require_once dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemType.php';
     require dirname(__DIR__, 2) . '/game/include/Game/WorldSpeedProfile.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Tribes.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Unit.php';
     require dirname(__DIR__, 2) . '/game/include/Game/Formulas.php';
     require dirname(__DIR__, 2) . '/game/include/Game/WorldOverrides.php';
 

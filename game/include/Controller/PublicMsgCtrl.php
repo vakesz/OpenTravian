@@ -7,6 +7,7 @@ use Core\Config;
 use Core\Database\GlobalDB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use resources\View\OutOfGameView;
 use resources\View\PHPBatchView;
 
@@ -40,10 +41,10 @@ class PublicMsgCtrl extends GameCtrl
         } else if ($view->vars['message'] == '[NatarsAreBuildingWW]') {
             $view->vars['autoType'] = TRUE;
             $config = Config::getInstance();
-            if ($config->timers->WWUpLvlInterval >= 86400) {
-                $message = sprintf(T("Global", 'NatarsAreBuildingWW'), min(round(86400 / $config->timers->WWUpLvlInterval, 1), 100), T("Global", "Day"));
+            if ($config->timers->WWUpLvlInterval >= Time::DAY) {
+                $message = sprintf(T("Global", 'NatarsAreBuildingWW'), min(round(Time::DAY / $config->timers->WWUpLvlInterval, 1), 100), T("Global", "Day"));
             } else {
-                $message = sprintf(T("Global", 'NatarsAreBuildingWW'), min(round(3600 / $config->timers->WWUpLvlInterval, 1), 100), T("Global", "Hour"));
+                $message = sprintf(T("Global", 'NatarsAreBuildingWW'), min(round(Time::HOUR / $config->timers->WWUpLvlInterval, 1), 100), T("Global", "Hour"));
             }
             $view->vars['message'] = $message;
         } else if ($view->vars['message'] == '[GoldPromotionPublicMsg]') {
