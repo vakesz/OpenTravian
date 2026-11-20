@@ -526,7 +526,8 @@ class Automation
         $merchant_cap = Formulas::merchantCAP($race, $market[28], $alliance_bonus);
         $total_resources = array_sum($resources_to_send);
         $total_available_merchants = $market[17] - $marketModel->getOfferingMerchantsCount($row['kid'], $merchant_cap) - $marketModel->getOnTheWayMerchantsCount($row['kid'], $merchant_cap);
-        if (!$total_available_merchants) {
+        // Negative when the marketplace is now smaller than the merchants already in use.
+        if ($total_available_merchants <= 0) {
             return;
         }
         $total_need_merchants = ceil($total_resources / $merchant_cap);
@@ -538,6 +539,9 @@ class Automation
                 $max -= $resourcesTogo[$i];
             }
             $resources_to_send = $resourcesTogo;
+        }
+        if (array_sum($resources_to_send) <= 0) {
+            return;
         }
         // Debit first, guarded against stock that changed since it was read; skip this run when it did.
         if (!Village::debit((int)$row['kid'], [$resources_to_send[1], $resources_to_send[2], $resources_to_send[3], $resources_to_send[4]])) {

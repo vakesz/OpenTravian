@@ -66,4 +66,20 @@ if ($stock() !== [700.0, 800.0, 1000.0, 1000.0] || (int)$pdo->fetchScalar('SELEC
     $fail('A route that is not due again must not send twice.');
 }
 
+// The marketplace shrank (level 10 -> 1) while far more merchants are on the road: the free merchant count is
+// negative, so the route must send nothing (not an empty dispatch) and debit nothing.
+$pdo->run('UPDATE fdata SET f19=1 WHERE kid=?', [$kid]);
+$pdo->run('INSERT INTO `send` (kid, to_kid, wood, clay, iron, crop, x, ships, mode, end_time) VALUES (?, ?, 1000000, 0, 0, 0, 1, 0, 0, ?)', [$kid, $to, time() + 3600]);
+$sendsBefore = (int)$pdo->fetchScalar('SELECT COUNT(*) FROM `send` WHERE kid=?', [$kid]);
+$stockBefore = $stock();
+$pdo->run('INSERT INTO traderoutes (kid, to_kid, r1, r2, r3, r4, enabled, start_hour, times, time) VALUES (?, ?, 100, 0, 0, 0, 1, 0, 1, ?)', [$kid, $to, time() - 60]);
+$busyRouteId = (int)$pdo->fetchScalar('SELECT LAST_INSERT_ID()');
+$run($busyRouteId);
+if ((int)$pdo->fetchScalar('SELECT COUNT(*) FROM `send` WHERE kid=?', [$kid]) !== $sendsBefore) {
+    $fail('A route with no free merchants must not create a merchant dispatch.');
+}
+if ($stock() !== $stockBefore) {
+    $fail('A route with no free merchants must not debit the village: ' . json_encode($stock()));
+}
+
 echo "Trade route runtime passed.\n";
