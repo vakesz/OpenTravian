@@ -54,9 +54,9 @@ try {
         $config->game->useMilSeconds = $config->game->speed > 20;
         $config->game->useNanoseconds = $config->game->speed > 20000;
         foreach ([[71, 1], [71, 20], [1, 10], [86, 5]] as [$unitId, $level]) {
-            $second = $config->game->useNanoseconds ? 1_000_000_000 : ($config->game->useMilSeconds ? 1000 : 1);
-            $expected = max($second, (int)round(Formulas::uTrainingTime($unitId, $level) * 0.5));
-            assertWounded(Formulas::uHealingTime($unitId, $level) === $expected, "Healing unit $unitId at level $level and speed $speed is half its training time and at least one second.");
+            // At least one tick of the queue clock (1 s, 1 ms or 1 ns): sub-second on speed worlds.
+            $expected = max(1, (int)round(Formulas::uTrainingTime($unitId, $level) * 0.5));
+            assertWounded(Formulas::uHealingTime($unitId, $level) === $expected, "Healing unit $unitId at level $level and speed $speed is half its training time and at least one queue tick.");
         }
     }
     $config->game->speed = 1;

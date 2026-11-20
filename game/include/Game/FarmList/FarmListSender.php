@@ -151,9 +151,6 @@ final class FarmListSender
         if ($speeds === []) {
             return self::text('error_no_troops');
         }
-        if (MovementsModel::accountOutgoingTroops((int)$this->session->getPlayerId()) + (int)array_sum($send) > MovementsModel::OUTGOING_CAP) {
-            return (string)T('FarmList', 'tooManyTroopsOut', 'You cannot have more than 20,000 troops outside your villages.');
-        }
         // The check and the deduction happen under one row lock; the UPDATE is conditional as well (uN>=n).
         $this->db->begin_transaction();
         try {

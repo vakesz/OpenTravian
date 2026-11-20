@@ -15,6 +15,7 @@ use Core\Locale;
 use Model\Quest;
 use resources\View\PHPBatchView;
 use Game\ResearchMode;
+use Game\ResearchQueue;
 
 class SmithyCtrl extends AnyCtrl
 {
@@ -25,7 +26,7 @@ class SmithyCtrl extends AnyCtrl
     /** @var array<mixed> */
     private $researchLevels = [];
     /** @var int */
-    private $smithyCapacity = 1;
+    private $smithyCapacity = ResearchQueue::CAPACITY;
 
     /**
      * @param mixed $index
@@ -34,7 +35,7 @@ class SmithyCtrl extends AnyCtrl
     {
         parent::__construct();
 
-        if (Session::getInstance()->hasPlus()) $this->smithyCapacity = 2;
+        $this->smithyCapacity = ResearchQueue::capacity(Session::getInstance()->hasPlus());
         $this->building_lvl = Village::getInstance()->getField($index)['level'];
         $this->view = new PHPBatchView("build/building/SmithyLayout");
         $this->getSmithy();
@@ -56,17 +57,15 @@ class SmithyCtrl extends AnyCtrl
                     $unitId = nrToUnitId($nr, Session::getInstance()->getRace());
                     $costs = Formulas::uUpgradeCost($unitId, $this->smithy[$nr] + $this->getResearchLevel($nr) + 1);
                     $duration = Formulas::uUpgradeTime($unitId, $this->smithy[$nr] + $this->getResearchLevel($nr) + 1, $this->building_lvl);
-                    $db = DB::getInstance();
-                    if ($this->isResearch()) {
-                        $lastResearch = $db->fetchScalar("SELECT end_time FROM research WHERE kid=" . Village::getInstance()->getKid() . " AND mode=" . ResearchMode::SMITHY);
-                        if ($lastResearch !== false) {
-                            $duration += $lastResearch - time();
-                        }
-                    }
                     if (Village::getInstance()->isResourcesAvailable($costs)) {
                         $village = Village::getInstance();
-                        $endTime = time() + $duration;
-                        $started = $village->transaction(static function () use ($village, $costs, $nr, $endTime): bool {
+                        $plus = Session::getInstance()->hasPlus();
+                        $started = $village->transaction(static function () use ($village, $costs, $nr, $duration, $plus): bool {
+                            // Queue size (two with Plus) re-checked under the village lock; a queued one starts after the last.
+                            if (ResearchQueue::queueFull($village->getKid(), ResearchMode::SMITHY, $plus)) {
+                                return false;
+                            }
+                            $endTime = ResearchQueue::queuedEndTime($village->getKid(), ResearchMode::SMITHY, $duration);
                             if (!$village->spend($costs)) {
                                 return false;
                             }
@@ -187,11 +186,6 @@ class SmithyCtrl extends AnyCtrl
                 $this->view->vars['availableResearches'] .= '<hr />';
             }
         }
-    }
-
-    private function isResearch(): int
-    {
-        return sizeof($this->researches);
     }
 
     private function isResearchFull(): bool

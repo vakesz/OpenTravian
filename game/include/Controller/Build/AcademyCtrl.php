@@ -15,6 +15,7 @@ use Model\Quest;
 use function nrToUnitId;
 use resources\View\PHPBatchView;
 use Game\ResearchMode;
+use Game\ResearchQueue;
 use function unitIdToNr;
 
 class AcademyCtrl extends AnyCtrl
@@ -25,6 +26,8 @@ class AcademyCtrl extends AnyCtrl
     private $researching = [];
     /** @var array<mixed> */
     private $researches = [];
+    /** @var int */
+    private $capacity = ResearchQueue::CAPACITY;
 
     /**
      * @param mixed $index
@@ -33,6 +36,7 @@ class AcademyCtrl extends AnyCtrl
     {
         parent::__construct();
 
+        $this->capacity = ResearchQueue::capacity(Session::getInstance()->hasPlus());
         $this->view = new PHPBatchView("build/building/Academy");
         $this->view->vars['villageName'] = Village::getInstance()->getName();
         $db = DB::getInstance();
@@ -42,7 +46,7 @@ class AcademyCtrl extends AnyCtrl
         }
         $this->fetchResearches();
         $this->prepare();
-        if(Session::claimAction($_GET['c'] ?? null) && !$this->isResearching2()) {
+        if(Session::claimAction($_GET['c'] ?? null) && !$this->isResearchFull()) {
             if(Session::getInstance()->banned()) {
                 $this->innerRedirect("InGameBannedPage");
             } else if(Config::getInstance()->dynamic->serverFinished) {
@@ -59,13 +63,15 @@ class AcademyCtrl extends AnyCtrl
                         $quest->setQuestBitwise('battle', Quest::BATTLE_RESEARCH_UNIT, 1);
                         $village = Village::getInstance();
                         $researchNr = unitIdToNr($_GET['a']);
-                        $endTime = time() + $duration;
-                        $queued = $village->transaction(static function () use ($village, $costs, $researchNr, $endTime): bool {
+                        $plus = Session::getInstance()->hasPlus();
+                        $queued = $village->transaction(static function () use ($village, $costs, $researchNr, $duration, $plus): bool {
                             $mdb = DB::getInstance();
-                            // One academy research at a time, re-checked under the village lock.
-                            if ((int)$mdb->fetchScalar('SELECT COUNT(*) FROM research WHERE kid=? AND mode=' . ResearchMode::ACADEMY, [$village->getKid()]) > 0) {
+                            // One academy research at a time (two with Plus), re-checked under the village lock;
+                            // a queued one starts after the last.
+                            if (ResearchQueue::queueFull($village->getKid(), ResearchMode::ACADEMY, $plus)) {
                                 return false;
                             }
+                            $endTime = ResearchQueue::queuedEndTime($village->getKid(), ResearchMode::ACADEMY, $duration);
                             if (!$village->spend($costs)) {
                                 return false;
                             }
@@ -97,7 +103,7 @@ class AcademyCtrl extends AnyCtrl
     {
         $this->researching = [];
         $db = DB::getInstance();
-        $researching = $db->query("SELECT * FROM research WHERE mode=" . ResearchMode::ACADEMY . " AND kid=" . Village::getInstance()->getKid());
+        $researching = $db->query("SELECT * FROM research WHERE mode=" . ResearchMode::ACADEMY . " AND kid=" . Village::getInstance()->getKid() . " ORDER BY end_time ASC, id ASC");
         while($row = $researching->fetch_assoc()) {
             $this->researching[$row['nr']] = $row;
         }
@@ -120,7 +126,7 @@ class AcademyCtrl extends AnyCtrl
             $costs = Formulas::uResearchCost($unitId);
             $duration = Formulas::uResearchTime($unitId);
             $npc = '';
-            if($this->isResearching2()) {
+            if($this->isResearchFull()) {
                 $contractLink = '<div class="errorMessage">' . T("Academy", "one_research_is_going") . '</div>';
             } else if($village->isResourcesAvailable($costs)) {
                 $contractLink = getButton(["type" => "button", "class" => "textButtonV1 green ", "version" => "textButtonV1", "value" => T("Academy", "research"), "onclick" => "window.location.href = '/build.php?id=" . $index . "&a=" . $unitId . "&c=" . Session::getInstance()->getChecker() . "'; return false;",], ["data" => ["type" => "button", "version" => "textButtonV1"]], T("Academy", "research"));
@@ -224,8 +230,8 @@ class AcademyCtrl extends AnyCtrl
         return TRUE;
     }
 
-    private function isResearching2(): bool
+    private function isResearchFull(): bool
     {
-        return $this->view->vars['researchingSize'] > 0;
+        return $this->view->vars['researchingSize'] >= $this->capacity;
     }
 }

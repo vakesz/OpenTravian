@@ -165,10 +165,12 @@ class StatisticsGeneralModel
 
         $now = time();
         $metrics = [];
+        // Per real day, with the world-speed multiplier (x1 through x10: unchanged).
+        $speedMultiplier = \Game\Helpers\CulturePointsHelper::productionMultiplier();
         foreach ($users as $user) {
             $id = (int)$user['id'];
-            $buildingProduction = $buildings[$id] ?? 0;
-            $helmetProduction = $helmets[$id] ?? 0;
+            $buildingProduction = (int)round(($buildings[$id] ?? 0) * $speedMultiplier);
+            $helmetProduction = (int)round(($helmets[$id] ?? 0) * $speedMultiplier);
             $baseProduction = $buildingProduction + $helmetProduction;
             $multiplier = AllianceBonus::culturePointProductionMultiplier(
                 (int)$user['cp_bonus_level'],

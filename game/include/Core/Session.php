@@ -1288,7 +1288,9 @@ class Session
 
     public function getCP(): float
     {
-        return round($this->data['cp'] + ($this->data['cp_prod'] / Time::DAY * (time() - $this->data['lastupdate'])));
+        $perDay = $this->data['cp_prod'] * \Game\Helpers\CulturePointsHelper::productionMultiplier();
+
+        return round($this->data['cp'] + ($perDay / Time::DAY * (time() - $this->data['lastupdate'])));
     }
 
     public function isInVacationMode(): bool

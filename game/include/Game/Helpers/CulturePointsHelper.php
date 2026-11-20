@@ -6,6 +6,7 @@ use Core\Database\DB;
 use Core\Time;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Hero\HeroHelper;
+use Game\WorldSpeedProfile;
 
 class CulturePointsHelper
 {
@@ -21,9 +22,16 @@ class CulturePointsHelper
             if ($row['aid'] > 0) {
                 $cp_prod *= AllianceBonus::getCulturePointProductionBonus($row['aid'], $row['alliance_join_time']);
             }
+            $cp_prod *= self::productionMultiplier();
             $cp = $cp_prod / Time::DAY * (time() - $row['lastupdate']);
             self::increaseUserCP(time(), $row['id'], $cp);
         }
+    }
+
+    /** The world-speed multiplier on culture point production (WorldSpeedProfile::culturePointProductionMultiplier). */
+    public static function productionMultiplier(): float
+    {
+        return WorldSpeedProfile::culturePointProductionMultiplier((int)getGameSpeed());
     }
 
     /**

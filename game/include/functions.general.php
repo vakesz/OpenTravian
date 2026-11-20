@@ -466,6 +466,33 @@ function trainingTimeDisplaySeconds($duration): int
 }
 
 /**
+ * A positive training/healing duration under one second, in milliseconds for display ("21", "0.072"), or null when it
+ * is zero or a second or more. Only the millisecond and nanosecond clocks (above x20) store sub-second durations.
+ *
+ * @param mixed $duration ticks of the current training clock
+ */
+function trainingTimeSubSecondMilliseconds($duration): ?string
+{
+    if (!is_numeric($duration) || $duration <= 0) {
+        return null;
+    }
+    $rate = Config::getInstance()->game->useNanoseconds
+        ? 1_000_000_000
+        : (Config::getInstance()->game->useMilSeconds ? 1_000 : 1);
+    if ($duration >= $rate) {
+        return null;
+    }
+    $ms = $duration * 1_000 / $rate;
+    if ($ms >= 1) {
+        return (string)(int)round($ms);
+    }
+    // Two significant digits below a millisecond (nanosecond clock), without exponent notation.
+    $decimals = (int)max(1, 1 - floor(log10($ms)));
+
+    return rtrim(rtrim(number_format($ms, $decimals, '.', ''), '0'), '.');
+}
+
+/**
  * @return mixed
  */
 function getDirection()
@@ -1131,9 +1158,14 @@ function secondsToString($seconds, $isTrainingTime = false)
     if (is_string($seconds)) {
         return $seconds;
     }
-    // Training/healing/ship/revive clocks are stored in ticks (s/ms/ns). Player chrome shows whole
-    // seconds only — never a "(+N ms)" remainder — matching the reference and dorf3/quick-link path.
+    // Training/healing/ship/revive clocks are stored in ticks (s/ms/ns). A second or more shows whole
+    // seconds (never a "(+N ms)" remainder); under a second, which only the ms/ns clocks of speed worlds
+    // reach, shows milliseconds ("21 ms", "0.072 ms") instead of rounding up to 0:00:01.
     if ($isTrainingTime) {
+        $subSecond = trainingTimeSubSecondMilliseconds($seconds);
+        if ($subSecond !== null) {
+            return $subSecond . ' ' . T('Global', 'ms');
+        }
         return secondsToString(trainingTimeDisplaySeconds($seconds));
     }
     if ($seconds == time()) {

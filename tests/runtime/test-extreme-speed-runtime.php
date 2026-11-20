@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-// World speeds from x1000 up to x1,000,000,000: every construction, training, research, healing and troop movement
-// takes at least one second; celebrations, World Wonder levels, trade ships, festivals, auctions, revival and the alliance bonus stay at their floors; no
+// World speeds from x1000 up to x1,000,000,000: every construction, research and troop movement takes at least one
+// second, and training and healing at least one tick of their queue clock (sub-second on speed worlds); celebrations, World Wonder levels, trade ships, festivals, auctions, revival and the alliance bonus stay at their floors; no
 // speed-scaled value leaves PHP's integer range or its database column (BIGINT / DOUBLE); values never step backwards
 // along the ladder; large numbers format without exponents. The minimum is documented in docs/world-speed.md.
 
@@ -65,11 +65,11 @@ try {
         foreach ([1, 6, 21, 31] as $unitId) {
             foreach ([1, 20] as $level) {
                 $training = Formulas::uTrainingTime($unitId, $level);
-                if ($training < $unit) {
+                if ($training < 1) {
                     $fail("training unit {$unitId} at building level {$level} takes {$training} (unit {$unit}) {$at}.");
                 }
                 $healing = Formulas::uHealingTime($unitId, $level);
-                if ($healing < $unit) {
+                if ($healing < 1) {
                     $fail("healing unit {$unitId} takes {$healing} (unit {$unit}) {$at}.");
                 }
             }
