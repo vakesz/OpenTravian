@@ -15,6 +15,8 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require dirname(__DIR__) . '/game/deployment/include/env.php';
+// Before installation there is no autoloader: Preflight's constants use Core\Time.
+require_once dirname(__DIR__) . '/game/include/Core/Time.php';
 require dirname(__DIR__) . '/game/include/Game/Admin/TwoFactorStore.php';
 require dirname(__DIR__) . '/game/include/Game/Admin/Preflight.php';
 

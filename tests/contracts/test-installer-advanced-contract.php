@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__, 2) . '/game/deployment/include/env.php';
-foreach (['WorldSpeedProfile', 'FinishConstruction', 'Tribes', 'WorldOverrides', 'WorldSchemaVersion', 'SupportContact', 'SmtpConfig', 'Installer/InstallInput', 'Installer/WorldInstaller'] as $installerClass) {
+require_once dirname(__DIR__, 2) . '/game/include/Core/Time.php';
+foreach (['Gid', 'Unit', 'WorldSpeedProfile', 'FinishConstruction', 'Tribes', 'WorldOverrides', 'WorldSchemaVersion', 'SupportContact', 'SmtpConfig', 'Installer/InstallInput', 'Installer/WorldInstaller'] as $installerClass) {
     require_once dirname(__DIR__, 2) . '/game/include/Game/' . $installerClass . '.php';
 }
 
