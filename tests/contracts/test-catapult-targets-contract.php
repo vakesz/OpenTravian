@@ -5,6 +5,7 @@ declare(strict_types=1);
 // One definition of the catapult targets feeds both the Rally Point form and the send request, and the aim
 // rules for the Brewery celebration and the random-aim Cranny artefact.
 
+require_once dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
 require_once dirname(__DIR__, 2) . '/game/include/Game/CatapultTargets.php';
 
 use Game\CatapultTargets;

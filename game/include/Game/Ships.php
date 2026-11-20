@@ -6,6 +6,7 @@ namespace Game;
 
 use Core\Config;
 use Core\Database\DB;
+use Model\MovementsModel;
 
 /**
  * Single source for Harbor ships (gid 49).
@@ -120,7 +121,7 @@ final class Ships
      */
     public static function deepWaterSpeed(int $type, int $tribe): float
     {
-        $speed = ($type === self::RAID && $tribe === 9) ? self::VIKING_RAID_SPEED : self::DEEP_WATER_SPEED;
+        $speed = ($type === self::RAID && $tribe === Tribes::VIKINGS) ? self::VIKING_RAID_SPEED : self::DEEP_WATER_SPEED;
         return $speed * ($type === self::TRADE ? getGameSpeed() : Config::getProperty('game', 'movement_speed_increase'));
     }
 
@@ -194,7 +195,7 @@ final class Ships
         }
         if ((int)$row['mode'] === 1) {
             $home = (int)$row['to_kid'];
-        } elseif (in_array((int)$row['attack_type'], [2, 5], true)) {
+        } elseif (in_array((int)$row['attack_type'], [MovementsModel::ATTACKTYPE_REINFORCEMENT, MovementsModel::ATTACKTYPE_SETTLERS], true)) {
             $home = (int)$row['kid'];
         } else {
             return;
@@ -217,7 +218,7 @@ final class Ships
     public static function pickForArmy(int $kid, int $attackType, int $unitCount): int
     {
         $home = self::homeShips($kid);
-        $order = $attackType === 4 ? [self::RAID, self::DECOY, self::WAR] : [self::DECOY, self::WAR];
+        $order = $attackType === MovementsModel::ATTACKTYPE_RAID ? [self::RAID, self::DECOY, self::WAR] : [self::DECOY, self::WAR];
         foreach ($order as $type) {
             if ($home[$type] > 0 && $unitCount <= self::unitCapacity($type)) {
                 return $type;

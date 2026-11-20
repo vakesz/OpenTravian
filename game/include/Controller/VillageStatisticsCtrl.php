@@ -10,8 +10,11 @@ use Core\Session;
 use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
+use Game\Gid;
 use Game\ResourcesHelper;
 use Game\TrainingHelper;
+use Game\Tribes;
+use Game\Unit;
 use function getGame;
 use function getGameSpeed;
 use Model\ArtefactsModel;
@@ -412,7 +415,7 @@ class VillageStatisticsCtrl extends GameCtrl
         $view = new PHPBatchView('village-statistics/training');
         $view->vars += [
             'race' => $race,
-            'buildings' => [19, 20, 21, \Game\Wounded::buildingFor($race)],
+            'buildings' => [Gid::BARRACKS, Gid::STABLE, Gid::WORKSHOP, \Game\Wounded::buildingFor($race)],
             'rows' => $rows,
             'selectedKid' => (int)$this->session->getKid(),
         ];
@@ -528,11 +531,11 @@ class VillageStatisticsCtrl extends GameCtrl
             $content .= '</td>';
             $content .= '<td class="tro">';
             for ($i = 1; $i <= $data['units']['settlers']; ++$i) {
-                $unitId = nrToUnitId(10, $this->session->getRace());
+                $unitId = nrToUnitId(Unit::SETTLER, $this->session->getRace());
                 $content .= '<img class="unit u' . $unitId . '" src="/img/spacer.gif" alt="' . T("Troops", "{$unitId}.title") . '" title="' . T("Troops", "{$unitId}.title") . '">';
             }
             for ($i = 1; $i <= $data['units']['chiefs']; ++$i) {
-                $unitId = nrToUnitId(9, $this->session->getRace());
+                $unitId = nrToUnitId(Unit::CHIEF, $this->session->getRace());
                 $content .= '<img class="unit u' . $unitId . '" src="/img/spacer.gif" alt="' . T("Troops", "{$unitId}.title") . '" title="' . T("Troops", "{$unitId}.title") . '">';
             }
             if (array_sum($data['units']) == 0) {
@@ -579,7 +582,7 @@ class VillageStatisticsCtrl extends GameCtrl
             $summary = [];
             $view->vars['units'] = '';
             for ($i = 1; $i <= 11; ++$i) {
-                if ($i == 11) {
+                if ($i == Unit::HERO) {
                     $unitId = 'hero';
                 } else {
                     $unitId = nrToUnitId($i, $this->session->getRace());
@@ -770,7 +773,7 @@ class VillageStatisticsCtrl extends GameCtrl
      */
     public function getTotalCropConsumption($race, $units, $hdp, $effect = 1)
     {
-        if ($race == 4) {
+        if ($race == Tribes::NATURE) {
             return 0;
         }
         $total = 0;
@@ -778,7 +781,7 @@ class VillageStatisticsCtrl extends GameCtrl
             if ($nr <= 10) {
                 $unitId = nrToUnitId($nr, $race);
             } else {
-                $unitId = 98;
+                $unitId = Unit::HERO_ID;
             }
             $total += $amount * Formulas::uUpkeep($unitId, $hdp);
         }

@@ -766,11 +766,11 @@ function round10($value): float
 function nrToUnitId($nr, $tribe)
 {
     // Exeption for the hero: Every time id 98
-    if ($nr == 11) {
-        return 98;
+    if ($nr == \Game\Unit::HERO) {
+        return \Game\Unit::HERO_ID;
     }
-    if ($nr == 99) {
-        return 99;
+    if ($nr == \Game\Unit::TRAP) {
+        return \Game\Unit::TRAP;
     }
 
     return ($tribe - 1) * 10 + $nr * 1;
@@ -816,11 +816,11 @@ function unitIdToTribe($unitId): int
  */
 function unitIdToNr($a): int
 {
-    if ($a == 99) {
-        return 99;
+    if ($a == \Game\Unit::TRAP) {
+        return \Game\Unit::TRAP;
     }
-    if ($a == 98 || $a == 'hero') {
-        return 11;
+    if ($a == \Game\Unit::HERO_ID || $a == 'hero') {
+        return \Game\Unit::HERO;
     }
 
     return 1 + (($a - 1) % 10);

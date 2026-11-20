@@ -191,7 +191,7 @@ foreach (['combat/simulatorResult', 'renderResult', 'resultCard', "'trapped'", "
         failSimulatorContract("Combat simulator result view must retain: $needle");
     }
 }
-foreach (['simulatorHeroData', "'a1_hero'", "'a2_hero'", "'total_power' => \$totalPower", "'arm' => self::boundedPostInt", "'h'    => (bool)\$this->output['attacker']['hero'] && \$attack_type <> 1"] as $needle) {
+foreach (['simulatorHeroData', "'a1_hero'", "'a2_hero'", "'total_power' => \$totalPower", "'arm' => self::boundedPostInt", "'h'    => (bool)\$this->output['attacker']['hero'] && \$attack_type <> MovementsModel::ATTACKTYPE_SPY"] as $needle) {
     if (!str_contains($controller, $needle)) {
         failSimulatorContract("Combat simulator controller must use side-specific canonical hero data: $needle");
     }

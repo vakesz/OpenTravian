@@ -168,7 +168,7 @@ class Starvation
         foreach ($order as $nr) {
             if ($row['u' . $nr] <= 0) continue;
             if ($this->currentCrop > 0) break;
-            if ($nr == 11) {
+            if ($nr == Unit::HERO) {
                 $heroKid = $isMovement && (int)$row['mode'] === 1 ? $row['to_kid'] : $row['kid'];
                 $experience = (int)$this->db->fetchScalar(
                     'SELECT exp FROM hero WHERE kid=' . (int)$heroKid . ' LIMIT 1',
@@ -196,7 +196,7 @@ class Starvation
                     $q = $this->db->query("UPDATE movement SET u{$nr}=GREATEST(u{$nr}-$killNum, 0) WHERE id={$row['id']} AND u{$nr}>=$killNum");
                 }
                 if ($q && $this->db->affectedRows()) {
-                    if ($nr == 11) {
+                    if ($nr == Unit::HERO) {
                         // Returning movements are fed by their destination
                         // village. Their hero is already homed there, not at
                         // the movement's origin (`kid`).

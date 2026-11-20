@@ -10,9 +10,12 @@ use Core\Log;
 use Core\Session;
 use Core\Village;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\ResourcesHelper;
 use Game\SpeedCalculator;
+use Game\Tribes;
+use Game\Unit;
 use function miliseconds;
 use Model\ArtefactsModel;
 use Model\MovementsModel;
@@ -107,8 +110,8 @@ class RallyPoint extends RallyPointHTML
             $calculator = new SpeedCalculator();
             $calculator->setFrom($row['to_kid']);
             $calculator->setTo($row['kid']);
-            $calculator->hasCata($units[8] > 0);
-            if ($units[11] > 0) {
+            $calculator->hasCata($units[Unit::CATAPULT] > 0);
+            if ($units[Unit::HERO] > 0) {
                 $calculator->hasHero();
                 $heroHelper = new HeroHelper();
                 $uid = $db->fetchScalar("SELECT owner FROM vdata WHERE kid={$row['kid']}");
@@ -126,7 +129,7 @@ class RallyPoint extends RallyPointHTML
             }
             $calculator->setMinSpeed($speeds);
             for ($i = 19; $i <= 38; ++$i) {
-                if ($village->getField($i)['item_id'] == 14) {
+                if ($village->getField($i)['item_id'] == Gid::TOURNAMENT_SQUARE) {
                     $calculator->setTournamentSqLvl($village->getField($i)['level']);
                     break;
                 }
@@ -155,7 +158,7 @@ class RallyPoint extends RallyPointHTML
                             $move->addMovement($row['to_kid'], $row['kid'], $session->getRace(), $units, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
                         }
                     }
-                    if ($row['race'] <> 4) {
+                    if ($row['race'] <> Tribes::NATURE) {
                         $o = new OasesModel();
                         {
                             $isOasis = $o->isOasis($row['to_kid']);
@@ -215,7 +218,7 @@ class RallyPoint extends RallyPointHTML
                 ],
                 T("RallyPoint", "withdraw"));
         } else {
-            if ($row['race'] == 4) {
+            if ($row['race'] == Tribes::NATURE) {
                 $villageData = $player = [];
             } else {
                 //others reinforcement
@@ -228,7 +231,7 @@ class RallyPoint extends RallyPointHTML
             $units_id = [];
             $postedTroop = $_POST['troop'] ?? null;
             for ($i = 1; $i <= 11; $i++) {
-                if ($i === 11 && $row['race'] == 4) {
+                if ($i === Unit::HERO && $row['race'] == Tribes::NATURE) {
                     continue;
                 }
                 if (is_array($postedTroop) && isset($postedTroop['t' . $i])) {
@@ -249,8 +252,8 @@ class RallyPoint extends RallyPointHTML
             $calculator = new SpeedCalculator();
             $calculator->setFrom($row['to_kid']);
             $calculator->setTo($row['kid']);
-            $calculator->hasCata($units[8] > 0);
-            if ($units[11] > 0) {
+            $calculator->hasCata($units[Unit::CATAPULT] > 0);
+            if ($units[Unit::HERO] > 0) {
                 $calculator->hasHero();
                 $heroHelper = new HeroHelper();
                 $uid = $db->fetchScalar("SELECT owner FROM vdata WHERE kid={$row['kid']}");
@@ -268,7 +271,7 @@ class RallyPoint extends RallyPointHTML
                 ));
                 if (array_sum($units) > 1) $calculator->troopsWithHero();
             }
-            if ($row['race'] <> 4) {
+            if ($row['race'] <> Tribes::NATURE) {
                 $buildings = $db->query("SELECT `f18t`, `f19`, `f19t`, `f20`, `f20t`, `f21`, `f21t`, `f22`, `f22t`, `f23`, `f23t`, `f24`, `f24t`, `f25`, `f25t`, `f26`, `f26t`, `f27`, `f27t`, `f28`, `f28t`, `f29`, `f29t`, `f30`, `f30t`, `f31`, `f31t`, `f32`, `f32t`, `f33`, `f33t`, `f34`, `f34t`, `f35`, `f35t`, `f36`, `f36t`, `f37`, `f37t`, `f38`, `f38t` FROM fdata WHERE kid={$row['kid']}")->fetch_assoc();
                 for ($i = 18; $i <= 38; ++$i) {
                     if ($buildings['f' . $i . 't'] == 14) {
@@ -285,7 +288,7 @@ class RallyPoint extends RallyPointHTML
                     $move = new MovementsModel();
                     //process here
                     if (($wholeCount - $total) <= 0) {
-                        if ($m->deleteEnforce($d) && $row['race'] <> 4) {
+                        if ($m->deleteEnforce($d) && $row['race'] <> Tribes::NATURE) {
                             $move->addMovement($row['to_kid'], $row['kid'], $row['race'], $units, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
                         }
                     } else {
@@ -295,11 +298,11 @@ class RallyPoint extends RallyPointHTML
                                 $modify[] = "u{$i}=u{$i}-" . $units[$i];
                             }
                         }
-                        if ($m->modifyEnforce($modify, $d) && $row['race'] <> 4) {
+                        if ($m->modifyEnforce($modify, $d) && $row['race'] <> Tribes::NATURE) {
                             $move->addMovement($row['to_kid'], $row['kid'], $row['race'], $units, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $miliseconds, $miliseconds + $timeTaken * 1000);
                         }
                     }
-                    if ($row['race'] <> 4) {
+                    if ($row['race'] <> Tribes::NATURE) {
                         $o = new OasesModel();
                         {
                             $isOasis = $o->isOasis($row['to_kid']);
@@ -318,15 +321,15 @@ class RallyPoint extends RallyPointHTML
             $trow = [
                 "owner" => [
                     "kid" => "",
-                    "uid" => $row['race'] == 4 ? 0 : $villageData['owner'],
-                    "playerName" => $row['race'] == 4 ? T("Global", "NatureName") : $player['name'],
-                    "villageName" => $row['race'] == 4 ? '<string>' . T("Global",
+                    "uid" => $row['race'] == Tribes::NATURE ? 0 : $villageData['owner'],
+                    "playerName" => $row['race'] == Tribes::NATURE ? T("Global", "NatureName") : $player['name'],
+                    "villageName" => $row['race'] == Tribes::NATURE ? '<string>' . T("Global",
                             "NatureName") . '</string>' : $villageData['name'],
                 ],
                 "units" => $this->sortUnitsAssociated($units, $row['race']),
             ];
             $info = [];
-            if ($row['race'] <> 4) {
+            if ($row['race'] <> Tribes::NATURE) {
                 $info[] = [
                     "type" => "Arrival",
                     "ArrivalTime" => round(($miliseconds + 1000 * $timeTaken) / 1000),
@@ -336,9 +339,9 @@ class RallyPoint extends RallyPointHTML
             $settings = [
                 "noCoordinates" => TRUE,
                 "noVillageLink" => TRUE,
-                "troopHeadline" => '<a href="' . profileUrl((int) ($row['race'] == 4 ? 0 : $villageData['owner'])) . '">' . sprintf(T("RallyPoint",
+                "troopHeadline" => '<a href="' . profileUrl((int) ($row['race'] == Tribes::NATURE ? 0 : $villageData['owner'])) . '">' . sprintf(T("RallyPoint",
                         "reinforcementForPlayerName"),
-                        $row['race'] == 4 ? T("Global", "NatureName") : $player['name']) . '</a>',
+                        $row['race'] == Tribes::NATURE ? T("Global", "NatureName") : $player['name']) . '</a>',
                 //maybe show coordinates
                 "info" => $info,
                 "showTroopsNum" => TRUE,
@@ -377,7 +380,7 @@ class RallyPoint extends RallyPointHTML
     {
         $sorted = [];
         for ($i = 1; $i <= 11; ++$i) {
-            if ($i == 11 && $race == 4) {
+            if ($i == Unit::HERO && $race == Tribes::NATURE) {
                 continue;
             }
             if (!isset($units[$i])) {
@@ -432,11 +435,11 @@ class RallyPoint extends RallyPointHTML
             }
             $move = new MovementsModel();
             $units = array_fill(1, 10, 0);
-            $units[10] = 3;
+            $units[Unit::SETTLER] = 3;
             $calc = new SpeedCalculator();
             $calc->setFrom($village->getKid());
             $calc->setTo($kid);
-            $calc->setMinSpeed(Formulas::uSpeed(nrToUnitId(10, Session::getInstance()->getRace())));
+            $calc->setMinSpeed(Formulas::uSpeed(nrToUnitId(Unit::SETTLER, Session::getInstance()->getRace())));
             $time = $calc->calc();
             $quest = Quest::getInstance();
             $race = Session::getInstance()->getRace();
@@ -499,7 +502,7 @@ class RallyPoint extends RallyPointHTML
                 "errorMsg" => NULL,
                 "showSendTroops" => FALSE,
                 "troops_details" => '',
-                "attack_type" => 6,
+                "attack_type" => MovementsModel::ATTACKTYPE_EVASION,
                 "timestamp_checksum" => get_random_string(6),
                 "timestamp" => time(),
                 "submitButton" => getButton([
@@ -531,7 +534,7 @@ class RallyPoint extends RallyPointHTML
             }
             $rh = new RallyPointHTML();
             $units = array_fill(1, 10, 0);
-            $units[10] = 3;
+            $units[Unit::SETTLER] = 3;
             $row = [
                 "owner" => [
                     "kid" => "",
@@ -545,7 +548,7 @@ class RallyPoint extends RallyPointHTML
             $calc = new SpeedCalculator();
             $calc->setFrom($village->getKid());
             $calc->setTo($kid);
-            $calc->setMinSpeed(Formulas::uSpeed(nrToUnitId(10, Session::getInstance()->getRace())));
+            $calc->setMinSpeed(Formulas::uSpeed(nrToUnitId(Unit::SETTLER, Session::getInstance()->getRace())));
             $time = $calc->calc();
             $xy = Formulas::kid2xy($kid);
             $settings = [
@@ -639,7 +642,7 @@ class RallyPoint extends RallyPointHTML
             $race = $units['race'];
         }
         for ($i = 1; $i <= 11; ++$i) {
-            if ($race == 4 && $i == 11) {
+            if ($race == Tribes::NATURE && $i == Unit::HERO) {
                 continue;
             }
             if (!isset($units['u' . $i])) {
@@ -663,8 +666,8 @@ class RallyPoint extends RallyPointHTML
      */
     function addA2b($timestamp, $timestamp_checksum, $to_kid, $units, $attack_type, $redeployHero = 0)
     {
-        if (!isset($units[11])) {
-            $units[11] = 0;
+        if (!isset($units[Unit::HERO])) {
+            $units[Unit::HERO] = 0;
         }
         $db = DB::getInstance();
         $query = vsprintf("INSERT INTO a2b (`uid`, `timestamp`, `timestamp_checksum`, `to_kid`, `u1`, `u2`, `u3`, `u4`, `u5`, `u6`, `u7`, `u8`, `u9`, `u10`, `u11`, `attack_type`, `redeployHero`) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
@@ -985,9 +988,9 @@ class RallyPoint extends RallyPointHTML
                 $place = $places[(int)$row['kid']] ?? null;
                 $player = isset($place['playerName']) ? ['id' => $place['owner'], 'name' => $place['playerName']] : null;
                 $uid = $player['id'];
-                $username = $row['race'] == 4 ? '<span class="none2">' . T("Global",
+                $username = $row['race'] == Tribes::NATURE ? '<span class="none2">' . T("Global",
                         "NatureName") . '</span>' : $player['name'];
-                if ($row['race'] == 4) {
+                if ($row['race'] == Tribes::NATURE) {
                     $villageName = T("RallyPoint", "unoccupiedOasis");
                 } else {
                     $villageName = $places[(int)$row['kid']]['name'] ?? false;
@@ -1007,7 +1010,7 @@ class RallyPoint extends RallyPointHTML
                 "settings" => [
                     'movementId' => $row['id'],
                     'markState' => $row['markState'],
-                    'showMarkState' => ($row['attack_type'] == 3 || $row['attack_type'] == 4) && $row['mode'] == 0,
+                    'showMarkState' => ($row['attack_type'] == MovementsModel::ATTACKTYPE_NORMAL || $row['attack_type'] == MovementsModel::ATTACKTYPE_RAID) && $row['mode'] == 0,
                     "noCoordinates" => FALSE,
                     "troopDetailsClass" => $mode,
                     "troopHeadline" => $troopHeadline,
@@ -1263,7 +1266,7 @@ class RallyPoint extends RallyPointHTML
      */
     private function getTotalCropConsumption($race, $units, $hdp, $effect = 1)
     {
-        if ($race == 4) {
+        if ($race == Tribes::NATURE) {
             return 0;
         }
         $total = 0;
@@ -1272,7 +1275,7 @@ class RallyPoint extends RallyPointHTML
             if ($nr <= 10) {
                 $unitId = nrToUnitId($nr, $race);
             } else {
-                $unitId = 98;
+                $unitId = Unit::HERO_ID;
             }
             $total += $amount * Formulas::uUpkeep($unitId, $hdp);
         }
@@ -1305,10 +1308,10 @@ class RallyPoint extends RallyPointHTML
             $enforces = $enforces ? $enforces->fetch_all(MYSQLI_ASSOC) : [];
             $places = $this->places(array_merge(array_column($enforces, 'kid'), array_column($enforces, 'to_kid')));
             foreach ($enforces as $trap) {
-                if ($trap['race'] == 4) {
+                if ($trap['race'] == Tribes::NATURE) {
                     $player = [
                         "name" => T("Global", "NatureName"),
-                        'race' => 4,
+                        'race' => Tribes::NATURE,
                     ];
                     $trappedFromVillage = [];
                 } else {
@@ -1343,7 +1346,7 @@ class RallyPoint extends RallyPointHTML
                     $villageName = $this->getVillageName($places[(int)$trap['to_kid']] ?? null);
                     $troopHeadline = '<a href="/karte.php?d=' . $trap['to_kid'] . '">' . sprintf(T("RallyPoint", "reinforcementForVillageName"), $villageName) . '</a>';
                 } else {//others reinforcements
-                    if ($trap['race'] == 4) {
+                    if ($trap['race'] == Tribes::NATURE) {
                         $troopHeadline = sprintf(T("RallyPoint", "reinforcementForPlayerName"), $player['name']);
                     } else {
                         $troopHeadline = '<a href="/karte.php?d=' . $trap['kid'] . '">' . sprintf(T("RallyPoint", "reinforcementForPlayerName"), $player['name']) . '</a>';
@@ -1354,15 +1357,15 @@ class RallyPoint extends RallyPointHTML
                         'id' => $trap['id'],
                         "owner" => [
                             "kid" => $trap['kid'],
-                            "uid" => $trap['race'] == 4 ? 0 : $trappedFromVillage['owner'],
+                            "uid" => $trap['race'] == Tribes::NATURE ? 0 : $trappedFromVillage['owner'],
                             "playerName" => $player['name'],
-                            "villageName" => $player['race'] == 4 ? '<strong>' . T("Global", "NatureName") . '</strong>' : $trappedFromVillage['name'],
+                            "villageName" => $player['race'] == Tribes::NATURE ? '<strong>' . T("Global", "NatureName") . '</strong>' : $trappedFromVillage['name'],
                         ],
                         "units" => $units,
                     ],
                     "settings" => [
-                        'noCoordinates' => $player['race'] == 4,
-                        'noVillageLink' => $player['race'] == 4,
+                        'noCoordinates' => $player['race'] == Tribes::NATURE,
+                        'noVillageLink' => $player['race'] == Tribes::NATURE,
                         "troopDetailsClass" => '',
                         "troopHeadline" => $troopHeadline,
                         "info" => [

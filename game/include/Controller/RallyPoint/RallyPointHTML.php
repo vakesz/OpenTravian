@@ -7,6 +7,8 @@ use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Game\CatapultTargets;
 use Game\Formulas;
+use Game\Gid;
+use Game\Unit;
 use Model\ArtefactsModel;
 use Model\WonderOfTheWorldModel;
 
@@ -31,7 +33,7 @@ class RallyPointHTML
             $HTML .= '<a href="/karte.php?d=' . $row['owner']['kid'] . '">' . $row['owner']['villageName'] . '</a>';
         }
         $size = sizeof($row['units']);
-        if (isset($row['units'][98]) && $noHeroWhenZero && $row['units'][98] == 0) {
+        if (isset($row['units'][Unit::HERO_ID]) && $noHeroWhenZero && $row['units'][Unit::HERO_ID] == 0) {
             $size--;
         }
         $HTML .= '</td>';
@@ -59,7 +61,7 @@ class RallyPointHTML
         $i = 1;
         $isset = isset($settings['unitsRowId']) && $settings['unitsRowId'] == "unitRowAtTown";
         foreach ($row['units'] as $u => $value) {
-            if ($i == 11 || $i == 98) {
+            if ($i == Unit::HERO || $i == Unit::HERO_ID) {
                 if ($value == 0 && $noHeroWhenZero) continue;
                 $u = "hero";
             }
@@ -75,7 +77,7 @@ class RallyPointHTML
         $HTML .= '<tbody class="units last"><tr><th>' . T("RallyPoint", "troops") . '</th>';
         $i = 1;
         foreach ($row['units'] as $value) {
-            if ($i == 11 || $i == 98) {
+            if ($i == Unit::HERO || $i == Unit::HERO_ID) {
                 if ($value == 0 && $noHeroWhenZero) continue;
             }
             $none = "";
@@ -247,7 +249,7 @@ class RallyPointHTML
                         $kill = T("RallyPoint", "kill");
                         $query = "/build.php?" . http_build_query([
                                 'tt' => 1,
-                                "gid" => 16,
+                                "gid" => Gid::RALLY_POINT,
                                 "kill" => $info['taskId'],
                                 Session::getCheckerName() => Session::getInstance()->getChecker(),
                                 "page" => isset($_REQUEST['page']) ? $_REQUEST['page'] : 1,

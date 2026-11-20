@@ -6,6 +6,7 @@ use Core\ErrorHandler;
 use function detect_season;
 use Game\Formulas;
 use Game\Map\ImageMapCache;
+use Game\OasisType;
 use Model\MapModel;
 use Model\WonderOfTheWorldModel;
 
@@ -74,7 +75,7 @@ class MapBlockCtrl extends AnyCtrl
      */
     private function setWald($kid, $resultRows): void
     {
-        if (1 == $resultRows[$kid]['landscape'] || in_array($resultRows[$kid]['oasistype'], [2, 3, 4])) {
+        if (1 == $resultRows[$kid]['landscape'] || in_array($resultRows[$kid]['oasistype'], OasisType::WOOD)) {
             $img = '';
             $hasNorth = $this->isWaldInCoordinates($resultRows[$kid]['x'], $resultRows[$kid]['y'] + 1, $resultRows);
             $hasWest = $this->isWaldInCoordinates($resultRows[$kid]['x'] - 1, $resultRows[$kid]['y'], $resultRows);
@@ -206,11 +207,11 @@ class MapBlockCtrl extends AnyCtrl
     {
         $kid = Formulas::xy2kid($x, $y);
         if (isset($resultRows[$kid])) {
-            return 1 == $resultRows[$kid]['landscape'] || in_array($resultRows[$kid]['oasistype'], [2, 3, 4]);
+            return 1 == $resultRows[$kid]['landscape'] || in_array($resultRows[$kid]['oasistype'], OasisType::WOOD);
         }
         $db = DB::getInstance();
         $map = $db->query("SELECT oasistype, landscape FROM wdata WHERE id=$kid LIMIT 1")->fetch_assoc();
-        return 1 == $map['landscape'] || in_array($map['oasistype'], [2, 3, 4]);
+        return 1 == $map['landscape'] || in_array($map['oasistype'], OasisType::WOOD);
     }
 
     /**

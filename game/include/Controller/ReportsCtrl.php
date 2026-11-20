@@ -12,6 +12,8 @@ use Core\Session;
 use Game\Formulas;
 use Game\Hero\HeroItems;
 use Game\NoticeHelper;
+use Game\Tribes;
+use Game\Unit;
 use Model\ReportsModel;
 use Model\FarmListModel;
 use Model\Quest;
@@ -387,7 +389,7 @@ class ReportsCtrl extends GameCtrl
             case NoticeHelper::TYPE_ADVENTURE:
                 $content = '';
                 $units = array_fill(1, 11, 0);
-                $units[11] = 1;
+                $units[Unit::HERO] = 1;
                 $adventure = new PHPBatchView('reports/adventure');
                 $adventure->vars['race'] = $data['race'];
                 $adventure->vars['title'] = isset($data['adventureNumber'])
@@ -498,7 +500,7 @@ class ReportsCtrl extends GameCtrl
                 foreach ($data['defender'] as $row) {
                     --$size;
                     if ($hideUnits) {
-                        $row['dead'] = $row['num'] = array_fill(1, $row['race'] == 4 ? 10 : 11, '?');
+                        $row['dead'] = $row['num'] = array_fill(1, $row['race'] == Tribes::NATURE ? 10 : 11, '?');
                     }
                     $uid = isset($row['uid']) ? $row['uid'] : 0;
                     if (isset($row['kid'])) {
@@ -646,7 +648,7 @@ class ReportsCtrl extends GameCtrl
                     }
                     foreach ($data['defender'] as $row) {
                         if ($hideUnits) {
-                            $row['dead'] = $row['num'] = array_fill(1, $row['race'] == 4 ? 10 : 11, '?');
+                            $row['dead'] = $row['num'] = array_fill(1, $row['race'] == Tribes::NATURE ? 10 : 11, '?');
                             if (array_key_exists('trapped', $row)) {
                                 $row['trapped'] = $row['num'];
                             }
@@ -1068,7 +1070,7 @@ class ReportsCtrl extends GameCtrl
                 ($permissionMask & RIGHT_HIDE_OPPONENT_TROOPS && $uid != $data['notice']['uid']) ||
                 ($permissionMask & RIGHT_HIDE_OWN_TROOPS && $uid == $data['notice']['uid'])
             ) {
-                $units = array_fill(1, $race == 4 ? 10 : 11, '?');
+                $units = array_fill(1, $race == Tribes::NATURE ? 10 : 11, '?');
                 $killed = null;
                 $trapped = null;
             }
@@ -1097,17 +1099,17 @@ class ReportsCtrl extends GameCtrl
         $params['isDefender'] = $isDefender;
         $params['role'] = $role;
         $params['troopHeadline'] = $troopHeadline;
-        $end = $race == 4 ? 10 : 11;
+        $end = $race == Tribes::NATURE ? 10 : 11;
         $icons = '<tbody class="units"><tr><th class="coords"></th>';
         for ($i = 1; $i <= $end; ++$i) {
-            $unitId = $i == 11 ? 'hero' : nrToUnitId($i, $race);
+            $unitId = $i == Unit::HERO ? 'hero' : nrToUnitId($i, $race);
             $title = T('Troops', $unitId . '.title');
             $icons .= '<td class="uniticon' . ($i == $end ? ' last' : '') . '"><img src="/img/spacer.gif" class="unit u' . $unitId
                 . '" title="' . $title . '" alt="' . $title . '"></td>';
         }
         $content = $icons . '</tr></tbody>';
         $rows = [[
-            '<i class="troopCount_small" title="' . ($race == 4 ? T('Reports', 'units') : T('Reports', 'Troops')) . '"> </i>',
+            '<i class="troopCount_small" title="' . ($race == Tribes::NATURE ? T('Reports', 'units') : T('Reports', 'Troops')) . '"> </i>',
             $units,
         ]];
         if (!is_null($killed)) {
@@ -1319,7 +1321,7 @@ class ReportsCtrl extends GameCtrl
             $information[] = $text;
         }
         if (isset($data['info']['captureResult'])) {
-            $unitId = nrToUnitId(9, $data['attacker']['race']);
+            $unitId = nrToUnitId(Unit::CHIEF, $data['attacker']['race']);
             $text =
                 '<img src="img/spacer.gif" class="unit u' .
                 $unitId .
@@ -1481,13 +1483,13 @@ class ReportsCtrl extends GameCtrl
                         return '';
                     }
                 }
-                for ($nr = 1; $nr <= ($group['race'] == 4 ? 10 : 11); ++$nr) {
-                    $unitId = $nr == 11 ? 98 : nrToUnitId($nr, $group['race']);
+                for ($nr = 1; $nr <= ($group['race'] == Tribes::NATURE ? 10 : 11); ++$nr) {
+                    $unitId = $nr == Unit::HERO ? Unit::HERO_ID : nrToUnitId($nr, $group['race']);
                     $upkeep = Formulas::uUpkeep($unitId, 0, true);
                     $dead = (int) ($group['dead'][$nr] ?? 0);
                     $totals[$side]['supplyBefore'] += (int) $group['num'][$nr] * $upkeep;
                     $totals[$side]['supplyLost'] += $dead * $upkeep;
-                    if ($nr != 11) {
+                    if ($nr != Unit::HERO) {
                         $totals[$side]['resourcesLost'] += $dead * array_sum(Formulas::uTrainingCost($unitId));
                     }
                 }

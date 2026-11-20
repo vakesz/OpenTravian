@@ -9,6 +9,7 @@ use Game\Formulas;
 use Game\Helpers\CulturePointsHelper;
 use Game\NoticeHelper;
 use Game\SpeedCalculator;
+use Game\Unit;
 use Model\AllianceModel;
 use Model\ArtefactsModel;
 use Model\MovementsModel;
@@ -93,7 +94,7 @@ class SettlersProcessor
         $calc->setFrom($toKid);
         $calc->setTo($kid);
         $calc->isReturn();
-        $calc->setMinSpeed(Formulas::uSpeed(nrToUnitId(10, (int) $row['race'])));
+        $calc->setMinSpeed(Formulas::uSpeed(nrToUnitId(Unit::SETTLER, (int) $row['race'])));
         $db = DB::getInstance();
         $buildings = $db->query("SELECT * FROM fdata WHERE kid=$kid")->fetch_assoc();
         for ($i = 18; $i <= 38; ++$i) {
@@ -104,7 +105,7 @@ class SettlersProcessor
         }
         $calc->setArtefactEffect(ArtefactsModel::getArtifactEffectByType($owner, $toKid, ArtefactsModel::ARTIFACT_INCREASE_SPEED));
         $units = array_fill(1, 11, 0);
-        $units[10] = 3;
+        $units[Unit::SETTLER] = 3;
         (new MovementsModel())->addMovement(
             $toKid,
             $kid,

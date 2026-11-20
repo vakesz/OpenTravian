@@ -8,6 +8,7 @@ use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Core\Village;
 use Game\Formulas;
+use Game\Unit;
 use Core\Locale;
 use function htmlspecialchars;
 use function logError;
@@ -184,7 +185,7 @@ class MapCtrl extends GameCtrl
      */
     private static function addElement(&$result, $row): void
     {
-        if ($row['kid'] != Session::getInstance()->getKid() && $row['mode'] == 0 && ($row['attack_type'] == 3 || $row['attack_type'] == 4)) {
+        if ($row['kid'] != Session::getInstance()->getKid() && $row['mode'] == 0 && ($row['attack_type'] == MovementsModel::ATTACKTYPE_NORMAL || $row['attack_type'] == MovementsModel::ATTACKTYPE_RAID)) {
             return;
         }
         if ($row['mode'] == 1) {
@@ -241,7 +242,7 @@ class MapCtrl extends GameCtrl
         $units = null;
         for ($i = 1; $i <= 11; ++$i) {
             if (!$row['u' . $i]) continue;
-            if ($i == 11) {
+            if ($i == Unit::HERO) {
                 $unitId = 'hero';
             } else {
                 $unitId = nrToUnitId($i, $row['race']);

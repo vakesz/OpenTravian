@@ -8,10 +8,13 @@ use Core\Config;
 use Core\Database\DB;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\Map\Map;
 use Game\ResourcesHelper;
 use Game\SpeedCalculator;
+use Game\Tribes;
+use Game\Unit;
 use Game\Wounded;
 use function getCustom;
 use function logError;
@@ -91,7 +94,7 @@ class AccountDeleter
         $owner = (int) $vdata['owner'];
         if ($full && (int) $vdata['capital'] === 1) {
             $villageModel = new VillageModel();
-            $villageModel->captureVillage($owner, $kid, 100, 1, 0, 5, Formulas::xy2kid(0, 0));
+            $villageModel->captureVillage($owner, $kid, 100, 1, 0, Tribes::NATARS, Formulas::xy2kid(0, 0));
             $buildings = $villageModel->getBuildingsAssoc($kid);
             for ($i = 1; $i <= 18; ++$i) {
                 if ($buildings[$i]['level'] > 10) {
@@ -99,7 +102,7 @@ class AccountDeleter
                 }
             }
             for ($i = 19; $i <= 40; ++$i) {
-                if (in_array($buildings[$i]['item_id'], [34, 35])) {
+                if (in_array($buildings[$i]['item_id'], [Gid::STONEMASON, Gid::BREWERY])) {
                     BuildingAction::downgrade($kid, $i, 0, true);
                 }
             }
@@ -257,7 +260,7 @@ class AccountDeleter
         $units_id = [];
         for ($i = 1; $i <= 11; ++$i) {
             $units[$i] = (int)$enforce['u' . $i];
-            if (!$enforce['u' . $i] || $i == 11) {
+            if (!$enforce['u' . $i] || $i == Unit::HERO) {
                 continue;
             }
             $speeds[] = Formulas::uSpeed(nrToUnitId($i, $enforce['race']));
