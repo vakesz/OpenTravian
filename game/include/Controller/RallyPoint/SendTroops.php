@@ -884,7 +884,9 @@ class SendTroops extends RallyPointHTML
             return false;
         }
         $db = DB::getInstance();
-        $row = $db->query("SELECT * FROM units WHERE kid=" . Village::getInstance()->getKid())->fetch_assoc();
+        // Lock the troops for this send (the caller holds the transaction), so a concurrent send waits and clamps
+        // against what is left instead of the same snapshot.
+        $row = $db->query("SELECT * FROM units WHERE kid=" . (int)Village::getInstance()->getKid() . " FOR UPDATE")->fetch_assoc();
         $speeds = [];
         $units_id = [];
         for ($i = 1; $i <= 11; ++$i) {
