@@ -155,11 +155,12 @@ class Starvation
      * @param bool $isTrapped
      * @param bool $isVillage
      * @param bool $isMovement
+     * @param int|null $onlyNr starve only this unit slot (the caller has already chosen it)
      * @return (float|int)
      */
-    private function starveRow(array $row, $isEnforcement, $isTrapped, $isVillage, $isMovement)
+    private function starveRow(array $row, $isEnforcement, $isTrapped, $isVillage, $isMovement, ?int $onlyNr = null)
     {
-        $order = $this->getUnitKillOrder($row['race'], $row);
+        $order = $onlyNr !== null ? [$onlyNr] : $this->getUnitKillOrder($row['race'], $row);
         $total_killed = 0;
         $sum = 0;
         for ($i = 1; $i <= 11; ++$i) {
@@ -380,28 +381,26 @@ class Starvation
             if ((int)$row['u' . $nr] <= 0) {
                 continue;
             }
+            // The home army is the garrison plus own-oasis troops. Kill from the
+            // first part that has this unit, and keep that part's count in step.
+            $partIndex = null;
             $part = $row;
-            $kind = $row['_kind'];
-            if ($kind === 'home') {
-                foreach ($row['_parts'] as $candidate) {
+            $partKind = $row['_kind'];
+            if ($partKind === 'home') {
+                foreach ($row['_parts'] as $idx => $candidate) {
                     if ((int)$candidate['u' . $nr] > 0) {
                         $part = $candidate;
-                        $kind = $candidate['_kind'];
+                        $partKind = $candidate['_kind'];
+                        $partIndex = $idx;
                         break;
                     }
                 }
             }
-            $killed = $this->starveRow($part, $kind === 'enforcement', $kind === 'trapped', $kind === 'units', $kind === 'movement');
+            $killed = (int)$this->starveRow($part, $partKind === 'enforcement', $partKind === 'trapped', $partKind === 'units', $partKind === 'movement', $nr);
             if ($killed > 0) {
                 $row['u' . $nr] = (int)$row['u' . $nr] - $killed;
-                if ($kind === 'home') {
-                    foreach ($row['_parts'] as &$candidate) {
-                        if ((int)$candidate['id'] === (int)($part['id'] ?? 0) || ($kind === 'units' && $candidate['_kind'] === 'units')) {
-                            $candidate['u' . $nr] = (int)$candidate['u' . $nr] - $killed;
-                            break;
-                        }
-                    }
-                    unset($candidate);
+                if ($partIndex !== null) {
+                    $row['_parts'][$partIndex]['u' . $nr] = (int)$row['_parts'][$partIndex]['u' . $nr] - $killed;
                 }
             }
 
