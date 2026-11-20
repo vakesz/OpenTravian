@@ -267,6 +267,9 @@ class BattleSetter
     public function move_to_traps(array &$units, int|float &$traps): array
     {
         $atkrs_total = array_sum($units);
+        if ($traps <= 0 || $atkrs_total <= 0) {
+            return array_fill_keys(array_keys($units), 0);
+        }
         $used_traps = min($traps, $atkrs_total);
         $trapped = [];
         $tr = 0;
@@ -411,12 +414,17 @@ class BattleSetter
             $end_time,
             $end_time + $seconds * 1000
         );
-        $wave['units']['num'] = array_fill(1, 11, 0);
+        // Only the troops that left: a hidden hero stays at home and is not in the evasion.
         $modify = [];
-        for ($i = 1; $i <= 11; ++$i) {
-            $modify[] = "u{$i}=0";
+        foreach ($wave['units']['num'] as $i => $count) {
+            if ((int)$count > 0) {
+                $modify[] = 'u' . (int)$i . '=u' . (int)$i . '-' . (int)$count;
+            }
         }
-        DB::getInstance()->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid={$kid}");
+        $wave['units']['num'] = array_fill(1, 11, 0);
+        if ($modify !== []) {
+            DB::getInstance()->query('UPDATE units SET ' . implode(',', $modify) . " WHERE kid={$kid}");
+        }
 
         //no report!
         return 0;

@@ -387,6 +387,8 @@ class BattleModel
             $up = $this->attacker['wave']['units']['smithy'][7];
             $rams = $this->attacker['wave']['units']['num'][7];
             $mwl = $this->model->early_ramming($this->defender['wall'], $rams, $siege_percent, $up, $d, $wall_dur);
+            // The flat wall defence follows the wall level the rams leave, like the percentage bonus.
+            $defense['t'] -= self::WALL_EXTRA[$this->defender['wave'][0]['race']] * ($this->defender['wall'] - $mwl);
             $wall_bonus = round(pow($wall_b, $mwl), 3);
             $pts_ratio = $this->model->remorale($offense['t'], $defense['t'], $no_morale ? 1 : $pop_ratio, $wall_bonus);
             $siege_percent = $this->model->sigma(pow($pts_ratio, 1.5));
@@ -756,9 +758,10 @@ class BattleModel
             $this->defender['wave'][] = $wave;
             if ($totalTraps > 0 && $this->defender['wave'][0]['race'] == Tribes::GAULS) {
                 $this->startProfile('assocDefender:fillTraps');
-                $this->defender['traps'] = min($this->model->getTraps($this->row['to_kid']), $totalTraps);
-                $this->defender['traps'] = max($this->defender['traps'], 0);
-                $this->defender['traps'] -= $this->model->getFilledTrapCount($this->row['to_kid']);
+                // Free traps: built traps up to the trappers' capacity, minus the ones already holding prisoners.
+                // A trapper lowered by catapults can hold more prisoners than it now offers, so clamp after the subtraction.
+                $capacity = min($this->model->getTraps($this->row['to_kid']), $totalTraps);
+                $this->defender['traps'] = max(0, $capacity - $this->model->getFilledTrapCount($this->row['to_kid']));
                 $this->endProfile('assocDefender:fillTraps');
             }
         }
@@ -1591,7 +1594,9 @@ class BattleModel
                 }
             }
         }
-        \Game\Wounded::record((int)$this->row['kid'], (int)$this->attacker['wave']['race'], $this->attacker['wave']['units']['dead']);
+        // Bandages revive part of the dead first; only the rest can become wounded.
+        $_revived = $this->attacker['wave']['units']['num'][Unit::HERO] > 0 ? $this->get_revived($this->attacker['wave']) : [];
+        \Game\Wounded::record((int)$this->row['kid'], (int)$this->attacker['wave']['race'], self::withoutRevived($this->attacker['wave']['units']['dead'], $_revived));
         $move = new MovementsModel();
         $total_trapped = array_sum($this->attacker['wave']['units']['trapped']);
         if ($total_trapped) {//auto move to traps!
@@ -1610,8 +1615,11 @@ class BattleModel
             }
         }
         if ($this->attacker['wave']['units']['num'][Unit::HERO] > 0) {
-            $_revived = $this->get_revived($this->attacker['wave']);
             if (0 < ($bandages = array_sum($_revived))) {
+                // The revived troops walk home and keep eating there: their upkeep is not removed.
+                foreach ($_revived as $nr => $count) {
+                    $modifiedUpkeep -= $count * Formulas::uUpkeep(nrToUnitId($nr, $this->attacker['wave']['race']), $this->attacker['buildings'][Gid::HORSE_DRINKING_TROUGH], true);
+                }
                 $neededTime = $this->bandageReturnMilliseconds((int) $this->row['to_kid'], (int) $this->row['kid'], (int) $this->row['race'], $_revived, (int) $this->attacker['buildings'][Gid::TOURNAMENT_SQUARE], (int) $this->row['ship']);
                 $move->addMovement($this->row['kid'], $this->row['kid'], $this->row['race'], $_revived, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
                 $this->useBagItems($this->attacker['uid'], $this->attacker['wave']['heroItems']['bag'], $bandages);
@@ -1659,7 +1667,7 @@ class BattleModel
             }
             $travel = (int) ceil($calculator->calc());
         }
-        $rate = max(1.0, (float) Config::getInstance()->heroConfig->heroReviveArrivalTimeRate);
+        $rate = max(1.0, (float) (Config::getInstance()->heroConfig->heroItemsSettings->heroReviveArrivalTimeRate ?? 1));
 
         return 1000 * max((int) round(86400 / $rate), $travel);
     }
@@ -1685,6 +1693,20 @@ class BattleModel
      * @param Wave|AttackerWave $army
      * @return array<int, int|float>
      */
+    /**
+     * @param array<int, int|float> $dead
+     * @param array<int, int|float> $revived
+     * @return array<int, int|float> the dead that bandages did not revive
+     */
+    private static function withoutRevived(array $dead, array $revived): array
+    {
+        foreach ($revived as $nr => $count) {
+            $dead[$nr] = max(0, ($dead[$nr] ?? 0) - $count);
+        }
+
+        return $dead;
+    }
+
     private function get_revived(array $army): array
     {
         if (empty($army['units']['num'][Unit::HERO])) {
@@ -1792,12 +1814,20 @@ class BattleModel
                 $value['units']['dead'][$i] = $dead;
             }
             // Wounded go home with the troops that were hit: reinforcements to their own village.
-            \Game\Wounded::record((int)($value['isEnforce'] ? $value['kid'] : $value['uniqueId']), (int)$value['race'], $value['units']['dead']);
+            $_revived = $value['units']['num'][Unit::HERO] ? $this->get_revived($value) : [];
+            \Game\Wounded::record((int)($value['isEnforce'] ? $value['kid'] : $value['uniqueId']), (int)$value['race'], self::withoutRevived($value['units']['dead'], $_revived));
 
             if ($value['units']['num'][Unit::HERO]) {
-                $_revived = $this->get_revived($value);
                 $bandages = array_sum($_revived);
                 if ($bandages > 0) {
+                    if ($value['isEnforce']) {
+                        // Reinforcements' upkeep leaves this village with their dead; the revived eat at home again.
+                        ResourcesHelper::modifyUpkeep((int)$value['uid'], (int)$value['kid'], ResourcesHelper::getTotalCropConsumption((int)$value['race'], $_revived, VillageModel::getHDP((int)$value['kid'], (int)$value['race'])));
+                    } else {
+                        foreach ($_revived as $nr => $count) {
+                            $modifiedUpkeep -= $count * Formulas::uUpkeep(nrToUnitId($nr, $value['race']), $this->defender['hdp'], true);
+                        }
+                    }
                     $homeKid = $value['isEnforce'] ? (int) $value['kid'] : (int) $this->row['to_kid'];
                     $neededTime = $this->bandageReturnMilliseconds((int) $this->row['to_kid'], $homeKid, (int) $value['race'], $_revived, $this->tournamentSquareLevel($homeKid), 0);
                     if ($value['isEnforce']) {
@@ -2270,12 +2300,13 @@ class BattleModel
             }
             if ($trappedRow['u11']) {
                 $health = $db->fetchScalar("SELECT health FROM hero WHERE kid={$trappedRow['kid']}");
-                if ($health <= 75) {
+                // A freed hero loses 25 health, as a quarter of the freed troops die.
+                if ($health <= 25) {
                     $trappedRow['u11'] = 0;
                     $db->query("UPDATE hero SET health=0 WHERE kid={$trappedRow['kid']}");
                 } else {
                     $total_sum += 1;
-                    $db->query("UPDATE hero SET health=health-75 WHERE kid={$trappedRow['kid']}");
+                    $db->query("UPDATE hero SET health=health-25 WHERE kid={$trappedRow['kid']}");
                 }
             }
             $helper->returnTrappedOrEnforcementRow($trappedRow, false, $this->row['end_time']);

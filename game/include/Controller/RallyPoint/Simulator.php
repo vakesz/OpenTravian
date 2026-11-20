@@ -228,7 +228,8 @@ class Simulator
                     $up = $wave['U'][6];
                     $rams = $wave['u'][6];
                     $mwl = $this->battle->early_ramming($wl, $rams, $siege_percent, $up, $d, $wall_dur);
-                    // recalc wall effect
+                    // recalc wall effect: the flat defence follows the level the rams leave, as in battles
+                    $defense['t'] -= BattleModel::WALL_EXTRA[$pob + 1] * ($wl - $mwl);
                     $wall_bonus = round(pow($wall_b, $mwl), 3);
                     $pts_ratio = $this->battle->remorale($offense['t'],
                         $defense['t'],
