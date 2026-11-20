@@ -40,6 +40,9 @@ namespace {
     }
 
     require dirname(__DIR__, 2) . '/game/include/Game/WorldSpeedProfile.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Tribes.php';
+    require dirname(__DIR__, 2) . '/game/include/Game/Unit.php';
     require dirname(__DIR__, 2) . '/game/include/Game/Formulas.php';
 
     foreach ([1 => 1, 2 => 1, 3 => 2, 5 => 2, 10 => 4] as $speed => $speedDivisor) {

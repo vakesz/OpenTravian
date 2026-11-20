@@ -8,6 +8,8 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Session;
 use Game\Hero\HeroExperience;
+use Game\Hero\ItemBtype;
+use Game\Hero\ItemType;
 use Game\PremiumDuration;
 use Game\ResourcesHelper;
 
@@ -57,10 +59,10 @@ class DailyQuestModel
 
     /** Hero items: [building type, item type]. */
     private const ITEMS = [
-        'heroItem_ointment' => [11, 106],
-        'heroItem_tabletOfLaw' => [14, 109],
-        'heroItem_bandage25' => [7, 112],
-        'heroItem_cage' => [9, 114],
+        'heroItem_ointment' => [ItemBtype::OINTMENT, ItemType::OINTMENT],
+        'heroItem_tabletOfLaw' => [ItemBtype::TABLET_OF_LAW, ItemType::TABLET_OF_LAW],
+        'heroItem_bandage25' => [ItemBtype::SMALL_BANDAGE, ItemType::SMALL_BANDAGE],
+        'heroItem_cage' => [ItemBtype::CAGE, ItemType::CAGE],
     ];
 
     /** @var array<int, array{reward: int, stepCount: int}> */

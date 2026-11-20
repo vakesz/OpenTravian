@@ -10,6 +10,7 @@ use Core\Database\DB;
 use Game\Formulas;
 use Game\Hero\AuctionFee;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
 use mysqli_result;
 
 use function getCustom;
@@ -139,7 +140,7 @@ class AuctionModel
     public function addItemToUser(int $uid, int $btype, int $type, int $num): bool
     {
         $db = DB::getInstance();
-        $stackAble = $btype >= 7 && $btype !== 12 && $btype !== 13;
+        $stackAble = $btype >= ItemBtype::FIRST_CONSUMABLE && $btype !== ItemBtype::BUCKET && $btype !== ItemBtype::BOOK_OF_WISDOM;
         if ($stackAble) {
             $itemId = (int) $db->fetchScalar("SELECT id FROM items WHERE uid=$uid AND btype=$btype AND type=$type AND proc=0");
             if ($itemId) {
@@ -588,14 +589,14 @@ class AuctionModel
             $rand = $items->getRandomItem();
             $btype = (int) $rand['btype'];
             $type = (int) $rand['type'];
-            if ($btype === 15 && getGameSpeed() <= 100) {
+            if ($btype === ItemBtype::ARTWORK && getGameSpeed() <= 100) {
                 continue;
             }
             $amounts = heroAuction::getPackagesFakeAuctionForItem($btype, $type);
-            if ($highSpeedTrainingHelmets && $btype === 1 && ($type >= 10 && $type <= 15)) {
+            if ($highSpeedTrainingHelmets && $btype === ItemBtype::HELMET && ($type >= 10 && $type <= 15)) {
                 continue;
             }
-            if ($btype <= 6) {
+            if ($btype <= ItemBtype::LAST_EQUIPMENT) {
                 //this has tier
                 $tier = ($type % 3) === 0 ? 3 : ($type % 3 === 1 ? 1 : 2);
                 if ($tierNum !== $tier) {
@@ -625,14 +626,14 @@ class AuctionModel
         if (empty($silver)) {
             if (getCustom('decreaseItemsPriceInAuction')) {
                 $silver = match ($btype) {
-                    14, 11, 10 => 1,
-                    15 => 10,
-                    8 => 0.05,
+                    ItemBtype::TABLET_OF_LAW, ItemBtype::OINTMENT, ItemBtype::SCROLL => 1,
+                    ItemBtype::ARTWORK => 10,
+                    ItemBtype::BANDAGE => 0.05,
                     default => $stackAble ? 0.05 : 100,
                 };
             } else {
-                $silver = ($stackAble && $btype !== 15) ? 1 : 100;
-                if ($btype === 6 || $btype === 13) {
+                $silver = ($stackAble && $btype !== ItemBtype::ARTWORK) ? 1 : 100;
+                if ($btype === ItemBtype::HORSE || $btype === ItemBtype::BOOK_OF_WISDOM) {
                     $silver = 1;
                 }
             }

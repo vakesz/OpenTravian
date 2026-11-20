@@ -7,6 +7,7 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Gid;
 use Game\ResourcesHelper;
 use mysqli_result;
 
@@ -160,13 +161,13 @@ class ArtefactsModel
             return -1;
         }
         for ($i = 19; $i <= 38; $i++) {
-            if ($defBuildings[$i]['item_id'] == 27 && $defBuildings[$i]['level'] > 0) {
+            if ($defBuildings[$i]['item_id'] == Gid::TREASURY && $defBuildings[$i]['level'] > 0) {
                 return -3;
             }
         }
         $needTreasury = $size === 1 ? 10 : 20;
 
-        return $attackerBuildings[27] >= $needTreasury ? true : -1;
+        return $attackerBuildings[Gid::TREASURY] >= $needTreasury ? true : -1;
     }
 
     /**

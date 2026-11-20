@@ -22,6 +22,9 @@ function assertHunnicHeroSpeed(bool $condition, string $message): void
 }
 
 $root = dirname(__DIR__, 2);
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Tribes.php';
+require_once $root . '/game/include/Game/Unit.php';
 require_once $root . '/game/include/Game/Formulas.php';
 require_once $root . '/game/include/Game/SpeedCalculator.php';
 require_once $root . '/game/include/Game/Hero/HeroItems.php';

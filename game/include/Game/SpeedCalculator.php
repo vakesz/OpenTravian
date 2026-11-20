@@ -5,6 +5,7 @@ namespace Game;
 use Core\Config;
 use Core\Database\DB;
 use Game\Hero\HeroItems;
+use Game\Hero\ItemBtype;
 use Model\ArtefactsModel;
 use Model\WonderOfTheWorldModel;
 use function getCustom;
@@ -223,7 +224,7 @@ class SpeedCalculator
         }
         if ($this->hasHero) {
             $heroItems = new HeroItems();
-            if (is_array($this->leftHand) && $this->leftHand['btype'] == 3) {
+            if (is_array($this->leftHand) && $this->leftHand['btype'] == ItemBtype::LEFT_HAND) {
                 if ($this->isReturn
                     && in_array($this->leftHand['type'],
                         [
@@ -258,7 +259,7 @@ class SpeedCalculator
                     $minSpeed *= 1 + $item['speed_alliance'] / 100;
                 }
             }
-            if (is_array($this->shoes) && $this->shoes['btype'] == 5
+            if (is_array($this->shoes) && $this->shoes['btype'] == ItemBtype::SHOES
                 && in_array($this->shoes['type'],
                     [
                         97,

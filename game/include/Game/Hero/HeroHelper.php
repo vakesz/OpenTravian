@@ -4,6 +4,7 @@ namespace Game\Hero;
 
 use Core\Database\DB;
 use Game\Formulas;
+use Game\Tribes;
 
 class HeroHelper extends HeroItems
 {
@@ -27,7 +28,7 @@ class HeroHelper extends HeroItems
      */
     public function calcPower($race, $points)
     {
-        return 100 + $points * ($race == 1 ? 100 : 80);
+        return 100 + $points * ($race == Tribes::ROMANS ? 100 : 80);
     }
 
     /**
@@ -169,9 +170,7 @@ class HeroHelper extends HeroItems
     {
         $bag = $this->procInput($bag);
         if (is_array($bag) && isset($bag['btype'])
-            && in_array($bag['btype'], [
-                7, 8,
-            ])
+            && in_array($bag['btype'], [ItemBtype::SMALL_BANDAGE, ItemBtype::BANDAGE])
         ) {
             $item = $this->getHeroItemProperties($bag['btype'], $bag['type']);
 
@@ -204,7 +203,7 @@ class HeroHelper extends HeroItems
     public function getCages($bag): int
     {
         $bag = $this->procInput($bag);
-        if (is_array($bag) && isset($bag['btype']) && $bag['btype'] == 9) {
+        if (is_array($bag) && isset($bag['btype']) && $bag['btype'] == ItemBtype::CAGE) {
             return (int)$bag['num'];
         }
         return 0;
@@ -236,7 +235,7 @@ class HeroHelper extends HeroItems
             $item = $this->getHeroItemProperties($horse['btype'], $horse['type']);
             // Article 45: a mounted Gaul is 5 fields per hour faster at ×1, and
             // that bonus scales with the same troop-movement multiplier.
-            $gaul = (int)$race === 3 ? 5 * $rate : 0;
+            $gaul = (int)$race === Tribes::GAULS ? 5 * $rate : 0;
 
             return $item['speed_horse'] * $rate + $gaul;
         }
@@ -256,7 +255,7 @@ class HeroHelper extends HeroItems
      */
     public function getHunnicMountedArmySpeedBonus($race, $horse, $cavalryOnly)
     {
-        if ((int)$race !== 7 || !$cavalryOnly) {
+        if ((int)$race !== Tribes::HUNS || !$cavalryOnly) {
             return 0;
         }
 

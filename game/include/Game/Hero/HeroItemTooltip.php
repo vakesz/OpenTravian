@@ -29,12 +29,12 @@ final class HeroItemTooltip
     private static function tier(int $btype, int $type): int
     {
         $base = match ($btype) {
-            1 => 1,
-            2 => 82,
-            3 => 61,
-            4 => $type <= 60 ? 16 : ($type <= 144 ? 115 : ($type <= 163 ? 149 : 164)),
-            5 => 94,
-            6 => 103,
+            ItemBtype::HELMET => 1,
+            ItemBtype::BODY => 82,
+            ItemBtype::LEFT_HAND => 61,
+            ItemBtype::RIGHT_HAND => $type <= 60 ? 16 : ($type <= 144 ? 115 : ($type <= 163 ? 149 : 164)),
+            ItemBtype::SHOES => 94,
+            ItemBtype::HORSE => 103,
             default => 1,
         };
 
@@ -80,7 +80,7 @@ final class HeroItemTooltip
         $stats = [];
 
         switch ($btype) {
-            case 1:
+            case ItemBtype::HELMET:
                 if ($type <= 3) {
                     $stats[] = self::stat('experience', [$plus($item['exp'], '%')]);
                 } elseif ($type <= 6) {
@@ -93,7 +93,7 @@ final class HeroItemTooltip
                     $stats[] = self::stat('trainingBarracks', [self::number($item['inf'], '', '%')]);
                 }
                 break;
-            case 2:
+            case ItemBtype::BODY:
                 if (isset($item['reg'])) {
                     $stats[] = self::stat('regeneration', [$plus($item['reg'])]);
                 }
@@ -104,7 +104,7 @@ final class HeroItemTooltip
                     $stats[] = self::stat('damageReduction', [$plus($item['resist'])]);
                 }
                 break;
-            case 3:
+            case ItemBtype::LEFT_HAND:
                 if (isset($item['return_speed'])) {
                     $stats[] = self::stat('returnSpeed', [$plus($item['return_speed'], '%')], 'returnSpeedDetails');
                 } elseif (isset($item['speed_own'])) {
@@ -119,13 +119,13 @@ final class HeroItemTooltip
                     $stats[] = self::stat('strengthAgainstNatars', [$plus($item['powerAgainstNatars'], '%')], 'strengthAgainstNatarsDetails');
                 }
                 break;
-            case 4:
+            case ItemBtype::RIGHT_HAND:
                 if (isset($item['unitId'])) {
                     $stats[] = self::stat('weaponUnit', [$plus($item['unit_power']), (string)T('Troops', $item['unitId'] . '.title')]);
                     $stats[] = self::stat('fightingStrength', [$plus($item['hero_power'])]);
                 }
                 break;
-            case 5:
+            case ItemBtype::SHOES:
                 if (isset($item['reg'])) {
                     $stats[] = self::stat('regeneration', [$plus($item['reg'])]);
                 } elseif (isset($item['speed_distance'])) {
@@ -135,55 +135,55 @@ final class HeroItemTooltip
                     $stats[] = self::stat('speedMounted', [$plus($item['hero_cav_speed'] * $movement)]);
                 }
                 break;
-            case 6:
+            case ItemBtype::HORSE:
                 $movement = max(1.0, (float)getGame('movement_speed_increase'));
                 $stats[] = self::stat('speedMounted', [$plus($item['speed_horse'] * $movement)]);
                 break;
-            case 7:
-            case 8:
+            case ItemBtype::SMALL_BANDAGE:
+            case ItemBtype::BANDAGE:
                 $stats[] = self::stat('bandage', [self::number($item['revive'], '', '%')], 'bandageDetails');
                 break;
-            case 9:
+            case ItemBtype::CAGE:
                 $stats[] = self::stat('cage', [], 'cageDetails');
                 break;
-            case 10:
+            case ItemBtype::SCROLL:
                 $stats[] = self::stat('scroll', [], 'scrollDetails', [self::plain($item['exp'])]);
                 break;
-            case 11:
+            case ItemBtype::OINTMENT:
                 $stats[] = self::stat('ointment', [], 'ointmentDetails', [self::number($item['reg'], '', '%')]);
                 break;
-            case 12:
+            case ItemBtype::BUCKET:
                 $stats[] = self::stat('bucket', [], 'bucketDetails');
                 break;
-            case 13:
+            case ItemBtype::BOOK_OF_WISDOM:
                 $stats[] = self::stat('bookOfWisdom', [], 'bookOfWisdomDetails');
                 break;
-            case 14:
+            case ItemBtype::TABLET_OF_LAW:
                 $one = self::number($item['loyalty'], '', '%');
                 $max = self::number(125, '', '%');
                 $stats[] = self::stat('tabletOfLaw', [$one, $max], 'tabletOfLawDetails', [$one, $max]);
                 break;
-            case 15:
+            case ItemBtype::ARTWORK:
                 // The reward depends on the viewing player's culture point production.
                 $production = (int)DB::getInstance()->fetchScalar(
                     'SELECT COALESCE(SUM(cp), 0) FROM vdata WHERE owner=' . (int)Session::getInstance()->getPlayerId()
                 );
                 $stats[] = self::stat('artwork', [self::plain(Artwork::reward((int)getGameSpeed(), $production))], 'artworkDetails', [(string)intdiv(Artwork::rules((int)getGameSpeed())['cooldown'], 3600)]);
                 break;
-            case 16:
+            case ItemBtype::RESOURCES:
                 if ($item['title'] !== '') {
                     $stats[] = ['text' => (string)$item['title']];
                 }
                 break;
         }
 
-        if ($btype >= 7 && $btype <= 15) {
+        if ($btype >= ItemBtype::FIRST_CONSUMABLE && $btype <= ItemBtype::ARTWORK) {
             $stats[] = self::stat('takesEffectWhenEquipped');
             $stats[] = self::stat('stackable');
             if ($btype <= 9) {
                 $stats[] = self::stat('equipBeforeBattle');
             }
-            if ($btype === 9) {
+            if ($btype === ItemBtype::CAGE) {
                 $stats[] = self::stat('noFight');
             }
         }
@@ -198,7 +198,7 @@ final class HeroItemTooltip
      */
     public static function benefits(int $btype, int $type): array
     {
-        $benefits = $btype === 6 ? [self::t('mountsHero')] : [];
+        $benefits = $btype === ItemBtype::HORSE ? [self::t('mountsHero')] : [];
         foreach (self::stats($btype, $type) as $stat) {
             $benefits[] = $stat['text'];
         }
@@ -213,7 +213,7 @@ final class HeroItemTooltip
     {
         $item = (new HeroItems())->getHeroItemProperties($btype, $type);
         $e = static fn (string $text): string => htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $consumable = $btype >= 7 && $btype <= 15;
+        $consumable = $btype >= ItemBtype::FIRST_CONSUMABLE && $btype <= ItemBtype::ARTWORK;
         $tier = $consumable ? 'consumable' : 'tier' . self::tier($btype, $type);
         $slotKey = self::SLOT_LABELS[$item['slot']] ?? null;
         $subTitle = $consumable
@@ -224,7 +224,7 @@ final class HeroItemTooltip
             . '<div class="title">' . $e((string)$item['name']) . '</div>'
             . '<div class="subTitle">' . $e($subTitle) . '</div>'
             . '<div class="separator"></div>';
-        if ($btype === 12 && $heroAlive) {
+        if ($btype === ItemBtype::BUCKET && $heroAlive) {
             $html .= '<div class="notClickable">' . $e(self::t('notUsableWhileAlive')) . '</div>';
         }
         foreach (self::stats($btype, $type) as $stat) {

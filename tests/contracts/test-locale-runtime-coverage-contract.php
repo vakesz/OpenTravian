@@ -80,7 +80,7 @@ if (!str_contains($heroItemsSource, "T('HeroInventory', 'resourceItemInInventory
     failLocaleRuntimeCoverage('Carried-resource tiles must use the source-backed tooltip and suppress unsupported fa copy.');
 }
 
-if (!str_contains($heroItemsSource, '$btype === 4 && $type >= 149 && $type <= 163')
+if (!str_contains($heroItemsSource, '$btype === ItemBtype::RIGHT_HAND && $type >= 149 && $type <= 163')
     || !str_contains($heroItemsSource, '$result[\'name\'] = in_array(get_locale(), [\'en-US\', \'ar-AE\', \'el-GR\'], true)')
     || !str_contains($heroItemsSource, '$result[\'title\'] = \'\';')
     || !str_contains($heroItemsSource, '$result[\'attributes\'] = [];')) {

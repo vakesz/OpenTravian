@@ -10,6 +10,7 @@ use Core\Session;
 use Core\Village;
 use Game\Formulas;
 use Game\Helpers\HeroHealthHelper;
+use Game\Tribes;
 use Model\MovementsModel;
 use Model\TrainingModel;
 
@@ -534,9 +535,9 @@ class SessionHero extends HeroHelper
                 $items[$array]['name'] = htmlspecialchars("{$itemData['name']}");
                 $items[$array]['place'] = $row['proc'] ? $itemData['slot'] : "inventory";
                 $items[$array]['slot'] = $itemData['slot'];
-                $items[$array]['isConsumable'] = (int)$row['btype'] >= 7
-                    && !in_array((int)$row['btype'], [12, 13], true);
-                $items[$array]['isMaterial'] = in_array((int)$row['btype'], [12, 13], true);
+                $items[$array]['isConsumable'] = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE
+                    && !in_array((int)$row['btype'], ItemBtype::MATERIALS, true);
+                $items[$array]['isMaterial'] = in_array((int)$row['btype'], ItemBtype::MATERIALS, true);
                 $items[$array]['amount'] = (int)$row['num'];
                 $items[$array]['instant'] = $itemData['instant'];
                 $items[$array]['isUsableIfDead'] = $itemData['isUsableIfDead'];
@@ -556,7 +557,7 @@ class SessionHero extends HeroHelper
                         (int)$row['num']
                     );
                 }
-                if ((int)$row['btype'] === 15) {
+                if ((int)$row['btype'] === ItemBtype::ARTWORK) {
                     $uid = (int)Session::getInstance()->getPlayerId();
                     $production = (int)$db->fetchScalar("SELECT COALESCE(SUM(cp), 0) FROM vdata WHERE owner=$uid");
                     $lastUse = (int)$db->fetchScalar("SELECT lastArtworkUse FROM inventory WHERE uid=$uid");
@@ -588,11 +589,11 @@ class SessionHero extends HeroHelper
             'bonus' => 0,
             'loyaltyFull' => false,
         ];
-        if ($btype === 10) {
+        if ($btype === ItemBtype::SCROLL) {
             $properties = (new HeroItems())->getHeroItemProperties($btype, $type);
             $context['perScroll'] = (int)floor((float)$properties['exp']);
             $context['bonus'] = (int)(new HeroHelper())->calcMoreExp((int)$db->fetchScalar('SELECT helmet FROM inventory WHERE uid=?', [$uid]));
-        } elseif ($btype === 14) {
+        } elseif ($btype === ItemBtype::TABLET_OF_LAW) {
             $loyalty = $db->fetchScalar('SELECT loyalty FROM vdata WHERE kid=? AND owner=?', [(int)$this->hero['kid'], $uid]);
             $context['loyaltyFull'] = $loyalty !== false && (int)$loyalty >= 125;
         }
@@ -727,13 +728,13 @@ class SessionHero extends HeroHelper
         $HTML = T("HeroInventory", "heroLevel") . '||';
         $HTML .= '<br /><span class="heroAttributeInformation">';
         switch (Session::getInstance()->getRace()) {
-            case 1:
+            case Tribes::ROMANS:
                 $HTML .= sprintf(T("HeroInventory", "RomanSpecialHeroAttribute"), 100);
                 break;
-            case 2://percent mark :((
+            case Tribes::TEUTONS://percent mark :((
                 $HTML .= sprintf(T("HeroInventory", "TeutonSpecialHeroAttribute"), 30 . "%");
                 break;
-            case 3:
+            case Tribes::GAULS:
                 $HTML .= sprintf(T("HeroInventory", "GualSpecialHeroAttribute"), 5);
                 break;
         }

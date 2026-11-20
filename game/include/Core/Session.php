@@ -13,6 +13,7 @@ use Game\Admin\AdminAccounts;
 use Game\Admin\AuditLog;
 use Game\Admin\TwoFactorGate;
 use Game\Hero\SessionHero;
+use Game\Tribes;
 use Game\Mail\EventMail;
 use Model\AuctionModel;
 use Model\LoginModel;
@@ -1324,15 +1325,15 @@ class Session
     public function getRaceName()
     {
         switch ($this->get("race")) {
-            case 1: return "roman";
-            case 2: return "teuton";
-            case 3: return "gaul";
-            case 4: return "nature";
-            case 5: return "natars";
-            case 6: return "egyptian";
-            case 7: return "hun";
-            case 8: return "spartan";
-            case 9: return "viking";
+            case Tribes::ROMANS: return "roman";
+            case Tribes::TEUTONS: return "teuton";
+            case Tribes::GAULS: return "gaul";
+            case Tribes::NATURE: return "nature";
+            case Tribes::NATARS: return "natars";
+            case Tribes::EGYPTIANS: return "egyptian";
+            case Tribes::HUNS: return "hun";
+            case Tribes::SPARTANS: return "spartan";
+            case Tribes::VIKINGS: return "viking";
             default: return null;
         }
     }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemBtype.php';
 require dirname(__DIR__, 2) . '/game/include/Model/HeroInventoryModel.php';
 
 use Model\HeroInventoryModel;

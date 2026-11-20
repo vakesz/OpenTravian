@@ -2,6 +2,8 @@
 
 namespace Game\Hero;
 
+use Game\Tribes;
+
 /** Resolves the Gpack artwork identity for a hero-adventure destination. */
 final class AdventurePlace
 {
@@ -14,7 +16,7 @@ final class AdventurePlace
         $occupied = (int)($worldData['occupied'] ?? 0);
 
         if ($fieldType > 0 && $occupied > 0) {
-            return $villageRace === 5 ? 'village-natars' : 'village-normal';
+            return $villageRace === Tribes::NATARS ? 'village-natars' : 'village-normal';
         }
 
         $landscapes = [
