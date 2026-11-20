@@ -52,6 +52,9 @@ $db->begin_transaction();
 try {
     $model = new AuctionModel();
     $db->query("UPDATE auction SET finish=1 WHERE activeUid IN ($uid, $otherUid) AND finish=0");
+    // Bids are checked against the bidder's locked silver row, so both bidders hold the 1000 silver the fixture
+    // session reports (rolled back with everything else).
+    $db->query("UPDATE users SET silver=1000 WHERE id IN ($uid, $otherUid)");
     $model->addAuction(true, 0, 1, 1, 1, time() + 60, 100);
     $id = (int)$db->lastInsertId();
     $secureId = (string)$db->fetchScalar("SELECT secure_id FROM auction WHERE id=$id");

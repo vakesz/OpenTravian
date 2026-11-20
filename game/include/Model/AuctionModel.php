@@ -16,6 +16,7 @@ use mysqli_result;
 use function getCustom;
 use function getGameElapsedSeconds;
 use function getGameSpeed;
+use function logError;
 
 /**
  * Hero auctions and the hero inventory slots. Only ints are interpolated into SQL (everything else is bound), and
@@ -87,33 +88,55 @@ class AuctionModel
             $owner = (int) $row['uid'];
             $silver = (int) $row['silver'];
             $item = [(int) $row['btype'], (int) $row['type'], (int) $row['num']];
-            $db->query("UPDATE auction SET finish=1 WHERE id=$auctionId");
-            if ($spread_randomly) {
-                $uid = $this->getRandomUID($spread_timeout);
-                if ($uid !== false) {
-                    $dailyQuest->setQuestAsCompleted($activeUid, 4);
-                    $this->addItemToUser($uid, ...$item);
-                }
-            } elseif ((int) $row['activeId'] !== 0) {
-                $buyer = $m->getUser($activeUid, 'silver');
-                if ($buyer !== false && $this->updateUserSilver($activeUid, $silver)) {
-                    $dailyQuest->setQuestAsCompleted($activeUid, 4);
-                    $this->addItemToUser($activeUid, ...$item);
-                    $this->addBooking($activeUid, [2, ...$item], -$silver, -$silver + (int) $buyer['silver'], (int) $row['time']);
-                }
+            // Each auction settles once and completely: claim it (finish=0 to 1) and settle it in one transaction.
+            if (!$db->begin_transaction()) {
+                continue;
             }
-            if ($owner !== 0) {
-                if ((int) $row['activeId'] === 0 && !Config::getProperty('auction', 'buyInactiveAuctionBySystem')) {
-                    $this->addItemToUser($owner, ...$item);
-                    $db->query("DELETE FROM auction WHERE id=$auctionId AND finish=1");
-                } else {
-                    // The seller is paid the sale price minus the auction house's fee.
-                    $payout = AuctionFee::payout($silver);
-                    $seller = $m->getUser($owner, 'silver');
-                    if ($seller !== false && $this->updateUserSilver($owner, $payout, 1)) {
-                        $this->addBooking($owner, [1, ...$item], $payout, $payout + (int) $seller['silver'], (int) $row['time']);
+            try {
+                $claimed = $db->query("UPDATE auction SET finish=1 WHERE id=$auctionId AND finish=0");
+                if (!$claimed || $db->affectedRows() !== 1) {
+                    $db->rollback();
+                    continue;
+                }
+                $unsold = (int) $row['activeId'] === 0;
+                if ($spread_randomly) {
+                    $uid = $this->getRandomUID($spread_timeout);
+                    if ($uid !== false) {
+                        $dailyQuest->setQuestAsCompleted($activeUid, 4);
+                        $this->addItemToUser($uid, ...$item);
+                    }
+                } elseif (!$unsold) {
+                    $buyer = $m->getUser($activeUid, 'silver');
+                    if ($buyer !== false && $this->updateUserSilver($activeUid, $silver)) {
+                        $dailyQuest->setQuestAsCompleted($activeUid, 4);
+                        $this->addItemToUser($activeUid, ...$item);
+                        $this->addBooking($activeUid, [2, ...$item], -$silver, -$silver + (int) $buyer['silver'], (int) $row['time']);
+                    } else {
+                        // The winner can no longer pay: the item goes back to the seller as if nobody had bid.
+                        $unsold = true;
                     }
                 }
+                if ($owner !== 0) {
+                    if ($unsold && ((int) $row['activeId'] !== 0 || !Config::getProperty('auction', 'buyInactiveAuctionBySystem'))) {
+                        $this->addItemToUser($owner, ...$item);
+                        $db->query("DELETE FROM auction WHERE id=$auctionId AND finish=1");
+                    } else {
+                        // The seller is paid the sale price minus the auction house's fee.
+                        $payout = AuctionFee::payout($silver);
+                        $seller = $m->getUser($owner, 'silver');
+                        if ($seller !== false && $this->updateUserSilver($owner, $payout, 1)) {
+                            $this->addBooking($owner, [1, ...$item], $payout, $payout + (int) $seller['silver'], (int) $row['time']);
+                        }
+                    }
+                }
+                if (!$db->commit()) {
+                    throw new \RuntimeException('Could not commit the auction settlement.');
+                }
+            } catch (\Throwable $exception) {
+                if ($db->inTransaction()) {
+                    $db->rollback();
+                }
+                logError('Auction %d could not be settled: %s', [$auctionId, $exception->getMessage()]);
             }
         }
     }
@@ -235,7 +258,13 @@ class AuctionModel
 
     private function updateUserSilver(int $uid, int $silver, int $mode = 0): bool
     {
-        return (bool) DB::getInstance()->query("UPDATE users SET silver=silver" . ($mode === 0 ? '-' : '+') . "$silver WHERE id=$uid");
+        $db = DB::getInstance();
+        if ($mode === 0) {
+            // A debit never takes the balance below zero.
+            return $db->query("UPDATE users SET silver=silver-$silver WHERE id=$uid AND silver>=$silver") && $db->affectedRows() === 1;
+        }
+
+        return (bool) $db->query("UPDATE users SET silver=silver+$silver WHERE id=$uid");
     }
 
     /**
@@ -349,7 +378,7 @@ class AuctionModel
     public function cancelAuction(int $id): bool
     {
         $db = DB::getInstance();
-        $query = $db->query("UPDATE auction SET finish=1, cancel=1 WHERE id=$id");
+        $query = $db->query("UPDATE auction SET finish=1, cancel=1 WHERE id=$id AND finish=0");
 
         return $query && $db->affectedRows() > 0;
     }
@@ -524,7 +553,8 @@ class AuctionModel
     {
         $db = DB::getInstance();
         $time = max($time, time() + 300);
-        $query = $db->query("UPDATE auction SET activeId=$activeId, activeUid=$activeUid, silver = $silver, maxSilver=$maxSilver" . ($add ? ', bids = bids + 1' : '') . ", time = $time where id = $id");
+        // A settled auction is never rewritten.
+        $query = $db->query("UPDATE auction SET activeId=$activeId, activeUid=$activeUid, silver = $silver, maxSilver=$maxSilver" . ($add ? ', bids = bids + 1' : '') . ", time = $time where id = $id AND finish=0");
 
         return $query && $db->affectedRows() > 0;
     }

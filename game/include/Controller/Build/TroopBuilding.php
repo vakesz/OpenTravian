@@ -214,7 +214,12 @@ class TroopBuilding extends AnyCtrl
         $buildingId = $this->building_id;
         $trainingTime = $this->_getTroopTrainingTime(nrToUnitId($u, Session::getInstance()->getRace()));
 
-        return $village->transaction(static function () use ($village, $m, $cost, $buildingId, $u, $num, $trainingTime): bool {
+        return $village->transaction(static function () use ($village, $m, $cost, $buildingId, $u, $num, $trainingTime, $great): bool {
+            // Chiefs, settlers and traps are capped by free expansion slots and trap capacity. Recount them under the
+            // village lock: an order from another tab may have queued some since the form's limit was computed.
+            if ($u >= Unit::CHIEF && $num > (int)(new TrainingHelper())->getMaxUnitByNr($u, $great)) {
+                return false;
+            }
             if (!$village->spend($cost)) {
                 return false;
             }

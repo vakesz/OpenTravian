@@ -833,7 +833,6 @@ HTML;
             return;
         }
         $session = Session::getInstance();
-        $current_silver = $session->getAvailableSilver();
         $m = new AuctionModel();
         $db = DB::getInstance();
         if ($canTakePlaceInAuction && WebService::isPost() && isset($_REQUEST['a']) && Session::claimAction($_REQUEST['z'] ?? null)) {
@@ -844,58 +843,82 @@ HTML;
             } elseif ($session->isInVacationMode()) {
                 $this->redirect("/options/vacation");
             }
-            $auction = $m->getAuctionBySecureId($_REQUEST['a']);
-            $visibleAt = is_array($auction) ? (int) ($auction['visible'] ?? 0) : 0;
-            if ($auction === false || $auction['uid'] == $session->getPlayerId() || ($visibleAt > 0 && $visibleAt > time())) {
+            if (!$db->begin_transaction()) {
                 $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionNotFound") . '</div>';
-            } elseif ($auction['finish'] || $auction['time'] < time()) {
-                $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionFinished") . '</div>';
-            } elseif ($m->isBidLocked((int) $session->getPlayerId(), (int) $auction['id'])) {
-                $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
-            } else {
-                $quest = Quest::getInstance();
-                $quest->setQuestBitwise("battle", 9, 1);
-                if ($auction['activeUid'] == 0 || $auction['activeUid'] == $session->getPlayerId()) {
-                    $min = $auction['silver'];
-                } else {
-                    $min = $auction['silver'] + 1;
+                return;
+            }
+            try {
+                // Lock the bidder, then the auction, and work out the free silver from the locked rows, so two bids (or a
+                // bid and a silver exchange, which locks in the same order) cannot commit the same silver twice.
+                $uid = (int)$session->getPlayerId();
+                $silverRow = $db->query("SELECT silver FROM users WHERE id=$uid FOR UPDATE");
+                $silverNow = (int)(($silverRow ? $silverRow->fetch_assoc() : null)['silver'] ?? 0);
+                $auction = $m->getAuctionBySecureId($_REQUEST['a']);
+                if ($auction !== false) {
+                    $lockedAuction = $db->query('SELECT * FROM auction WHERE id=' . (int)$auction['id'] . ' FOR UPDATE');
+                    $auction = $lockedAuction ? ($lockedAuction->fetch_assoc() ?: false) : false;
                 }
-                $max = $auction['activeUid'] == $session->getPlayerId() ? $auction['silver'] : max($auction['maxSilver'], $auction['silver']);
-                $bidSilver = abs((int)($_REQUEST['bidAmount'] ?? 0));
-                $currentPrice = max(1, (int) $auction['silver']);
-                if ((int) $auction['activeUid'] !== 0
-                    && (int) $auction['activeUid'] !== (int) $session->getPlayerId()
-                    && $bidSilver > $currentPrice * AuctionModel::LARGE_BID_MULTIPLE) {
-                    $m->lockOutBidder((int) $session->getPlayerId(), (int) $auction['id']);
+                $current_silver = $silverNow - (int)$db->fetchScalar("SELECT COALESCE(SUM(maxSilver), 0) FROM auction WHERE finish=0 AND activeUid=$uid FOR UPDATE");
+                $visibleAt = is_array($auction) ? (int) ($auction['visible'] ?? 0) : 0;
+                if ($auction === false || $auction['uid'] == $session->getPlayerId() || ($visibleAt > 0 && $visibleAt > time())) {
+                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionNotFound") . '</div>';
+                } elseif ($auction['finish'] || $auction['time'] < time()) {
+                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "AuctionFinished") . '</div>';
+                } elseif ($m->isBidLocked((int) $session->getPlayerId(), (int) $auction['id'])) {
                     $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
-                } elseif ($current_silver < $bidSilver && $auction['activeUid'] != $session->getPlayerId()) {
-                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
-                } elseif ($auction['activeUid'] == $session->getPlayerId() && ($current_silver + $auction['maxSilver']) < $bidSilver) {
-                    $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
-                } elseif ($bidSilver < $min) {
-                    $this->view->vars['content'] .= '<div class="error">' . sprintf(T("Auction", "notEnoughSilverAuctionError"), $min) . '</div>';
-                } elseif ($bidSilver <= $max && $auction['activeUid'] != $session->getPlayerId() && $auction['activeUid'] != 0) {
-                    if ($m->modifyAuction($auction['id'], $auction['activeId'], $auction['activeUid'], $bidSilver, $max, $auction['time'])) {
-                        $m->setAsOutBid($m->addBid($session->getPlayerId(), $auction['id']));
-                    }
                 } else {
-                    $activeId = $auction['activeId'];
-                    if ($auction['activeUid'] <> $session->getPlayerId()) {
-                        $auction['activeId'] = $m->addBid($session->getPlayerId(), $auction['id']);
-                    }
-                    if ($activeId == 0) {
-                        $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time']);
+                    $quest = Quest::getInstance();
+                    $quest->setQuestBitwise("battle", 9, 1);
+                    if ($auction['activeUid'] == 0 || $auction['activeUid'] == $session->getPlayerId()) {
+                        $min = $auction['silver'];
                     } else {
-                        $bidder = $db->query("SELECT * FROM bids WHERE id=$activeId")->fetch_assoc();
-                        if ($bidder['uid'] == $session->getPlayerId()) {
-                            $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time'], false);
+                        $min = $auction['silver'] + 1;
+                    }
+                    $max = $auction['activeUid'] == $session->getPlayerId() ? $auction['silver'] : max($auction['maxSilver'], $auction['silver']);
+                    $bidSilver = abs((int)($_REQUEST['bidAmount'] ?? 0));
+                    $currentPrice = max(1, (int) $auction['silver']);
+                    if ((int) $auction['activeUid'] !== 0
+                        && (int) $auction['activeUid'] !== (int) $session->getPlayerId()
+                        && $bidSilver > $currentPrice * AuctionModel::LARGE_BID_MULTIPLE) {
+                        $m->lockOutBidder((int) $session->getPlayerId(), (int) $auction['id']);
+                        $this->view->vars['content'] .= '<div class="error">' . T("Auction", "Bid too high", "That bid is too high. You can no longer bid on this auction.") . '</div>';
+                    } elseif ($current_silver < $bidSilver && $auction['activeUid'] != $session->getPlayerId()) {
+                        $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
+                    } elseif ($auction['activeUid'] == $session->getPlayerId() && ($current_silver + $auction['maxSilver']) < $bidSilver) {
+                        $this->view->vars['content'] .= '<div class="error">' . T("Auction", "notEnoughSilver") . '</div>';
+                    } elseif ($bidSilver < $min) {
+                        $this->view->vars['content'] .= '<div class="error">' . sprintf(T("Auction", "notEnoughSilverAuctionError"), $min) . '</div>';
+                    } elseif ($bidSilver <= $max && $auction['activeUid'] != $session->getPlayerId() && $auction['activeUid'] != 0) {
+                        if ($m->modifyAuction($auction['id'], $auction['activeId'], $auction['activeUid'], $bidSilver, $max, $auction['time'])) {
+                            $m->setAsOutBid($m->addBid($session->getPlayerId(), $auction['id']));
+                        }
+                    } else {
+                        $activeId = $auction['activeId'];
+                        if ($auction['activeUid'] <> $session->getPlayerId()) {
+                            $auction['activeId'] = $m->addBid($session->getPlayerId(), $auction['id']);
+                        }
+                        if ($activeId == 0) {
+                            $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time']);
                         } else {
-                            if ($m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $max, $bidSilver, $auction['time'])) {
-                                $m->setAsOutBid($activeId);
+                            $bidder = $db->query("SELECT * FROM bids WHERE id=$activeId")->fetch_assoc();
+                            if ($bidder['uid'] == $session->getPlayerId()) {
+                                $m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $auction['silver'], $bidSilver, $auction['time'], false);
+                            } else {
+                                if ($m->modifyAuction($auction['id'], $auction['activeId'], $session->getPlayerId(), $max, $bidSilver, $auction['time'])) {
+                                    $m->setAsOutBid($activeId);
+                                }
                             }
                         }
                     }
                 }
+                if (!$db->commit()) {
+                    throw new \RuntimeException('Could not save the bid.');
+                }
+            } catch (\Throwable $exception) {
+                if ($db->inTransaction()) {
+                    $db->rollback();
+                }
+                throw $exception;
             }
         }
     }

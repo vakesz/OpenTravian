@@ -220,6 +220,25 @@ final class HeroResourceInventory
             }
 
             ResourcesHelper::updateVillageResources($kid, true);
+            // Only what fits in the warehouse and granary moves; the rest stays with the hero (as one-item use does).
+            $stock = $db->run(
+                'SELECT wood, clay, iron, crop, maxstore, maxcrop FROM vdata WHERE kid=? AND owner=? FOR UPDATE',
+                [$kid, $uid]
+            );
+            $village = $stock === false ? null : $stock->get_result()->fetch_assoc();
+            if (!is_array($village)) {
+                throw new \RuntimeException('The selected village is no longer available.');
+            }
+            foreach (self::RESOURCE_FIELDS as $field) {
+                $capacity = (float)$village[$field === 'crop' ? 'maxcrop' : 'maxstore'];
+                $taken[$field] = min($taken[$field], max(0, (int)floor($capacity - (float)$village[$field])));
+            }
+            if (array_sum($taken) === 0) {
+                if (!$db->commit()) {
+                    throw new \RuntimeException('Could not release the hero resource inventory.');
+                }
+                return $taken;
+            }
             $credited = $db->run(
                 'UPDATE vdata SET wood=wood+?, clay=clay+?, iron=iron+?, crop=crop+? WHERE kid=? AND owner=?',
                 [$taken['wood'], $taken['clay'], $taken['iron'], $taken['crop'], $kid, $uid]
