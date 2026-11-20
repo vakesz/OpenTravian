@@ -49,7 +49,9 @@ class ReinforcementProcessor
         $to_uid = (int) ($isOasis
             ? $db->query("SELECT owner FROM odata WHERE kid=$toKid")->fetch_assoc()['owner']
             : $m->getVillage($toKid, 'owner')['owner']);
-        if ($to_uid === UserId::NATARS || ($to_uid <= UserId::LEGACY_HIDDEN_MAX && (int) $m->getUser($to_uid, 'hidden')['hidden'] === 1)) {
+        // Natars never take reinforcements; the other system accounts (Support, Multihunter) refuse them while hidden.
+        // A hidden real player (any id from UserId::FIRST_PLAYER up) still receives them.
+        if ($to_uid === UserId::NATARS || ($to_uid <= UserId::LAST_SYSTEM && (int) $m->getUser($to_uid, 'hidden')['hidden'] === 1)) {
             $this->returnTroops($row);
             return;
         }

@@ -145,7 +145,8 @@ assertDomainConstants(Time::SECOND_MS === 1000 && Time::HOUR_MS === Time::HOUR *
 
 // System accounts (InstallerModel::finalize renumbers Support, Natars and Multihunter to 0, 1, 2).
 assertDomainConstants(UserId::SUPPORT === 0 && UserId::NATURE === 0 && UserId::NATARS === 1 && UserId::MULTIHUNTER === 2, 'Support and Nature are 0, Natars 1, Multihunter 2.');
-assertDomainConstants(UserId::LAST_SYSTEM === UserId::MULTIHUNTER && UserId::FIRST_PLAYER === UserId::LAST_SYSTEM + 1 && UserId::LEGACY_HIDDEN_MAX === 10, 'Players start at id 3; the legacy hidden range ends at 10.');
+assertDomainConstants(UserId::LAST_SYSTEM === UserId::MULTIHUNTER && UserId::FIRST_PLAYER === UserId::LAST_SYSTEM + 1, 'Players start at id 3.');
+assertDomainConstants(!defined(UserId::class . '::LEGACY_HIDDEN_MAX'), 'No legacy hidden-account id range: only the system accounts refuse reinforcements while hidden.');
 assertDomainConstants(AdminAccounts::BUILT_IN === [UserId::SUPPORT, UserId::MULTIHUNTER], 'The built-in administrators are Support and Multihunter.');
 $installer = (string)file_get_contents($root . '/game/include/Model/InstallerModel.php');
 assertDomainConstants(str_contains($installer, 'UPDATE users SET id=1 WHERE id=2') && str_contains($installer, 'UPDATE users SET id=2 WHERE id=3'), 'The installer renumbers Natars to 1 and Multihunter to 2.');

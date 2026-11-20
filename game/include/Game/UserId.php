@@ -23,10 +23,4 @@ final class UserId
     public const LAST_SYSTEM = self::MULTIHUNTER;
     /** Lowest player id: `$uid < UserId::FIRST_PLAYER` means a system account. */
     public const FIRST_PLAYER = 3;
-    /**
-     * Legacy (initial-commit) rule in ReinforcementProcessor: a hidden account with an id up to 10
-     * does not accept reinforcements. Nothing reserves ids 3-10 today, so the rule only affects
-     * whichever accounts got those ids.
-     */
-    public const LEGACY_HIDDEN_MAX = 10;
 }
