@@ -4,6 +4,7 @@ namespace Game\Helpers;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Hero\HeroHelper;
 
 class HeroHealthHelper
@@ -21,7 +22,7 @@ class HeroHealthHelper
             $healthRate = ($helper->calcHealth() + $row['itemHealth'])
                 * max(1, (float)Config::getProperty('game', 'heroRegenerationMultiplier'));
             self::updateHeroHealth($row['uid'],
-                min($row['health'] + $healthRate / 86400 * ($now - $row['lastupdate']), 100),
+                min($row['health'] + $healthRate / Time::DAY * ($now - $row['lastupdate']), 100),
                 time());
         }
     }

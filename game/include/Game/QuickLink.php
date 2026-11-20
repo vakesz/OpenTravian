@@ -71,7 +71,7 @@ class QuickLink
         } elseif ($type === 'ExpansionTrain') {
             $text = self::trainingText($kid, $gid);
         } elseif ($type === 'BlacksmithManagement') {
-            $end = (int) DB::getInstance()->fetchScalar("SELECT MAX(end_time) FROM research WHERE kid=$kid AND mode=0");
+            $end = (int) DB::getInstance()->fetchScalar("SELECT MAX(end_time) FROM research WHERE kid=$kid AND mode=" . ResearchMode::SMITHY);
             $text = $end > time()
                 ? sprintf(T('quickLinks', 'upgradingTime'), secondsToString($end - time()))
                 : T('quickLinks', 'notUpgrading');

@@ -9,6 +9,7 @@ use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Core\Village;
 use Game\GoldHelper;
+use Game\Slot;
 use resources\View\PHPBatchView;
 
 class MainBuildingCtrl extends AnyCtrl
@@ -67,7 +68,7 @@ class MainBuildingCtrl extends AnyCtrl
             $this->view->vars['isDemolishing'] = FALSE;
             $this->view->vars['checker'] = $session->getChecker();
             $this->view->vars['options'] = [];
-            for ($i = 19; $i <= 40; ++$i) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
                 if (!$village->getField($i)['item_id'] || !$village->getField($i)['level']) {
                     continue;
                 }

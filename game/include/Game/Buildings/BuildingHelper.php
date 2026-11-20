@@ -6,7 +6,9 @@ use Core\Config;
 use Core\Database\DB;
 use Game\Formulas;
 use Game\Gid;
+use Game\Slot;
 use Game\Tribes;
+use Game\UserId;
 use Model\ArtefactsModel;
 use Model\WonderOfTheWorldModel;
 use function getCustom;
@@ -194,7 +196,7 @@ class BuildingHelper
      */
     public function checkArtifactDependencies($aid, $uid, $kid, $item_id, $isWW, $wwLevel): int
     {
-        if($uid == 1){
+        if($uid == UserId::NATARS){
             return 0;
         }
         if ($item_id == Gid::GREAT_WAREHOUSE || $item_id == Gid::GREAT_GRANARY) {
@@ -232,7 +234,7 @@ class BuildingHelper
     public function checkIfPlayerHasWWBuildingPlan($uid): bool
     {
         $db = DB::getInstance();
-        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid=$uid AND active=1 AND type=12 LIMIT 1");
+        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid=$uid AND active=1 AND type=" . ArtefactsModel::WW_PLAN . " LIMIT 1");
     }
 
     // Alliance configuration may also affect this value.
@@ -255,7 +257,7 @@ class BuildingHelper
             return FALSE;
         }
         $members = implode(",", $members);
-        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid IN($members) AND type=12 AND active=1 LIMIT 1");
+        return 0 < $db->fetchScalar("SELECT COUNT(id) FROM artefacts WHERE uid IN($members) AND type=" . ArtefactsModel::WW_PLAN . " AND active=1 LIMIT 1");
     }
 
 
@@ -267,7 +269,7 @@ class BuildingHelper
         $db = DB::getInstance();
         $fields = $db->query("SELECT f.* FROM fdata f, vdata v WHERE f.kid=v.kid AND v.owner=$uid");
         while ($row = $fields->fetch_assoc()) {
-            for ($i = 19; $i <= 38; ++$i) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
                 if ($row['f' . $i . 't'] == Gid::PALACE) {
                     return TRUE;
                 }

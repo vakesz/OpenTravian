@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Game;
 
+use Core\Time;
 use RuntimeException;
 
 /**
@@ -20,7 +21,7 @@ final class WorldSpeedRound
 
     public static function ageDays(int $startTime, int $now): float
     {
-        return max(0, $now - $startTime) / 86400;
+        return max(0, $now - $startTime) / Time::DAY;
     }
 
     /**
@@ -32,7 +33,7 @@ final class WorldSpeedRound
     {
         $timeline = WorldSpeedProfile::officialRoundTimeline($speed);
         if ($timeline !== null) {
-            return $timeline['natarWwFinishAfter'] / 86400;
+            return $timeline['natarWwFinishAfter'] / Time::DAY;
         }
 
         return min(350 / max(1, $speed), (float)WorldSpeedProfile::roundLengthDays($speed));

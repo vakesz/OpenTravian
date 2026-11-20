@@ -8,6 +8,7 @@ use Core\Database\DB;
 use Game\Formulas;
 use Game\Gid;
 use Game\Hero\HeroExperience;
+use Game\Slot;
 use Game\Tribes;
 
 use function T;
@@ -464,7 +465,7 @@ class TasksModel
     private function readResourceFields(array $row): array
     {
         $fields = [];
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $fields[] = ['type' => (int)$row['f' . $i . 't'], 'level' => (int)$row['f' . $i]];
         }
         return $fields;
@@ -477,7 +478,7 @@ class TasksModel
     private function readBuildings(array $row): array
     {
         $buildings = [];
-        for ($i = 19; $i <= 40; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; ++$i) {
             $type = (int)$row['f' . $i . 't'];
             if ($type > 0) {
                 $buildings[] = ['types' => [$type], 'level' => (int)$row['f' . $i]];

@@ -7,7 +7,9 @@ namespace Model;
 use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Database\GlobalDB;
+use Core\Time;
 use Game\Mail\EventMail;
+use Game\Tribes;
 
 use function miliseconds;
 use function strtolower;
@@ -42,7 +44,7 @@ class OptionModel
 
     public function enterVacationMode(int $uid, int $days): void
     {
-        $till = time() + 86400 * $days;
+        $till = time() + Time::DAY * $days;
         $db = DB::getInstance();
         $db->run('UPDATE users SET vacationUsedDays=vacationUsedDays+?, vacationActiveTil=? WHERE id=?', [$days, $till, $uid]);
         (new InfoBoxModel())->addInfo($uid, false, 13, '', time(), $till);
@@ -51,7 +53,7 @@ class OptionModel
         foreach ($this->getPlayerVillagesAsArray($uid) as $kid) {
             // Spies in flight turn around and head home. Integer literals keep the arithmetic exact BIGINT.
             $db->run(
-                "UPDATE movement SET to_kid=kid, kid=?, mode=1, end_time=(2*$miliseconds-start_time), start_time=$miliseconds WHERE to_kid=? AND mode=0 AND attack_type=?",
+                "UPDATE movement SET to_kid=kid, kid=?, mode=" . MovementsModel::MODE_RETURN . ", end_time=(2*$miliseconds-start_time), start_time=$miliseconds WHERE to_kid=? AND mode=" . MovementsModel::MODE_GOING . " AND attack_type=?",
                 [$kid, $kid, MovementsModel::ATTACKTYPE_SPY]
             );
         }
@@ -81,10 +83,10 @@ class OptionModel
 
         // Keys follow the reference's display order.
         return [
-            1 => $this->countByKids('SELECT COUNT(id) FROM movement WHERE kid IN(%s) AND mode=0', $kids) === 0,
+            1 => $this->countByKids('SELECT COUNT(id) FROM movement WHERE kid IN(%s) AND mode=' . MovementsModel::MODE_GOING, $kids) === 0,
             2 => $this->getInComingMovementsNum($kids) === 0,
             3 => $this->count('SELECT COUNT(id) FROM enforcement WHERE uid=?', [$uid]) === 0,
-            4 => $this->countByKids('SELECT COUNT(id) FROM enforcement WHERE to_kid IN(%s) AND race!=4', $kids) === 0,
+            4 => $this->countByKids('SELECT COUNT(id) FROM enforcement WHERE to_kid IN(%s) AND race!=' . Tribes::NATURE, $kids) === 0,
             5 => !$this->hasRecentlyAnnexedOasis($uid),
             6 => $this->hasPlayerWWVillage($uid) === 0,
             7 => $this->hasPlayerArtifact($uid) === 0,
@@ -99,7 +101,7 @@ class OptionModel
     {
         return $this->count(
             'SELECT COUNT(kid) FROM odata WHERE owner=? AND conquered_time>=?',
-            [$uid, time() - 48 * 3600]
+            [$uid, time() - 48 * Time::HOUR]
         ) > 0;
     }
 
@@ -126,8 +128,8 @@ class OptionModel
      */
     private function getInComingMovementsNum(array $kids): int
     {
-        return $this->countByKids('SELECT COUNT(id) FROM movement WHERE to_kid IN(%s) AND mode=0 AND attack_type!=' . MovementsModel::ATTACKTYPE_SPY, $kids)
-            + $this->countByKids('SELECT COUNT(id) FROM movement WHERE to_kid IN(%s) AND mode=1', $kids);
+        return $this->countByKids('SELECT COUNT(id) FROM movement WHERE to_kid IN(%s) AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type!=' . MovementsModel::ATTACKTYPE_SPY, $kids)
+            + $this->countByKids('SELECT COUNT(id) FROM movement WHERE to_kid IN(%s) AND mode=' . MovementsModel::MODE_RETURN, $kids);
     }
 
     public function hasPlayerWWVillage(int $uid): int
@@ -242,7 +244,7 @@ class OptionModel
         $cache = Caching::getInstance();
         if (!($invalidNames = $cache->get('blackListedNames'))) {
             $invalidNames = explode(',', (string) file_get_contents(FILTERING_PATH . 'blackListedNames.txt'));
-            $cache->set('blackListedNames', $invalidNames, 2 * 86400);
+            $cache->set('blackListedNames', $invalidNames, 2 * Time::DAY);
         }
         foreach ($invalidNames as $blackListed) {
             similar_text($name, (string) $blackListed, $percent);

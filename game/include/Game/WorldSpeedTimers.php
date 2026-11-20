@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game;
 
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Rescales the in-flight timers of a world whose speed changed (tools/reconcile-world-speed-profile.php). Each row's
@@ -23,19 +24,19 @@ final class WorldSpeedTimers
      */
     public static function plans(int $from, int $to, int $nowSeconds): array
     {
-        $nowMs = $nowSeconds * 1000;
+        $nowMs = $nowSeconds * Time::SECOND_MS;
         $economy = $from / $to;
         $movement = WorldSpeedProfile::movementSpeedMultiplier($from) / WorldSpeedProfile::movementSpeedMultiplier($to);
         $oldUnit = WorldSpeedProfile::trainingTimeUnit($from);
         $newUnit = WorldSpeedProfile::trainingTimeUnit($to);
         $auction = WorldSpeedProfile::auctionDuration($to) / WorldSpeedProfile::auctionDuration($from);
-        $abandon = max(6 * 3600 / $to, 600) / max(6 * 3600 / $from, 600);
+        $abandon = max(6 * Time::HOUR / $to, 600) / max(6 * Time::HOUR / $from, 600);
 
         $plans = [
             ['label' => 'building queue', 'table' => 'building_upgrade', 'columns' => ['commence'], 'ratio' => $economy, 'unit' => 1, 'now' => $nowSeconds],
             ['label' => 'demolition', 'table' => 'demolition', 'columns' => ['end_time'], 'ratio' => $economy, 'unit' => 1, 'now' => $nowSeconds],
             ['label' => 'academy and smithy research', 'table' => 'research', 'columns' => ['end_time'], 'ratio' => $economy, 'unit' => 1, 'now' => $nowSeconds],
-            ['label' => 'troop movements', 'table' => 'movement', 'columns' => ['start_time', 'end_time'], 'ratio' => $movement, 'unit' => 1000, 'now' => $nowMs, 'guard' => 'end_time'],
+            ['label' => 'troop movements', 'table' => 'movement', 'columns' => ['start_time', 'end_time'], 'ratio' => $movement, 'unit' => Time::SECOND_MS, 'now' => $nowMs, 'guard' => 'end_time'],
             ['label' => 'auctions', 'table' => 'auction', 'columns' => ['time'], 'ratio' => $auction, 'unit' => 1, 'now' => $nowSeconds, 'extra' => 'finish=0 AND cancel=0'],
             ['label' => 'oasis abandonment', 'table' => 'odelete', 'columns' => ['end_time'], 'ratio' => $abandon, 'unit' => 1, 'now' => $nowSeconds],
             ['label' => 'alliance bonus upgrades', 'table' => 'alliance_bonus_upgrade_queue', 'columns' => ['time'], 'ratio' => $economy, 'unit' => 1, 'now' => $nowSeconds],

@@ -19,6 +19,7 @@ use Game\Tribes;
 use Core\Locale;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
+use Game\Slot;
 
 class ProductionCtrl extends GameCtrl
 {
@@ -137,14 +138,14 @@ class ProductionCtrl extends GameCtrl
     {
         $db = DB::getInstance();
         $village = Village::getInstance();
-        for ($i = 1; $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_BUILDING; ++$i) {
 
             $field = $village->getField($i);
 
-            if (!$field['level'] && $i > 18) {
+            if (!$field['level'] && $i > Slot::LAST_FIELD) {
                 continue;
             }
-            if ($i <= 18 && $field['item_id'] == $this->tabIndex) {
+            if ($i <= Slot::LAST_FIELD && $field['item_id'] == $this->tabIndex) {
                 $this->productionFields[] = [
                     "item_id" => $field['item_id'],
                     "level" => $field['level'],

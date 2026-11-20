@@ -8,6 +8,7 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Locale;
 use Core\Session;
+use Core\Time;
 use Game\Formulas;
 use Game\PremiumDuration;
 use Game\WorldSpeedProfile;
@@ -133,10 +134,10 @@ class Quest
         $this->qst_economy = explode(',', (string) ($session->isValid() ? $session->getQuestEconomy() : '0,0,0,0,0,0,0,0,0,0,0,0'));
         $this->qst_world = explode(',', (string) ($session->isValid() ? $session->getQuestWorld() : '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'));
         if ($session->isValid() && $session->getSuccessAdventuresCount() >= 10) {
-            $this->setQuestBitwise('battle', 8, 1);
+            $this->setQuestBitwise('battle', self::BATTLE_TEN_ADVENTURES, 1);
         }
         if ($session->isValid() && $session->getSuccessAdventuresCount() >= 5) {
-            $this->setQuestBitwise('battle', 15, 1);
+            $this->setQuestBitwise('battle', self::BATTLE_FIVE_ADVENTURES, 1);
         }
     }
 
@@ -235,12 +236,12 @@ class Quest
                 return number_format_x($eff);
             case 'plus':
             case 'productionBoost':
-                if ($eff >= 86400) {
-                    return round($eff / 86400, 1) . ' ' . Locale::units(get_locale())['days'];
-                } elseif ($eff >= 3600) {
-                    return round($eff / 3600, 1) . ' ' . Locale::units(get_locale())['hours'];
+                if ($eff >= Time::DAY) {
+                    return round($eff / Time::DAY, 1) . ' ' . Locale::units(get_locale())['days'];
+                } elseif ($eff >= Time::HOUR) {
+                    return round($eff / Time::HOUR, 1) . ' ' . Locale::units(get_locale())['hours'];
                 }
-                return round($eff / 60, 1) . ' ' . Locale::units(get_locale())['minutes'];
+                return round($eff / Time::MINUTE, 1) . ' ' . Locale::units(get_locale())['minutes'];
         }
         return $eff;
     }

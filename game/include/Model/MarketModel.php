@@ -7,8 +7,10 @@ namespace Model;
 use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
+use Core\Time;
 use Game\Formulas;
 use Game\ResourcesHelper;
+use Game\Slot;
 use mysqli_result;
 
 use const MAP_SIZE;
@@ -23,7 +25,7 @@ class MarketModel
     {
         $db = DB::getInstance();
 
-        return (int)ceil((float)$db->fetchScalar("SELECT COALESCE(SUM(CEIL((wood+clay+iron+crop) / $merchant_cap)), 0) FROM send WHERE ships=0 AND ((kid=$kid AND mode=0) OR (to_kid=$kid AND mode=1))"));
+        return (int)ceil((float)$db->fetchScalar("SELECT COALESCE(SUM(CEIL((wood+clay+iron+crop) / $merchant_cap)), 0) FROM send WHERE ships=0 AND ((kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . "))"));
     }
 
     public function deleteOffer(int $id): bool
@@ -69,7 +71,7 @@ class MarketModel
             . 'FROM send s '
             . 'LEFT JOIN vdata source ON source.kid=s.kid '
             . 'LEFT JOIN vdata target ON target.kid=s.to_kid '
-            . 'WHERE (s.mode=0 AND (s.kid=? OR s.to_kid=?)) OR (s.mode=1 AND s.to_kid=?) '
+            . 'WHERE (s.mode=' . MovementsModel::MODE_GOING . ' AND (s.kid=? OR s.to_kid=?)) OR (s.mode=' . MovementsModel::MODE_RETURN . ' AND s.to_kid=?) '
             . 'ORDER BY s.end_time ASC, s.id ASC',
             [$kid, $kid, $kid]
         );
@@ -79,7 +81,7 @@ class MarketModel
         }
 
         while ($row = $result->fetch_assoc()) {
-            $returning = (int)$row['mode'] === 1;
+            $returning = (int)$row['mode'] === MovementsModel::MODE_RETURN;
             $incoming = !$returning && (int)$row['to_kid'] === $kid;
             $villageKid = $incoming || $returning ? (int)$row['kid'] : (int)$row['to_kid'];
             $villageName = $incoming || $returning ? $row['source_name'] : $row['target_name'];
@@ -159,7 +161,7 @@ class MarketModel
         $xy = Formulas::kid2xy($kid);
         DB::getInstance()->run(
             'INSERT INTO market (aid, kid, x, y, rate, needType, needValue, giveType, giveValue, maxtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [$aid, $kid, (int) $xy['x'], (int) $xy['y'], $rate, $needType, $needValue, $giveType, $giveValue, $hours * 3600]
+            [$aid, $kid, (int) $xy['x'], (int) $xy['y'], $rate, $needType, $needValue, $giveType, $giveValue, $hours * Time::HOUR]
         );
     }
 
@@ -198,7 +200,7 @@ class MarketModel
         $db = DB::getInstance();
         $reserved = 0;
         $shipments = $db->run(
-            'SELECT wood, clay, iron, crop FROM send WHERE ships=0 AND ((kid=? AND mode=0) OR (to_kid=? AND mode=1)) FOR UPDATE',
+            'SELECT wood, clay, iron, crop FROM send WHERE ships=0 AND ((kid=? AND mode=' . MovementsModel::MODE_GOING . ') OR (to_kid=? AND mode=' . MovementsModel::MODE_RETURN . ')) FOR UPDATE',
             [$kid, $kid]
         );
         $shipmentRows = $shipments ? $shipments->get_result() : false;
@@ -310,8 +312,8 @@ class MarketModel
             $time = time();
         }
         $speed = Formulas::merchantSpeed($race);
-        $time = (int) ($time + Formulas::travelTimeSeconds(Formulas::getDistance($kid, $to_kid) / $speed * 3600));
-        DB::getInstance()->query("INSERT INTO send (kid, to_kid, wood, clay, iron, crop, x, mode, end_time) VALUES ($kid, $to_kid,$r1, $r2, $r3, $r4, $repeat,0,$time)");
+        $time = (int) ($time + Formulas::travelTimeSeconds(Formulas::getDistance($kid, $to_kid) / $speed * Time::HOUR));
+        DB::getInstance()->query("INSERT INTO send (kid, to_kid, wood, clay, iron, crop, x, mode, end_time) VALUES ($kid, $to_kid,$r1, $r2, $r3, $r4, $repeat," . MovementsModel::MODE_GOING . ",$time)");
     }
 
     public function getPlayerRace(int $uid): int
@@ -356,7 +358,7 @@ class MarketModel
         $return = [17 => 0, 28 => 0];
         $buildings = $this->fetchRow("SELECT * FROM fdata WHERE kid=$kid");
         if ($buildings !== null) {
-            for ($i = 19; $i <= 38; ++$i) {
+            for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
                 $type = (int) $buildings['f' . $i . 't'];
                 if ($type === 17 || $type === 28) {
                     $return[$type] = (int) $buildings['f' . $i];
@@ -467,7 +469,7 @@ class MarketModel
         }
 
         // maxtime is in seconds, like the travel time the accept check (withinMaxTime) compares it with.
-        return "kid!=$kid AND IF(maxtime>0, ROUND({$dist}/{$speed}*3600) <= maxtime, TRUE) AND IF(aid>0, IF(aid=$aid, TRUE, FALSE), TRUE)"
+        return "kid!=$kid AND IF(maxtime>0, ROUND({$dist}/{$speed}*" . Time::HOUR . ") <= maxtime, TRUE) AND IF(aid>0, IF(aid=$aid, TRUE, FALSE), TRUE)"
             . ($cond === [] ? '' : ' AND ' . implode(' AND ', $cond));
     }
 

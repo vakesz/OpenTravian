@@ -6,9 +6,12 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\Gid;
 use Game\ResourcesHelper;
+use Game\Slot;
+use Game\UserId;
 use mysqli_result;
 
 use function getGameSpeed;
@@ -33,19 +36,19 @@ class ArtefactsModel
     {
         $rate = (int) getGameSpeed();
         if ($rate <= 1) {
-            return 86400;
+            return Time::DAY;
         } else if ($rate <= 2) {
-            return 86400 * 2 / 3;
+            return Time::DAY * 2 / 3;
         } else if ($rate <= 3) {
-            return 86400 * 1 / 2;
+            return Time::DAY * 1 / 2;
         } else if ($rate <= 5) {
-            return 8 * 3600;
+            return 8 * Time::HOUR;
         } else if ($rate === 10) {
             // OpenTravian publishes a four-hour activation at x10.
-            return 4 * 3600;
+            return 4 * Time::HOUR;
         }
         // Unsupported speeds retain the established local high-speed policy.
-        return max(86400 / $rate, 600);
+        return max(Time::DAY / $rate, 600);
     }
 
     public static function getFoolArtifactChangeEffectInterval(): int|float
@@ -55,9 +58,9 @@ class ArtefactsModel
         // published OpenTravian speed.  Keep unlisted custom speeds on
         // the existing bounded local curve below.
         if ($rate == 1 || $rate == 2 || $rate == 3 || $rate == 5 || $rate === 10) {
-            return 86400;
+            return Time::DAY;
         }
-        return max(86400 / $rate, 1800);
+        return max(Time::DAY / $rate, 1800);
     }
 
     /**
@@ -169,7 +172,7 @@ class ArtefactsModel
         if ((int) $db->fetchScalar('SELECT COUNT(id) FROM artefacts WHERE kid=?', [$atkKid]) >= 1) {
             return -1;
         }
-        for ($i = 19; $i <= 38; $i++) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; $i++) {
             if ($defBuildings[$i]['item_id'] == Gid::TREASURY && $defBuildings[$i]['level'] > 0) {
                 return -3;
             }
@@ -357,7 +360,7 @@ class ArtefactsModel
             $this->fixArtifactOrderForPlayer($uid);
             $this->fixArtifactOrderForPlayer($previousOwner);
         } else {
-            $db->query("UPDATE artefacts SET status=2 WHERE type=12 AND uid=$uid");
+            $db->query("UPDATE artefacts SET status=2 WHERE type=" . self::WW_PLAN . " AND uid=$uid");
             $db->query("UPDATE artefacts SET kid=$kid, uid=$uid, conquered=$time, status=1, active=0 WHERE id=$artifactId");
         }
         if ((int) $currentArtifact['type'] === self::ART_FOOL) {
@@ -410,7 +413,7 @@ class ArtefactsModel
         $db = DB::getInstance();
         $db->query('UPDATE config SET ArtifactsReleased=1');
         \Game\Webhook\WorldEvents::record('artifactsReleased');
-        $stmt = $db->query('SELECT kid FROM artefacts WHERE uid=1');
+        $stmt = $db->query('SELECT kid FROM artefacts WHERE uid=' . UserId::NATARS);
         while ($stmt && ($row = $stmt->fetch_assoc())) {
             (new AccountDeleter())->deleteVillage((int) $row['kid']);
         }

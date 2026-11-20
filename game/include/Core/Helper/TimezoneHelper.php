@@ -6,6 +6,7 @@ namespace Core\Helper;
 
 use Core\Config;
 use Core\Session;
+use Core\Time;
 use function date_default_timezone_get;
 use function get_locale;
 use function jalali_to_gregorian;
@@ -127,8 +128,8 @@ class TimezoneHelper
             $prefix = sprintf(
                 'UTC%s%02d:%02d',
                 $offset < 0 ? '-' : '+',
-                intdiv($absoluteOffset, 3600),
-                intdiv($absoluteOffset % 3600, 60)
+                intdiv($absoluteOffset, Time::HOUR),
+                intdiv($absoluteOffset % Time::HOUR, 60)
             );
         }
 
@@ -223,15 +224,15 @@ class TimezoneHelper
      */
     public static function getIntervalUnit(int|float $seconds, bool $round = true): array
     {
-        if ($seconds >= 86400) {
+        if ($seconds >= Time::DAY) {
             $unit = T("inGame", "Days");
-            $seconds /= 86400;
-        } elseif ($seconds >= 3600) {
+            $seconds /= Time::DAY;
+        } elseif ($seconds >= Time::HOUR) {
             $unit = T("inGame", "Hours");
-            $seconds /= 3600;
-        } elseif ($seconds >= 60) {
+            $seconds /= Time::HOUR;
+        } elseif ($seconds >= Time::MINUTE) {
             $unit = T("inGame", "Minutes");
-            $seconds /= 60;
+            $seconds /= Time::MINUTE;
         } else {
             $unit = T("inGame", "Seconds");
         }

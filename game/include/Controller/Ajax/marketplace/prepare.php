@@ -18,6 +18,7 @@ use Game\ResourcesHelper;
 use Game\Ships;
 use Model\MarketModel;
 use Model\Quest;
+use Model\MovementsModel;
 
 /**
  * Validates marketplace shipments and atomically deducts an approved shipment.
@@ -141,7 +142,7 @@ final class prepare extends AjaxBase
             return;
         }
 
-        Quest::getInstance()->setQuestBitwise('economy', 7, 1);
+        Quest::getInstance()->setQuestBitwise('economy', Quest::ECONOMY_TRADE, 1);
         $this->response['notice'] = T('MarketPlace', 'resourcesSent');
         $this->response['checker'] = $this->session->getChecker();
     }
@@ -410,7 +411,7 @@ final class prepare extends AjaxBase
 
             $arrival = time() + Ships::tradeTravelSeconds($sourceKid, $targetKid, (int)$this->session->getRace(), $byShip);
             $shipment = $db->run(
-                'INSERT INTO send (kid, to_kid, wood, clay, iron, crop, x, ships, mode, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)',
+                'INSERT INTO send (kid, to_kid, wood, clay, iron, crop, x, ships, mode, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ' . MovementsModel::MODE_GOING . ', ?)',
                 [$sourceKid, $targetKid, $resources[0], $resources[1], $resources[2], $resources[3], $repeat, $byShip ? $shipsNeeded : 0, $arrival]
             );
             if (!$shipment || $db->affectedRows() !== 1 || !$db->commit()) {

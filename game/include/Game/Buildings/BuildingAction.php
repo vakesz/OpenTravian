@@ -19,6 +19,8 @@ use Model\SeasonPassModel;
 use Model\SummaryModel;
 use Model\VillageModel;
 use Model\WonderOfTheWorldModel;
+use Game\Slot;
+use Game\UserId;
 use function miliseconds;
 
 class BuildingAction
@@ -52,9 +54,9 @@ class BuildingAction
             LoyaltyHelper::updateVillageLoyalty($kid);
         }
         $dailyQuest = new DailyQuestModel();
-        $dailyQuest->setQuestAsCompleted($villageRow['owner'], 6);
+        $dailyQuest->setQuestAsCompleted($villageRow['owner'], DailyQuestModel::QUEST_UPGRADE_BUILDING);
         if ($item_id <= Gid::LAST_RESOURCE_FIELD) {
-            $dailyQuest->setQuestAsCompleted($villageRow['owner'], 7);
+            $dailyQuest->setQuestAsCompleted($villageRow['owner'], DailyQuestModel::QUEST_UPGRADE_FIELD);
         }
         list($pop, $cp) = Formulas::buildingCpPop($item_id, $level, $level + $levels, $isWW);
         if ($modifyPopCP) {
@@ -150,7 +152,7 @@ class BuildingAction
                 $db->query("UPDATE alidata SET week_pop_changes=week_pop_changes+{$pop} WHERE id=$aid");
             }
             $db->query("UPDATE vdata SET cp=cp+$cp, pop=pop+$pop WHERE kid=$kid");
-            if ((int)$uid > 2) {
+            if ((int)$uid > UserId::LAST_SYSTEM) {
                 $seasonPass = new SeasonPassModel();
                 if ((int)$pop > 0) {
                     $seasonPass->onMissionEvent((int)$uid, 'gainPopulation');
@@ -220,7 +222,7 @@ class BuildingAction
         if (!$complete) {
             $db->query("UPDATE fdata SET f{$building_field}=f{$building_field}-$levels WHERE kid = " . $kid);
         } else {
-            if ($building_field > 18 && $building_field <> 99 && !self::building_upgrade_state($kid, $building_field)) {
+            if ($building_field > Slot::LAST_FIELD && $building_field <> Slot::WONDER && !self::building_upgrade_state($kid, $building_field)) {
                 $db->query("UPDATE fdata SET f{$building_field}=0, f{$building_field}t=0 WHERE kid=" . $kid);
             } else {
                 $db->query("UPDATE fdata SET f{$building_field}=0 WHERE kid = " . $kid);
@@ -258,7 +260,7 @@ class BuildingAction
             // A destroyed Harbor sinks the ships in the village; ships away are lost when they come back to no Harbor.
             $db->query("UPDATE units SET ship1=0, ship2=0, ship3=0, ship4=0 WHERE kid=$kid");
         }
-        if ($building_field > 18 && $building_field <> 99 && !$complete && ((int)$level - 1) === 0 && !self::building_upgrade_state($kid, $building_field)) {
+        if ($building_field > Slot::LAST_FIELD && $building_field <> Slot::WONDER && !$complete && ((int)$level - 1) === 0 && !self::building_upgrade_state($kid, $building_field)) {
             $db->query("UPDATE fdata SET f{$building_field}t=0 WHERE kid={$kid}");
         }
         if (in_array($item_id, [Gid::WOODCUTTER, Gid::CLAY_PIT, Gid::IRON_MINE, Gid::CROPLAND, Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::GRAIN_MILL, Gid::BAKERY, Gid::WATERWORKS])) {
@@ -312,8 +314,8 @@ class BuildingAction
         $db = DB::getInstance();
         foreach ($buildings as $index => $build) {
             if ($build['item_id'] == 0 || $build['level'] > 0) continue;
-            if ($index <= 18) continue;
-            if ($index == 99) continue;
+            if ($index <= Slot::LAST_FIELD) continue;
+            if ($index == Slot::WONDER) continue;
             if (self::building_upgrade_state($kid, $index)) continue;
             //it's probably bugged
             $db->query("UPDATE fdata SET f{$index}t=0 WHERE kid={$kid}");

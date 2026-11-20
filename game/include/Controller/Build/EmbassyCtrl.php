@@ -15,6 +15,7 @@ use Model\AllianceModel;
 use Model\MessageModel;
 use resources\View\PHPBatchView;
 use Controller\BuildCtrl;
+use Game\UserId;
 
 use function array_values;
 
@@ -209,7 +210,7 @@ class EmbassyCtrl extends AnyCtrl
              JOIN wdata w ON w.id=v.kid
              JOIN users u ON u.id=v.owner
              LEFT JOIN alidata a ON a.id=u.aid
-             WHERE v.owner<>{$uid} AND v.owner>1 AND {$distance} <= {$radius}
+             WHERE v.owner<>{$uid} AND v.owner>" . UserId::NATARS . " AND {$distance} <= {$radius}
              ORDER BY `distance` ASC, v.kid ASC
              LIMIT {$limit}"
         );

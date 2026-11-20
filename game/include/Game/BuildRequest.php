@@ -35,7 +35,7 @@ final class BuildRequest
         }
         $slot = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
         $gid = filter_var($_GET['gid'] ?? null, FILTER_VALIDATE_INT);
-        if ($slot === false || $gid === false || $slot < 1 || ($slot > 40 && $slot !== 99)) {
+        if ($slot === false || $gid === false || $slot < 1 || ($slot > Slot::LAST && $slot !== Slot::WONDER)) {
             return true;
         }
         $master = array_key_exists('buildmaster', $_GET);

@@ -14,6 +14,7 @@ use function logError;
 use Model\Quest;
 use function nrToUnitId;
 use resources\View\PHPBatchView;
+use Game\ResearchMode;
 use function unitIdToNr;
 
 class AcademyCtrl extends AnyCtrl
@@ -55,20 +56,20 @@ class AcademyCtrl extends AnyCtrl
                     $duration = Formulas::uResearchTime($_GET['a']);
                     if(Village::getInstance()->isResourcesAvailable($costs)) {
                         $quest = Quest::getInstance();
-                        $quest->setQuestBitwise('battle', 12, 1);
+                        $quest->setQuestBitwise('battle', Quest::BATTLE_RESEARCH_UNIT, 1);
                         $village = Village::getInstance();
                         $researchNr = unitIdToNr($_GET['a']);
                         $endTime = time() + $duration;
                         $queued = $village->transaction(static function () use ($village, $costs, $researchNr, $endTime): bool {
                             $mdb = DB::getInstance();
                             // One academy research at a time, re-checked under the village lock.
-                            if ((int)$mdb->fetchScalar('SELECT COUNT(*) FROM research WHERE kid=? AND mode=1', [$village->getKid()]) > 0) {
+                            if ((int)$mdb->fetchScalar('SELECT COUNT(*) FROM research WHERE kid=? AND mode=' . ResearchMode::ACADEMY, [$village->getKid()]) > 0) {
                                 return false;
                             }
                             if (!$village->spend($costs)) {
                                 return false;
                             }
-                            $insert = $mdb->run('INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES (?, 1, ?, ?)', [$village->getKid(), $researchNr, $endTime]);
+                            $insert = $mdb->run('INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES (?, ' . ResearchMode::ACADEMY . ', ?, ?)', [$village->getKid(), $researchNr, $endTime]);
 
                             return $insert !== false && $insert->affected_rows === 1;
                         });
@@ -96,7 +97,7 @@ class AcademyCtrl extends AnyCtrl
     {
         $this->researching = [];
         $db = DB::getInstance();
-        $researching = $db->query("SELECT * FROM research WHERE mode=1 AND kid=" . Village::getInstance()->getKid());
+        $researching = $db->query("SELECT * FROM research WHERE mode=" . ResearchMode::ACADEMY . " AND kid=" . Village::getInstance()->getKid());
         while($row = $researching->fetch_assoc()) {
             $this->researching[$row['nr']] = $row;
         }

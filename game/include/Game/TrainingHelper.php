@@ -6,6 +6,7 @@ use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Session;
 use Core\Village;
+use Model\MovementsModel;
 use Model\Quest;
 use Model\VillageOverviewModel;
 
@@ -19,13 +20,13 @@ class TrainingHelper
         $village = Village::getInstance();
         $db = DB::getInstance();
         $totalTraps = 0;
-        for ($i = 19; $i <= 38; $i++) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; $i++) {
             if ($village->getField($i)['item_id'] == Gid::TRAPPER) {
                 $totalTraps += Formulas::getTrapperValueByLevel($village->getField($i)['level']);
             }
         }
         $totalTraps -= $db->fetchScalar("SELECT u99 FROM units WHERE kid={$village->getKid()} LIMIT 1");
-        $totalTraps -= $db->fetchScalar("SELECT SUM(num) FROM training WHERE kid={$village->getKid()} AND item_id=36");
+        $totalTraps -= $db->fetchScalar("SELECT SUM(num) FROM training WHERE kid={$village->getKid()} AND item_id=" . Gid::TRAPPER);
         $cost = Formulas::uTrainingCost(Unit::TRAP);
         $can = [];
         foreach ($village->getCurrentResources(-1, TRUE) as $r => $v) {
@@ -45,13 +46,13 @@ class TrainingHelper
         $village = Village::getInstance();
         $db = DB::getInstance();
         $totalTraps = 0;
-        for ($i = 19; $i <= 38; $i++) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; $i++) {
             if ($village->getField($i)['item_id'] == Gid::TRAPPER) {
                 $totalTraps += Formulas::getTrapperValueByLevel($village->getField($i)['level']);
             }
         }
         $totalTraps -= $db->fetchScalar("SELECT u99 FROM units WHERE kid={$village->getKid()} LIMIT 1");
-        $totalTraps -= $db->fetchScalar("SELECT SUM(num) FROM training WHERE kid={$village->getKid()} AND item_id=36");
+        $totalTraps -= $db->fetchScalar("SELECT SUM(num) FROM training WHERE kid={$village->getKid()} AND item_id=" . Gid::TRAPPER);
         $cost = Formulas::uTrainingCost(Unit::TRAP);
         $can = floor(array_sum($village->getCurrentResources(-1, TRUE)) / array_sum($cost));
         return min($can, $totalTraps);
@@ -67,11 +68,11 @@ class TrainingHelper
 
         list($chiefs, $settlers) = $db->query("SELECT u9, u10 FROM units WHERE kid=$kid")->fetch_row();
 
-        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (kid={$kid} AND mode=0)")->fetch_assoc();
+        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (kid={$kid} AND mode=" . MovementsModel::MODE_GOING . ")")->fetch_assoc();
         $settlers += $onTheWay['settlers'];
         $chiefs += $onTheWay['chiefs'];
 
-        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (to_kid=$kid AND mode=1)")->fetch_assoc();
+        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")")->fetch_assoc();
         $settlers += $onTheWay['settlers'];
         $chiefs += $onTheWay['chiefs'];
 
@@ -176,7 +177,7 @@ class TrainingHelper
         $filledSlots = $db->fetchScalar("SELECT COUNT(kid) FROM vdata WHERE expandedfrom={$village->getKid()} LIMIT 3");
         $maxslots = self::unlockedSlots(...self::expansionBuilding()) - $filledSlots;
         list($chiefs, $settlers) = $db->query("SELECT u9, u10 FROM units WHERE kid=" . $village->getKid())->fetch_row();
-        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (mode=1 AND to_kid={$village->getKid()}) OR (mode=0 AND kid={$village->getKid()})")->fetch_assoc();
+        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (mode=" . MovementsModel::MODE_RETURN . " AND to_kid={$village->getKid()}) OR (mode=" . MovementsModel::MODE_GOING . " AND kid={$village->getKid()})")->fetch_assoc();
         $settlers += $onTheWay['settlers'];
         $chiefs += $onTheWay['chiefs'];
         $trapped = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM trapped WHERE kid={$village->getKid()}")->fetch_assoc();
@@ -189,7 +190,7 @@ class TrainingHelper
         $settlers += $onTrain['settlers'];
         $chiefs += $onTrain['chiefs'];
         if ($settlers >= 3) {
-            Quest::getInstance()->setQuestBitwise('world', 15, 1);
+            Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_THREE_SETTLERS, 1);
         }
         // trapped settlers/chiefs calculation required
         $settlerslots = ($maxslots * 3) - $settlers - ($chiefs * 3);
@@ -235,7 +236,7 @@ class TrainingHelper
         $filledSlots = $db->fetchScalar("SELECT COUNT(kid) FROM vdata WHERE expandedfrom={$village->getKid()}");
         $maxslots = self::unlockedSlots(...self::expansionBuilding()) - $filledSlots;
         list($chiefs, $settlers) = $db->query("SELECT u9, u10 FROM units WHERE kid=" . $village->getKid())->fetch_row();
-        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (mode=1 AND to_kid={$village->getKid()}) OR (mode=0 AND kid={$village->getKid()})")->fetch_assoc();
+        $onTheWay = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM movement WHERE (mode=" . MovementsModel::MODE_RETURN . " AND to_kid={$village->getKid()}) OR (mode=" . MovementsModel::MODE_GOING . " AND kid={$village->getKid()})")->fetch_assoc();
         $settlers += $onTheWay['settlers'];
         $chiefs += $onTheWay['chiefs'];
         $trapped = $db->query("SELECT SUM(u10) AS `settlers`, SUM(u9) AS `chiefs` FROM trapped WHERE kid={$village->getKid()}")->fetch_assoc();
@@ -248,7 +249,7 @@ class TrainingHelper
         $settlers += $onTrain['settlers'];
         $chiefs += $onTrain['chiefs'];
         if ($settlers >= 3) {
-            Quest::getInstance()->setQuestBitwise('world', 15, 1);
+            Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_THREE_SETTLERS, 1);
         }
         // trapped settlers/chiefs calculation required
         $settlerslots = ($maxslots * 3) - $settlers - ($chiefs * 3);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Game;
 
+use Core\Time;
+
 /**
  * Operator settings for backups, engine catch-up and audit-log retention.
  * The control panel stores them in operations.local.json in the state
@@ -18,9 +20,9 @@ final class OperationsSettings
         'backupsEnabled' => ['env' => 'TRAVIAN_BACKUP_ENABLED', 'default' => 1, 'min' => 0, 'max' => 1, 'label' => 'Daily backups'],
         'backupKeepLast' => ['env' => 'TRAVIAN_BACKUP_KEEP_LAST', 'default' => 3, 'min' => 1, 'max' => 365, 'label' => 'Newest backups to keep'],
         'backupKeepDaily' => ['env' => 'TRAVIAN_BACKUP_KEEP_DAILY', 'default' => 7, 'min' => 0, 'max' => 365, 'label' => 'Days to keep the newest backup of each'],
-        'catchupAfter' => ['env' => 'TRAVIAN_CATCHUP_AFTER_SECONDS', 'default' => 300, 'min' => 1, 'max' => 604800, 'label' => 'Engine away for at least (seconds) before catching up'],
+        'catchupAfter' => ['env' => 'TRAVIAN_CATCHUP_AFTER_SECONDS', 'default' => 300, 'min' => 1, 'max' => Time::WEEK, 'label' => 'Engine away for at least (seconds) before catching up'],
         'catchupRate' => ['env' => 'TRAVIAN_CATCHUP_RATE_PER_SECOND', 'default' => 50, 'min' => 1, 'max' => 10000, 'label' => 'Overdue rows completed per second'],
-        'catchupMax' => ['env' => 'TRAVIAN_CATCHUP_MAX_SECONDS', 'default' => 600, 'min' => 1, 'max' => 86400, 'label' => 'Longest catch-up pass (seconds)'],
+        'catchupMax' => ['env' => 'TRAVIAN_CATCHUP_MAX_SECONDS', 'default' => 600, 'min' => 1, 'max' => Time::DAY, 'label' => 'Longest catch-up pass (seconds)'],
         'auditRetentionDays' => ['env' => '', 'default' => 365, 'min' => 0, 'max' => 3650, 'label' => 'Keep audit log entries for (days, 0 = forever)'],
     ];
 

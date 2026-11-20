@@ -19,6 +19,7 @@ use Core\Locale;
 use Model\MarketModel;
 use Model\Quest;
 use resources\View\PHPBatchView;
+use Core\Time;
 
 class MarketPlaceCtrl extends AnyCtrl
 {
@@ -121,7 +122,7 @@ class MarketPlaceCtrl extends AnyCtrl
             if ($offer !== false) {
                 if ($offer['kid'] <> Village::getInstance()->getKid()) {
                     if ($offer['aid'] == 0 || $offer['aid'] == Session::getInstance()->getAllianceId()) {
-                        $duration = Formulas::travelTimeSeconds(Formulas::getDistance($offer['kid'], Village::getInstance()->getKid()) / $speed * 3600);
+                        $duration = Formulas::travelTimeSeconds(Formulas::getDistance($offer['kid'], Village::getInstance()->getKid()) / $speed * Time::HOUR);
                         $ratio = round($offer['needValue'] / $offer['giveValue'], 1);
                         if ($this->evenTradeReason() !== null && $offer['needValue'] != $offer['giveValue']) {
                             $view->vars['error'] = T('MarketPlace', "During beginner's protection, you can only accept 1:1 trades. The same applies if you have less than 200 population.");
@@ -163,7 +164,7 @@ class MarketPlaceCtrl extends AnyCtrl
                                     if ($accepted) {
                                         $db = DB::getInstance();
                                         $quest = Quest::getInstance();
-                                        $quest->setQuestBitwise('economy', 7, 1);
+                                        $quest->setQuestBitwise('economy', Quest::ECONOMY_TRADE, 1);
                                         $playerName = $db->fetchScalar("SELECT name FROM users WHERE id=$playerId");
                                         $view->vars['offerAccepted'] = true;
                                         $view->vars['offerAcceptTitle'] = sprintf(T("MarketPlace", 'x\'s offering has been accepted'), '<a href="' . profileUrl((int) $playerId) . '">' . $playerName . '</a>');
@@ -196,8 +197,8 @@ class MarketPlaceCtrl extends AnyCtrl
             $owner = $m->getVillageOwner($row['kid']);
             $player = $m->getPlayerRaceAndName($owner);
             $xy = Formulas::kid2xy($row['kid']);
-            $travelSeconds = (int)Formulas::travelTimeSeconds(Formulas::getDistance($row['kid'], Village::getInstance()->getKid()) / $speed * 3600);
-            $duration = sprintf('%02d:%02d:%02d', intdiv($travelSeconds, 3600), intdiv($travelSeconds % 3600, 60), $travelSeconds % 60);
+            $travelSeconds = (int)Formulas::travelTimeSeconds(Formulas::getDistance($row['kid'], Village::getInstance()->getKid()) / $speed * Time::HOUR);
+            $duration = sprintf('%02d:%02d:%02d', intdiv($travelSeconds, Time::HOUR), intdiv($travelSeconds % Time::HOUR, 60), $travelSeconds % 60);
             $quality = $ratio <= 1 ? 4 : ($ratio < 1.5 ? 3 : ($ratio < 2 ? 2 : 1));
             $view->vars['content'] .= '<tr>'
                 . '<td class="offered"><div class="inlineIcon"><i class="' . $resourceClass[$row['giveType']] . '_small" title="' . T('inGame', 'resources.r' . $row['giveType']) . '"></i><span>' . "\u{202D}" . number_format_x($row['giveValue']) . "\u{202C}" . '</span></div></td>'
@@ -383,7 +384,7 @@ class MarketPlaceCtrl extends AnyCtrl
                     $view->vars['success'] = T("MarketPlace", 'offer added successfully');
                     $view->vars['merchantsAvailable'] -= ceil($_POST['m1'] / $merchant_cap);
                     $quest = Quest::getInstance();
-                    $quest->setQuestBitwise('economy', 7, 1);
+                    $quest->setQuestBitwise('economy', Quest::ECONOMY_TRADE, 1);
                 }
             }
         }
@@ -401,7 +402,7 @@ class MarketPlaceCtrl extends AnyCtrl
                 $class = 'red';
             }
             $view->vars['content'] .= '<tr>';
-            $view->vars['content'] .= '<td class="abo"><a href="/build.php?gid=17&amp;t=2&amp;a=5&amp;del=' . $row['id'] . '"><img class="del" src="img/spacer.gif" alt="' . htmlspecialchars(T('MarketPlace', 'Delete'), ENT_QUOTES, 'UTF-8') . '"></a></td>';
+            $view->vars['content'] .= '<td class="abo"><a href="/build.php?gid=' . Gid::MARKETPLACE . '&amp;t=2&amp;a=5&amp;del=' . $row['id'] . '"><img class="del" src="img/spacer.gif" alt="' . htmlspecialchars(T('MarketPlace', 'Delete'), ENT_QUOTES, 'UTF-8') . '"></a></td>';
             $view->vars['content'] .= '<td class="val"><div class="inlineIconList resourceWrapper"><div class="inlineIcon resources"><i class="r' . $row['giveType'] . '"></i><span class="value ">' . $row['giveValue'] . '</span></div></div></td>';
             $view->vars['content'] .= '<td class="ratio">
 
@@ -423,7 +424,7 @@ class MarketPlaceCtrl extends AnyCtrl
             $view->vars['content'] .= '<td class="val"><div class="inlineIconList resourceWrapper"><div class="inlineIcon resources"><i class="r' . $row['needType'] . '"></i><span class="value ">' . $row['needValue'] . '</span></div></div></td>';
             $view->vars['content'] .= '<td class="tra">' . ceil($row['giveValue'] / $merchant_cap) . '</td>';
             $view->vars['content'] .= '<td class="al">' . (T("MarketPlace", $row['aid'] > 0 ? 'yes' : 'no')) . '</td>';
-            $view->vars['content'] .= '<td class="dur">' . ($row['maxtime'] > 0 ? ($row['maxtime'] / 3600) . ' ' . T("MarketPlace", "hours") : '-') . '</td>';
+            $view->vars['content'] .= '<td class="dur">' . ($row['maxtime'] > 0 ? ($row['maxtime'] / Time::HOUR) . ' ' . T("MarketPlace", "hours") : '-') . '</td>';
             $view->vars['content'] .= '</tr>';
         }
         $this->view->vars['content'] .= $view->output();
@@ -544,7 +545,7 @@ class MarketPlaceCtrl extends AnyCtrl
             if (WebService::isPost() && Session::claimAction($_POST['c'] ?? null) && isset($_POST['did_dest'])) {
                 $repeat = max(min((int)$_POST['repeat'], 3), 1);
                 if ($usePeriodicTradeRoutes) {
-                    $hour = max(min((int)$_POST['hour'], 30 * 86400), 600);
+                    $hour = max(min((int)$_POST['hour'], 30 * Time::DAY), 600);
                 } else {
                     $hour = max(min((int)$_POST['hour'], 23), 0);
                 }
@@ -584,7 +585,7 @@ class MarketPlaceCtrl extends AnyCtrl
             if (WebService::isPost() && Session::claimAction($_POST['c'] ?? null)) {
                 $repeat = max(min((int)$_POST['repeat'], 3), 1);
                 if ($usePeriodicTradeRoutes) {
-                    $hour = max(min((int)$_POST['hour'], 30 * 86400), 600);
+                    $hour = max(min((int)$_POST['hour'], 30 * Time::DAY), 600);
                 } else {
                     $hour = max(min((int)$_POST['hour'], 23), 0);
                 }

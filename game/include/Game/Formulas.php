@@ -4,6 +4,7 @@ namespace Game;
 
 use function array_values;
 use Core\Config;
+use Core\Time;
 use function getCustom;
 use function getGame;
 use function getGameElapsedSeconds;
@@ -3564,7 +3565,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         if ($ub <= 10) {
             $ub = 1;
         }
-        $time = 60;
+        $time = Time::MINUTE;
         $time /= $ub;
         $time *= Config::getProperty("game", "useNanoseconds") ? 1e9 : (Config::getProperty("game",
             "useMilSeconds") ? 1e3 : 1);
@@ -3652,7 +3653,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
             return 1_000_000_000;
         }
 
-        return Config::getProperty("game", "useMilSeconds") ? 1000 : 1;
+        return Config::getProperty("game", "useMilSeconds") ? Time::SECOND_MS : 1;
     }
 
     /**
@@ -4137,7 +4138,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         // A batch of `ceil(speed / 50)` celebrations (cost and culture points scale with it, see celebrationCost()) lasts one
         // cool-down, which keeps shrinking with the speed down to the one second minimum.
-        $cool_down_time = (($big ? 216000 : 86400) * self::townHallCelebrationTime($lvl)) / (floor(getGameSpeed() / 3) + 1);
+        $cool_down_time = (($big ? 216000 : Time::DAY) * self::townHallCelebrationTime($lvl)) / (floor(getGameSpeed() / 3) + 1);
         return max(1, round($cool_down_time));
     }
 
@@ -4303,7 +4304,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         if (is_null($elapsed)) {
             $elapsed = getGameElapsedMiliSeconds();
-            $rate = 1000;
+            $rate = Time::SECOND_MS;
         }
         $elapsed = max(0, $elapsed);
         $round_length = getGame('round_length_real');
@@ -4312,7 +4313,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         } else {
             $max_distance = floor(hypot(MAP_SIZE, MAP_SIZE)) * 0.5;
         }
-        $distance_increase_per_second = $max_distance / $round_length / 86400 / $rate;
+        $distance_increase_per_second = $max_distance / $round_length / Time::DAY / $rate;
         if ($elapsed <= (10800 * $rate)) {
             $distance_increase_per_second *= 25;
         }
@@ -4455,7 +4456,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         if (!$gid) {
             return [0, 0, 0, 0];
         }
-        if ($gid == 99) {
+        if ($gid == Slot::WONDER) {
             $gid = Gid::WONDER_OF_THE_WORLD;
         }//w :>
         $cost = self::$data['buildings'][$gid - 1]['cost'];
@@ -4661,7 +4662,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
             $hours = min($level + 1, 24) / WorldSpeedProfile::heroRevivalDivisor($speed);
         }
 
-        return round($hours * 3600 * $rate);
+        return round($hours * Time::HOUR * $rate);
     }
 
     /**
@@ -4755,18 +4756,18 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         $speed = (int)getGameSpeed();
         if (WorldSpeedProfile::isOfficialLegendsSpeed($speed)) {
-            if ($elapsed < 70 * 86400 / $speed) {
+            if ($elapsed < 70 * Time::DAY / $speed) {
                 return 1;
             }
-            return $elapsed < 140 * 86400 / $speed ? 2 : 3;
+            return $elapsed < 140 * Time::DAY / $speed ? 2 : 3;
         }
         /**
          * Level 1: until day 75 of server
          * Level 2: days 75 - 165 of server
          * Level 3: starting on day 165 of server
          */
-        $rate_tier1 = 75 / 350 * Config::getProperty("game", "round_length") * 86400;
-        $rate_tier2 = 165 / 350 * Config::getProperty("game", "round_length") * 86400;
+        $rate_tier1 = 75 / 350 * Config::getProperty("game", "round_length") * Time::DAY;
+        $rate_tier2 = 165 / 350 * Config::getProperty("game", "round_length") * Time::DAY;
 
         return $elapsed <= $rate_tier1 ? 1 : ($elapsed <= $rate_tier2 ? 2 : 3);
     }
@@ -4816,7 +4817,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function getAllianceBonusCoolDownForNewPlayers($level): float
     {
-        return ceil(max(0, $level - 1) * 86400 / getGameSpeed());
+        return ceil(max(0, $level - 1) * Time::DAY / getGameSpeed());
     }
 
     /**
@@ -4843,7 +4844,7 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         // Alliance upgrade records and the unlock worker use Unix seconds.
         // Preserve an observable queue at the supported 1,000,000x limit.
-        return max(1, (int)round(($level * 86400) / getGameSpeed()));
+        return max(1, (int)round(($level * Time::DAY) / getGameSpeed()));
     }
 
     /**

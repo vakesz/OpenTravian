@@ -20,6 +20,7 @@ use Core\Locale;
 use Model\Quest;
 use Model\VillageModel;
 use resources\View\PHPBatchView;
+use Core\Time;
 
 class ResidencePalaceCtrl extends AnyCtrl
 {
@@ -93,7 +94,7 @@ class ResidencePalaceCtrl extends AnyCtrl
 
     private function culturePoints(): void
     {
-        Quest::getInstance()->setQuestBitwise('world', 11, 1);
+        Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_CULTURE_POINTS, 1);
         $view = new PHPBatchView("build/building/ResidenceCulturePoints");
         $db = DB::getInstance();
         $villages = $db->query("SELECT SUM(cp) AS `total_cp`, COUNT(kid) `total_village_count`  FROM vdata WHERE owner=" . Session::getInstance()->getPlayerId())->fetch_assoc();
@@ -116,7 +117,7 @@ class ResidencePalaceCtrl extends AnyCtrl
         );
         $helper = new HeroHelper();
         $view->vars['heroCP'] = $helper->calcMoreCulturePoints($helmet);
-        $totalInSecond = ($view->vars['activeVillageCP'] + $view->vars['otherVillageCP'] + $view->vars['heroCP']) / 86400;
+        $totalInSecond = ($view->vars['activeVillageCP'] + $view->vars['otherVillageCP'] + $view->vars['heroCP']) / Time::DAY;
         $totalInSecond = min($totalInSecond, 1e8);
         $nextVillageAt = $totalInSecond == 0 ? null : (int) (time() + (($newVillageCP - $currentCP) / $totalInSecond));
         $view->vars['date'] = $nextVillageAt === null ? '?' : TimezoneHelper::date(TimezoneHelper::getDateFormat(), $nextVillageAt);

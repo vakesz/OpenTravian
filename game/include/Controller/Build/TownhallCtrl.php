@@ -109,7 +109,7 @@ class TownhallCtrl extends AnyCtrl
                                 Village::getInstance()->setCelebrationQueue((int) ($saved['celebration2'] ?? 0), (int) ($saved['type2'] ?? 0));
                             }
                             $dailyQuest = new DailyQuestModel();
-                            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), 10);
+                            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), DailyQuestModel::QUEST_CELEBRATION);
                             if ($type == 1) {
                                 $cp = Formulas::getCelebrationMaxCP(false, $village->getCP());
                             } else {

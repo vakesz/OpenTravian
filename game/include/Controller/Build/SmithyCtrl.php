@@ -14,6 +14,7 @@ use Game\GoldHelper;
 use Core\Locale;
 use Model\Quest;
 use resources\View\PHPBatchView;
+use Game\ResearchMode;
 
 class SmithyCtrl extends AnyCtrl
 {
@@ -57,7 +58,7 @@ class SmithyCtrl extends AnyCtrl
                     $duration = Formulas::uUpgradeTime($unitId, $this->smithy[$nr] + $this->getResearchLevel($nr) + 1, $this->building_lvl);
                     $db = DB::getInstance();
                     if ($this->isResearch()) {
-                        $lastResearch = $db->fetchScalar("SELECT end_time FROM research WHERE kid=" . Village::getInstance()->getKid() . " AND mode=0");
+                        $lastResearch = $db->fetchScalar("SELECT end_time FROM research WHERE kid=" . Village::getInstance()->getKid() . " AND mode=" . ResearchMode::SMITHY);
                         if ($lastResearch !== false) {
                             $duration += $lastResearch - time();
                         }
@@ -70,7 +71,7 @@ class SmithyCtrl extends AnyCtrl
                                 return false;
                             }
                             $insert = DB::getInstance()->run(
-                                'INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES (?, 0, ?, ?)',
+                                'INSERT INTO research (`kid`, `mode`, `nr`, `end_time`) VALUES (?, ' . ResearchMode::SMITHY . ', ?, ?)',
                                 [$village->getKid(), $nr, $endTime]
                             );
 
@@ -78,7 +79,7 @@ class SmithyCtrl extends AnyCtrl
                         });
                         if ($started) {
                             $quest = Quest::getInstance();
-                            $quest->setQuestBitwise('battle', 14, 1);
+                            $quest->setQuestBitwise('battle', Quest::BATTLE_IMPROVE_UNITS, 1);
                         }
                         $this->getSmithyResearches();
                     }
@@ -114,7 +115,7 @@ class SmithyCtrl extends AnyCtrl
         $this->researchLevels = array_fill(1, 8, 0);
         $db = DB::getInstance();
         $kid = Village::getInstance()->getKid();
-        $researches = $db->query("SELECT * FROM research WHERE kid={$kid} AND mode=0 ORDER BY end_time ASC");
+        $researches = $db->query("SELECT * FROM research WHERE kid={$kid} AND mode=" . ResearchMode::SMITHY . " ORDER BY end_time ASC");
         $this->view->vars['researchingSize'] = $researches->num_rows;
         $this->view->vars['researchingTableBody'] = '';
         while ($row = $researches->fetch_assoc()) {

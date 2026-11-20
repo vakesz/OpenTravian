@@ -30,6 +30,9 @@ use Model\TrainingModel;
 use Model\VillageModel;
 use Model\BattleSetter;
 use resources\View\PHPBatchView;
+use Game\Slot;
+use Core\Time;
+use Game\Gid;
 
 use function array_key_exists;
 use function array_search;
@@ -319,12 +322,12 @@ class premium extends AjaxBase
         }
         $db = DB::getInstance();
         $session = Session::getInstance();
-        if ((time() - $session->get("protectionLastExtend")) > 86400) {
+        if ((time() - $session->get("protectionLastExtend")) > Time::DAY) {
             $session->set("protectionLastExtend", 0);
             $session->set("protectionBoughtHours", 0);
             $db->query("UPDATE users SET protectionLastExtend=0, protectionBoughtHours=0 WHERE id={$session->getPlayerId()}");
         }
-        if ((time() - $session->get("protectionLastExtend")) < 86400 && ($feature['duration'] + $session->get("protectionBoughtHours")) > $maxDuration) {
+        if ((time() - $session->get("protectionLastExtend")) < Time::DAY && ($feature['duration'] + $session->get("protectionBoughtHours")) > $maxDuration) {
             $this->response['functionToCall'] = 'reloadDialog';
             $this->response['context'] = 'paymentWizard';
             $this->response['e'] = 'Protection limit exceeded.';
@@ -337,7 +340,7 @@ class premium extends AjaxBase
             $this->response['e'] = 'Has artifact or WW.';
             return;
         }
-        $duration = $feature['duration'] * 3600;
+        $duration = $feature['duration'] * Time::HOUR;
         if ($session->get("protection") > time()) {
             $duration = $session->get("protection") + $duration;
         } else {
@@ -417,7 +420,7 @@ class premium extends AjaxBase
         $oneSecond = (int)$rate;
         // Training time already divides by speed, so the herd grows with the world.
         // Once that time is floored at one second, keep multiplying by speed.
-        $legionaire_train = (int)round(($modifier * 3600 * $rate) / max(1, $train));
+        $legionaire_train = (int)round(($modifier * Time::HOUR * $rate) / max(1, $train));
         if ($train <= $oneSecond) {
             $legionaire_train *= $speed;
         }
@@ -442,10 +445,10 @@ class premium extends AjaxBase
             0,
             0,
             0,
-            0,
+            MovementsModel::MODE_GOING,
             MovementsModel::ATTACKTYPE_REINFORCEMENT,
             miliseconds(),
-            miliseconds() + $delivery * 60 * 1000
+            miliseconds() + $delivery * Time::MINUTE * Time::SECOND_MS
         );
         $coins = $config->extraSettings->buyAnimal['packages'][$packageId]['coins'];
         if (!$this->spendGold($coins, true)) {
@@ -566,7 +569,7 @@ class premium extends AjaxBase
         }
         $db = DB::getInstance();
 
-        $unitAmt =  round(($realPackage['hours'] * 3600 * $rate) / Formulas::uTrainingTime($unitId, 20));
+        $unitAmt =  round(($realPackage['hours'] * Time::HOUR * $rate) / Formulas::uTrainingTime($unitId, 20));
         $coins = $realPackage['coins'];
 
         $db->begin_transaction();
@@ -625,7 +628,7 @@ class premium extends AjaxBase
             }
             $done = true;
             $max = $resourceLevel;
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 if ($village->getField($i)['level'] >= $max) {
                     $done &= true;
                 } else {
@@ -640,7 +643,7 @@ class premium extends AjaxBase
             if (!$this->spendGold($coins)) {
                 return;
             }
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 $up = max($resourceLevel - $village->getField($i)['level'], 0);
                 if ($up) {
                     $village->buildings[$i]['level'] += $up;
@@ -704,7 +707,7 @@ class premium extends AjaxBase
         }
         $db = DB::getInstance();
         $remainingSeconds = Session::getInstance()->getVacationTil() - time();
-        $remainingDays = floor((Session::getInstance()->getVacationTil() - time()) / 86400);
+        $remainingDays = floor((Session::getInstance()->getVacationTil() - time()) / Time::DAY);
         if ($remainingSeconds <= 0) {
             $this->unavailablePremiumAction();
             return;
@@ -795,10 +798,10 @@ class premium extends AjaxBase
             $now = miliseconds();
             $elapsed = max(0, $now - (int)$stock['lastmupdate']);
             $rawResources = [
-                min((float)$stock['wood'] + $elapsed * (int)$stock['woodp'] / 3600000, (int)$stock['maxstore']),
-                min((float)$stock['clay'] + $elapsed * (int)$stock['clayp'] / 3600000, (int)$stock['maxstore']),
-                min((float)$stock['iron'] + $elapsed * (int)$stock['ironp'] / 3600000, (int)$stock['maxstore']),
-                min((float)$stock['crop'] + $elapsed * ((int)$stock['cropp'] - (int)$stock['pop'] - (int)$stock['upkeep']) / 3600000, (int)$stock['maxcrop']),
+                min((float)$stock['wood'] + $elapsed * (int)$stock['woodp'] / Time::HOUR_MS, (int)$stock['maxstore']),
+                min((float)$stock['clay'] + $elapsed * (int)$stock['clayp'] / Time::HOUR_MS, (int)$stock['maxstore']),
+                min((float)$stock['iron'] + $elapsed * (int)$stock['ironp'] / Time::HOUR_MS, (int)$stock['maxstore']),
+                min((float)$stock['crop'] + $elapsed * ((int)$stock['cropp'] - (int)$stock['pop'] - (int)$stock['upkeep']) / Time::HOUR_MS, (int)$stock['maxcrop']),
             ];
             $current = array_map(static function ($amount) {
                 return max(0, (int)floor($amount));
@@ -1167,7 +1170,7 @@ class premium extends AjaxBase
         }
         $db = DB::getInstance();
         $session = Session::getInstance();
-        $duration = $config->extraSettings->generalOptions->fasterTraining->duration * 3600;
+        $duration = $config->extraSettings->generalOptions->fasterTraining->duration * Time::HOUR;
         if ($session->get("fasterTraining") > time()) {
             $duration = $session->get("fasterTraining") + $duration;
         } else {
@@ -1207,16 +1210,16 @@ class premium extends AjaxBase
         $this->response['redirectTo'] = '/dorf2.php';
         $village = Village::getInstance();
         $db = DB::getInstance();
-        if (!($village->getField(39)['item_id'] == 0 || $village->getField(39)['level'] < 20)) return;
+        if (!($village->getField(Slot::RALLY_POINT)['item_id'] == 0 || $village->getField(Slot::RALLY_POINT)['level'] < 20)) return;
         $coins = $config->extraSettings->generalOptions->rallyPointTo20->coins;
         if (GoldHelper::decreaseGold(Session::getInstance()->getPlayerId(), $coins)) {
-            if ($village->getField(39)['item_id'] == 0) {
-                $db->query("UPDATE fdata SET f39t=16 WHERE kid=" . $village->getKid());
+            if ($village->getField(Slot::RALLY_POINT)['item_id'] == 0) {
+                $db->query("UPDATE fdata SET f39t=" . Gid::RALLY_POINT . " WHERE kid=" . $village->getKid());
                 BuildingAction::upgrade($village->getKid(), 39, 20);
-            } else if ($village->getField(39)['level'] < 20) {
+            } else if ($village->getField(Slot::RALLY_POINT)['level'] < 20) {
                 $db->query("DELETE FROM building_upgrade WHERE kid={$village->getKid()} AND building_field=39");
                 $db->query("DELETE FROM demolition WHERE kid={$village->getKid()} AND building_field=39");
-                BuildingAction::upgrade($village->getKid(), 39, 20 - $village->getField(39)['level']);
+                BuildingAction::upgrade($village->getKid(), Slot::RALLY_POINT, 20 - $village->getField(Slot::RALLY_POINT)['level']);
             }
         }
     }
@@ -1233,7 +1236,7 @@ class premium extends AjaxBase
         $village = Village::getInstance();
         $done = FALSE;
         $max = Formulas::buildingMaxLvl(1, $village->isCapital(), false);
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $up = max($max - $village->getField($i)['level'], 0);
             if ($up) {
                 $done = TRUE;
@@ -1244,7 +1247,7 @@ class premium extends AjaxBase
         }
         $coins = $village->isCapital() ? $config->extraSettings->generalOptions->upgradeAllResourcesTo20->coinsCapital : $config->extraSettings->generalOptions->upgradeAllResourcesTo20->coinsNoNCapital;
         if (GoldHelper::decreaseGold(Session::getInstance()->getPlayerId(), $coins)) {
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 $up = max($max - $village->getField($i)['level'], 0);
                 if ($up) {
                     $village->buildings[$i]['level'] += $up;
@@ -1267,7 +1270,7 @@ class premium extends AjaxBase
         if (!$village->isCapital()) return;
         $done = FALSE;
         $max = 30;
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $up = max($max - $village->getField($i)['level'], 0);
             if ($up) {
                 $done = TRUE;
@@ -1278,7 +1281,7 @@ class premium extends AjaxBase
         }
         $coins = $config->extraSettings->generalOptions->upgradeAllResourcesTo30->coins;
         if (GoldHelper::decreaseGold(Session::getInstance()->getPlayerId(), $coins)) {
-            for ($i = 1; $i <= 18; ++$i) {
+            for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
                 $up = max($max - $village->getField($i)['level'], 0);
                 if ($up) {
                     $village->buildings[$i]['level'] += $up;

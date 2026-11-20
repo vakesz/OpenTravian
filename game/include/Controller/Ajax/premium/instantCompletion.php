@@ -9,6 +9,7 @@ use Core\Database\DB;
 use Core\Village;
 use Game\FinishConstruction;
 use Game\GoldHelper;
+use Game\ResearchMode;
 use resources\View\PHPBatchView;
 
 /** Finish now: completes the eligible construction and research of the active village. */
@@ -111,7 +112,7 @@ final class instantCompletion extends InstantPurchase
         $result = $statement->get_result();
         while ($row = $result->fetch_assoc()) {
             $unitName = (string)T('Troops', (int)$row['nr'] . '.title');
-            $buildingLabel = (int)$row['mode'] === 1
+            $buildingLabel = (int)$row['mode'] === ResearchMode::ACADEMY
                 ? (string)T('finishNowPopup', 'smithy')
                 : (string)T('finishNowPopup', 'academy');
             $orders[] = ['label' => trim($unitName . ' — ' . $buildingLabel)];

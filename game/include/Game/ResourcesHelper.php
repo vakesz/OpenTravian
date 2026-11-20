@@ -10,8 +10,10 @@ namespace Game;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Model\ArtefactsModel;
 use Model\MasterBuilder;
+use Model\MovementsModel;
 use Model\VillageModel;
 
 class ResourcesHelper
@@ -105,7 +107,7 @@ class ResourcesHelper
         if (getGame("starvation")) {
             $units = $db->query("SELECT * FROM units WHERE kid=$kid")->fetch_assoc();
             $heroHealth = (int)$db->fetchScalar("SELECT health FROM hero WHERE uid=$uid AND kid=$kid");
-            for ($i = 1; $i <= 11; ++$i) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
                 if (!$units['u' . $i]) {
                     continue;
                 }
@@ -123,7 +125,7 @@ class ResourcesHelper
             $oasesArray[] = $kid;
             $toMeReinforcements = $db->query("SELECT * FROM enforcement WHERE to_kid IN(" . implode(",", $oasesArray) . ")");
             while ($un = $toMeReinforcements->fetch_assoc()) {
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if (!$un['u' . $i]) {
                         continue;
                     }
@@ -133,16 +135,16 @@ class ResourcesHelper
             //own trapped units
             $trapped = $db->query($q = "SELECT * FROM trapped WHERE kid=$kid");
             while ($un = $trapped->fetch_assoc()) {
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if (!$un['u' . $i]) {
                         continue;
                     }
                     $upkeep += Formulas::uUpkeep(nrToUnitId($i, $un['race']), $hdp) * $un['u' . $i];
                 }
             }
-            $movements = $db->query("SELECT race, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11 FROM movement WHERE (kid=$kid AND mode=0) OR (to_kid=$kid AND mode=1)");
+            $movements = $db->query("SELECT race, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11 FROM movement WHERE (kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")");
             while ($un = $movements->fetch_assoc()) {
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if (!$un['u' . $i]) {
                         continue;
                     }
@@ -247,10 +249,10 @@ class ResourcesHelper
             $production = [$row['woodp'], $row['clayp'], $row['ironp'], $row['cropp'] - $row['upkeep'] - $row['pop']];
             $cur_res = [$row['wood'], $row['clay'], $row['iron'], $row['crop']];
             $resources = [
-                (($production[0] / 3600000) * $diff_time),
-                (($production[1] / 3600000) * $diff_time),
-                (($production[2] / 3600000) * $diff_time),
-                (($production[3] / 3600000) * $diff_time),
+                (($production[0] / Time::HOUR_MS) * $diff_time),
+                (($production[1] / Time::HOUR_MS) * $diff_time),
+                (($production[2] / Time::HOUR_MS) * $diff_time),
+                (($production[3] / Time::HOUR_MS) * $diff_time),
             ];
             foreach ($resources as $key => $res) {
                 $nextValue = $res + $cur_res[$key];
@@ -261,7 +263,7 @@ class ResourcesHelper
                 $resources[$key] = round($resources[$key], 4);
             }
             $absoluteCrop = false;
-            if ($row['owner'] == 1 && $row['crop'] + $resources[3] < 0) {
+            if ($row['owner'] == UserId::NATARS && $row['crop'] + $resources[3] < 0) {
                 $resources[3] = $row['maxcrop'] * 2 / 3;
                 $absoluteCrop = true;
             }
@@ -284,8 +286,8 @@ class ResourcesHelper
         $plusBonusPercent = [0, 0, 0, 0];
         $waterWorks = 0;
         $productionFields = [];
-        for ($i = 1; $i <= 38; ++$i) {
-            if ((!$fields['f' . $i . 't'] || !$fields['f' . $i]) && $i > 18) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_BUILDING; ++$i) {
+            if ((!$fields['f' . $i . 't'] || !$fields['f' . $i]) && $i > Slot::LAST_FIELD) {
                 continue;
             }
             if ($fields['f' . $i . 't'] <= 4) {
@@ -328,7 +330,7 @@ class ResourcesHelper
             $i = $field['item_id'] - 1;
             $bonusMultiplier = (($bonusPercent[$i] + ($oasisBonusPercent[$i] * $waterWorksEffect)) / 100);
             $prod = Formulas::fieldProduction($field['level']);
-            if ($row['owner'] == 1 && $field['item_id'] == Gid::CROPLAND) {
+            if ($row['owner'] == UserId::NATARS && $field['item_id'] == Gid::CROPLAND) {
                 $prod *= 2;
             }
             $totalProd[$i] += $prod + round5($prod * $bonusMultiplier);
@@ -364,10 +366,10 @@ class ResourcesHelper
         $diff_time = ($lastmupdate - $row['lastmupdate']);
         $cur_res = [$row['wood'], $row['clay'], $row['iron'], $row['crop']];
         $resources = [
-            (($production[0] / 3600000) * $diff_time),
-            (($production[1] / 3600000) * $diff_time),
-            (($production[2] / 3600000) * $diff_time),
-            ((($production[3] - $row['pop'] - $upkeep) / 3600000) * $diff_time),
+            (($production[0] / Time::HOUR_MS) * $diff_time),
+            (($production[1] / Time::HOUR_MS) * $diff_time),
+            (($production[2] / Time::HOUR_MS) * $diff_time),
+            ((($production[3] - $row['pop'] - $upkeep) / Time::HOUR_MS) * $diff_time),
         ];
         foreach ($resources as $key => $res) {
             $nextValue = $res + $cur_res[$key];
@@ -386,7 +388,7 @@ class ResourcesHelper
             $updateWithMaster = TRUE;
         }
         $absoluteCrop = false;
-        if ($row['owner'] == 1 && $row['crop'] + $resources[3] < 0) {
+        if ($row['owner'] == UserId::NATARS && $row['crop'] + $resources[3] < 0) {
             $resources[3] = $row['maxcrop'] * 2 / 3;
             $absoluteCrop = true;
         }

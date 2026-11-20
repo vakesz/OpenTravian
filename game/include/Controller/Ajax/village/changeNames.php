@@ -73,7 +73,7 @@ final class changeNames extends AjaxBase
                 $this->error(T('inGame', 'Inadmissible name/message'));
                 return;
             }
-            Quest::getInstance()->setQuestBitwise('world', 2, Quest::QUEST_FINISHED);
+            Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_RENAME_VILLAGE, Quest::QUEST_FINISHED);
             $xy = Formulas::kid2xy($did);
             NoticeHelper::addSurrounding(
                 $xy['x'],

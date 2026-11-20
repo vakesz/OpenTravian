@@ -32,6 +32,7 @@ use Model\WonderOfTheWorldModel;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
 use Game\Buildings\BuildingAction;
+use Game\Slot;
 
 use function number_format_x;
 
@@ -53,7 +54,7 @@ class BuildCtrl extends GameCtrl
     {
         parent::__construct();
         $village = Village::getInstance();
-        if (isset($_REQUEST['id']) && (($_REQUEST['id'] > 0 && $_REQUEST['id'] <= 40) || $_REQUEST['id'] == 99)) {
+        if (isset($_REQUEST['id']) && (($_REQUEST['id'] > 0 && $_REQUEST['id'] <= Slot::LAST) || $_REQUEST['id'] == Slot::WONDER)) {
             $this->selectedBuildingIndex = (int)$_REQUEST['id'];
         } elseif (isset($_REQUEST['gid'])) {
             // `gid` is descriptive in modern map URLs.  The field id remains
@@ -72,7 +73,7 @@ class BuildCtrl extends GameCtrl
             WebService::redirect('/build.php?' . http_build_query($_GET + ['gid' => (int)$field['item_id']]));
         }
         $this->view = new GameView();
-        $this->view->vars['bodyCssClass'] = $this->selectedBuildingIndex <= 18 || $this->selectedBuildingIndex == 39 ? "build perspectiveResources" : "build perspectiveBuildings";
+        $this->view->vars['bodyCssClass'] = $this->selectedBuildingIndex <= Slot::LAST_FIELD || $this->selectedBuildingIndex == Slot::RALLY_POINT ? "build perspectiveResources" : "build perspectiveBuildings";
         // The native V2 GPack scopes the building viewport through
         // `#content.build`.  Keeping the class only on <body> leaves the
         // actual page surface at the generic content width, which makes the
@@ -140,7 +141,7 @@ class BuildCtrl extends GameCtrl
         $village = Village::getInstance();
         $category = isset($_GET['category']) ? (int)$_GET['category'] : -1;
         $noSoon = false;
-        if ($this->selectedBuildingIndex == 39 || $this->selectedBuildingIndex == 40) {
+        if ($this->selectedBuildingIndex == Slot::RALLY_POINT || $this->selectedBuildingIndex == Slot::WALL) {
             $category = 2;
             $noSoon = true;
         } elseif (in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99]) && $village->isWW()) {
@@ -166,9 +167,9 @@ class BuildCtrl extends GameCtrl
         foreach ($newBuilds['available'] as $item_id => $build) {
             if ($village->isWW() && $item_id <> Gid::WONDER_OF_THE_WORLD && in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99])) {
                 continue;
-            } elseif ($this->selectedBuildingIndex == 39 && $item_id <> Gid::RALLY_POINT) {
+            } elseif ($this->selectedBuildingIndex == Slot::RALLY_POINT && $item_id <> Gid::RALLY_POINT) {
                 continue;
-            } elseif ($this->selectedBuildingIndex == 40 && !in_array($item_id, Formulas::WALL_BUILDINGS)) {
+            } elseif ($this->selectedBuildingIndex == Slot::WALL && !in_array($item_id, Formulas::WALL_BUILDINGS)) {
                 continue;
             }
             $content .= $this->getBuildingWrapper($item_id, $build);
@@ -266,7 +267,7 @@ class BuildCtrl extends GameCtrl
                     $data['count'] = sizeof($village->getCrannyLvls()) + 1;
                     break;
                 default:
-                    for ($i = 19; $i <= 38; ++$i) {
+                    for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
                         if ($village->getField($i)['item_id'] == $item_id) {
                             ++$data['count'];
                         }
