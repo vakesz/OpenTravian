@@ -6,7 +6,9 @@
  *   success  card -> `collected`, button -> `collect collected disabled`
  *   +2000ms  `animated` removed, HUD hero bars refreshed (collect response,
  *            then hero/dataForHUD), then progressive-tasks/reload swaps the
- *            server-rendered card for the next milestone in place.
+ *            server-rendered card for the next milestone in place; when the
+ *            visible page has nothing left to collect but the scope does,
+ *            it goes back to page 1, where those tasks are listed first.
  */
 (function () {
   "use strict";
@@ -229,6 +231,31 @@
     });
   }
 
+  function isClaimableRow(html) {
+    return /class="task achieved /.test(html);
+  }
+
+  /*
+   * Rows are swapped in place, so the server order (collectable first) only applies on a page load. When the
+   * visible overview page has nothing left to collect but the scope still has collectable tasks (on another page,
+   * or pushed off this one), go back to the first page, where the server lists them first.
+   */
+  function surfaceCollectable(rows) {
+    var overview = document.querySelector("#tasks .taskOverview");
+    if (detailKey !== null || !overview || overview.querySelector(":scope > .task.achieved")) {
+      return false;
+    }
+    var claimable = Object.keys(rows).some(function (key) {
+      return isClaimableRow(rows[key]);
+    });
+    var firstPage = overview.querySelector(".pagination button.page[data-task-page-url]");
+    if (!claimable || !firstPage) {
+      return false;
+    }
+    window.location.assign(firstPage.getAttribute("data-task-page-url"));
+    return true;
+  }
+
   function reload() {
     Travian.api(
       "progressive-tasks/reload",
@@ -250,12 +277,13 @@
           }
           var claimable = ["general", "village"].some(function (scope) {
             return Object.keys((data.rows && data.rows[scope]) || {}).some(function (key) {
-              return /class="task achieved /.test(data.rows[scope][key]);
+              return isClaimableRow(data.rows[scope][key]);
             });
           });
           if (!claimable) {
             jQuery("#questmasterButton .bigSpeechBubble").remove();
           }
+          surfaceCollectable(rows);
         },
       },
       "GET",

@@ -481,6 +481,18 @@ class SendTroops extends RallyPointHTML
                             $db->mysqli->commit();
                         } else {
                             $db->mysqli->rollback();
+                            // A refusal with a reason (e.g. the outgoing-troops cap) goes back to the send form with
+                            // the troops still filled in, instead of a silent redirect to the overview.
+                            if (!empty($this->result['errorMsg'])) {
+                                $this->result['beforeError'] = true;
+                                $this->result['beforeErrorMsg'] = $this->result['errorMsg'];
+                                $this->result['error'] = false;
+                                $this->result['errorMsg'] = null;
+                                $timestamp_params = $this->generateTimestampParams();
+                                $this->result['settings']['timestamp'] = $timestamp_params['timestamp'];
+                                $this->result['settings']['timestamp_checksum'] = $timestamp_params['checksum'];
+                                return $this->procSendTroopsContent();
+                            }
                         }
                     }
                 }
@@ -1084,15 +1096,6 @@ class SendTroops extends RallyPointHTML
             $insert['ctar2'] = 0;
         }
         $move = new MovementsModel();
-        $leaving = (int)array_sum($units);
-        if (MovementsModel::accountOutgoingTroops((int)$session->getPlayerId()) + $leaving > MovementsModel::OUTGOING_CAP) {
-            if ($ship) {
-                \Game\Ships::restore((int)$session->getKid(), $ship);
-            }
-            $this->result['error'] = true;
-            $this->result['errorMsg'] = T('RallyPoint', 'Errors.tooManyTroopsOut', 'You cannot have more than 20,000 troops outside your villages.');
-            return false;
-        }
         $stmtSuccess = Units::modifyUnits($session->getKid(), $units);
         if (!$stmtSuccess) {
             if ($ship) {

@@ -6,10 +6,12 @@ declare(strict_types=1);
  * Contract: gold "Upgrade to max level" (speed-world shortcut) is ExtraModules::upgradeToMaxLevel,
  * gated by SpeedShortcuts, priced via extraSettings.upgradeToMaxLevel.coins (World rules editable),
  * and accepts nested WayOfPayment additionalData ({additionalData: {gid}} as well as {gid}).
+ * A local dev stack (TRAVIAN_DEV_TOOLS=1) has it on regardless of the rule.
  */
 
 $root = dirname(__DIR__, 2);
 require_once $root . '/game/include/Game/WorldOverrides.php';
+require_once $root . '/game/include/Core/Dev/RequestTiming.php';
 require_once $root . '/game/include/Game/SpeedShortcuts.php';
 
 function expectUpgradeToMaxLevel(bool $ok, string $message): void
@@ -100,5 +102,12 @@ expectUpgradeToMaxLevel(
     str_contains($smithyLayout, 'return {additionalData: {nr:'),
     'Smithy getNr callbacks return nested additionalData (unwrap must keep working).'
 );
+
+putenv('TRAVIAN_DEV_TOOLS=1');
+expectUpgradeToMaxLevel(
+    \Game\SpeedShortcuts::enabled(),
+    'A local dev stack (TRAVIAN_DEV_TOOLS=1) must have the speed shortcuts on whatever the world rule says.'
+);
+putenv('TRAVIAN_DEV_TOOLS');
 
 echo "Upgrade to max level contract passed.\n";

@@ -39,15 +39,27 @@ try {
     if (secondsToString(5943, true) !== '0:00:06' || str_contains(secondsToString(5943, true), 'ms')) {
         failHighSpeedQueuePresentation('Training-time labels must show whole seconds, never a (+ms) remainder.');
     }
+    if (secondsToString(715, true) !== '715 ms' || secondsToString(21, true) !== '21 ms' || secondsToString(1000, true) !== '0:00:01') {
+        failHighSpeedQueuePresentation('A sub-second millisecond training duration must show as milliseconds, a full second as the clock.');
+    }
 
     $config->game->useMilSeconds = false;
     $config->game->useNanoseconds = true;
     if (trainingTimeDisplaySeconds(71_595) !== 1 || trainingTimeDisplaySeconds(1_000_000_000) !== 1) {
         failHighSpeedQueuePresentation('A positive sub-second nanosecond training duration must remain visible as one second.');
     }
-    if (secondsToString(1_500_000_000, true) !== '0:00:02' || str_contains(secondsToString(71_595, true), 'ms')) {
-        failHighSpeedQueuePresentation('Nanosecond training-time labels must also show whole seconds only.');
+    if (secondsToString(1_500_000_000, true) !== '0:00:02' || str_contains(secondsToString(1_500_000_000, true), 'ms')) {
+        failHighSpeedQueuePresentation('Nanosecond training-time labels of a second or more must show whole seconds only.');
     }
+    if (secondsToString(71_595, true) !== '0.072 ms' || secondsToString(21_000_000, true) !== '21 ms' || secondsToString(1, true) !== '0.000001 ms') {
+        failHighSpeedQueuePresentation('A sub-second nanosecond training duration must show as milliseconds: ' . secondsToString(71_595, true));
+    }
+
+    $config->game->useNanoseconds = false;
+    if (secondsToString(1, true) !== '0:00:01') {
+        failHighSpeedQueuePresentation('The whole-second clock (x20 and below) never shows milliseconds.');
+    }
+    $config->game->useNanoseconds = true;
 
     if (!str_contains(appendTimer(-1), 'value="0">0:00:00</span>')) {
         failHighSpeedQueuePresentation('An overdue server-rendered countdown must clamp to zero instead of rendering a negative clock.');

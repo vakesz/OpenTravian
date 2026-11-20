@@ -52,6 +52,19 @@ final class WorldSpeedProfile
     }
 
     /**
+     * Culture point production (buildings and the hero's helmet) per real day is multiplied by this: 1 through x10,
+     * where the Legends values hold, then speed ÷ 10, so expansion keeps pace with the economy on speed worlds
+     * (x100: ×10, x10000: ×1000). Stored rates (users.cp_prod, vdata.cp) stay unscaled; celebrations and one-off
+     * culture point rewards have their own rules.
+     */
+    public static function culturePointProductionMultiplier(int $speed): float
+    {
+        $speed = self::speed($speed);
+
+        return $speed > 10 ? $speed / 10 : 1.0;
+    }
+
+    /**
      * Moderated troop/hero map movement vs economic speed.
      * Above 250× the historical high-speed band is floored at the 250× value so
      * raising world speed never reduces movement (product decision 2026-11-04).

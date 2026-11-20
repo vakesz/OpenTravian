@@ -79,6 +79,8 @@ foreach (WorldSpeedProfile::profile($speed) as $key => $value) {
 $config->game->useMilSeconds = $unit >= 1000;
 $config->game->useNanoseconds = $unit >= 1000000000;
 $config->custom->speedShortcuts = $scenario !== 'rule off';
+// A dev stack (TRAVIAN_DEV_TOOLS=1) forces the shortcuts on; the rule-off case must not inherit it.
+putenv('TRAVIAN_DEV_TOOLS');
 // The runtime is about the shortcut, not the state of the round: a finished local world must not hide it.
 $config->dynamic->serverFinished = 0;
 $at = "at x{$speed} ({$scenario})";

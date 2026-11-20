@@ -3625,7 +3625,8 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
         if (getGameSpeed() <= 10) {
             $time = round($time);
         }
-        // At least one second, stored in this queue's unit (1 s, 1 ms or 1 ns).
+        // At least one tick of this queue's clock: 1 s up to x20, so sub-second training on the millisecond
+        // (above x20) and nanosecond (above x20000) clocks of speed worlds.
         // Never zero: a training_time of 0 marks a row as complete.
         return max(floor($time), self::minimumQueueDuration());
     }
@@ -3640,20 +3641,19 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
      */
     public static function uHealingTime($unitId, $buildingLevel): int
     {
-        // Half the training time, and at least one second in the queue's unit.
+        // Half the training time, and at least one tick of the queue's clock.
         $half = (int)round(self::uTrainingTime($unitId, $buildingLevel) * Wounded::HEAL_TIME_FACTOR);
 
         return max(self::minimumQueueDuration(), $half);
     }
 
-    /** One second in the unit a training or healing queue stores at the current speed. */
+    /**
+     * The shortest training or healing duration: one tick of the queue's clock (1 s, 1 ms or 1 ns). The engine credits
+     * every unit whose tick has passed, so several sub-second units finish in one worker pass.
+     */
     private static function minimumQueueDuration(): int
     {
-        if (Config::getProperty("game", "useNanoseconds")) {
-            return 1_000_000_000;
-        }
-
-        return Config::getProperty("game", "useMilSeconds") ? Time::SECOND_MS : 1;
+        return 1;
     }
 
     /**

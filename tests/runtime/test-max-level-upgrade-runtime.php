@@ -74,6 +74,8 @@ foreach (WorldSpeedProfile::profile($speed) as $key => $value) {
 $config->game->useMilSeconds = $speed > 20;
 $config->game->useNanoseconds = $speed > 20000;
 $config->custom->speedShortcuts = $scenario !== 'rule off';
+// A dev stack (TRAVIAN_DEV_TOOLS=1) forces the shortcuts on; the rule-off case must not inherit it.
+putenv('TRAVIAN_DEV_TOOLS');
 $config->dynamic->serverFinished = 0;
 $config->extraSettings->upgradeToMaxLevel->coins = 20;
 $at = "at x{$speed} ({$scenario})";

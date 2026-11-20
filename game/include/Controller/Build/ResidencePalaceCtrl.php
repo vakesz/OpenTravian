@@ -108,15 +108,17 @@ class ResidencePalaceCtrl extends AnyCtrl
         $view->vars['max_village_count'] = $i;
         $view->vars['curCP'] = $currentCP;
         $view->vars['nextCP'] = $newVillageCP;
-        $view->vars['activeVillageCP'] = Village::getInstance()->getCP();
-        $view->vars['otherVillageCP'] = $villages['total_cp'] - Village::getInstance()->getCP();
+        // Production per real day, with the world-speed multiplier (x1 through x10: unchanged).
+        $speedMultiplier = \Game\Helpers\CulturePointsHelper::productionMultiplier();
+        $view->vars['activeVillageCP'] = round(Village::getInstance()->getCP() * $speedMultiplier);
+        $view->vars['otherVillageCP'] = round(($villages['total_cp'] - Village::getInstance()->getCP()) * $speedMultiplier);
         $view->vars['hasAlliance'] = Session::getInstance()->getAllianceId() > 0;
         $view->vars['allianceBonus'] = !$view->vars['hasAlliance'] ? 1 : AllianceBonus::getCulturePointProductionBonus(
             Session::getInstance()->getAllianceId(),
             Session::getInstance()->getAllianceJoinTime()
         );
         $helper = new HeroHelper();
-        $view->vars['heroCP'] = $helper->calcMoreCulturePoints($helmet);
+        $view->vars['heroCP'] = round($helper->calcMoreCulturePoints($helmet) * $speedMultiplier);
         $totalInSecond = ($view->vars['activeVillageCP'] + $view->vars['otherVillageCP'] + $view->vars['heroCP']) / Time::DAY;
         $totalInSecond = min($totalInSecond, 1e8);
         $nextVillageAt = $totalInSecond == 0 ? null : (int) (time() + (($newVillageCP - $currentCP) / $totalInSecond));
