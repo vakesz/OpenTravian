@@ -262,7 +262,7 @@ $constructEnd = $constructStart === false
 $constructBuilding = $constructStart === false || $constructEnd === false
     ? ''
     : substr($villageRuntime, $constructStart, $constructEnd - $constructStart);
-$constructWwGuard = strpos($constructBuilding, 'if ($isMaster && $this->isWW() && $item_id <> 40)');
+$constructWwGuard = strpos($constructBuilding, 'if ($isMaster && $this->isWW() && $item_id <> Gid::WONDER_OF_THE_WORLD)');
 $constructQueueInsert = strpos($constructBuilding, 'INSERT INTO building_upgrade');
 expectFinishConstructionCapability(
     $constructWwGuard !== false

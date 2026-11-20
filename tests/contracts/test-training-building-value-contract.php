@@ -21,7 +21,7 @@ if ($controller === false || $wrapper === false) {
     failTrainingBuildingValueContract('Unable to read training-building sources.');
 }
 
-if (preg_match('/case 19:.*case 20:.*case 21:.*case 29:.*case 30:.*getTrainingTimeValuesTable\(\$contract\)/s', $controller) !== 1) {
+if (preg_match('/case Gid::BARRACKS:.*case Gid::STABLE:.*case Gid::WORKSHOP:.*case Gid::GREAT_BARRACKS:.*case Gid::GREAT_STABLE:.*getTrainingTimeValuesTable\(\$contract\)/s', $controller) !== 1) {
     failTrainingBuildingValueContract('All normal and Great training buildings must render the shared training-time value table.');
 }
 

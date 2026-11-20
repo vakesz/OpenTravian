@@ -80,12 +80,12 @@ if (!str_contains($controller, 'function label(')
     || !str_contains($controller, "T('Buildings', \$m[1] . '.title')")) {
     failTaskUiContract('Task labels must use the locale-aware building names.');
 }
-foreach ([17 => 'Marketplace', 19 => 'Barracks'] as $gid => $label) {
+foreach (['Gid::MARKETPLACE' => 'Marketplace', 'Gid::BARRACKS' => 'Barracks'] as $gid => $label) {
     if (!str_contains($tasksModel, "[[{$gid}], '{$label}', [1, 3, 7, 12, 20]]")) {
         failTaskUiContract("The spawn task catalogue must include the {$label} levels from article 17.");
     }
 }
-if (!str_contains($tasksModel, "[[25, 26, 44], 'Residence', [1, 3, 7, 10, 20]]")
+if (!str_contains($tasksModel, "[Gid::EXPANSION, 'Residence', [1, 3, 7, 10, 20]]")
     || !str_contains($tasksModel, "\$kind === 'spawn' ? [2, 3, 5, 8, 10] : [2, 5, 10]")) {
     failTaskUiContract('Spawn tasks must use the article 17 residence and field milestones.');
 }

@@ -17,9 +17,9 @@ use Core\Village;
  */
 final class FinishConstruction
 {
-    private const RESIDENCE_GID = 25;
-    private const PALACE_GID = 26;
-    private const COMMAND_CENTER_GID = 44;
+    private const RESIDENCE_GID = Gid::RESIDENCE;
+    private const PALACE_GID = Gid::PALACE;
+    private const COMMAND_CENTER_GID = Gid::COMMAND_CENTER;
 
     private function __construct()
     {
@@ -41,7 +41,7 @@ final class FinishConstruction
 
     public static function canFinishWithGold(int $buildingGid, bool $isWorldWonder): bool
     {
-        if ($isWorldWonder || $buildingGid === 40 || $buildingGid === self::COMMAND_CENTER_GID) {
+        if ($isWorldWonder || $buildingGid === Gid::WONDER_OF_THE_WORLD || $buildingGid === self::COMMAND_CENTER_GID) {
             return false;
         }
         if (!in_array($buildingGid, [self::RESIDENCE_GID, self::PALACE_GID], true)) {

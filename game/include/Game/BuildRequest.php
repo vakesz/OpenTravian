@@ -43,7 +43,7 @@ final class BuildRequest
         if (is_array($field) && (int)$field['item_id'] === $gid && $gid > 0) {
             // Gold "Upgrade to max level" is ExtraModules::upgradeToMaxLevel (instant); &max is not a build path.
             $village->upgradeBuilding($slot, $master);
-        } elseif (is_array($field) && (int)$field['item_id'] === 0 && $gid > 4) {
+        } elseif (is_array($field) && (int)$field['item_id'] === 0 && $gid > Gid::LAST_RESOURCE_FIELD) {
             $village->constructBuilding($slot, $gid, $master);
         }
 

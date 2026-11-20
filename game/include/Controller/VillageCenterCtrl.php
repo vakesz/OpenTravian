@@ -11,6 +11,7 @@ use Game\Buildings\BuildingHelper;
 use Game\Buildings\BuildingRearranger;
 use Game\BuildRequest;
 use Game\Formulas;
+use Game\Gid;
 use Model\WonderOfTheWorldModel;
 use resources\View\GameView;
 use resources\View\PHPBatchView;
@@ -114,7 +115,7 @@ class VillageCenterCtrl extends GameCtrl
             return false;
         }
         for ($i = BuildingRearranger::FIRST_MOVABLE_SLOT; $i <= BuildingRearranger::LAST_MOVABLE_SLOT; ++$i) {
-            if ((int)$village->getField($i)['item_id'] === 15 && (int)$village->getField($i)['level'] >= 1) {
+            if ((int)$village->getField($i)['item_id'] === Gid::MAIN_BUILDING && (int)$village->getField($i)['level'] >= 1) {
                 return true;
             }
         }
@@ -196,7 +197,7 @@ class VillageCenterCtrl extends GameCtrl
             $item_id = $village->getField($i)['item_id'];
             $lvl = $village->getField($i)['level'] + $village->getField($i)['upgrade_state'] + 1;
             $cost = Formulas::buildingUpgradeCosts($item_id, $lvl);
-            if (!$village->isWorkersBusy(false, $item_id == 40)['isBusy'] && $village->isResourcesAvailable($cost) && !$village->checkArtifactDependencies($item_id) && $village->checkDependencies($item_id, $lvl) == 0) {
+            if (!$village->isWorkersBusy(false, $item_id == Gid::WONDER_OF_THE_WORLD)['isBusy'] && $village->isResourcesAvailable($cost) && !$village->checkArtifactDependencies($item_id) && $village->checkDependencies($item_id, $lvl) == 0) {
                 $color = 'good';
             } else {
                 $color = 'notNow';

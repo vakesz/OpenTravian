@@ -11,7 +11,9 @@ use Core\Security\Password;
 use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
+use Game\Gid;
 use Game\Helpers\LoyaltyHelper;
+use Game\Unit;
 use Game\TrainingHelper;
 use Game\Hero\HeroHelper;
 use Core\Locale;
@@ -43,7 +45,7 @@ class ResidencePalaceCtrl extends AnyCtrl
         $this->view->vars['selectedTabId'] = isset($_REQUEST['s']) && $_REQUEST['s'] >= 0 && $_REQUEST['s'] <= 4 ? (int)$_REQUEST['s'] : (int)$this->view->vars['favor'];
         if ($this->view->vars['selectedTabId'] == 0 || $buildingInfo['level'] <= 0) {
             $this->view->vars['content'] .= $build->getBuildingContract();
-            if ($this->building_id == 26 && $buildingInfo['level'] >= 1) {
+            if ($this->building_id == Gid::PALACE && $buildingInfo['level'] >= 1) {
                 $view = new PHPBatchView("build/building/ResidenceChangeCapital");
                 $view->vars['showForm'] = FALSE;
                 $view->vars['error'] = '';
@@ -177,8 +179,8 @@ class ResidencePalaceCtrl extends AnyCtrl
         $view->vars['slots'] = $slots;
         $view->vars['gid'] = (int) $this->building_id;
         $view->vars['race'] = $race;
-        $view->vars['settlerUnit'] = nrToUnitId(10, $race);
-        $view->vars['chiefUnit'] = nrToUnitId(9, $race);
+        $view->vars['settlerUnit'] = nrToUnitId(Unit::SETTLER, $race);
+        $view->vars['chiefUnit'] = nrToUnitId(Unit::CHIEF, $race);
         $view->vars['settleCost'] = Formulas::newVillageCost();
         $this->view->vars['content'] .= $view->output();
     }

@@ -13,6 +13,7 @@ use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\ButtonPagination;
 use Game\Formulas;
+use Game\Gid;
 use Game\GoldHelper;
 use Core\Locale;
 use Model\MarketModel;
@@ -109,7 +110,7 @@ class MarketPlaceCtrl extends AnyCtrl
         }
         $merchant_cap = max(1, (int)floor(Formulas::merchantCAP(
             Session::getInstance()->getRace(),
-            max(Village::getInstance()->getTypeLevel(28)),
+            max(Village::getInstance()->getTypeLevel(Gid::TRADE_OFFICE)),
             $alliance_bonus
         )));
         $view->vars['merchantCapacity'] = $merchant_cap;
@@ -312,7 +313,7 @@ class MarketPlaceCtrl extends AnyCtrl
 
         $merchant_cap = max(1, (int)floor(Formulas::merchantCAP(
             $session->getRace(),
-            max(Village::getInstance()->getTypeLevel(28)),
+            max(Village::getInstance()->getTypeLevel(Gid::TRADE_OFFICE)),
             $alliance_bonus
         )));
         $view->vars['merchantCapacity'] = $merchant_cap;
@@ -457,7 +458,7 @@ class MarketPlaceCtrl extends AnyCtrl
 
         $merchant_cap = max(1, (int)floor(Formulas::merchantCAP(
             Session::getInstance()->getRace(),
-            max(Village::getInstance()->getTypeLevel(28)),
+            max(Village::getInstance()->getTypeLevel(Gid::TRADE_OFFICE)),
             $alliance_bonus
         )));
         $view->vars['total_merchants'] = $this->building_level;
@@ -465,7 +466,7 @@ class MarketPlaceCtrl extends AnyCtrl
         $view->vars['merchantCapacityValue'] = $merchant_cap;
         $tradeShips = \Game\Ships::homeShips((int)Village::getInstance()->getKid())[\Game\Ships::TRADE];
         $view->vars['tradeShips'] = $tradeShips;
-        $view->vars['tradeShipCapacity'] = $tradeShips > 0 ? \Game\Ships::tradeCapacity((int)Session::getInstance()->getRace(), (int)max(Village::getInstance()->getTypeLevel(28)), (float)$alliance_bonus) : 0;
+        $view->vars['tradeShipCapacity'] = $tradeShips > 0 ? \Game\Ships::tradeCapacity((int)Session::getInstance()->getRace(), (int)max(Village::getInstance()->getTypeLevel(Gid::TRADE_OFFICE)), (float)$alliance_bonus) : 0;
         $view->vars['index'] = $this->view->vars['index'];
         $view->vars['hasGoldClub'] = $session->hasGoldClub();
         $view->vars['hasPlus'] = $session->hasPlus();
@@ -485,7 +486,7 @@ class MarketPlaceCtrl extends AnyCtrl
             $alliance_bonus = AllianceBonus::getTradersBonus($session->getAllianceId(), $session->getAllianceJoinTime());
         }
 
-        $merchant_cap = Formulas::merchantCAP(Session::getInstance()->getRace(), max(Village::getInstance()->getTypeLevel(28)), $alliance_bonus);
+        $merchant_cap = Formulas::merchantCAP(Session::getInstance()->getRace(), max(Village::getInstance()->getTypeLevel(Gid::TRADE_OFFICE)), $alliance_bonus);
         $m = new MarketModel();
         $view = new PHPBatchView("build/building/MarketplaceManagement");
         $helper = new GoldHelper();
@@ -513,7 +514,7 @@ class MarketPlaceCtrl extends AnyCtrl
         }
         $merchant_cap = Formulas::merchantCAP(
             $session->getRace(),
-            max(Village::getInstance()->getTypeLevel(28)),
+            max(Village::getInstance()->getTypeLevel(Gid::TRADE_OFFICE)),
             $alliance_bonus
         );
         $m = new MarketModel();

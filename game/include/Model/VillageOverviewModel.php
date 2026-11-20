@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\Gid;
 use mysqli_result;
 
 class VillageOverviewModel
@@ -132,7 +133,7 @@ class VillageOverviewModel
      */
     public function getResidencePalaceLevel(int $capWref): array|false
     {
-        $building = $this->findBuilding($capWref, [25, 26, 44]);
+        $building = $this->findBuilding($capWref, Gid::EXPANSION);
 
         return $building === null ? false : ['item_id' => $building['item_id'], 'level' => $building['level']];
     }
@@ -140,7 +141,7 @@ class VillageOverviewModel
     /** Town Hall level, 0 when the village has none. */
     public function getTHLevel(int $capWref): int
     {
-        return $this->findBuilding($capWref, [24])['level'] ?? 0;
+        return $this->findBuilding($capWref, [Gid::TOWN_HALL])['level'] ?? 0;
     }
 
     /**

@@ -25,6 +25,7 @@ use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\ExtraModules;
 use Game\Formulas;
+use Game\Gid;
 use Game\GoldHelper;
 use Model\ArtefactsModel;
 use Model\WonderOfTheWorldModel;
@@ -78,7 +79,7 @@ class BuildCtrl extends GameCtrl
         // building header, Rally Point, and their tables stretch and overlap.
         // Reference content token is `build` (not the contentPage wrapper class).
         $this->view->vars['contentCssClass'] = 'build';
-        if ((int)$field['item_id'] === 15) {
+        if ((int)$field['item_id'] === Gid::MAIN_BUILDING) {
             $this->view->vars['contentCssClass'] .= ' buildMainBuilding';
         }
         $this->view->newVillagePrefix['id'] = $this->selectedBuildingIndex;
@@ -87,12 +88,12 @@ class BuildCtrl extends GameCtrl
 
         if ($field['item_id']) {
             $this->view->vars['manualBuildingId'] = (int)$field['item_id'];
-            if (in_array((int)$field['item_id'], [17, 19], true)) {
+            if (in_array((int)$field['item_id'], [Gid::MARKETPLACE, Gid::BARRACKS], true)) {
                 // The reference offers contextual help on the Marketplace and Barracks; here it opens the building manual.
                 $this->view->vars['contextualHelpBuildingId'] = (int)$field['item_id'];
             }
             $this->view->vars['titleInHeader'] = T("Buildings", $field['item_id'] . '.title') . ' <span class="level">' . T("Buildings", "level") . ' ' . $field['level'] . '</span>';
-            if ($field['item_id'] > 4) {
+            if ($field['item_id'] > Gid::LAST_RESOURCE_FIELD) {
                 $this->view->newVillagePrefix['gid'] = $field['item_id'];
             }
         } else {
@@ -163,9 +164,9 @@ class BuildCtrl extends GameCtrl
         $view->vars = ["selectedId" => $this->selectedBuildingIndex, "activeTab" => $category, "InfrastructureTab" => ["id" => get_button_id(), "text" => T("Buildings", "newBuilding.Infrastructure"),], "MilitaryTab" => ["id" => get_button_id(), "text" => T("Buildings", "newBuilding.Military"),], "ResourcesTab" => ["id" => get_button_id(), "text" => T("Buildings", "newBuilding.Resources"),],];
         $content = $view->output();
         foreach ($newBuilds['available'] as $item_id => $build) {
-            if ($village->isWW() && $item_id <> 40 && in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99])) {
+            if ($village->isWW() && $item_id <> Gid::WONDER_OF_THE_WORLD && in_array($this->selectedBuildingIndex, [...WonderOfTheWorldModel::RESERVED_SLOTS, 99])) {
                 continue;
-            } elseif ($this->selectedBuildingIndex == 39 && $item_id <> 16) {
+            } elseif ($this->selectedBuildingIndex == 39 && $item_id <> Gid::RALLY_POINT) {
                 continue;
             } elseif ($this->selectedBuildingIndex == 40 && !in_array($item_id, Formulas::WALL_BUILDINGS)) {
                 continue;
@@ -198,9 +199,9 @@ class BuildCtrl extends GameCtrl
     private function getCategoryAvailableBuildings($category)
     {
         $categories = [1 =>
-            [15, 23, 10, 11, 18, 17, 25, 26, 44, 45, 49, 34, 27, 24, 28, 35, 41, 39, 38, 40,],
-            [16, 31, 32, 33, 42, 43, 47, 50, 19, 36, 37, 22, 13, 20, 29, 30, 21, 46, 14, 48],
-            [8, 5, 6, 7, 9],
+            [Gid::MAIN_BUILDING, Gid::CRANNY, Gid::WAREHOUSE, Gid::GRANARY, Gid::EMBASSY, Gid::MARKETPLACE, Gid::RESIDENCE, Gid::PALACE, Gid::COMMAND_CENTER, Gid::WATERWORKS, Gid::HARBOR, Gid::STONEMASON, Gid::TREASURY, Gid::TOWN_HALL, Gid::TRADE_OFFICE, Gid::BREWERY, Gid::HORSE_DRINKING_TROUGH, Gid::GREAT_GRANARY, Gid::GREAT_WAREHOUSE, Gid::WONDER_OF_THE_WORLD,],
+            [Gid::RALLY_POINT, Gid::CITY_WALL, Gid::EARTH_WALL, Gid::PALISADE, Gid::STONE_WALL, Gid::MAKESHIFT_WALL, Gid::DEFENSIVE_WALL, Gid::BARRICADE, Gid::BARRACKS, Gid::TRAPPER, Gid::HEROS_MANSION, Gid::ACADEMY, Gid::SMITHY, Gid::STABLE, Gid::GREAT_BARRACKS, Gid::GREAT_STABLE, Gid::WORKSHOP, Gid::HOSPITAL, Gid::TOURNAMENT_SQUARE, Gid::ASCLEPEION],
+            [Gid::GRAIN_MILL, Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::BAKERY],
         ];
         $newBuilds = ['available' => [], 'soon' => []];
         $village = Village::getInstance();
@@ -258,10 +259,10 @@ class BuildCtrl extends GameCtrl
         $multi = Formulas::$data['buildings'][$item_id - 1];
         if (isset($multi['req']) && isset($multi['req']['multi']) && $multi['req']['multi'] == true) {
             switch ($item_id) {
-                case 36:
+                case Gid::TRAPPER:
                     $data['count'] = sizeof($village->getTrapperLvls()) + 1;
                     break;
-                case 23:
+                case Gid::CRANNY:
                     $data['count'] = sizeof($village->getCrannyLvls()) + 1;
                     break;
                 default:
@@ -324,68 +325,68 @@ class BuildCtrl extends GameCtrl
         };
 
         switch ($itemId) {
-            case 5:
+            case Gid::SAWMILL:
                 $add('lumberBonus_small', $level * 5, '%');
                 break;
-            case 6:
+            case Gid::BRICKYARD:
                 $add('clayBonus_small', $level * 5, '%');
                 break;
-            case 7:
+            case Gid::IRON_FOUNDRY:
                 $add('ironBonus_small', $level * 5, '%');
                 break;
-            case 8:
-            case 9:
+            case Gid::GRAIN_MILL:
+            case Gid::BAKERY:
                 $add('cropBonus_medium', $level * 5, '%');
                 break;
-            case 10:
+            case Gid::WAREHOUSE:
                 $add('warehouseCap_medium', Formulas::storeCAP($level));
                 break;
-            case 11:
+            case Gid::GRANARY:
                 $add('granaryCap_medium', Formulas::storeCAP($level));
                 break;
-            case 14:
+            case Gid::TOURNAMENT_SQUARE:
                 $add('troopSpeed_medium', Formulas::TournamentSqValue($level), '%');
                 break;
-            case 15:
+            case Gid::MAIN_BUILDING:
                 $add('constructionTime_medium', Formulas::getMainBuildingValue($level), '%');
                 break;
-            case 19:
-            case 29:
+            case Gid::BARRACKS:
+            case Gid::GREAT_BARRACKS:
                 $add('infantryBonusTime_medium', $this->trainingTimeReduction($level), '%');
                 break;
-            case 20:
-            case 30:
+            case Gid::STABLE:
+            case Gid::GREAT_STABLE:
                 $add('cavalryBonusTime_medium', $this->trainingTimeReduction($level), '%');
                 break;
-            case 21:
+            case Gid::WORKSHOP:
                 $add('siegeTime_small', $this->trainingTimeReduction($level), '%');
                 break;
-            case 23:
+            case Gid::CRANNY:
                 $add('crannyCap_small', Formulas::crannyCAP($level, $this->session->getRace()));
                 break;
-            case 28:
+            case Gid::TRADE_OFFICE:
                 $allianceBonus = $this->session->getAllianceId() > 0
                     ? AllianceBonus::getTradersBonus($this->session->getAllianceId(), $this->session->getAllianceJoinTime())
                     : 1;
                 $add('merchantCap_small', Formulas::merchantCAP($this->session->getRace(), $level, $allianceBonus));
                 break;
-            case 34:
+            case Gid::STONEMASON:
                 $add('stabilityBonus_small', Formulas::StonemasonsLodgeValue($level), '%');
                 break;
-            case 36:
+            case Gid::TRAPPER:
                 $add('maxTraps_medium', Formulas::trapperValue($level));
                 break;
-            case 38:
+            case Gid::GREAT_WAREHOUSE:
                 $add('warehouseCap_medium', Formulas::bigStoreCAP($level));
                 break;
-            case 39:
+            case Gid::GREAT_GRANARY:
                 $add('granaryCap_medium', Formulas::bigStoreCAP($level));
                 break;
-            case 46:
-            case 48:
+            case Gid::HOSPITAL:
+            case Gid::ASCLEPEION:
                 $add('healTime_medium', round(100 * pow(0.9, $level - 1), 1), '%');
                 break;
-            case 49:
+            case Gid::HARBOR:
                 $add('maxShips_medium', \Game\Ships::maxShips($level));
                 break;
             default:
@@ -413,8 +414,8 @@ class BuildCtrl extends GameCtrl
         ];
         $village = Village::getInstance();
         $fieldId = $this->selectedBuildingIndex;
-        if (($item_id == 16 || in_array($item_id, Formulas::WALL_BUILDINGS))) {
-            if ($item_id == 16) {
+        if (($item_id == Gid::RALLY_POINT || in_array($item_id, Formulas::WALL_BUILDINGS))) {
+            if ($item_id == Gid::RALLY_POINT) {
                 $fieldId = 39;
             } else {
                 $fieldId = 40;
@@ -427,7 +428,7 @@ class BuildCtrl extends GameCtrl
             $new = true;
         }
         $lvl = $village->getField($fieldId)['level'] + $village->getField($fieldId)['upgrade_state'] + 1;
-        if ($village->getField($fieldId)['item_id'] == 40 && $village->isWW()) {
+        if ($village->getField($fieldId)['item_id'] == Gid::WONDER_OF_THE_WORLD && $village->isWW()) {
             foreach ($village->onLoadBuildings['master'] as $k => $v) {
                 if ($this->selectedBuildingIndex == $v['building_field']) {
                     $lvl++;
@@ -441,7 +442,7 @@ class BuildCtrl extends GameCtrl
         } elseif ($village->getField($fieldId)['level'] + $village->getField($fieldId)['upgrade_state'] >= Formulas::buildingMaxLvl($item_id, $village->isCapital())) {
             $result['main'] = "<span class=\"none\">" . sprintf(T("Buildings", "upgradeNotices.currentlyReachingMaxLevel"), T("Buildings", $item_id . ".title")) . "</span>";
             goto outReturn;
-        } elseif ($item_id == 40 && ($lvl - 1) >= Formulas::buildingMaxLvl($item_id, $village->isCapital())) {
+        } elseif ($item_id == Gid::WONDER_OF_THE_WORLD && ($lvl - 1) >= Formulas::buildingMaxLvl($item_id, $village->isCapital())) {
             $result['main'] = "<span class=\"none\">" . sprintf(T("Buildings", "upgradeNotices.currentlyReachingMaxLevel"), T("Buildings", $item_id . ".title")) . "</span>";
             goto outReturn;
         } elseif ($village->getOnDemolishBuildingFieldId() == $fieldId) {
@@ -482,8 +483,8 @@ class BuildCtrl extends GameCtrl
             }
         }
         $session = $this->session;
-        $workerResult = $village->isWorkersBusy($item_id <= 4, $item_id == 40);
-        $pageNamePostfix = ($item_id <= 4 ? '1' : '2');
+        $workerResult = $village->isWorkersBusy($item_id <= Gid::LAST_RESOURCE_FIELD, $item_id == Gid::WONDER_OF_THE_WORLD);
+        $pageNamePostfix = ($item_id <= Gid::LAST_RESOURCE_FIELD ? '1' : '2');
         $link = '/dorf' . $pageNamePostfix . '.php?id=' . $fieldId
             . '&gid=' . $item_id
             . '&action=build&checksum=' . $session->getChecker();
@@ -491,7 +492,7 @@ class BuildCtrl extends GameCtrl
         $result['extraModuleButton'] = $new ? null : $this->maxLevelButton((int)$fieldId);
         $cost = Formulas::buildingUpgradeCosts($item_id, $lvl);
         $goldHelper = new GoldHelper();
-        if ((!$village->isWW() || $item_id == 40) && ($workerResult['isBusy'] || !$village->isResourcesAvailable($cost))) {
+        if ((!$village->isWW() || $item_id == Gid::WONDER_OF_THE_WORLD) && ($workerResult['isBusy'] || !$village->isResourcesAvailable($cost))) {
             //masterBuilder
             $result['master'] = $goldHelper->getMasterBuilderButton($fieldId, $item_id, $village->getField($fieldId)['level'] + $village->getField($fieldId)['upgrade_state'], $masterBuilderLink);
         }
@@ -506,7 +507,7 @@ class BuildCtrl extends GameCtrl
             $result['main'] = $village->calcWhenResourcesAreAvailable($cost, true);
             goto outReturn;
         }
-        $buttonLabel = $lvl == 1 && $item_id > 4 ? T("Buildings", "constructBuilding") : sprintf(T("Buildings", "upgradeBuilding"), $lvl);
+        $buttonLabel = $lvl == 1 && $item_id > Gid::LAST_RESOURCE_FIELD ? T("Buildings", "constructBuilding") : sprintf(T("Buildings", "upgradeBuilding"), $lvl);
         $btn = getButton(["type" => "button", "class" => "textButtonV1 green " . ($new ? 'new' : 'build'), "value" => $buttonLabel, "onclick" => "this.disabled = true; window.location.href = '$link'; return false;",], ['data' => ["class" => "textButtonV1 green " . ($new ? 'new' : 'build')]], $buttonLabel);
         $result['waitLoop'] = $workerResult['isPlusUsed'];
         if ($workerResult['isBusy']) {
@@ -527,21 +528,21 @@ class BuildCtrl extends GameCtrl
         //process tabs here.
         $showDesc = true;
         switch ($this->buildView->vars['selectedBuildingId']) {
-            case 16: //rally point
+            case Gid::RALLY_POINT: //rally point
                 $rallyPoint = new RallyPointCtrl($this);
                 $this->buildView->vars['content'] .= $rallyPoint->render();
                 return true;
-            case 25:
-            case 26:
-            case 44:
+            case Gid::RESIDENCE:
+            case Gid::PALACE:
+            case Gid::COMMAND_CENTER:
                 $dispatcher = new ResidencePalaceCtrl($this);
                 $this->buildView->vars['content'] .= $dispatcher->render();
                 return true;
-            case 27:
+            case Gid::TREASURY:
                 $dispatcher = new TreasuryCtrl($this);
                 $this->buildView->vars['content'] .= $dispatcher->render();
                 return true;
-            case 17://Marketplace TOD:
+            case Gid::MARKETPLACE://Marketplace TOD:
                 $dispatcher = new MarketPlaceCtrl($this);
                 $this->buildView->vars['content'] .= $dispatcher->render();
                 return true;
@@ -550,7 +551,7 @@ class BuildCtrl extends GameCtrl
             $this->buildView->vars['content'] .= $this->getBuildingContract();
         }
         switch ($this->buildView->vars['selectedBuildingId']) {
-            case 40:
+            case Gid::WONDER_OF_THE_WORLD:
                 $db = DB::getInstance();
                 $wwName = $db->fetchScalar("SELECT wwname FROM fdata WHERE kid=" . $this->session->getKid());
                 $wwNameInput = $_POST['ww_name'] ?? null;
@@ -567,19 +568,19 @@ class BuildCtrl extends GameCtrl
                 $view->vars['WWName'] = $wwName;
                 $this->buildView->vars['content'] .= $view->output();
                 break;
-            case 18:
+            case Gid::EMBASSY:
                 $view = new EmbassyCtrl($this);
                 $this->buildView->vars['content'] .= $view->render();
                 break;
-            case 15:
+            case Gid::MAIN_BUILDING:
                 $view = new MainBuildingCtrl((int)$village->getField($this->selectedBuildingIndex)['level']);
                 $this->buildView->vars['content'] .= $view->render();
                 break;
-            case 37:
+            case Gid::HEROS_MANSION:
                 $view = new HeroMansionCtrl();
                 $this->buildView->vars['content'] .= $view->render();
                 break;
-            case 24:
+            case Gid::TOWN_HALL:
                 if ($village->getField($this->selectedBuildingIndex)['level'] <= 0) {
                     break;
                 }
@@ -587,42 +588,42 @@ class BuildCtrl extends GameCtrl
                 $this->buildView->vars['content'] .= $view->render();
                 break;
 
-            case 13:
+            case Gid::SMITHY:
                 $dispatcher = new SmithyCtrl($this->selectedBuildingIndex);
                 $this->buildView->vars['content'] .= $dispatcher->render();
                 break;
-            case 22:
+            case Gid::ACADEMY:
                 $dispatcher = new AcademyCtrl($this->selectedBuildingIndex);
                 $this->buildView->vars['content'] .= $dispatcher->render();
                 break;
-            case 19:
-            case 20:
-            case 21:
-            case 29:
-            case 30:
-            case 36:
+            case Gid::BARRACKS:
+            case Gid::STABLE:
+            case Gid::WORKSHOP:
+            case Gid::GREAT_BARRACKS:
+            case Gid::GREAT_STABLE:
+            case Gid::TRAPPER:
                 if ($village->getField($this->selectedBuildingIndex)['level'] <= 0) {
                     break;
                 }
                 $dispatcher = new TroopBuilding($this->selectedBuildingIndex);
                 $this->buildView->vars['content'] .= $dispatcher->render();
                 break;
-            case 46:
-            case 48:
+            case Gid::HOSPITAL:
+            case Gid::ASCLEPEION:
                 if ($village->getField($this->selectedBuildingIndex)['level'] <= 0) {
                     break;
                 }
                 $view = new HospitalCtrl($this->selectedBuildingIndex);
                 $this->buildView->vars['content'] .= $view->render();
                 break;
-            case 49:
+            case Gid::HARBOR:
                 if ($village->getField($this->selectedBuildingIndex)['level'] <= 0) {
                     break;
                 }
                 $view = new HarborCtrl($this->selectedBuildingIndex);
                 $this->buildView->vars['content'] .= $view->render();
                 break;
-            case 35:
+            case Gid::BREWERY:
                 if ($village->getField($this->selectedBuildingIndex)['level'] <= 0) {
                     break;
                 }
@@ -700,142 +701,142 @@ class BuildCtrl extends GameCtrl
             'defenceBonus' => null,
         ];
         $item_id = $village->getField($this->selectedBuildingIndex)['item_id'];
-        if ($item_id == 14) {
+        if ($item_id == Gid::TOURNAMENT_SQUARE) {
             $contract['culturePointsAndPopulation']['troopSpeed'] = Formulas::TournamentSqValue($curLevel);
             $contract['nextLevelCpPop']['troopSpeed'] = Formulas::TournamentSqValue($nextLevel) - $contract['culturePointsAndPopulation']['troopSpeed'];
-        } elseif ($item_id == 10 ||  $item_id == 38) {
-            $contract['culturePointsAndPopulation']['warehouseCap'] = $item_id == 38 ? Formulas::bigStoreCAP($curLevel) : Formulas::storeCAP($curLevel);
-            $contract['nextLevelCpPop']['warehouseCap'] = ($item_id == 38 ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel)) - $contract['culturePointsAndPopulation']['warehouseCap'];
-        } elseif ($item_id == 11 || $item_id == 39) {
-            $contract['culturePointsAndPopulation']['granaryCap'] = $item_id == 39 ? Formulas::bigStoreCAP($curLevel) : Formulas::storeCAP($curLevel);
-            $contract['nextLevelCpPop']['granaryCap'] = ($item_id == 39 ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel)) - $contract['culturePointsAndPopulation']['granaryCap'];
-        } elseif ($item_id == 28) {
+        } elseif ($item_id == Gid::WAREHOUSE ||  $item_id == Gid::GREAT_WAREHOUSE) {
+            $contract['culturePointsAndPopulation']['warehouseCap'] = $item_id == Gid::GREAT_WAREHOUSE ? Formulas::bigStoreCAP($curLevel) : Formulas::storeCAP($curLevel);
+            $contract['nextLevelCpPop']['warehouseCap'] = ($item_id == Gid::GREAT_WAREHOUSE ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel)) - $contract['culturePointsAndPopulation']['warehouseCap'];
+        } elseif ($item_id == Gid::GRANARY || $item_id == Gid::GREAT_GRANARY) {
+            $contract['culturePointsAndPopulation']['granaryCap'] = $item_id == Gid::GREAT_GRANARY ? Formulas::bigStoreCAP($curLevel) : Formulas::storeCAP($curLevel);
+            $contract['nextLevelCpPop']['granaryCap'] = ($item_id == Gid::GREAT_GRANARY ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel)) - $contract['culturePointsAndPopulation']['granaryCap'];
+        } elseif ($item_id == Gid::TRADE_OFFICE) {
             $alliance_bonus = 1;
             if ($this->session->getAllianceId() > 0) {
                 $alliance_bonus = AllianceBonus::getTradersBonus($this->session->getAllianceId(), $this->session->getAllianceJoinTime());
             }
             $contract['culturePointsAndPopulation']['merchantCap'] = Formulas::merchantCAP($this->session->getRace(), $curLevel, $alliance_bonus);
             $contract['nextLevelCpPop']['merchantCap'] = Formulas::merchantCAP($this->session->getRace(), $nextLevel, $alliance_bonus) - $contract['culturePointsAndPopulation']['merchantCap'];
-        } elseif (in_array($item_id, [20, 30], true)) {
+        } elseif (in_array($item_id, [Gid::STABLE, Gid::GREAT_STABLE], true)) {
             $contract['culturePointsAndPopulation']['cavalryBonusTime'] = $this->trainingTimeReduction($curLevel);
             $contract['nextLevelCpPop']['cavalryBonusTime'] = $this->trainingTimeReduction($nextLevel)
                 - $contract['culturePointsAndPopulation']['cavalryBonusTime'];
-        } elseif ($item_id == 21) {
+        } elseif ($item_id == Gid::WORKSHOP) {
             $contract['culturePointsAndPopulation']['siegeTime'] = $this->trainingTimeReduction($curLevel);
             $contract['nextLevelCpPop']['siegeTime'] = $this->trainingTimeReduction($nextLevel)
                 - $contract['culturePointsAndPopulation']['siegeTime'];
-        } elseif ($item_id == 36) {
+        } elseif ($item_id == Gid::TRAPPER) {
             $contract['culturePointsAndPopulation']['maxTraps'] = Formulas::trapperValue($curLevel);
             $contract['nextLevelCpPop']['maxTraps'] = Formulas::trapperValue($nextLevel) - $contract['culturePointsAndPopulation']['maxTraps'];
-        } elseif (in_array($item_id, [19, 29], true)) {
+        } elseif (in_array($item_id, [Gid::BARRACKS, Gid::GREAT_BARRACKS], true)) {
             $contract['culturePointsAndPopulation']['infantryBonusTime'] = $this->trainingTimeReduction($curLevel);
             $contract['nextLevelCpPop']['infantryBonusTime'] = $this->trainingTimeReduction($nextLevel)
                 - $contract['culturePointsAndPopulation']['infantryBonusTime'];
-        } elseif ($item_id == 15) {
+        } elseif ($item_id == Gid::MAIN_BUILDING) {
             $contract['culturePointsAndPopulation']['constructionTime'] = Formulas::getMainBuildingValue($curLevel);
             $contract['nextLevelCpPop']['constructionTime'] = Formulas::getMainBuildingValue($curLevel) - Formulas::getMainBuildingValue($nextLevel);
-        } elseif ($item_id == 16) {
+        } elseif ($item_id == Gid::RALLY_POINT) {
             // The rally point shows an attacking army's unit types while it has fewer units than its level.
             $contract['culturePointsAndPopulation']['troopVisibility'] = max(0, $curLevel - 1);
             $contract['nextLevelCpPop']['troopVisibility'] = max(0, $nextLevel - 1) - $contract['culturePointsAndPopulation']['troopVisibility'];
         } elseif (in_array($item_id, Formulas::WALL_BUILDINGS, true)) {
             $contract['culturePointsAndPopulation']['defenceBonus'] = Formulas::wallPower($this->session->getRace(), $curLevel);
             $contract['nextLevelCpPop']['defenceBonus'] = Formulas::wallPower($this->session->getRace(), $nextLevel) - $contract['culturePointsAndPopulation']['defenceBonus'];
-        } elseif ($item_id == 23) {
+        } elseif ($item_id == Gid::CRANNY) {
             $contract['culturePointsAndPopulation']['crannyCap'] = Formulas::crannyCAP($curLevel, $this->session->getRace());
             $contract['nextLevelCpPop']['crannyCap'] = Formulas::crannyCAP($nextLevel, $this->session->getRace()) - $contract['culturePointsAndPopulation']['crannyCap'];
         }
         switch ($item_id) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
+            case Gid::WOODCUTTER:
+            case Gid::CLAY_PIT:
+            case Gid::IRON_MINE:
+            case Gid::CROPLAND:
                 $percent = $village->calculateResourcesTotalBonusProduction($item_id);
                 $this->getValuesTable($contract, ["percent" => $percent], function ($params, $lvl) {
                     return Formulas::fieldProduction($lvl) + round5(Formulas::fieldProduction($lvl) * $params['percent'] / 100);
                 });
                 break;
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 45:
+            case Gid::SAWMILL:
+            case Gid::BRICKYARD:
+            case Gid::IRON_FOUNDRY:
+            case Gid::GRAIN_MILL:
+            case Gid::BAKERY:
+            case Gid::WATERWORKS:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return $lvl * 5;
                 });
                 break;
-            case 10:
-            case 11:
-            case 38:
-            case 39:
-                $this->getValuesTable($contract, ["big" => $item_id > 11], function ($params, $lvl) {
+            case Gid::WAREHOUSE:
+            case Gid::GRANARY:
+            case Gid::GREAT_WAREHOUSE:
+            case Gid::GREAT_GRANARY:
+                $this->getValuesTable($contract, ["big" => $item_id > Gid::GRANARY], function ($params, $lvl) {
                     return $params['big'] ? Formulas::bigStoreCAP($lvl) : Formulas::storeCAP($lvl);
                 });
                 break;
-            case 23:
+            case Gid::CRANNY:
                 $increase = ArtefactsModel::getArtifactEffectByType($this->session->getPlayerId(), $village->getKid(), ArtefactsModel::ARTIFACT_CRANNY);
                 $this->getValuesTable($contract, ["race" => $this->session->getRace(), "increase" => $increase,], function ($params, $lvl) {
                     return Formulas::crannyCAP($lvl, $params['race']) * $params['increase'];
                 });
                 break;
-            case 36:
+            case Gid::TRAPPER:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return Formulas::trapperValue($lvl);
                 });
                 break;
-            case 15:
+            case Gid::MAIN_BUILDING:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return Formulas::getMainBuildingValue($lvl);
                 });
                 break;
-            case 19:
-            case 20:
-            case 21:
-            case 29:
-            case 30:
+            case Gid::BARRACKS:
+            case Gid::STABLE:
+            case Gid::WORKSHOP:
+            case Gid::GREAT_BARRACKS:
+            case Gid::GREAT_STABLE:
                 $this->getTrainingTimeValuesTable($contract);
                 break;
-            case 31:
-            case 32:
-            case 33:
-            case 42:
-            case 43:
-            case 47:
-            case 50:
+            case Gid::CITY_WALL:
+            case Gid::EARTH_WALL:
+            case Gid::PALISADE:
+            case Gid::STONE_WALL:
+            case Gid::MAKESHIFT_WALL:
+            case Gid::DEFENSIVE_WALL:
+            case Gid::BARRICADE:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return Formulas::wallPower($this->session->getRace(), $lvl);
                 });
                 break;
-            case 46:
-            case 48:
+            case Gid::HOSPITAL:
+            case Gid::ASCLEPEION:
                 // Duration of healing relative to a level-1 building (Knowledge Base building effect "healTime").
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return round(100 * pow(0.9, $lvl - 1), 1);
                 });
                 break;
-            case 41:
+            case Gid::HORSE_DRINKING_TROUGH:
                 // Training time left, as a percent of the unboosted stable time (1% faster per level).
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return 100 - $lvl;
                 });
                 break;
-            case 14:
+            case Gid::TOURNAMENT_SQUARE:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return Formulas::TournamentSqValue($lvl);
                 });
                 break;
-            case 28:
+            case Gid::TRADE_OFFICE:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return Formulas::TradeOfficeValue($this->session->getRace(), $lvl);
                 });
                 break;
-            case 34:
+            case Gid::STONEMASON:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return Formulas::StonemasonsLodgeValue($lvl);
                 });
                 break;
-            case 49:
+            case Gid::HARBOR:
                 $this->getValuesTable($contract, [], function ($params, $lvl) {
                     return \Game\Ships::maxShips($lvl);
                 });
@@ -909,9 +910,9 @@ class BuildCtrl extends GameCtrl
         //no over all for resources
         $village = Village::getInstance();
         $item_id = $village->getField($this->selectedBuildingIndex)['item_id'];
-        if ($item_id == 23 || $item_id == 36) {
+        if ($item_id == Gid::CRANNY || $item_id == Gid::TRAPPER) {
             // Lists the overall row only once a second one exists.
-            $levels = $item_id == 23 ? $village->getCrannyLvls() : $village->getTrapperLvls();
+            $levels = $item_id == Gid::CRANNY ? $village->getCrannyLvls() : $village->getTrapperLvls();
             if (count($levels) > 1) {
                 $overall = 0;
                 foreach ($levels as $lvl) {

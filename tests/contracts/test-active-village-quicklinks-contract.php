@@ -36,7 +36,7 @@ if (!str_contains($view, '$hospitalGid = $firstBuiltGid([46, 48]);')
     || str_contains($view, 'gidIfBuilt(41)')) {
     failActiveVillageQuickLinks('Hospital quick links must resolve the actual Hospital/Asclepeion gids (46/48), not Horse Drinking Trough (41).');
 }
-if (!str_contains($quickLink, 'foreach ([46, 48] as $candidate)')
+if (!str_contains($quickLink, 'foreach ([Gid::HOSPITAL, Gid::ASCLEPEION] as $candidate)')
     || str_contains($quickLink, "'HospitalManagement' => 41")) {
     failActiveVillageQuickLinks('QuickLink tooltip resolution must use Hospital/Asclepeion gids (46/48).');
 }

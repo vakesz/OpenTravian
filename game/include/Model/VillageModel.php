@@ -8,8 +8,10 @@ use Game\FarmList\FarmListInbox;
 use Core\Database\DB;
 use Game\Buildings\BuildingAction;
 use Game\Formulas;
+use Game\Gid;
 use Game\Map\Map;
 use Game\ResourcesHelper;
+use Game\Tribes;
 use function logError;
 
 class VillageModel
@@ -146,7 +148,7 @@ class VillageModel
     /** Horse Drinking Trough level (Romans only), 0 when the village has none. */
     public static function getHDP(int $kid, int|string|null $race = null): int
     {
-        if ($race !== null && (int) $race !== 1) {
+        if ($race !== null && (int) $race !== Tribes::ROMANS) {
             return 0;
         }
 
@@ -200,7 +202,7 @@ class VillageModel
             return 0;
         }
 
-        return self::findBuildingLevel((int) $capVillage['kid'], 19, 35);
+        return self::findBuildingLevel((int) $capVillage['kid'], 19, Gid::BREWERY);
     }
 
     public function changeCapital(int $uid, int $new_capital_kid): bool
@@ -212,14 +214,14 @@ class VillageModel
         }
         $buildings = $this->getBuildingsAssoc($new_capital_kid);
         for ($i = 19; $i <= 40; ++$i) {
-            if (in_array($buildings[$i]['item_id'], [29, 30])) {
+            if (in_array($buildings[$i]['item_id'], [Gid::GREAT_BARRACKS, Gid::GREAT_STABLE])) {
                 BuildingAction::downgrade($new_capital_kid, $i, 0, true);
             }
         }
         ResourcesHelper::updateVillageResources($new_capital_kid, FALSE);
         $buildings = $this->getBuildingsAssoc($capital_kid);
         for ($i = 19; $i <= 40; ++$i) {
-            if (in_array($buildings[$i]['item_id'], [34, 35])) {
+            if (in_array($buildings[$i]['item_id'], [Gid::STONEMASON, Gid::BREWERY])) {
                 BuildingAction::downgrade($capital_kid, $i, 0, true);
             }
         }
@@ -302,7 +304,7 @@ class VillageModel
         if ($newUidPop > $pop) {
             foreach ($buildings as $index => $build) {
                 if ($build['item_id'] && $build['level']) {
-                    if ($build['item_id'] > 4 && ($build['level'] - 1) == 0) {
+                    if ($build['item_id'] > Gid::LAST_RESOURCE_FIELD && ($build['level'] - 1) == 0) {
                         $build['item_id'] = 0;
                     }
                     $build['level']--;
@@ -376,7 +378,7 @@ class VillageModel
         if (!is_array($buildings)) {
             return false;
         }
-        $tribeSpecificArray = [34, 29, 30, 35];
+        $tribeSpecificArray = [Gid::STONEMASON, Gid::GREAT_BARRACKS, Gid::GREAT_STABLE, Gid::BREWERY];
         for ($i = 19; $i <= 40; $i++) {
             if (in_array((int) $buildings['f' . $i . 't'], $tribeSpecificArray, true)) {
                 BuildingAction::downgrade($kid, $i, 0, true);

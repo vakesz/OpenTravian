@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Game\Manual;
 
 use Game\Formulas;
+use Game\Gid;
+use Game\Tribes;
 use resources\View\PHPBatchView;
 
 /**
@@ -18,7 +20,7 @@ final class ManualContent
      * renders a building's manual art with the tribe that owns it; shared
      * buildings and the Asclepeion use the Gaul art (capture 2026-10-30).
      */
-    private const ART_TRIBE = [41 => 'roman', 42 => 'egyptian', 43 => 'hun', 44 => 'hun', 45 => 'egyptian', 47 => 'spartan', 50 => 'viking'];
+    private const ART_TRIBE = [Gid::HORSE_DRINKING_TROUGH => 'roman', Gid::STONE_WALL => 'egyptian', Gid::MAKESHIFT_WALL => 'hun', Gid::COMMAND_CENTER => 'hun', Gid::WATERWORKS => 'egyptian', Gid::DEFENSIVE_WALL => 'spartan', Gid::BARRICADE => 'viking'];
 
     public function renderOverview(): string
     {
@@ -27,7 +29,7 @@ final class ManualContent
 
     public function renderBuilding(int $buildingId): string
     {
-        if ($buildingId < 1 || $buildingId > 50 || $buildingId === 12) {
+        if ($buildingId < 1 || $buildingId > Gid::BARRICADE || $buildingId === Gid::BLACKSMITH) {
             throw new \DomainException('The requested manual entry is not available.');
         }
 
@@ -102,7 +104,7 @@ final class ManualContent
         if ((($building['req'] ?? [])['capital'] ?? 0) == 1) {
             $requirements[] = T('Manual', 'Capital');
         }
-        if ($buildingId === 40) {
+        if ($buildingId === Gid::WONDER_OF_THE_WORLD) {
             $requirements[] = T('Manual', 'BuildingPlan');
         }
 
@@ -119,7 +121,7 @@ final class ManualContent
                 $this->buildingLink(25, 10),
                 $this->buildingLink(26, 10),
             ];
-            if ($tribe === 7) {
+            if ($tribe === Tribes::HUNS) {
                 $requirements[] = $this->buildingLink(44, 10);
             }
 

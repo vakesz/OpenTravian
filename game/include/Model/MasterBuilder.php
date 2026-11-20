@@ -8,8 +8,10 @@ use Core\Config;
 use Core\Database\DB;
 use Game\Buildings\BuildingHelper;
 use Game\Formulas;
+use Game\Gid;
 use Game\GoldHelper;
 use Game\ResourcesHelper;
+use Game\Tribes;
 
 use function logError;
 
@@ -47,13 +49,13 @@ class MasterBuilder
             $player['plus'] >= time(),
             (int) $row['kid'],
             $row['building_field'] <= 18,
-            $item_id == 40);
+            $item_id == Gid::WONDER_OF_THE_WORLD);
         if ($workers['isBusy']) {
             //logError("MasterBuilder: Workers were busy.");
             return;
         }
         //ignore  ww here
-        if ($item_id <> 40) {
+        if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
             if (!$this->isResourcesAvailable($village, $costs)) {
                 //maybe a server lag!
                 //logError("MasterBuilder: Resources not available.");
@@ -66,7 +68,7 @@ class MasterBuilder
         }
 
         $gold = 0;
-        if ($item_id <> 40) {
+        if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
             $gold = Config::getInstance()->gold->masterBuilderGold;
             if (($player['gift_gold'] + $player['bought_gold']) < $gold) {
                 $db->rollback();
@@ -76,7 +78,7 @@ class MasterBuilder
 
         try {
             $changed = 'The queued build or its Gold debit changed before it could be processed.';
-            if ($item_id <> 40 && $gold > 0 && !GoldHelper::decreaseGold($village['owner'], $gold, true)) {
+            if ($item_id <> Gid::WONDER_OF_THE_WORLD && $gold > 0 && !GoldHelper::decreaseGold($village['owner'], $gold, true)) {
                 throw new \RuntimeException($changed);
             }
             $dequeued = $db->query("DELETE FROM building_upgrade WHERE id={$row['id']} AND isMaster=1");
@@ -91,7 +93,7 @@ class MasterBuilder
             if ($db->query("INSERT INTO building_upgrade (`kid`, `building_field`, `isMaster`, start_time, `commence`) VALUES ({$row['kid']},{$row['building_field']},0," . time() . ",$commence)") === false) {
                 throw new \RuntimeException('Could not create the scheduled build.');
             }
-            if ($item_id <> 40) {
+            if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
                 $deducted = $db->query(
                     "UPDATE vdata SET wood=wood-{$costs[0]}, clay=clay-{$costs[1]}, iron=iron-{$costs[2]}, crop=crop-{$costs[3]}"
                     . " WHERE kid={$row['kid']} AND wood>={$costs[0]} AND clay>={$costs[1]} AND iron>={$costs[2]} AND crop>={$costs[3]}"
@@ -113,7 +115,7 @@ class MasterBuilder
 
     private function getLastCommence(int $kid, int $field, int $race): int
     {
-        [$min, $max] = $race == 1 ? ($field <= 18 ? [1, 18] : [19, 99]) : [0, 99];
+        [$min, $max] = $race == Tribes::ROMANS ? ($field <= 18 ? [1, 18] : [19, 99]) : [0, 99];
         $commence = (int)DB::getInstance()->fetchScalar("SELECT MAX(commence) FROM building_upgrade WHERE kid=$kid AND isMaster=0 AND building_field BETWEEN $min AND $max");
 
         return max(time(), $commence);
@@ -133,7 +135,7 @@ class MasterBuilder
                 'item_id' => (int) ($buildings_db['f' . $i . 't'] ?? 0),
                 'level'   => (int) ($buildings_db['f' . $i] ?? 0),
             ];
-            if ($whole_village_buildings[$i]['item_id'] == 15) {
+            if ($whole_village_buildings[$i]['item_id'] == Gid::MAIN_BUILDING) {
                 $mainBuildingLevel = $whole_village_buildings[$i]['level'];
             }
         }
@@ -162,7 +164,7 @@ class MasterBuilder
         if ($isWW) {
             $maxTasks = 2;
         }
-        if ($race == 1) {
+        if ($race == Tribes::ROMANS) {
             return [
                 'fieldsNum'  => $workers['fieldsNum'],
                 'buildsNum'  => $workers['buildsNum'],
@@ -244,7 +246,7 @@ class MasterBuilder
                     $item_id,
                     $buildings['buildings'],
                     true,
-                    $item_id == 49 && $helper->isShoreVillage((int)$kid)) <> 1) {
+                    $item_id == Gid::HARBOR && $helper->isShoreVillage((int)$kid)) <> 1) {
                 $this->deleteProcess($row['id'], $kid, $row['building_field'], $level);
                 continue;
             }
@@ -271,8 +273,8 @@ class MasterBuilder
             $workers = $this->isWorkersBusy((int) $player['race'],
                 $player['plus'] >= time(),
                 (int) $row['kid'],
-                $item_id <= 4,
-                $item_id == 40);
+                $item_id <= Gid::LAST_RESOURCE_FIELD,
+                $item_id == Gid::WONDER_OF_THE_WORLD);
             if ($workers['isBusy']) {
                 $end_time = $db->fetchScalar("SELECT commence FROM building_upgrade WHERE isMaster=0 AND kid={$row['kid']} ORDER BY commence ASC LIMIT 1");
                 if ($end_time > $commence) {
@@ -280,7 +282,7 @@ class MasterBuilder
                 }
             }
             //ignore WW here cuz it's not actually master and we got the resources first.
-            if ($item_id <> 40) {
+            if ($item_id <> Gid::WONDER_OF_THE_WORLD) {
                 $cost = Formulas::buildingUpgradeCosts($item_id, $level);
                 if (!$this->isResourcesAvailable($village, $cost)) {
                     $commence += $this->calcualteAvailable($village, $cost);

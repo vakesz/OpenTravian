@@ -9,8 +9,10 @@ use Core\Helper\WebService;
 use Game\Buildings\BuildingAction;
 use Game\Buildings\BuildingHelper;
 use Game\Formulas;
+use Game\Gid;
 use Game\ResourcesHelper;
 use Game\Starvation;
+use Game\Tribes;
 use Model\AccountDeleter;
 use Model\MasterBuilder;
 use Model\Quest;
@@ -220,70 +222,70 @@ class Village
                 $this->setSpecialBuildingLevel($this->specialBuildingsName[$this->buildings[$i]['item_id']],
                     $this->buildings[$i]['level']);
             }
-            if ($this->buildings[$i]['item_id'] == 3 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::IRON_MINE && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('economy', 1, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 23 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::CRANNY && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('battle', 2, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 19 && $this->buildings[$i]['level'] >= 3) {
+            if ($this->buildings[$i]['item_id'] == Gid::BARRACKS && $this->buildings[$i]['level'] >= 3) {
                 $quest->setQuestBitwise('battle', 10, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 22 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::ACADEMY && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('battle', 11, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 13 && $this->buildings[$i]['level'] >= 0) {
+            if ($this->buildings[$i]['item_id'] == Gid::SMITHY && $this->buildings[$i]['level'] >= 0) {
                 $quest->setQuestBitwise('battle', 13, 1);
             }
             if (in_array($this->buildings[$i]['item_id'], \Game\Formulas::WALL_BUILDINGS) && $this->buildings[$i]['level'] == 1) {
                 $quest->setQuestBitwise('battle', 6, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 11 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::GRANARY && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('economy', 3, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 17 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::MARKETPLACE && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('economy', 6, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 8 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::GRAIN_MILL && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('economy', 11, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 18 && $this->buildings[$i]['level'] >= 1) {
+            if ($this->buildings[$i]['item_id'] == Gid::EMBASSY && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('world', 4, 1);
             }
-            if (in_array($this->buildings[$i]['item_id'], [25, 26, 44]) && $this->buildings[$i]['level'] >= 1) {
+            if (in_array($this->buildings[$i]['item_id'], Gid::EXPANSION) && $this->buildings[$i]['level'] >= 1) {
                 $quest->setQuestBitwise('world', 10, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 10 && $this->buildings[$i]['level'] >= 3) {
+            if ($this->buildings[$i]['item_id'] == Gid::WAREHOUSE && $this->buildings[$i]['level'] >= 3) {
                 $quest->setQuestBitwise('economy', 9, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 11 && $this->buildings[$i]['level'] >= 3) {
+            if ($this->buildings[$i]['item_id'] == Gid::GRANARY && $this->buildings[$i]['level'] >= 3) {
                 $quest->setQuestBitwise('economy', 10, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 15 && $this->buildings[$i]['level'] >= 3) {
+            if ($this->buildings[$i]['item_id'] == Gid::MAIN_BUILDING && $this->buildings[$i]['level'] >= 3) {
                 $quest->setQuestBitwise('world', 3, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 15 && $this->buildings[$i]['level'] >= 5) {
+            if ($this->buildings[$i]['item_id'] == Gid::MAIN_BUILDING && $this->buildings[$i]['level'] >= 5) {
                 $quest->setQuestBitwise('world', 9, 1);
             }
-            if ($this->buildings[$i]['item_id'] == 10 && $this->buildings[$i]['level'] >= 7) {
+            if ($this->buildings[$i]['item_id'] == Gid::WAREHOUSE && $this->buildings[$i]['level'] >= 7) {
                 $quest->setQuestBitwise('world', 12, 1);
             }
-            if ($this->buildings[$i]['level'] >= 10 && in_array($this->buildings[$i]['item_id'], [25, 26, 44])) {
+            if ($this->buildings[$i]['level'] >= 10 && in_array($this->buildings[$i]['item_id'], Gid::EXPANSION)) {
                 $quest->setQuestBitwise('world', 14, 1);
             }
-            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == 12) {
+            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == Gid::BLACKSMITH) {
                 $quest->setQuestBitwise('economy', 3, Quest::QUEST_FINISHED);
             }
-            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == 23) {
+            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == Gid::CRANNY) {
                 $quest->setQuestBitwise('battle', 2, Quest::QUEST_FINISHED);
             }
-            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == 13) {
+            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == Gid::SMITHY) {
                 $quest->setQuestBitwise('battle', 13, Quest::QUEST_FINISHED);
             }
-            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == 19) {
+            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] == Gid::BARRACKS) {
                 $quest->setQuestBitwise('battle', 3, Quest::QUEST_FINISHED);
             }
-            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] >= 31 && $this->buildings[$i]['item_id'] <= 33) {
+            if ($this->buildings[$i]['level'] > 0 && $this->buildings[$i]['item_id'] >= Gid::CITY_WALL && $this->buildings[$i]['item_id'] <= Gid::PALISADE) {
                 $quest->setQuestBitwise('battle', 5, Quest::QUEST_FINISHED);
             }
             if ($i <= 18) {
@@ -409,12 +411,12 @@ class Village
                 $this->cropLoading += Formulas::buildingCropConsumption($this->getField($row['building_field'])['item_id'],
                     $lvl);
             }
-            if ($this->getField($row['building_field'])['item_id'] == 40) {
+            if ($this->getField($row['building_field'])['item_id'] == Gid::WONDER_OF_THE_WORLD) {
                 ++$this->workers['WW'];
             }
             // A level chained behind another level of the same building (a multi-level order) shares that level's worker.
             if (!(int)($row['chained'] ?? 0)) {
-                ++$this->workers[$this->getField($row['building_field'])['item_id'] <= 4 ? 'fieldsNum' : 'buildsNum'];
+                ++$this->workers[$this->getField($row['building_field'])['item_id'] <= Gid::LAST_RESOURCE_FIELD ? 'fieldsNum' : 'buildsNum'];
             }
             ++$this->buildings[$row['building_field']]['upgrade_state'];
         }
@@ -651,11 +653,11 @@ class Village
         if ($this->isSupport) {
             return null;
         }
-        if ($gid == 16) {
+        if ($gid == Gid::RALLY_POINT) {
             return [$this->buildings[39]['level']];
         }
         $lvl = [];
-        if ($gid <= 4) {
+        if ($gid <= Gid::LAST_RESOURCE_FIELD) {
             for ($i = 1; $i <= 18; ++$i) {
                 if ($this->getField($i)['item_id'] == $gid) {
                     $lvl[] = $this->getField($i)['level'];
@@ -713,7 +715,7 @@ class Village
             return 0;
         }
 
-        if ($gid <= 4) {
+        if ($gid <= Gid::LAST_RESOURCE_FIELD) {
             for ($i = 1; $i <= 18; ++$i) {
                 if ($this->buildings[$i]['item_id'] == $gid) {
                     return $i;
@@ -854,13 +856,13 @@ class Village
         }
         $nextLevel = $this->getField($field)['level'] + $this->getField($field)['upgrade_state'] + 1;
         $item_id = (int)$this->getField($field)['item_id'];
-        if ($item_id == 16) {
+        if ($item_id == Gid::RALLY_POINT) {
             $field = 39;
         }
         if (in_array($item_id, \Game\Formulas::WALL_BUILDINGS)) {
             $field = 40;
         }
-        if ($item_id == 40) {
+        if ($item_id == Gid::WONDER_OF_THE_WORLD) {
             $field = 99;
         }
         if ($isMaster) {
@@ -874,12 +876,12 @@ class Village
         if ($this->getOnDemolishBuildingFieldId() == $field) {
             return false;
         }
-        $workers = $this->isWorkersBusy($field <= 18, $item_id == 40);
+        $workers = $this->isWorkersBusy($field <= 18, $item_id == Gid::WONDER_OF_THE_WORLD);
         if (!$isMaster && !$chained && $workers['isBusy']) {
             return false;
         } else if ($nextLevel > Formulas::buildingMaxLvl($item_id, $this->isCapital())) { //reached max lvl
             return false;
-        } else if (($isMaster && $this->isWW() && $item_id <> 40) || ($isMaster && $workers['isMasterBusy'])) { // World Wonder master queue is zero-gold.
+        } else if (($isMaster && $this->isWW() && $item_id <> Gid::WONDER_OF_THE_WORLD) || ($isMaster && $workers['isMasterBusy'])) { // World Wonder master queue is zero-gold.
             return false;
         } else if ($this->checkArtifactDependencies($item_id) <> 0) {
             return false;
@@ -887,7 +889,7 @@ class Village
             return false;
         }
         $costs = Formulas::buildingUpgradeCosts($item_id, $nextLevel);
-        if (!$this->isResourcesAvailable($costs) && (!$isMaster || $item_id == 40)) {
+        if (!$this->isResourcesAvailable($costs) && (!$isMaster || $item_id == Gid::WONDER_OF_THE_WORLD)) {
             return false;
         } else if ($isMaster && $this->isResourcesAvailable($costs) && !$workers['isBusy']) {
             return false;
@@ -1009,7 +1011,7 @@ class Village
         if ($isWWQueue) {
             $maxTasks = 2;
         }
-        if ($this->session->getRace() == 1) {
+        if ($this->session->getRace() == Tribes::ROMANS) {
             return [
                 'isMasterBusy' => $master >= ($this->isWW() ? $config->masterBuilder->maxTasksInWonder : $config->masterBuilder->maxTasksInNoneWonder),
                 'isBusy' => (($isField) ? ($fieldsNum >= $maxTasks) : ($buildsNum >= $maxTasks)) || ($fieldsNum + $buildsNum) >= 3,
@@ -1029,7 +1031,7 @@ class Village
      */
     public function checkArtifactDependencies($item_id)
     {
-        if (!in_array($item_id, [38, 39, 40])) {
+        if (!in_array($item_id, [Gid::GREAT_WAREHOUSE, Gid::GREAT_GRANARY, Gid::WONDER_OF_THE_WORLD])) {
             return 0;
         }
 
@@ -1133,7 +1135,7 @@ class Village
      */
     private function getQueueBounds(int $field): array
     {
-        if ($this->session->getRace() == 1) {
+        if ($this->session->getRace() == Tribes::ROMANS) {
             return $field <= 18 ? [1, 18] : [19, 99];
         }
 
@@ -1528,7 +1530,7 @@ class Village
         $demolishField = $this->getField($fieldId);
         $demolishGid = (int)$demolishField['item_id'];
         $demolishLevel = (int)$demolishField['level'];
-        if (in_array($demolishGid, [8, 9], true) && $demolishLevel > 0) {
+        if (in_array($demolishGid, [Gid::GRAIN_MILL, Gid::BAKERY], true) && $demolishLevel > 0) {
             $cropGate = \Game\ResourcesHelper::legendsCropGate($this->getKid(), $this->cropLoading + $this->cropLoadingMaster);
             $removed = Formulas::buildingCropConsumption($demolishGid, $demolishLevel);
             $kept = $demolishLevel > 1 ? Formulas::buildingCropConsumption($demolishGid, $demolishLevel - 1) : 0;
@@ -1624,14 +1626,14 @@ class Village
         } else {
             $this->db->run("DELETE FROM building_upgrade WHERE id=?", (int)$id);
         }
-        if ($this->getField($row['building_field'])['item_id'] == 40) {
+        if ($this->getField($row['building_field'])['item_id'] == Gid::WONDER_OF_THE_WORLD) {
             --$this->workers['WW'];
         }
         if ($row['isMaster']) {
             --$this->workers['master'];
         } else {
             if (!(int)($row['chained'] ?? 0)) {
-                --$this->workers[$this->getField($row['building_field'])['item_id'] <= 4 ? 'fieldsNum' : 'buildsNum'];
+                --$this->workers[$this->getField($row['building_field'])['item_id'] <= Gid::LAST_RESOURCE_FIELD ? 'fieldsNum' : 'buildsNum'];
             }
             --$this->buildings[$row['building_field']]['upgrade_state'];
         }
@@ -1778,24 +1780,24 @@ class Village
         }
         $nextLevel = 1;
         $item_id = (int)$gid;
-        if ($isMaster && $this->isWW() && $item_id <> 40) {
+        if ($isMaster && $this->isWW() && $item_id <> Gid::WONDER_OF_THE_WORLD) {
             return false;
         }
-        if ($item_id == 16) {
+        if ($item_id == Gid::RALLY_POINT) {
             $field = 39;
         }
         if (in_array($item_id, \Game\Formulas::WALL_BUILDINGS)) {
             $field = 40;
         }
-        if ($item_id == 40) {
+        if ($item_id == Gid::WONDER_OF_THE_WORLD) {
             $field = 99;
         }
         //fuck u users.
         if ($field == 40 && !in_array($item_id, \Game\Formulas::WALL_BUILDINGS)) {
             return false;
-        } else if ($field == 99 && $item_id <> 40) {
+        } else if ($field == 99 && $item_id <> Gid::WONDER_OF_THE_WORLD) {
             return false;
-        } else if ($field == 39 && $item_id <> 16) {
+        } else if ($field == 39 && $item_id <> Gid::RALLY_POINT) {
             return false;
         }
         if ($this->getField($field)['item_id'] > 0) {
@@ -1816,7 +1818,7 @@ class Village
             return false;
         }
         $costs = Formulas::buildingUpgradeCosts($item_id, $nextLevel);
-        if (!$this->isResourcesAvailable($costs) && (!$isMaster || $item_id == 40)) {
+        if (!$this->isResourcesAvailable($costs) && (!$isMaster || $item_id == Gid::WONDER_OF_THE_WORLD)) {
             return false;
         } else if ($isMaster && $this->isResourcesAvailable($costs) && !$workers['isBusy']) {
             return false;
@@ -1868,7 +1870,7 @@ class Village
             if (sizeof($this->onLoadBuildings['master'])) {
                 (new MasterBuilder())->updateCommence($this->getKid(), false);
             }
-            if ($this->getField($field)['item_id'] == 40) {
+            if ($this->getField($field)['item_id'] == Gid::WONDER_OF_THE_WORLD) {
                 ++$this->workers['WW'];
             }
             ++$this->workers[$field <= 18 ? 'fieldsNum' : 'buildsNum'];
@@ -1918,14 +1920,14 @@ class Village
      */
     public function canCreateNewBuild($item_id)
     {
-        if ($item_id == 40 && !$this->isWW()) return -1;
+        if ($item_id == Gid::WONDER_OF_THE_WORLD && !$this->isWW()) return -1;
         $dep = $this->helper->canCreateNewBuild($this->isCapital(),
             $this->session->getRace(),
             $item_id,
             $this->buildings,
             FALSE,
-            $item_id == 49 && $this->helper->isShoreVillage((int)$this->get('kid')));
-        if ($item_id == 26) {
+            $item_id == Gid::HARBOR && $this->helper->isShoreVillage((int)$this->get('kid')));
+        if ($item_id == Gid::PALACE) {
             if ($this->helper->hasPalaceAnywhere($this->get('owner'))) {
                 $dep = -1;
             }

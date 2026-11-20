@@ -11,6 +11,7 @@ use Core\Helper\TimezoneHelper;
 use Core\Session;
 use Core\Village;
 use Game\Formulas;
+use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\Hero\SessionHero;
 use Core\Locale;
@@ -194,7 +195,7 @@ class tileDetails extends AjaxBase
     private function annexOption(array $tile, bool $lockedWithoutMansion): string
     {
         $label = T("map", "Annex Oasis");
-        $level = max(Village::getInstance()->getTypeLevel(37));
+        $level = max(Village::getInstance()->getTypeLevel(Gid::HEROS_MANSION));
         if ($level == 0) {
             return $lockedWithoutMansion ? $this->disabledOption($label, T("map", "buildHeroMansion")) : '';
         }
@@ -232,7 +233,7 @@ class tileDetails extends AjaxBase
                 return $this->disabledOption($label, T("map", "vacationModeActive"));
             }
         }
-        if (max(Village::getInstance()->getTypeLevel(16))) {
+        if (max(Village::getInstance()->getTypeLevel(Gid::RALLY_POINT))) {
             return $this->linkOption($label, $this->targetUrl($tile, $eventType));
         }
         if ($owner !== null && $owner['owner'] != $session->getPlayerId() && ($protect = $m->hasBeginnerProtection($owner['did']))) {
@@ -304,7 +305,7 @@ class tileDetails extends AjaxBase
             } else if ($m->isInVacation($tile['id'])) {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
                         "vacationModeActive") . '">' . T("map", "sendTroops") . '</span></div>';
-            } else if (max(Village::getInstance()->getTypeLevel(16))) {
+            } else if (max(Village::getInstance()->getTypeLevel(Gid::RALLY_POINT))) {
                 $view->vars['options'] .= $this->linkOption(T("map", "sendTroops"), $this->targetUrl($tile, 5));
             } else {
                 $view->vars['options'] .= '<div class="option"><span class="a arrow disabled" title="' . T("map",
