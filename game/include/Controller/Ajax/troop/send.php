@@ -8,6 +8,7 @@ use Controller\Ajax\AjaxBase;
 use Core\Config;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Game\Gold\PurchaseNonce;
 use Game\Hero\AdventureStarted;
 use Game\Hero\AdventureTravel;
@@ -113,16 +114,16 @@ final class send extends AjaxBase
         $session = $this->session;
         $heroKid = (int) $session->hero->hero['kid'];
         $kid = (int) $db->fetchScalar('SELECT kid FROM adventure WHERE id=? AND uid=? AND end=0', [$adventureId, $session->getPlayerId()], 0);
-        $travel = (int) round(AdventureTravel::seconds($kid) * 1000);
+        $travel = (int) round(AdventureTravel::seconds($kid) * Time::SECOND_MS);
         $start = miliseconds();
         if (!$db->query('UPDATE units SET u11=0 WHERE kid=' . $heroKid)) {
             $this->error(T('map', 'please_resend_all_data'), 500);
             return;
         }
-        (new MovementsModel())->addMovement($heroKid, $kid, $session->getRace(), [1 => 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 0, 0, 0, 0, 0, MovementsModel::ATTACKTYPE_ADVENTURE, $start, $start + $travel);
+        (new MovementsModel())->addMovement($heroKid, $kid, $session->getRace(), [1 => 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 0, 0, 0, 0, MovementsModel::MODE_GOING, MovementsModel::ATTACKTYPE_ADVENTURE, $start, $start + $travel);
         $session->hero->findHero();
-        Quest::getInstance()->setQuestBitwise('battle', 1, Quest::QUEST_FINISHED);
-        $arrival = (int) ceil(($start + $travel) / 1000);
+        Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_NEXT_ADVENTURE, Quest::QUEST_FINISHED);
+        $arrival = (int) ceil(($start + $travel) / Time::SECOND_MS);
         $this->response['troops'] = [['timeArrive' => $arrival, 'arrivalIn' => max(0, $arrival - time())]];
         $this->response['sourceVillage'] = ['id' => $heroKid];
         // Not part of the reference answer: the block the list is replaced with, so the page needs no further request.

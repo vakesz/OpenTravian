@@ -6,6 +6,7 @@ use Controller\Ajax\AjaxBase;
 use Core\Config;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
@@ -14,6 +15,7 @@ use Model\AdventureModel;
 use Model\AllianceModel;
 use Model\AuctionModel;
 use Model\MarketModel;
+use Model\MovementsModel;
 use Model\TrainingModel;
 
 class layoutButton extends AjaxBase
@@ -81,7 +83,7 @@ class layoutButton extends AjaxBase
                     if (Config::getProperty("game", "useNanoseconds")) {
                         $trainingTime /= 1e9;
                     } elseif (Config::getProperty("game", "useMilSeconds")) {
-                        $trainingTime /= 1000;
+                        $trainingTime /= Time::SECOND_MS;
                     }
                     if ($trainingTime == 0) {
                         $this->response['text'] = T("inGame", "noTroopInBeingTrained");
@@ -100,7 +102,7 @@ class layoutButton extends AjaxBase
             }
             // Like the reference: no title, one line per kind of incoming hostile movement.
             $counts = [];
-            $rows = DB::getInstance()->query("SELECT attack_type, COUNT(*) AS c FROM movement WHERE to_kid=" . (int)$villageId . " AND mode=0 AND attack_type IN(3,4) GROUP BY attack_type");
+            $rows = DB::getInstance()->query("SELECT attack_type, COUNT(*) AS c FROM movement WHERE to_kid=" . (int)$villageId . " AND mode=" . MovementsModel::MODE_GOING . " AND attack_type IN(" . MovementsModel::ATTACKTYPE_NORMAL . "," . MovementsModel::ATTACKTYPE_RAID . ") GROUP BY attack_type");
             while ($rows && ($row = $rows->fetch_assoc())) {
                 $counts[(int)$row['attack_type']] = (int)$row['c'];
             }

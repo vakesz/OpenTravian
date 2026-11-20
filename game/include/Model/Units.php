@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model;
 
 use Core\Database\DB;
+use Game\Unit;
 
 class Units
 {
@@ -18,7 +19,7 @@ class Units
     {
         $modify = [];
         $enough = [];
-        for ($i = 1; $i <= 11; $i++) {
+        for ($i = 1; $i <= Unit::LAST; $i++) {
             if (isset($units[$i]) && $units[$i] > 0) {
                 $modify[] = "u{$i}=u{$i}-" . (int) $units[$i];
                 $enough[] = "u{$i}>=" . (int) $units[$i];

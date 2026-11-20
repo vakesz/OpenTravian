@@ -18,7 +18,7 @@ function failNoMoraleAgainstNature(string $message): never
 }
 
 $battle = (string)file_get_contents($root . '/game/include/Model/BattleModel.php');
-if (!str_contains($battle, "\$no_morale = \$this->defender['isWW'] || \$this->defender['uid'] == 1 || (\$this->defender['isOasis'] && !\$this->defender['isOccupied']);")) {
+if (!str_contains($battle, "\$no_morale = \$this->defender['isWW'] || \$this->defender['uid'] == UserId::NATARS || (\$this->defender['isOasis'] && !\$this->defender['isOccupied']);")) {
     failNoMoraleAgainstNature('Battles must not apply morale against a free oasis, Natars or a Wonder.');
 }
 $simulator = (string)file_get_contents($root . '/game/include/Controller/RallyPoint/Simulator.php');

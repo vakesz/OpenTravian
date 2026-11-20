@@ -33,7 +33,7 @@ foreach ([
 
 foreach ([
     "\$query = \"/build.php?\" . http_build_query([",
-    '<a class="arrow" href="/build.php?id=39&amp;tt=2&amp;free=',
+    '<a class="arrow" href="/build.php?id=\' . Slot::RALLY_POINT . \'&amp;tt=2&amp;free=',
     'Session::getCheckerName() => Session::getInstance()->getChecker()',
     'Session::getCheckerForUrl()',
 ] as $needle) {

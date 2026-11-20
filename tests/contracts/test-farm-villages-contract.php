@@ -54,7 +54,7 @@ foreach ([1, 7, 40, 150, 400, 1000] as $count) {
 
 $natars = (string) file_get_contents($root . '/game/include/Model/NatarsModel.php');
 expectFarmVillages(str_contains($natars, 'v.isFarm=0 AND (SELECT COUNT(id) FROM artefacts'), 'Farm villages do not count toward the Natar expansion target.');
-expectFarmVillages(str_contains($natars, 'owner=1 AND isWW=0 AND isFarm=0 AND isArtifact=0'), 'The Natar AI skips farm villages.');
+expectFarmVillages(str_contains($natars, 'owner=" . UserId::NATARS . " AND isWW=0 AND isFarm=0 AND isArtifact=0'), 'The Natar AI skips farm villages.');
 expectFarmVillages(substr_count($natars, 'addMovement(') === 1 && str_contains($natars, '$cap_kid,'), 'The only Natar attack leaves the Natar capital.');
 
 $register = (string) file_get_contents($root . '/game/include/Model/RegisterModel.php');

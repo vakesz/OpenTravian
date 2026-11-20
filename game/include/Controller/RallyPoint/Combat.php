@@ -10,6 +10,7 @@ use Game\Hero\HeroItems;
 use Game\Hero\ItemBtype;
 use Game\Hero\ItemType;
 use Game\NoticeHelper;
+use Game\Slot;
 use Game\Tribes;
 use Game\Unit;
 use resources\View\PHPBatchView;
@@ -69,7 +70,7 @@ class Combat
             'off',
             'a1'
         );
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             $this->output['attacker']['units'][$i - 1]['number'] = isset($_POST['a1_' . $i]) ? (int)$_POST['a1_' . $i] : 0;
             $this->output['attacker']['units'][$i - 1]['level'] = isset($_POST['f1_' . $i]) ? (int)$_POST['f1_' . $i] : 0;
         }
@@ -118,7 +119,7 @@ class Combat
                         $data = NoticeHelper::parseReport($report['type'], $report['data']);
                         $_POST['a1_v'] = $this->output['attacker']['race'] = $data['attacker']['race'];
                         $attacker_troops = $data['attacker']['num'];
-                        for ($i = 1; $i <= 10; ++$i) {
+                        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                             if (isset($data['attacker']['smithy'][$i])) {
                                 $this->output['attacker']['units'][$i - 1]['level'] = $data['attacker']['smithy'][$i];
                             }
@@ -132,7 +133,7 @@ class Combat
                                 $firstDefender = false;
                             }
                             $this->addDefenderTribe((int)$row['race']);
-                            for ($i = 1; $i <= 10; ++$i) {
+                            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                                 $this->output['defender']['races'][$row['race']]['units'][$i - 1]['number'] = $row['num'][$i];
                             }
                         }
@@ -149,7 +150,7 @@ class Combat
         $this->output['defender']['steinmetz'] = 0;
         $this->output['defender']['palast'] = 0;
         foreach ($this->output['defender']['races'] as $race => &$value) {
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 if ($value['units'][$i - 1]['number'] == 0) {
                     $value['units'][$i - 1]['number'] = isset($_POST['a2_' . nrToUnitId($i,
                             $race)]) ? (int)$_POST['a2_' . nrToUnitId($i, $race)] : 0;
@@ -196,7 +197,7 @@ class Combat
         if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
             $attack_type = $this->output['attack_type'];
             $sum = 0;
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 $sum += $this->output['attacker']['units'][$i - 1]['number'];
             }
             if (!$sum) {
@@ -470,7 +471,7 @@ class Combat
         };
         $owned = ['leftHand' => [], 'body' => [], 'bag' => []];
         $statement = \Core\Database\DB::getInstance()->run(
-            'SELECT btype, type, num FROM items WHERE uid=? AND btype IN (2, 3, 7, 8)',
+            'SELECT btype, type, num FROM items WHERE uid=? AND btype IN (' . ItemBtype::BODY . ', ' . ItemBtype::LEFT_HAND . ', ' . ItemBtype::SMALL_BANDAGE . ', ' . ItemBtype::BANDAGE . ')',
             [(int)Session::getInstance()->getPlayerId()]
         );
         $rows = $statement ? $statement->get_result() : null;
@@ -539,13 +540,13 @@ class Combat
         $fieldRows = $readByKid('fdata');
         $snapshots = [];
         foreach ($baseRows as $kid => $base) {
-            $units = array_fill(1, 11, 0);
-            $smithy = array_fill(1, 10, 0);
+            $units = array_fill(1, Unit::LAST, 0);
+            $smithy = array_fill(1, Unit::LAST_TROOP, 0);
             $unitRow = $unitRows[$kid] ?? [];
             $smithyRow = $smithyRows[$kid] ?? [];
-            for ($slot = 1; $slot <= 11; ++$slot) {
+            for ($slot = 1; $slot <= Unit::LAST; ++$slot) {
                 $units[$slot] = max(0, (int)($unitRow['u' . $slot] ?? 0));
-                if ($slot <= 10) {
+                if ($slot <= Unit::LAST_TROOP) {
                     $smithy[$slot] = max(0, (int)($smithyRow['u' . $slot] ?? 0));
                 }
             }
@@ -573,7 +574,7 @@ class Combat
     private static function buildingLevel(array $fields, array $gids): int
     {
         $level = 0;
-        for ($slot = 19; $slot <= 40; ++$slot) {
+        for ($slot = Slot::FIRST_BUILDING; $slot <= Slot::LAST; ++$slot) {
             if (in_array((int)($fields['f' . $slot . 't'] ?? 0), $gids, true)) {
                 $level = max($level, (int)($fields['f' . $slot] ?? 0));
             }
@@ -603,7 +604,7 @@ class Combat
         }
         $input = ['a1_v' => $session->getRace(), 'a2_v4' => 4, 'ew1' => $session->get('total_pop'), 'ew2' => 500];
         $units = $db->query("SELECT * FROM units WHERE kid=$kid")->fetch_assoc() ?: [];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             if (!empty($units['u' . $i])) {
                 $input['a2_3' . $i] = (int)$units['u' . $i];
             }
@@ -663,7 +664,7 @@ class Combat
         $pop = (int)$snapshot['population'];
         if ($this->output['role'] === 'attacker') {
             $_POST['a1_v'] = $race;
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 $_POST['a1_' . $i] = (int)($units[$i] ?? 0);
                 $_POST['f1_' . $i] = $i <= 8 ? (int)($smithy[$i] ?? 0) : 0;
             }
@@ -675,7 +676,7 @@ class Combat
             unset($_POST['a2_v' . $tribe]);
         }
         $_POST['a2_main'] = $race;
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             $_POST['a2_' . nrToUnitId($i, $race)] = (int)($units[$i] ?? 0);
             if ($i <= 8) {
                 $_POST['f2_' . nrToUnitId($i, $race)] = (int)($smithy[$i] ?? 0);
@@ -816,7 +817,7 @@ class Combat
         $rows = [];
         $supplyBefore = 0;
         $supplyLost = 0;
-        for ($slot = 1; $slot <= 10; ++$slot) {
+        for ($slot = 1; $slot <= Unit::LAST_TROOP; ++$slot) {
             $initial = max(0, (int)($units[$slot - 1]['number'] ?? 0));
             $removed = min($initial, max(0, (int)($trapped[$slot - 1] ?? 0)) + max(0, (int)($captured[$slot - 1] ?? 0)));
             $loss = min($initial - $removed, max(0, (int)round(($initial - $removed) * $lossRatio)));

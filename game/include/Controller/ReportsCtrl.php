@@ -9,11 +9,15 @@ use Core\Helper\PageNavigator;
 use Core\Helper\TimezoneHelper;
 use Core\Helper\WebService;
 use Core\Session;
+use Game\Conquest\CaptureResult;
+use Game\Conquest\OasisCaptureResult;
 use Game\Formulas;
 use Game\Hero\HeroItems;
 use Game\NoticeHelper;
+use Game\Slot;
 use Game\Tribes;
 use Game\Unit;
+use Game\UserId;
 use Model\ReportsModel;
 use Model\FarmListModel;
 use Model\Quest;
@@ -198,7 +202,7 @@ class ReportsCtrl extends GameCtrl
             'reportId' => $notice['id'],
             'showImage' =>
                 $this->session->showImagesInReports(),
-            'imgType' => $notice['type'] == 0 || $notice['type'] == 22 ? 30 : $notice['type'],
+            'imgType' => $notice['type'] == 0 || $notice['type'] == NoticeHelper::TYPE_NEW_VILLAGE ? 30 : $notice['type'],
             'sendTime' => $this->getTimeByTimezone($notice['time']),
             'showForward' => false,
             'hasGoldClub' => $this->session->hasGoldClub(),
@@ -388,7 +392,7 @@ class ReportsCtrl extends GameCtrl
                 break;
             case NoticeHelper::TYPE_ADVENTURE:
                 $content = '';
-                $units = array_fill(1, 11, 0);
+                $units = array_fill(1, Unit::LAST, 0);
                 $units[Unit::HERO] = 1;
                 $adventure = new PHPBatchView('reports/adventure');
                 $adventure->vars['race'] = $data['race'];
@@ -719,7 +723,7 @@ class ReportsCtrl extends GameCtrl
     public function getPlayerHeadline($uid, $kid = null, $username = null, $linear = false)
     {
         $HTML = null;
-        if ($uid > 1) {
+        if ($uid > UserId::NATARS) {
             $HTML .= $this->getAllianceHTMLLinkByUid($uid, $linear);
             $HTML .= $linear ? ' ' : '&nbsp;';
         }
@@ -888,10 +892,10 @@ class ReportsCtrl extends GameCtrl
         if ($uid == -1) {
             return '<span class="none2">' . T('Reports', 'unknown') . '</span>';
         }
-        if ($uid == 0) {
+        if ($uid == UserId::NATURE) {
             return '<span class="none2">' . T('Global', 'NatureName') . '</span>';
         }
-        if ($uid == 1) {
+        if ($uid == UserId::NATARS) {
             return '<span>' . T('Global', 'NatarsName') . '</span>';
         }
         $db = DB::getInstance();
@@ -1149,9 +1153,9 @@ class ReportsCtrl extends GameCtrl
 
     private function checkPlayerName($uid, &$name)
     {
-        if ($uid == 0) {
+        if ($uid == UserId::NATURE) {
             $name = '<span class="none2">' . T('Global', 'NatureName') . '</span>';
-        } elseif ($uid == 1) {
+        } elseif ($uid == UserId::NATARS) {
             $name = T('Global', 'NatarsName');
         }
     }
@@ -1182,7 +1186,7 @@ class ReportsCtrl extends GameCtrl
 
     private function getAllianceHTMLLinkByUid($uid, bool $withEmptyTitle = false)
     {
-        if ($uid == 0) {
+        if ($uid == UserId::NATURE) {
             return null;
         }
         $db = DB::getInstance();
@@ -1300,9 +1304,9 @@ class ReportsCtrl extends GameCtrl
                 T('Troops', 'hero.title') .
                 '">';
             $result = $data['info']['oasisCapture'];
-            if ($result == -1) {
+            if ($result == OasisCaptureResult::NO_FREE_SLOT) {
                 $text .= T('Reports', 'NoFreeSlotsToCaptureOasis');
-            } elseif ($result == 0) {
+            } elseif ($result == OasisCaptureResult::CAPTURED) {
                 $text .= T('Reports', 'OasisCaptured');
             } else {
                 $text .= sprintf(T('Reports', 'LoyaltyLowered'), round($result[0]), round($result[1]));
@@ -1331,19 +1335,19 @@ class ReportsCtrl extends GameCtrl
                 T('Troops', "$unitId.title") .
                 '"> ';
             $result = $data['info']['captureResult'];
-            if ($result == 0) {
+            if ($result == CaptureResult::CAPTURED) {
                 $text .= sprintf(T('Reports', 'VillageCaptured'), $this->getVillageName($notice['to_kid']));
-            } elseif ($result == -1) {
+            } elseif ($result == CaptureResult::CAPITAL) {
                 $text .= T('Reports', 'CantCaptureCapital');
-            } elseif ($result == -2) {
+            } elseif ($result == CaptureResult::NOT_ENOUGH_CULTURE_POINTS) {
                 $text .= T('Reports', 'culturePointsErr');
-            } elseif ($result == -3) {
+            } elseif ($result == CaptureResult::RESIDENCE_OR_PALACE_STANDS) {
                 $text .= T('Reports', 'rpExists');
-            } elseif ($result == -4) {
+            } elseif ($result == CaptureResult::ONE_WONDER_LIMIT) {
                 $text .= T('Reports', 'You can only have 1 ww village at a time');
-            } elseif ($result == -5) {
+            } elseif ($result == CaptureResult::NAP) {
                 $text .= T('Reports', "Couldn't decrease loyalty because you have NAP with that alliance");
-            } elseif ($result == -6) {
+            } elseif ($result == CaptureResult::NO_EXPANSION_SLOT) {
                 $text .= T('Reports', 'noExpansionSlot', 'The attacking village has no free expansion slot.');
             } else {
                 $text .= sprintf(T('Reports', 'LoyaltyLowered'), round($result[0]), round($result[1]));
@@ -1753,7 +1757,7 @@ class ReportsCtrl extends GameCtrl
                 $style = $resources == $bounty[4] ? 'full' : ($resources == 0 ? 'empty' : 'half');
                 if ($this->session->hasPlus()) {
                     $rpt->vars['reportIcon'] =
-                        '<a class="reportInfoIcon" href="/build.php?id=39&amp;tt=2&amp;reportId=' .
+                        '<a class="reportInfoIcon" href="/build.php?id=' . Slot::RALLY_POINT . '&amp;tt=2&amp;reportId=' .
                         $row['id'] .
                         '&amp;readReport=1"><img title="' .
                         $this->number_format($resources) .
@@ -1860,7 +1864,7 @@ class ReportsCtrl extends GameCtrl
 
     private function showSurrounding()
     {
-        Quest::getInstance()->setQuestBitwise('world', 13, 1);
+        Quest::getInstance()->setQuestBitwise('world', Quest::WORLD_SURROUNDINGS_REPORT, 1);
         $view = new PHPBatchView('reports/Surrounding');
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $prefix = [];

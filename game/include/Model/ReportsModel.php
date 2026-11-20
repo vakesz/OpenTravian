@@ -168,13 +168,13 @@ class ReportsModel
      */
     public function getJustOnReportForPositionData(int $kid, int $uid): ?array
     {
-        return $this->fetchRow("SELECT * FROM ndata WHERE uid=$uid AND to_kid=$kid AND type <= 3 ORDER BY id DESC LIMIT 1");
+        return $this->fetchRow("SELECT * FROM ndata WHERE uid=$uid AND to_kid=$kid AND type <= " . NoticeHelper::TYPE_LOST_AS_ATTACKER . " ORDER BY id DESC LIMIT 1");
     }
 
     public function getLast5Reports(int $aid, int $uid, int $kid): mysqli_result|bool
     {
         return DB::getInstance()->query(
-            "SELECT * FROM ndata WHERE (uid=$uid OR (aid>0 AND aid=$aid)) AND to_kid=$kid AND ((type <= 7) OR (type>=15 AND type<=19)) ORDER BY id DESC LIMIT 5"
+            "SELECT * FROM ndata WHERE (uid=$uid OR (aid>0 AND aid=$aid)) AND to_kid=$kid AND ((type <= " . NoticeHelper::TYPE_LOST_AS_DEFENDER_WITHOUT_CASUALTIES . ") OR (type>=" . NoticeHelper::TYPE_WON_SPY_WITHOUT_CASUALTIES . " AND type<=" . NoticeHelper::TYPE_WON_SPY_AS_DEFENDER_LETTING_ATTACKER_SPY . ")) ORDER BY id DESC LIMIT 5"
         );
     }
 

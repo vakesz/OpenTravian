@@ -8,9 +8,11 @@ use Core\AI;
 use Core\Config;
 use Core\Database\DB;
 use Core\Helper\Notification;
+use Core\Time;
 use Game\Buildings\AutoUpgrade;
 use Game\Formulas;
 use Game\Installer\InstallInput;
+use Game\UserId;
 use Game\WorldSpeedProfile;
 use Game\ResourcesHelper;
 use function getGameElapsedSeconds;
@@ -98,10 +100,10 @@ class NatarsModel
                 99,
                 0,
                 0,
-                0,
+                MovementsModel::MODE_GOING,
                 MovementsModel::ATTACKTYPE_NORMAL,
                 $miliseconds,
-                $miliseconds + (1000 * $time) + $increase);
+                $miliseconds + (Time::SECOND_MS * $time) + $increase);
         }
     }
 
@@ -264,7 +266,7 @@ class NatarsModel
         };
         $now = time();
         $time = $now - 900;
-        $result = $db->query("SELECT kid, lastVillageCheck FROM vdata WHERE owner=1 AND isWW=0 AND isFarm=0 AND isArtifact=0 AND lastVillageCheck > 0 AND lastVillageCheck <= $time LIMIT 10");
+        $result = $db->query("SELECT kid, lastVillageCheck FROM vdata WHERE owner=" . UserId::NATARS . " AND isWW=0 AND isFarm=0 AND isArtifact=0 AND lastVillageCheck > 0 AND lastVillageCheck <= $time LIMIT 10");
         while ($row = $result->fetch_assoc()) {
             $kid = (int) $row['kid'];
             $lastCheck = (int) $row['lastVillageCheck'];
@@ -291,10 +293,10 @@ class NatarsModel
         ];
         foreach ($sides as $side => $angle) {
             $countNormalVillages = $db->query("SELECT COUNT(kid) FROM available_villages av WHERE occupied=1 AND (angle >= {$angle[0]} AND angle <= {$angle[1]}) AND (SELECT owner FROM vdata v WHERE v.kid=av.kid)>2")->fetch_row()[0];
-            $countNatarsVillages = $db->query("SELECT COUNT(av.kid) FROM available_villages av, vdata v WHERE av.occupied=1 AND (av.angle >= {$angle[0]} AND av.angle <= {$angle[1]}) AND v.kid=av.kid AND v.owner=1 AND v.isWW=0 AND v.isFarm=0 AND (SELECT COUNT(id) FROM artefacts WHERE kid=v.kid)=0")->fetch_row()[0];
+            $countNatarsVillages = $db->query("SELECT COUNT(av.kid) FROM available_villages av, vdata v WHERE av.occupied=1 AND (av.angle >= {$angle[0]} AND av.angle <= {$angle[1]}) AND v.kid=av.kid AND v.owner=" . UserId::NATARS . " AND v.isWW=0 AND v.isFarm=0 AND (SELECT COUNT(id) FROM artefacts WHERE kid=v.kid)=0")->fetch_row()[0];
 
             $natarsShouldBe = (int) round($countNormalVillages / 2);
-            $percent = max(0, getGameElapsedSeconds()) / (getGame('round_length_real') * 86400);
+            $percent = max(0, getGameElapsedSeconds()) / (getGame('round_length_real') * Time::DAY);
             $pop = $percent * 900;
             $twentyPercent = $pop * 0.15;
             if ($natarsShouldBe > $countNatarsVillages) {
@@ -311,8 +313,8 @@ class NatarsModel
                     $conditions[] = "(angle >= {$angle[0]} AND angle <= {$angle[1]})";
                     $conditions[] = "(r >= {$r[0]} AND r <= {$r[1]})";
 
-                    $nearby = '(SELECT COUNT(av2.kid) FROM available_villages av2, vdata v2 WHERE av2.occupied=1 AND ABS(av2.r-av.r) <= 8 AND ABS(av2.angle-av.angle) <= 8 AND v2.kid=av2.kid AND v2.owner>1)';
-                    $nearbyNatars = '(SELECT COUNT(av2.kid) FROM available_villages av2, vdata v2 WHERE av2.occupied=1 AND ABS(av2.r-av.r) <= 10 AND ABS(av2.angle-av.angle) <= 8 AND v2.kid=av2.kid AND v2.owner=1 AND v2.isWW=0 AND (SELECT COUNT(id) FROM artefacts WHERE kid=v2.kid)=0)';
+                    $nearby = '(SELECT COUNT(av2.kid) FROM available_villages av2, vdata v2 WHERE av2.occupied=1 AND ABS(av2.r-av.r) <= 8 AND ABS(av2.angle-av.angle) <= 8 AND v2.kid=av2.kid AND v2.owner>' . UserId::NATARS . ')';
+                    $nearbyNatars = '(SELECT COUNT(av2.kid) FROM available_villages av2, vdata v2 WHERE av2.occupied=1 AND ABS(av2.r-av.r) <= 10 AND ABS(av2.angle-av.angle) <= 8 AND v2.kid=av2.kid AND v2.owner=' . UserId::NATARS . ' AND v2.isWW=0 AND (SELECT COUNT(id) FROM artefacts WHERE kid=v2.kid)=0)';
 
                     $conditions[] = "$nearby > 1";
                     $conditions[] = "$nearbyNatars < 3";

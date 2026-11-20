@@ -39,7 +39,7 @@ if (substr_count($dorf3, '<span class="none">?</span>') !== 3) {
 if (substr_count($dorf3, '<span class="none">-</span>') < 3) {
     failB8Contract('VillageStatisticsCtrl must render empty cells as span.none "-".');
 }
-if (!str_contains($dorf3, "gid=17&t=5\">")) {
+if (!str_contains($dorf3, "Gid::MARKETPLACE . '&t=5\">")) {
     failB8Contract('The overview merchants link must carry t=5.');
 }
 foreach (["'village3 village3' . match", "2 => 'Resources'", "4 => 'Culturepoints'", "5 => 'Troops'", "default => 'Overview'"] as $needle) {

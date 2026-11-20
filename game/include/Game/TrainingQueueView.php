@@ -6,6 +6,7 @@ namespace Game;
 
 use Core\Config;
 use Core\Helper\TimezoneHelper;
+use Core\Time;
 
 use function appendTimer;
 use function getDisplay;
@@ -47,8 +48,8 @@ final class TrainingQueueView
             $commence = (int)ceil((float)$row['commence'] / $rate);
             $next = $next === null ? $commence - $now : min($next, $commence - $now);
             $finish = $end >= $tomorrow ? TimezoneHelper::autoDateString($end, true) : TimezoneHelper::date('H:i', $end);
-            $remainingMs = max(0.0, ((float)$row['end_time'] - $nowTicks) * 1000 / $rate);
-            $periodMs = (float)$row['training_time'] * 1000 / $rate;
+            $remainingMs = max(0.0, ((float)$row['end_time'] - $nowTicks) * Time::SECOND_MS / $rate);
+            $periodMs = (float)$row['training_time'] * Time::SECOND_MS / $rate;
             $count = '<span class="trainingCount"' . $group
                 . ' data-num="' . (int)$row['num'] . '"'
                 . ' data-remaining-ms="' . self::decimal($remainingMs) . '"'

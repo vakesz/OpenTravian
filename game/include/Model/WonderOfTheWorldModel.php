@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use function getCustom;
 use function getGameSpeed;
@@ -187,7 +188,7 @@ class WonderOfTheWorldModel
                 11 => 0,
             ];
             $units = array_map(static fn ($count): int => (int) ceil($count), $units);
-            $time = max(24 * 3600 / getGameSpeed(), 300);
+            $time = max(24 * Time::HOUR / getGameSpeed(), 300);
             $move->addMovement($cap_kid,
                 $kid,
                 5,
@@ -196,10 +197,10 @@ class WonderOfTheWorldModel
                 40,
                 0,
                 0,
-                0,
+                MovementsModel::MODE_GOING,
                 MovementsModel::ATTACKTYPE_NORMAL,
                 $miliseconds,
-                $miliseconds + 1000 * $time);
+                $miliseconds + Time::SECOND_MS * $time);
         }
     }
 

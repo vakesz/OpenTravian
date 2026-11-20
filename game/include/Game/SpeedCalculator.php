@@ -4,6 +4,7 @@ namespace Game;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Hero\HeroItems;
 use Game\Hero\ItemBtype;
 use Model\ArtefactsModel;
@@ -219,7 +220,7 @@ class SpeedCalculator
             // A ship sails the flat straight line: no shortcut over the world edge.
             $distance = Formulas::getFlatDistance($this->from, $this->to);
             $deepDistance = $distance * \Game\Map\ShipRoute::deepFraction($this->from, $this->to);
-            $seaTime = $deepDistance / Ships::deepWaterSpeed($this->shipType, $this->shipTribe) * 3600;
+            $seaTime = $deepDistance / Ships::deepWaterSpeed($this->shipType, $this->shipTribe) * Time::HOUR;
             $distance -= $deepDistance;
         }
         if ($this->hasHero) {
@@ -317,7 +318,7 @@ class SpeedCalculator
             if ($start >= $bootThreshold) {
                 $bonus += $bootBonus;
             }
-            $time += ($boundaries[$i] - $start) / ($minSpeed * $bonus) * 3600;
+            $time += ($boundaries[$i] - $start) / ($minSpeed * $bonus) * Time::HOUR;
         }
         // Preserve the legacy calculator's float return type while applying
         // the centralized whole-second floor.

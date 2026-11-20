@@ -10,15 +10,18 @@ use Core\Helper\Notification;
 use Core\Helper\TimezoneHelper;
 use Core\Log;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\CatapultTargets;
 use Game\Formulas;
 use Game\Gid;
 use Game\Hero\HeroHelper;
 use Game\NoticeHelper;
+use Game\Slot;
 use Game\SpeedCalculator;
 use Game\Tribes;
 use Game\Unit;
+use Game\UserId;
 use Model\ArtefactsModel;
 use Model\ReportsModel;
 use Model\InfoBoxModel;
@@ -97,7 +100,7 @@ class SendTroops extends RallyPointHTML
                         $data = NoticeHelper::parseReport($report['type'], $report['data'])['attacker']['num'];
                         $row = (new RallyPointModel())->getUnits(Village::getInstance()->getKid());
                         $_REQUEST['troop'] = [];
-                        for ($i = 1; $i <= 11; ++$i) {
+                        for ($i = 1; $i <= Unit::LAST; ++$i) {
                             $count = (int)$data[$i];
                             if ($count > $row['u' . $i]) {
                                 $count = (int)$row['u' . $i];
@@ -175,7 +178,7 @@ class SendTroops extends RallyPointHTML
         $row = $m->getUnits(Village::getInstance()->getKid());
         $units = [];
         $postedTroops = $this->readPostedTroopCounts();
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $units[$i] = $postedTroops[$i];
             if ($units[$i] > $row['u' . $i]) {
                 $units[$i] = $row['u' . $i];
@@ -233,7 +236,7 @@ class SendTroops extends RallyPointHTML
     {
         $troopBag = $_REQUEST['troop'] ?? null;
         $units = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $raw = is_array($troopBag) ? ($troopBag['t' . $i] ?? 0) : 0;
             $units[$i] = abs((int)$raw);
         }
@@ -278,7 +281,7 @@ class SendTroops extends RallyPointHTML
             }
         } else {
             $owner = $this->getOwner($kid, false);
-            if ($owner == 1) {
+            if ($owner == UserId::NATARS) {
                 $attackTypes = [
                     MovementsModel::ATTACKTYPE_SPY => ["disabled" => false, "checked" => false], //reinforcement
                     MovementsModel::ATTACKTYPE_REINFORCEMENT => ["disabled" => true, "checked" => false], //reinforcement
@@ -449,7 +452,7 @@ class SendTroops extends RallyPointHTML
             $this->result['settings']['to']['y'] = $xy['y'];
             $this->result['settings']['to']['kid'] = $a2b['to_kid'];
             $this->result['settings']['to']['uid'] = $this->getOwner($a2b['to_kid'], $isOasis);
-            $this->result['settings']['to']['villageName'] = $isOasis ? ($this->result['settings']['to']['uid'] <> 0 ? T(
+            $this->result['settings']['to']['villageName'] = $isOasis ? ($this->result['settings']['to']['uid'] <> UserId::NATURE ? T(
                 "RallyPoint",
                 "occupiedOasis"
             ) : "") : $db->fetchScalar("SELECT name FROM vdata WHERE kid={$this->result['settings']['to']['kid']}");
@@ -481,7 +484,7 @@ class SendTroops extends RallyPointHTML
                         }
                     }
                 }
-                redirect("/build.php?id=39&tt=1"); //redirect to outgoing troops ;)
+                redirect("/build.php?id=" . Slot::RALLY_POINT . "&tt=1"); //redirect to outgoing troops ;)
                 exit();
             }
         } else {
@@ -512,7 +515,7 @@ class SendTroops extends RallyPointHTML
             $this->result['settings']['a2bId'] = $id;
         }
         $units = [];
-        for ($i = 1; $i <= 11; $i++) {
+        for ($i = 1; $i <= Unit::LAST; $i++) {
             $units[nrToUnitId($i, $session->getRace())] = $this->result['settings']['units'][$i];
         }
         $row = [
@@ -540,7 +543,7 @@ class SendTroops extends RallyPointHTML
         switch ($this->result['settings']['attack_type']) {
             case MovementsModel::ATTACKTYPE_SPY:
                 $settings['troopHeadline'] .= ' ' . T("RallyPoint", "from") . ' ';
-                if ($this->result['settings']['to']['uid'] == 0) {
+                if ($this->result['settings']['to']['uid'] == UserId::NATURE) {
                     $settings['troopHeadline'] .= T("RallyPoint", "unoccupiedOasis");
                 } else {
                     $settings['troopHeadline'] .= $this->result['settings']['to']['villageName'];
@@ -548,7 +551,7 @@ class SendTroops extends RallyPointHTML
                 break;
             case MovementsModel::ATTACKTYPE_REINFORCEMENT:
                 $settings['troopHeadline'] .= ' ' . T("RallyPoint", "for") . ' ';
-                if ($this->result['settings']['to']['uid'] == 0) {//not possible
+                if ($this->result['settings']['to']['uid'] == UserId::NATURE) {//not possible
                     $settings['troopHeadline'] .= T("RallyPoint", "unoccupiedOasis");
                 } else {
                     $settings['troopHeadline'] .= $this->result['settings']['to']['villageName'];
@@ -560,7 +563,7 @@ class SendTroops extends RallyPointHTML
                     $settings['troopHeadline'] .= ' ' . T("RallyPoint", "against");
                 }
                 $settings['troopHeadline'] .= ' ';
-                if ($this->result['settings']['to']['uid'] == 0) {//not possible
+                if ($this->result['settings']['to']['uid'] == UserId::NATURE) {//not possible
                     $settings['troopHeadline'] .= T("RallyPoint", "unoccupiedOasis");
                 } else {
                     $settings['troopHeadline'] .= $this->result['settings']['to']['villageName'];
@@ -571,7 +574,7 @@ class SendTroops extends RallyPointHTML
             $settings['cata'][] = [
                 "type"       => "cata",
                 'count'      => $this->result['settings']['units'][Unit::CATAPULT],
-                "level"      => $village->getField(39)['level'],
+                "level"      => $village->getField(Slot::RALLY_POINT)['level'],
                 "isRaid"     => $this->result['settings']['attack_type'] == MovementsModel::ATTACKTYPE_RAID,
             ];
         }
@@ -581,7 +584,7 @@ class SendTroops extends RallyPointHTML
         }
         $speeds = [];
         $units_id = [];
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; $i++) {
             if ($this->result['settings']['units'][$i] > 0) {
                 $speeds[] = Formulas::uSpeed(nrToUnitId($i, $session->getRace()));
                 $units_id[] = nrToUnitId($i, $session->getRace());
@@ -631,7 +634,7 @@ class SendTroops extends RallyPointHTML
             }
         }
         $isFarm = !$isOasis && $this->isFarm($this->result['settings']['to']['kid'], $isOasis);
-        $skippedProtection = ($isOasis && !$isOasisOccupied) || (isset($this->result['settings']['to']['uid']) && $this->result['settings']['to']['uid'] == 1 && !$isFarm);
+        $skippedProtection = ($isOasis && !$isOasisOccupied) || (isset($this->result['settings']['to']['uid']) && $this->result['settings']['to']['uid'] == UserId::NATARS && !$isFarm);
         if (Config::getProperty(
             "custom",
             "skipProtectionOnAttack"
@@ -665,7 +668,7 @@ class SendTroops extends RallyPointHTML
             }
         }
         $calculator->setMinSpeed($speeds);
-        for ($i = 19; $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
             if ($village->getField($i)['item_id'] == Gid::TOURNAMENT_SQUARE) {
                 $calculator->setTournamentSqLvl($village->getField($i)['level']);
                 break;
@@ -684,7 +687,7 @@ class SendTroops extends RallyPointHTML
         $settings['info'][] = [
             "type"        => "Arrival",
             "countUp"     => true,
-            "ArrivalTime" => round(((miliseconds(true) + 1000 * $neededTime)) / 1000),
+            "ArrivalTime" => round(((miliseconds(true) + Time::SECOND_MS * $neededTime)) / Time::SECOND_MS),
         ];
         $this->result['settings']['troop_details'] = $this->getMovementTable($row, $settings, true);
         return $this->procPrepareSendContent();
@@ -705,7 +708,7 @@ class SendTroops extends RallyPointHTML
      */
     public function getPlayerName($uid)
     {
-        if ($uid == 0) {
+        if ($uid == UserId::NATURE) {
             return T("Global", "NatureName");
         }
         $db = DB::getInstance();
@@ -751,7 +754,7 @@ class SendTroops extends RallyPointHTML
             if ($value > 0) {
                 // The shared base target turns a hash-only fallback into the login route,
                 // so the fallback is the Rally Point's own root-absolute route.
-                $html .= '&nbsp;/&nbsp;&#8236;<a href="/build.php?gid=16&amp;tt=2" onclick="jQuery(\'table#troops\').find(\'input[name=\\\'' . $inputName
+                $html .= '&nbsp;/&nbsp;&#8236;<a href="/build.php?gid=' . Gid::RALLY_POINT . '&amp;tt=2" onclick="jQuery(\'table#troops\').find(\'input[name=\\\'' . $inputName
                     . '\\\']\').val(' . $value . ').trigger(\'focus\'); return false">' . number_format_x($value) . '</a>';
             } else {
                 $html .= '&nbsp;/&nbsp;&#8236;<span class="none">&#8237;0&#8236;</span>';
@@ -853,14 +856,14 @@ class SendTroops extends RallyPointHTML
         }
         $isOasis = $this->isOasis($kid);
         $owner = $this->getOwner($kid, $isOasis);
-        if ($owner == 1) {
+        if ($owner == UserId::NATARS) {
             $attackTypes = [
                 MovementsModel::ATTACKTYPE_SPY => ["disabled" => false, "checked" => false],//spy
                 MovementsModel::ATTACKTYPE_REINFORCEMENT => ["disabled" => true, "checked" => false],//reinforcement
                 MovementsModel::ATTACKTYPE_NORMAL => ["disabled" => false, "checked" => false],//normal attacks
                 MovementsModel::ATTACKTYPE_RAID => ["disabled" => false, "checked" => true],//raid attacks
             ];
-        } elseif ($owner == 0) {
+        } elseif ($owner == UserId::NATURE) {
             $attackTypes = [
                 MovementsModel::ATTACKTYPE_SPY => ["disabled" => false, "checked" => false],//spy
                 MovementsModel::ATTACKTYPE_REINFORCEMENT => ["disabled" => true, "checked" => false],//reinforcement
@@ -878,7 +881,7 @@ class SendTroops extends RallyPointHTML
             $attackTypes = [5 => ["disabled" => false, "checked" => true]];//spy
 
         }
-        $units = array_fill(1, 11, 0);
+        $units = array_fill(1, Unit::LAST, 0);
         $m = new RallyPointModel();
         if ($attack_type == MovementsModel::ATTACKTYPE_RAID && !$m->checkMaxAttacks(Village::getInstance()->getKid())) {
             return false;
@@ -889,7 +892,7 @@ class SendTroops extends RallyPointHTML
         $row = $db->query("SELECT * FROM units WHERE kid=" . (int)Village::getInstance()->getKid() . " FOR UPDATE")->fetch_assoc();
         $speeds = [];
         $units_id = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $units[$i] = abs((int)$a2b['u' . $i]);
             if ($units[$i] > $row['u' . $i]) {
                 $units[$i] = $row['u' . $i];
@@ -950,7 +953,7 @@ class SendTroops extends RallyPointHTML
         }
         $isFarm = $this->isFarm($kid, $isOasis);
         $isOasisOccupied = $isOasis ? $this->isOasisOccupied($this->result['settings']['to']['kid']) : false;
-        $skippedProtection = ($isOasis && !$isOasisOccupied) || ($owner == 1 && !$isFarm);
+        $skippedProtection = ($isOasis && !$isOasisOccupied) || ($owner == UserId::NATARS && !$isFarm);
         if (!$skippedProtection) {
             if ($owner <> $session->getPlayerId() && $this->hasBeginnerProtection($kid) == 1) {
                 return false;
@@ -966,9 +969,9 @@ class SendTroops extends RallyPointHTML
         if ($this->result['settings']['to']['kid'] == $village->getKid()) {
             return false;
         }
-        if ($owner <> 0) {
+        if ($owner <> UserId::NATURE) {
             $userAccess = $db->fetchScalar("SELECT access FROM users WHERE id={$owner}");
-            if ($owner == 1 && (!Config::getInstance()->dynamic->WWPlansReleased && !Config::getProperty(
+            if ($owner == UserId::NATARS && (!Config::getInstance()->dynamic->WWPlansReleased && !Config::getProperty(
                 "custom",
                 "wwPlansEnabled"
             ))) {
@@ -993,7 +996,7 @@ class SendTroops extends RallyPointHTML
             }
         }
         if ($isOasis) {
-            Quest::getInstance()->setQuestBitwise('battle', 7, 1);
+            Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_ATTACK_OASIS, 1);
         }
         //all right
         //let's send units =>
@@ -1038,7 +1041,7 @@ class SendTroops extends RallyPointHTML
             }
         }
         $calculator->setMinSpeed(min($speeds));
-        for ($i = 19; $i <= 38; ++$i) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST_BUILDING; ++$i) {
             if ($village->getField($i)['item_id'] == Gid::TOURNAMENT_SQUARE) {
                 $calculator->setTournamentSqLvl($village->getField($i)['level']);
                 break;
@@ -1064,10 +1067,10 @@ class SendTroops extends RallyPointHTML
         if (isset($_POST['ctar1']) || isset($_POST['ctar2'])) {
             $targets = [99];
             if ($session->getRace() <> Tribes::TEUTONS || $villageModel->getCapBrewery($session->getPlayerId()) <= 0) {
-                $targets = CatapultTargets::allowed((int)$village->getField(39)['level']);
+                $targets = CatapultTargets::allowed((int)$village->getField(Slot::RALLY_POINT)['level']);
             }
             $insert['ctar1'] = isset($_POST['ctar1']) && in_array($_POST['ctar1'], $targets) ? $_POST['ctar1'] : 99;
-            if ($village->getField(39)['level'] == 20) {
+            if ($village->getField(Slot::RALLY_POINT)['level'] == 20) {
                 $insert['ctar2'] = isset($_POST['ctar2']) && (in_array(
                     $_POST['ctar2'],
                     $targets
@@ -1077,7 +1080,7 @@ class SendTroops extends RallyPointHTML
         if (isset($_POST['spy']) && $_POST['spy'] >= 1 && $_POST['spy'] <= 2) {
             $insert['spy'] = $isOasis ? 1 : (int)$_POST['spy'];
         }
-        if ($village->getField(39)['level'] < 20 || $units[Unit::CATAPULT] < 20) {
+        if ($village->getField(Slot::RALLY_POINT)['level'] < 20 || $units[Unit::CATAPULT] < 20) {
             $insert['ctar2'] = 0;
         }
         $move = new MovementsModel();
@@ -1103,7 +1106,7 @@ class SendTroops extends RallyPointHTML
             if ($attacksPerSecond < 4) {
                 break;
             }
-            $now += 1000;
+            $now += Time::SECOND_MS;
         }
         $success = $move->addMovement(
             $village->getKid(),
@@ -1114,10 +1117,10 @@ class SendTroops extends RallyPointHTML
             $insert['ctar2'],
             $insert['spy'],
             $insert['redeployHero'],
-            0,
+            MovementsModel::MODE_GOING,
             $insert['attack_type'],
             $now,
-            $now + 1000 * $neededTime,
+            $now + Time::SECOND_MS * $neededTime,
             NULL,
             $ship
         );
@@ -1127,7 +1130,7 @@ class SendTroops extends RallyPointHTML
             sprintf("Troops: %s, Result: %s", implode(",", array_values($units)), $success > 0)
         );
         if ($isOasis) {
-            Quest::getInstance()->setQuestBitwise('battle', 7, Quest::QUEST_FINISHED);
+            Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_ATTACK_OASIS, Quest::QUEST_FINISHED);
         }
         return true;
     }
@@ -1409,7 +1412,7 @@ class SendTroops extends RallyPointHTML
             "Global",
             "NatureName"
         ) : $db->fetchScalar("SELECT name FROM users WHERE id={$villageOwner}");
-        $this->result['settings']['to']['villageName'] = $isOasis ? ($this->result['settings']['to']['uid'] <> 0 ? T(
+        $this->result['settings']['to']['villageName'] = $isOasis ? ($this->result['settings']['to']['uid'] <> UserId::NATURE ? T(
             "RallyPoint",
             "occupiedOasis"
         ) : "") : $db->fetchScalar("SELECT name FROM vdata WHERE kid={$this->result['settings']['to']['kid']}");

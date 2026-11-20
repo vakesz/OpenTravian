@@ -7,11 +7,13 @@ use Core\Caching\ProfileCache;
 use Core\Config;
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Formulas;
 use Game\Gid;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Game\TrainingHelper;
 use Game\Tribes;
 use Game\Unit;
@@ -94,7 +96,7 @@ class VillageStatisticsCtrl extends GameCtrl
             }
             $content = null;
             $number = $this->number_format($count);
-            $content .= '<a href="/build.php?newdid=' . $kid . '&amp;id=39&amp;tt=1#at">';
+            $content .= '<a href="/build.php?newdid=' . $kid . '&amp;id=' . Slot::RALLY_POINT . '&amp;tt=1#at">';
             $content .= '<img class="' . $class . '" src="img/spacer.gif" title="' . $number . 'x ' . $title . '" alt="' . $number . 'x ' . $title . '"></a>';
             return $content;
         };
@@ -173,7 +175,7 @@ class VillageStatisticsCtrl extends GameCtrl
                 $upgrades = $m->getVillageUpgradeBuildings($row['kid']);
                 while ($build = $upgrades->fetch_assoc()) {
                     $item_id = $m->getFieldItemId($row['kid'], $build['building_field']);
-                    $content .= '<a href="/dorf' . ($build['building_field'] <= 18 ? 1 : 2) . '.php?newdid=' . $row['kid'] . '"><img class="bau" src="/img/spacer.gif" title="' . T(
+                    $content .= '<a href="/dorf' . ($build['building_field'] <= Slot::LAST_FIELD ? 1 : 2) . '.php?newdid=' . $row['kid'] . '"><img class="bau" src="/img/spacer.gif" title="' . T(
                         "Buildings",
                             "{$item_id}.title"
                     ) . '" alt="' . T("Buildings", "{$item_id}.title") . '"></a>';
@@ -231,7 +233,7 @@ class VillageStatisticsCtrl extends GameCtrl
             $merchants_offering = $market->getOfferingMerchantsCount($row['kid'], $merchant_cap);
             $free_merchants = $total_merchants - $merchants_on_the_way - $merchants_offering;
 
-            $content .= '<td class="tra lc"><a href="/build.php?newdid=' . $row['kid'] . '&gid=17&t=5">&#x202d;&#x202d;'
+            $content .= '<td class="tra lc"><a href="/build.php?newdid=' . $row['kid'] . '&gid=' . Gid::MARKETPLACE . '&t=5">&#x202d;&#x202d;'
                 . $free_merchants . '&#x202c;/&#x202d;' . $total_merchants . '&#x202c;&#x202c;</a></td>';
             $content .= '</tr>';
         }
@@ -372,7 +374,7 @@ class VillageStatisticsCtrl extends GameCtrl
             if ($production[$i] <= 0 || $stock[$i] >= $capacity[$i]) {
                 continue;
             }
-            $seconds = (int)ceil(($capacity[$i] - $stock[$i]) / $production[$i] * 3600);
+            $seconds = (int)ceil(($capacity[$i] - $stock[$i]) / $production[$i] * Time::HOUR);
             $best = $best === null ? $seconds : min($best, $seconds);
         }
 
@@ -477,7 +479,7 @@ class VillageStatisticsCtrl extends GameCtrl
                     ));
             $summary['merchants_available'] += $available;
             $summary['merchants_total'] += $totalMerchants;
-            $content .= '<td class="tra lc"><a href="/build.php?newdid=' . $row['kid'] . '&gid=17">&#x202d;&#x202d;' . $available . '&#x202c;/&#x202d;' . $totalMerchants . '&#x202c;&#x202c;</a></td>';
+            $content .= '<td class="tra lc"><a href="/build.php?newdid=' . $row['kid'] . '&gid=' . Gid::MARKETPLACE . '">&#x202d;&#x202d;' . $available . '&#x202c;/&#x202d;' . $totalMerchants . '&#x202c;&#x202c;</a></td>';
             $content .= '</tr>';
         }
         $summary['r1'] = number_format($summary['r1'], 0, ',', ',');
@@ -527,7 +529,7 @@ class VillageStatisticsCtrl extends GameCtrl
             $content .= '<td class="vil fc"><a href="/dorf1.php?newdid=' . $row['kid'] . '">' . $row['name'] . '</a></td>';
             $content .= '<td class="cps">' . $cp . '</td>';
             $content .= '<td class="cel">';
-            $content .= $data['th_lvl'] > 0 ? '<a href="/build.php?newdid=' . $row['kid'] . '&amp;gid=24">' . ($row['celebration'] >= time() ? appendTimer($row['celebration'] - time()) : '<span class="dot">●</span>') . '</a>' : '<span class="none">-</span>';
+            $content .= $data['th_lvl'] > 0 ? '<a href="/build.php?newdid=' . $row['kid'] . '&amp;gid=' . Gid::TOWN_HALL . '">' . ($row['celebration'] >= time() ? appendTimer($row['celebration'] - time()) : '<span class="dot">●</span>') . '</a>' : '<span class="none">-</span>';
             $content .= '</td>';
             $content .= '<td class="tro">';
             for ($i = 1; $i <= $data['units']['settlers']; ++$i) {
@@ -566,7 +568,7 @@ class VillageStatisticsCtrl extends GameCtrl
             return null;
         }
 
-        return date('d.m.y, H:i', time() + (int)ceil($missing / $cpPerDay * 86400));
+        return date('d.m.y, H:i', time() + (int)ceil($missing / $cpPerDay * Time::DAY));
     }
 
     private function showTroops(): void
@@ -581,7 +583,7 @@ class VillageStatisticsCtrl extends GameCtrl
         if ($view->vars['selectedTab'] == 0) {
             $summary = [];
             $view->vars['units'] = '';
-            for ($i = 1; $i <= 11; ++$i) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
                 if ($i == Unit::HERO) {
                     $unitId = 'hero';
                 } else {
@@ -593,10 +595,10 @@ class VillageStatisticsCtrl extends GameCtrl
             $result = $this->getPlayerVillages();
             foreach ($result as $row) {
                 $content .= '<tr class="' . ($row['kid'] == $this->session->getKid() ? 'hl' : 'hover') . '">';
-                $content .= '<td class="villageName"><a href="/build.php?newdid=' . $row['kid'] . '&amp;id=39#td">' . $row['name'] . '</a></td>';
+                $content .= '<td class="villageName"><a href="/build.php?newdid=' . $row['kid'] . '&amp;id=' . Slot::RALLY_POINT . '#td">' . $row['name'] . '</a></td>';
                 $totalUnits = [];
                 $unitsHome = $m->getUnits($row['kid']);
-                for ($i = 1; $i <= 11; $i++) {
+                for ($i = 1; $i <= Unit::LAST; $i++) {
                     if (!isset($totalUnits[$i])) {
                         $totalUnits[$i] = 0;
                     }
@@ -608,33 +610,33 @@ class VillageStatisticsCtrl extends GameCtrl
                 }
                 $unitsOnTheWayGo = $m->getGoingUnits($row['kid']);
                 while ($b = $unitsOnTheWayGo->fetch_assoc()) {
-                    for ($i = 1; $i <= 11; $i++) {
+                    for ($i = 1; $i <= Unit::LAST; $i++) {
                         $totalUnits[$i] += $b['u' . $i];
                         $summary[$i] += $b['u' . $i];
                     }
                 }
                 $unitsOnTheWayBack = $m->getReturningUnits($row['kid']);
                 while ($b = $unitsOnTheWayBack->fetch_assoc()) {
-                    for ($i = 1; $i <= 11; $i++) {
+                    for ($i = 1; $i <= Unit::LAST; $i++) {
                         $totalUnits[$i] += $b['u' . $i];
                         $summary[$i] += $b['u' . $i];
                     }
                 }
                 $enforcedUnits = $m->getOutEnforcement($row['kid']);
                 while ($b = $enforcedUnits->fetch_assoc()) {
-                    for ($i = 1; $i <= 11; $i++) {
+                    for ($i = 1; $i <= Unit::LAST; $i++) {
                         $totalUnits[$i] += $b['u' . $i];
                         $summary[$i] += $b['u' . $i];
                     }
                 }
                 $trappedUnits = $m->getOutTrappedUnits($row['kid']);
                 while ($b = $trappedUnits->fetch_assoc()) {
-                    for ($i = 1; $i <= 11; $i++) {
+                    for ($i = 1; $i <= Unit::LAST; $i++) {
                         $totalUnits[$i] += $b['u' . $i];
                         $summary[$i] += $b['u' . $i];
                     }
                 }
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     if ($totalUnits[$i]) {
                         $content .= '<td' . $this->getStyle() . '>' . $this->number_format($totalUnits[$i]) . '</td>';
                     } else {
@@ -645,7 +647,7 @@ class VillageStatisticsCtrl extends GameCtrl
             }
             $view->vars['summary'] = '';
             $view->vars['summaryLarge'] = false;
-            for ($i = 1; $i <= 11; ++$i) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
                 if (!$view->vars['summaryLarge']) {
                     $view->vars['summaryLarge'] = $summary[$i] > 100000;
                 }
