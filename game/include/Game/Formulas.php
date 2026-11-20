@@ -281,7 +281,6 @@ class Formulas
                         'breq' =>
                             array(
                                 4 => 5,
-                                15 => 5,
                             ),
                         'gid' => 8,
                         'req' => NULL,

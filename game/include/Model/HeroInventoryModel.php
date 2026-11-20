@@ -480,6 +480,8 @@ class HeroInventoryModel
                     || !$this->consumeItem($uid, $item, 1)) {
                     throw new \RuntimeException('Could not use the Book of Wisdom.');
                 }
+                // The hero's production points are gone: settle at the old rate, then cache the new one.
+                ResourcesHelper::updateVillageResources((int)$hero['kid'], false);
                 return;
 
             case 14:

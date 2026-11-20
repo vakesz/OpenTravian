@@ -82,7 +82,8 @@ class BuildingAction
             if ($nextLevel >= 1 && $real_storage_capacity == Formulas::storeCAP(0)) {
                 $max -= Formulas::storeCAP(0);
             }
-            if ($nextLevel > 1) {
+            // Remove the old level's capacity. A new building (level 0) has none; its base was removed above.
+            if ($level >= 1) {
                 $max -= ($big ? Formulas::bigStoreCAP($level) : Formulas::storeCAP($level));
             }
             $max += ($big ? Formulas::bigStoreCAP($nextLevel) : Formulas::storeCAP($nextLevel));
