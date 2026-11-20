@@ -10,6 +10,8 @@ use Core\Session;
 use Core\Village;
 use Game\BuildRequest;
 use Game\Formulas;
+use Game\Gid;
+use Game\Slot;
 use Game\Tribes;
 use Game\Unit;
 use Model\ResourceFieldsModel;
@@ -135,7 +137,7 @@ class ResourceFieldsCtrl extends GameCtrl
     {
         $village = $this->session->village;
         $this->dorf1View->vars['fieldType'] = $village->getFieldType();
-        for ($i = 1; $i <= 18; ++$i) {
+        for ($i = Slot::FIRST_FIELD; $i <= Slot::LAST_FIELD; ++$i) {
             $max = Formulas::buildingMaxLvl($village->getField($i)['item_id'], $village->isCapital());
             $this->dorf1View->vars['areas'][] = [
                 "title" => $village->getFieldTitleAsString($i),
@@ -186,7 +188,7 @@ class ResourceFieldsCtrl extends GameCtrl
         }
         $enf = $m->getEnforcements($kid);
         while ($row = $enf->fetch(PDO::FETCH_ASSOC)) {
-            for ($i = 1; $i <= 11; ++$i) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
                 if (!$row['u' . $i]) {
                     continue;
                 }
@@ -353,7 +355,7 @@ class ResourceFieldsCtrl extends GameCtrl
             'hero_on_adventure', 'settlersOnTheWay' => [2, 4],
             default => [2, 4],
         };
-        $href = '/build.php?gid=16&amp;tt=1&amp;filter=' . $filter . '&amp;subfilters=' . $subfilter;
+        $href = '/build.php?gid=' . Gid::RALLY_POINT . '&amp;tt=1&amp;filter=' . $filter . '&amp;subfilters=' . $subfilter;
         $hour = T('Dorf1', "movements.hour");
         $in = T('Dorf1', "movements.in");
         $title = T('Dorf1', 'movementTitles.' . ($attackType === 'settlersOnTheWay' ? 'settler' : $attackType));

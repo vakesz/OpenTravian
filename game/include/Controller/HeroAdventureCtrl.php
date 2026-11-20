@@ -4,6 +4,7 @@ namespace Controller;
 
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
+use Core\Time;
 use Game\ExtraModules;
 use Game\Formulas;
 use Game\Hero\AdventurePlace;
@@ -27,7 +28,7 @@ class HeroAdventureCtrl extends GameCtrl
         $successAdventures = $this->session->get("success_adventures_count");
         if ($successAdventures > 0) {
             if ($successAdventures >= 2) {
-                $quest->setQuestBitwise("battle", 1, Quest::QUEST_FINISHED);
+                $quest->setQuestBitwise("battle", Quest::BATTLE_NEXT_ADVENTURE, Quest::QUEST_FINISHED);
             }
         }
         $this->view = new GameView();
@@ -86,13 +87,13 @@ class HeroAdventureCtrl extends GameCtrl
         $db = DB::getInstance();
         if ($status === SessionHero::STATUS_ON_ADVENTURE) {
             $movement = $db->query(
-                'SELECT end_time FROM movement WHERE u11>0 AND mode=0 AND kid=' . $heroKid
+                'SELECT end_time FROM movement WHERE u11>0 AND mode=' . MovementsModel::MODE_GOING . ' AND kid=' . $heroKid
                 . ' AND attack_type=' . (int)MovementsModel::ATTACKTYPE_ADVENTURE . ' LIMIT 1'
             )->fetch_assoc();
             $text = (string)T('HeroAdventure', 'status50_generic');
         } elseif ($status === SessionHero::STATUS_IN_RETURN) {
             $movement = $db->query(
-                'SELECT to_kid, end_time FROM movement WHERE u11>0 AND mode=1 AND to_kid=' . $heroKid . ' LIMIT 1'
+                'SELECT to_kid, end_time FROM movement WHERE u11>0 AND mode=' . MovementsModel::MODE_RETURN . ' AND to_kid=' . $heroKid . ' LIMIT 1'
             )->fetch_assoc();
             $name = htmlspecialchars((string)$db->fetchScalar('SELECT name FROM vdata WHERE kid=' . $heroKid . ' LIMIT 1', [], ''), ENT_QUOTES, 'UTF-8');
             $text = sprintf((string)T('HeroAdventure', 'status9'), '<a href="/karte.php?d=' . $heroKid . '">' . $name . '</a>');
@@ -102,7 +103,7 @@ class HeroAdventureCtrl extends GameCtrl
         if (!$movement) {
             return null;
         }
-        $arrival = (int)ceil(((int)$movement['end_time']) / 1000);
+        $arrival = (int)ceil(((int)$movement['end_time']) / Time::SECOND_MS);
         $when = str_replace(
             ['[ARRIVAL]', '[TIME]'],
             [appendTimer(max(0, $arrival - time())), TimezoneHelper::date('H:i', $arrival)],
@@ -149,9 +150,9 @@ class HeroAdventureCtrl extends GameCtrl
         // Isolates the number (LRO..PDF) and drops trailing zeros ("5.1 fields").
         $HTML .= '<td class="distance">' . "\u{202D}" . rtrim(rtrim(number_format($distance, 2, '.', ''), '0'), '.') . "\u{202C}" . ' ' . T('map', 'fields') . '</td>';
         $HTML .= '<td class="duration" id="walktime' . $row['kid'] . '">';
-        $hours = (int)floor($need / 3600);
-        $minutes = (int)floor($need % 3600 / 60);
-        $seconds = (int)floor($need % 60);
+        $hours = (int)floor($need / Time::HOUR);
+        $minutes = (int)floor($need % Time::HOUR / 60);
+        $seconds = (int)floor($need % Time::MINUTE);
         $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
         $HTML .= '<div class="cellWrapper"><div class="iconWrapper"><i class="clock_medium" aria-hidden="true"></i></div><div class="duration">' . $duration . '</div></div>';
         $HTML .= '</td>';

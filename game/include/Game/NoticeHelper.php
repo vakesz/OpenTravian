@@ -135,7 +135,7 @@ class NoticeHelper
         ]);
         $db->query($query);
         $reportId = $db->lastInsertId();
-        if($type <= 7){
+        if($type <= self::TYPE_LOST_AS_DEFENDER_WITHOUT_CASUALTIES){
             if(($recordId = $db->fetchScalar("SELECT id FROM farmlist_last_reports WHERE uid=$uid AND kid=$to_kid"))){
                 $db->query("UPDATE farmlist_last_reports SET report_id=$reportId WHERE id=$recordId");
             } else {

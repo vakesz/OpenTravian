@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Model;
 
+use Core\Time;
 use Game\FarmList\FarmListInbox;
 use Core\Config;
 use Core\Database\DB;
@@ -11,6 +12,8 @@ use Game\Formulas;
 use Game\Map\Map;
 use Game\OasisType;
 use Game\ResourcesHelper;
+use Game\Unit;
+use Game\UserId;
 
 use function miliseconds;
 
@@ -76,7 +79,7 @@ class OasesModel
         try {
             $oasesResult = $db->query("SELECT type, lasttrain, lastfarmed, owner FROM odata WHERE kid=$kid FOR UPDATE");
             $oases = $oasesResult ? $oasesResult->fetch_assoc() : false;
-            if (!$oases || (int)$oases['owner'] !== 0) {
+            if (!$oases || (int)$oases['owner'] !== UserId::NATURE) {
                 $db->rollback();
                 return false;
             }
@@ -95,7 +98,7 @@ class OasesModel
 
             $maximum = self::getOasisAnimalCap();
             $sum = 0;
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 $sum += (int) $units['u' . $i];
             }
             if ($sum >= $maximum) {
@@ -119,7 +122,7 @@ class OasesModel
                 return false;
             }
 
-            $gains = array_fill(1, 10, 0);
+            $gains = array_fill(1, Unit::LAST_TROOP, 0);
             $perAnimal = max(1, (int)getGameSpeed());
             for ($i = 0; $i < $cycles && $sum < $maximum; ++$i) {
                 $unitId = $troops[mt_rand(0, count($troops) - 1)];
@@ -165,7 +168,7 @@ class OasesModel
         $cutoff = time() - self::getOasisRespawnInterval();
         $db = DB::getInstance();
         $result = $db->query(
-            "SELECT kid FROM odata WHERE owner=0 AND lasttrain <= $cutoff AND lastfarmed <= $cutoff ORDER BY lasttrain ASC LIMIT $limit"
+            "SELECT kid FROM odata WHERE owner=" . UserId::NATURE . " AND lasttrain <= $cutoff AND lastfarmed <= $cutoff ORDER BY lasttrain ASC LIMIT $limit"
         );
         if (!$result) {
             return;
@@ -233,7 +236,7 @@ class OasesModel
     public static function releaseOasis(int $kid, int $did): void
     {
         $db = DB::getInstance();
-        $db->query("UPDATE odata SET owner=0, did=0, lasttrain=" . time() . ", last_loyalty_update=" . time() . " WHERE kid=$kid");
+        $db->query("UPDATE odata SET owner=" . UserId::NATURE . ", did=0, lasttrain=" . time() . ", last_loyalty_update=" . time() . " WHERE kid=$kid");
         $db->query("UPDATE wdata SET occupied=0 WHERE id=$kid");
         Map::OccupyOrLeaveOasisCacheRemove($kid);
         ResourcesHelper::updateVillageResources($did, false);
@@ -248,7 +251,7 @@ class OasesModel
             return false;
         }
         $lastmupdate = (int) miliseconds();
-        $protectionEnd = self::getInitialProtectionEndTime() * 1000;
+        $protectionEnd = self::getInitialProtectionEndTime() * Time::SECOND_MS;
         if ($lastmupdate < $protectionEnd) {
             $db->query("UPDATE odata SET lastmupdate=$protectionEnd WHERE kid={$row['kid']}");
             return true;
@@ -257,10 +260,10 @@ class OasesModel
         $production = Formulas::getOasisProduction((int) $row['type']);
         $diff_time = $lastmupdate - max((int) $row['lastmupdate'], $protectionEnd);
         $resources = [
-            ($production[0] / 3600000) * $diff_time,
-            ($production[1] / 3600000) * $diff_time,
-            ($production[2] / 3600000) * $diff_time,
-            ($production[3] / 3600000) * $diff_time,
+            ($production[0] / Time::HOUR_MS) * $diff_time,
+            ($production[1] / Time::HOUR_MS) * $diff_time,
+            ($production[2] / Time::HOUR_MS) * $diff_time,
+            ($production[3] / Time::HOUR_MS) * $diff_time,
         ];
         $maxStore = Formulas::getOasisStorage((int) $row['type']);
         foreach ($resources as $key => $res) {

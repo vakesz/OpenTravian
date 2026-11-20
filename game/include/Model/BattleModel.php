@@ -7,9 +7,13 @@ namespace Model;
 use function array_sum;
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Buildings\BuildingAction;
+use Game\CatapultTargets;
+use Game\Conquest\CaptureResult;
 use Game\Conquest\LoyaltyProtection;
+use Game\Conquest\OasisCaptureResult;
 use Game\Formulas;
 use Game\Gid;
 use Game\Helpers\HeroHealthHelper;
@@ -21,12 +25,14 @@ use Game\Hero\HeroHelper;
 use Game\Hero\HeroItems;
 use Game\NoticeHelper;
 use Game\ResourcesHelper;
+use Game\Slot;
 use Game\SpeedCalculator;
 use Game\Starvation;
 use Game\TrainingHelper;
 use Game\Tribes;
 use Game\TruceDay;
 use Game\Unit;
+use Game\UserId;
 use function array_filter_units;
 use function getCustom;
 use function logError;
@@ -175,7 +181,7 @@ class BattleModel
     {
         if (!$this->profilingEnabled)
             return;
-        $this->profile[$name] = (microtime(true) - $this->profile[$name]) * 1000;
+        $this->profile[$name] = (microtime(true) - $this->profile[$name]) * Time::SECOND_MS;
     }
 
     private function profileOutput(): void
@@ -196,7 +202,7 @@ class BattleModel
     {
         foreach (array_merge(
             ['id', 'kid', 'to_kid', 'race', 'ctar1', 'ctar2', 'spyType', 'redeployHero', 'ship', 'mode', 'attack_type', 'start_time', 'end_time', 'markState'],
-            array_map(static fn (int $unit): string => 'u' . $unit, range(1, 11))
+            array_map(static fn (int $unit): string => 'u' . $unit, range(1, Unit::LAST))
         ) as $column) {
             if (array_key_exists($column, $row)) {
                 $row[$column] = (int) $row[$column];
@@ -217,7 +223,7 @@ class BattleModel
         $this->startProfile('__construct');
         $this->heroItemsModel = new HeroItems();
         $this->row = self::typedMovementRow($row);
-        $this->row['end_time_seconds'] = (int) ceil($this->row['end_time'] / 1000);
+        $this->row['end_time_seconds'] = (int) ceil($this->row['end_time'] / Time::SECOND_MS);
 
         if (getGame("catapultAvailableTime") > 0) {
             $this->cataWorks = time() >= getGame("catapultAvailableTime");
@@ -250,11 +256,11 @@ class BattleModel
             return;
         }
         // Checking for multi account
-        if ($this->defender['uid'] > 2 && $this->attacker['uid'] > 2 && $this->defender['uid'] != $this->attacker['uid']) {
+        if ($this->defender['uid'] > UserId::LAST_SYSTEM && $this->attacker['uid'] > UserId::LAST_SYSTEM && $this->defender['uid'] != $this->attacker['uid']) {
             MultiAccount::addMultiAccountLog($this->attacker['uid'], $this->defender['uid'], 3);
         }
         if ($this->row['attack_type'] != MovementsModel::ATTACKTYPE_SPY && TruceDay::isActive()) {
-            if ($this->defender['uid'] > 2 && $this->attacker['uid'] > 2 && $this->attacker['uid'] != $this->defender['uid']) {
+            if ($this->defender['uid'] > UserId::LAST_SYSTEM && $this->attacker['uid'] > UserId::LAST_SYSTEM && $this->attacker['uid'] != $this->defender['uid']) {
                 $this->sendTruceReport(true);
                 //attacker report
                 if (!$this->defender['isOasis'] || $this->defender['isOccupied']) {
@@ -270,7 +276,7 @@ class BattleModel
                     0,
                     0,
                     0,
-                    1,
+                    MovementsModel::MODE_RETURN,
                     $this->row['attack_type'],
                     $this->row['end_time'],
                     2 * $this->row['end_time'] - $this->row['start_time'],
@@ -286,7 +292,7 @@ class BattleModel
             $cages = $helper->getCages($this->attacker['wave']['heroItems']['bag']);
             if ($cages) {
                 //caged attack :>
-                $caged = array_fill(1, 10, 0);
+                $caged = array_fill(1, Unit::LAST_TROOP, 0);
                 $this->model->move_to_cages($this->defender['wave'][0]['units']['num'], $cages, $caged);
                 $this->finalize_caged_attack($caged);
                 $this->endProfile('cagedAttack');
@@ -296,7 +302,7 @@ class BattleModel
             $this->endProfile('cagedAttack');
         }
         // Morale (the population bonus) exists only between players: not against Natars, Wonders or free oases.
-        $no_morale = $this->defender['isWW'] || $this->defender['uid'] == 1 || ($this->defender['isOasis'] && !$this->defender['isOccupied']);
+        $no_morale = $this->defender['isWW'] || $this->defender['uid'] == UserId::NATARS || ($this->defender['isOasis'] && !$this->defender['isOccupied']);
         $wall_b = \Game\Formulas::WALL_BASE[$this->defender['wave'][0]['race']];
         $pop_ratio = $this->attacker['total_pop'] / $this->defender['total_pop'];
         if (getGame("ignoreMoralPointsInAttacks")) {
@@ -324,7 +330,7 @@ class BattleModel
         $stone = 1 + $this->defender['stone'] / 10;
         $brewery = (new VillageModel())->getCapBrewery($this->attacker['uid']);
         $offense = $this->calc_offense($brewery);
-        if ($this->defender['uid'] == 1) {
+        if ($this->defender['uid'] == UserId::NATARS) {
             if ($this->attacker['wave']['units']['num'][Unit::HERO] && isset($offense['n'])) {
                 $offense['b'] *= 1 + $offense['n'] / 100; // natarian horns
             }
@@ -600,7 +606,7 @@ class BattleModel
     private function returnTroops(): void
     {
         $move = new MovementsModel();
-        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], array_filter_units($this->row), 0, 0, 0, 0, 1, $this->row['attack_type'], $this->row['end_time'], 2 * $this->row['end_time'] - $this->row['start_time'], NULL, $this->row['ship']);
+        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], array_filter_units($this->row), 0, 0, 0, 0, MovementsModel::MODE_RETURN, $this->row['attack_type'], $this->row['end_time'], 2 * $this->row['end_time'] - $this->row['start_time'], NULL, $this->row['ship']);
     }
 
     private function assocDefender(): bool
@@ -673,7 +679,7 @@ class BattleModel
                 ];
                 $this->defender['total_pop'] = max($user['total_pop'], 1);
                 $this->startProfile('assocDefender:getVillageFullUnits');
-                $units = $this->model->getFullUnits($this->row['to_kid'], array_fill(1, 11, 0));
+                $units = $this->model->getFullUnits($this->row['to_kid'], array_fill(1, Unit::LAST, 0));
                 $this->endProfile('assocDefender:getVillageFullUnits');
                 $this->defender['wave'][] = [
                     'uid' => $this->defender['uid'],
@@ -797,7 +803,7 @@ class BattleModel
             $uid = $wave['uid'];
             if (!isset($metallurgy[$uid])) {
                 $metallurgy[$uid] = 1;
-                if ($uid > 1) {
+                if ($uid > UserId::NATARS) {
                     $owner = $this->model->getUser($uid);
                     $metallurgy[$uid] = AllianceBonus::getArmorBonus($owner['aid'], $owner['alliance_join_time']);
                 }
@@ -881,7 +887,7 @@ class BattleModel
         $calculator->setMinSpeed($speeds);
         $neededTime = $calculator->calc();
         $move = new MovementsModel();
-        $move->addMovement($this->row['to_kid'], $this->row['kid'], 4, $caged, 0, 0, 0, 0, 0, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + 1000 * $neededTime);
+        $move->addMovement($this->row['to_kid'], $this->row['kid'], 4, $caged, 0, 0, 0, 0, MovementsModel::MODE_GOING, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + 1000 * $neededTime);
         //send hero back and send report.
         $helper = new HeroHelper();
         $calculator = new SpeedCalculator();
@@ -890,10 +896,10 @@ class BattleModel
         $calculator->setTo($this->row['kid']);
         $calculator->setArtefactEffect(ArtefactsModel::getArtifactEffectByType($this->attacker['uid'], $this->row['kid'], ArtefactsModel::ARTIFACT_INCREASE_SPEED));
         $calculator->setTournamentSqLvl($this->attacker['buildings'][Gid::TOURNAMENT_SQUARE]);
-        $units = array_fill(1, 11, 0);
+        $units = array_fill(1, Unit::LAST, 0);
         $returnSpeeds = [];
         $returnUnitIds = [];
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
             if ($this->attacker['wave']['units']['num'][$i] <= 0) {
                 continue;
             }
@@ -919,9 +925,9 @@ class BattleModel
         $calculator->setLeftHand($this->attacker['wave']['heroItems']['leftHand']);
         $calculator->setShoes($this->attacker['wave']['heroItems']['shoes']);
         $calculator->setShip($this->row['ship'], (int)$this->row['race']);
-        $end_time = $this->row['end_time'] + $calculator->calc() * 1000;
+        $end_time = $this->row['end_time'] + $calculator->calc() * Time::SECOND_MS;
         $move = new MovementsModel();
-        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], $units, 0, 0, 0, 0, 1, $this->row['attack_type'], $this->row['end_time'], $end_time, NULL, $this->row['ship']);
+        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], $units, 0, 0, 0, 0, MovementsModel::MODE_RETURN, $this->row['attack_type'], $this->row['end_time'], $end_time, NULL, $this->row['ship']);
         $report = [
             'uid' => 0,
             'uname' => '<span class="errorMessage">' . T("Global", "NatureName") . '</span>',
@@ -966,7 +972,7 @@ class BattleModel
             $report['info']['none_return'] = $tmp['info']['none_return'] = true;
             $tmp['defender'] = [$tmp['defender'][0]];
             foreach ($tmp['defender'] as &$val) {
-                $val['num'] = array_fill(1, 11, '?');
+                $val['num'] = array_fill(1, Unit::LAST, '?');
                 $val['dead'] = null;
             }
             NoticeHelper::addNotice($this->attacker['player']['aid'], $this->attacker['uid'], $this->row['kid'], $this->row['to_kid'], $reportType, null, $tmp, $this->row['end_time_seconds']);
@@ -997,7 +1003,7 @@ class BattleModel
         }
         //report defender.
         if ($attacker['total_dead'] > 0) {
-            if ((!$this->defender['isOasis'] || $this->defender['isOccupied']) && $this->defender['uid'] > 0 && $this->attacker['uid'] <> $this->defender['uid']) {
+            if ((!$this->defender['isOasis'] || $this->defender['isOccupied']) && $this->defender['uid'] > UserId::NATURE && $this->attacker['uid'] <> $this->defender['uid']) {
                 $reportType = $reportType == NoticeHelper::TYPE_LOST_AS_SPY ? NoticeHelper::TYPE_WON_SPY_AS_DEFENDER_REFUSED_ATTACKER_SPY : NoticeHelper::TYPE_WON_SPY_AS_DEFENDER_LETTING_ATTACKER_SPY;
                 NoticeHelper::addNotice($this->defender['player']['aid'], $this->defender['uid'], $this->row['kid'], $this->row['to_kid'], $reportType, null, $report, $this->row['end_time_seconds']);
             }
@@ -1019,7 +1025,7 @@ class BattleModel
             $m = new AllianceModel();
             $m->setAlliancePoints($this->attacker['player']['aid'], $def_total_upkeep, 0, +$total_bounty * $total_bounty_percent);
         }
-        if ($this->attacker['uid'] > 2) {
+        if ($this->attacker['uid'] > UserId::LAST_SYSTEM) {
             $m = new PlayerModel();
             $m->setPlayerPoints($this->attacker['uid'], $def_total_upkeep, 0, +$total_bounty * $total_bounty_percent);
         }
@@ -1034,7 +1040,7 @@ class BattleModel
         $allianceModel = new AllianceModel();
 
         foreach ($def_points_share as $uid => $share) {
-            if ($uid > 2) {
+            if ($uid > UserId::LAST_SYSTEM) {
                 $bounty = $uid == $this->defender['uid'] ? -$total_bounty : 0;
                 $playerModel->setPlayerPoints($uid, 0, $share, $bounty);
                 $allianceModel->setAlliancePointsByUid($uid, 0, $share, $bounty);
@@ -1193,7 +1199,7 @@ class BattleModel
      */
     private function item_unit_bonus(array $wave): array
     {
-        $item_bonus = array_fill(1, 10, 0);
+        $item_bonus = array_fill(1, Unit::LAST_TROOP, 0);
         if (!in_array($wave['race'], [Tribes::ROMANS, Tribes::TEUTONS, Tribes::GAULS, Tribes::EGYPTIANS, Tribes::HUNS, Tribes::SPARTANS, Tribes::VIKINGS])) {
             return $item_bonus;
         }
@@ -1345,7 +1351,7 @@ class BattleModel
      */
     private function unit_offense(int $r, array $wave, array $item_bonus, array &$offense): void
     {
-        for ($u = 1; $u <= 10; $u++) {
+        for ($u = 1; $u <= Unit::LAST_TROOP; $u++) {
             $up_level = (in_array($r, [Tribes::ROMANS, Tribes::TEUTONS, Tribes::GAULS, Tribes::EGYPTIANS, Tribes::HUNS, Tribes::SPARTANS, Tribes::VIKINGS]) and $u <= 8) ? $wave['smithy'][$u] : 0;
             $value = $item_bonus[$u] + $this->model->stat_with_upg($this->unitStat($r, $u, 'off'),
                     $this->unitStat($r, $u, 'cu'),
@@ -1366,7 +1372,7 @@ class BattleModel
     {
         $r = (int) $this->model->int_check_limit($wave, 'race', 1, 9);
         $units = $wave['units'];
-        for ($u = 1; $u <= 10; $u++) {
+        for ($u = 1; $u <= Unit::LAST_TROOP; $u++) {
             $up_level = (in_array($r, [Tribes::ROMANS, Tribes::TEUTONS, Tribes::GAULS, Tribes::EGYPTIANS, Tribes::HUNS, Tribes::SPARTANS, Tribes::VIKINGS]) && $u <= 8) ? $units['smithy'][$u] : 0;
             $cu = $this->unitStat($r, $u, 'cu');
 
@@ -1440,21 +1446,21 @@ class BattleModel
             $this->handleTrapFreeOnNormalAttack($attacker);
             $this->endProfile('finalize_attack:handleTrapFreeOnNormalAttack');
         }
-        if (!$captured && $this->attacker['uid'] <> 1) {
+        if (!$captured && $this->attacker['uid'] <> UserId::NATARS) {
             $this->startProfile('finalize_attack:finalize_troops_return');
             $this->finalize_troops_return(implode(",", isset($this->info['bounty']) ? $this->info['bounty'] : []));
             $this->endProfile('finalize_attack:finalize_troops_return');
         }
         finalize:
         $db = DB::getInstance();
-        $now = floor($this->row['end_time'] / 1000);
+        $now = floor($this->row['end_time'] / Time::SECOND_MS);
         if ($this->defender['isOasis'] && !$this->defender['isOccupied']) {
             $this->startProfile('finalize_attack:addSurrounding');
             $xy = Formulas::kid2xy($this->row['to_kid']);
             NoticeHelper::addSurrounding($xy['x'], $xy['y'], NoticeHelper::SURROUNDING_OASIS_RAID, null, $this->row['end_time_seconds']);
             $this->endProfile('finalize_attack:addSurrounding');
             $attackerUid = $this->attacker['uid'];
-            if ($attackerUid > 2) {
+            if ($attackerUid > UserId::LAST_SYSTEM) {
                 (new SeasonPassModel())->onMissionEvent($attackerUid, 'defeatAnimals');
             }
         }
@@ -1464,7 +1470,7 @@ class BattleModel
         $this->startProfile('finalize_attack:sendBattleReports');
         $this->sendBattleReports($attacker, $defender, $losses[0], $losses[1]);
         $this->endProfile('finalize_attack:sendBattleReports');
-        if ($this->defender['uid'] == 1 && $artifactCaptured) {
+        if ($this->defender['uid'] == UserId::NATARS && $artifactCaptured) {
             $this->startProfile('finalize_attack:deleteVillage');
             (new AccountDeleter())->deleteVillage($this->row['to_kid']);
             $this->endProfile('finalize_attack:deleteVillage');
@@ -1488,7 +1494,7 @@ class BattleModel
         $killed = (int)($this->attacker['wave']['units']['dead'][3] ?? 0);
         $survivors = 0;
         foreach ($this->defender['wave'] as $army) {
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 $survivors += max(0, (int)$army['units']['num'][$i] - (int)$army['units']['dead'][$i]);
             }
         }
@@ -1502,7 +1508,7 @@ class BattleModel
             $modify = [];
             $upkeep = 0;
             $extraDead = [];
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 $alive = max(0, (int)$army['units']['num'][$i] - (int)$army['units']['dead'][$i]);
                 $extra = min($alive, (int)round($alive * $ratio));
                 if ($extra <= 0) {
@@ -1544,7 +1550,7 @@ class BattleModel
         $helper = new HeroHelper();
 
 
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $num = $this->attacker['wave']['units']['num'][$i] - $this->attacker['wave']['units']['trapped'][$i];
             if ($i == Unit::HERO && $this->attacker['wave']['units']['num'][Unit::HERO]) {
                 if ($this->attacker['wave']['units']['trapped'][Unit::HERO] == 0) {
@@ -1605,7 +1611,7 @@ class BattleModel
             $trappedId = $move->isSameVillageTrappedExists($this->row['kid'], $this->row['to_kid']);
             if ($trappedId !== false) {
                 $modify = [];
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     $trapped = $this->attacker['wave']['units']['trapped'][$i];
                     if ($trapped) {
                         $modify[] = "u{$i}=u{$i}+" . $trapped;
@@ -1623,7 +1629,7 @@ class BattleModel
                     $modifiedUpkeep -= $count * Formulas::uUpkeep(nrToUnitId($nr, $this->attacker['wave']['race']), $this->attacker['buildings'][Gid::HORSE_DRINKING_TROUGH], true);
                 }
                 $neededTime = $this->bandageReturnMilliseconds((int) $this->row['to_kid'], (int) $this->row['kid'], (int) $this->row['race'], $_revived, (int) $this->attacker['buildings'][Gid::TOURNAMENT_SQUARE], (int) $this->row['ship']);
-                $move->addMovement($this->row['kid'], $this->row['kid'], $this->row['race'], $_revived, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
+                $move->addMovement($this->row['kid'], $this->row['kid'], $this->row['race'], $_revived, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
                 $this->useBagItems($this->attacker['uid'], $this->attacker['wave']['heroItems']['bag'], $bandages);
             }
         }
@@ -1650,7 +1656,7 @@ class BattleModel
     private function bandageReturnMilliseconds(int $fromKid, int $toKid, int $race, array $units, int $tournamentLevel, int $ship): int
     {
         $speeds = [];
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= Unit::LAST_TROOP; $i++) {
             if ((int) ($units[$i] ?? 0) <= 0) {
                 continue;
             }
@@ -1671,7 +1677,7 @@ class BattleModel
         }
         $rate = max(1.0, (float) (Config::getInstance()->heroConfig->heroItemsSettings->heroReviveArrivalTimeRate ?? 1));
 
-        return 1000 * max((int) round(86400 / $rate), $travel);
+        return 1000 * max((int) round(Time::DAY / $rate), $travel);
     }
 
     private function tournamentSquareLevel(int $kid): int
@@ -1682,7 +1688,7 @@ class BattleModel
             return 0;
         }
         $level = 0;
-        for ($i = 19; $i <= 40; $i++) {
+        for ($i = Slot::FIRST_BUILDING; $i <= Slot::LAST; $i++) {
             if ((int) ($fields['f' . $i . 't'] ?? 0) === 14) {
                 $level = max($level, (int) $fields['f' . $i]);
             }
@@ -1714,8 +1720,8 @@ class BattleModel
         if (empty($army['units']['num'][Unit::HERO])) {
             $bandages = 0;
         } else {
-            $dead = array_fill(1, 10, 0);
-            for ($u = 1; $u <= 10; $u++) {
+            $dead = array_fill(1, Unit::LAST_TROOP, 0);
+            for ($u = 1; $u <= Unit::LAST_TROOP; $u++) {
                 $un = $army['units']['dead'][$u];
                 $dead[$u] = $un;
             }
@@ -1833,9 +1839,9 @@ class BattleModel
                     $homeKid = $value['isEnforce'] ? (int) $value['kid'] : (int) $this->row['to_kid'];
                     $neededTime = $this->bandageReturnMilliseconds((int) $this->row['to_kid'], $homeKid, (int) $value['race'], $_revived, $this->tournamentSquareLevel($homeKid), 0);
                     if ($value['isEnforce']) {
-                        $move->addMovement($value['kid'], $value['kid'], $value['race'], $_revived, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
+                        $move->addMovement($value['kid'], $value['kid'], $value['race'], $_revived, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
                     } else {
-                        $move->addMovement($this->row['to_kid'], $this->row['to_kid'], $value['race'], $_revived, 0, 0, 0, 0, 1, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
+                        $move->addMovement($this->row['to_kid'], $this->row['to_kid'], $value['race'], $_revived, 0, 0, 0, 0, MovementsModel::MODE_RETURN, MovementsModel::ATTACKTYPE_REINFORCEMENT, $this->row['end_time'], $this->row['end_time'] + $neededTime, null);
                     }
                     $this->useBagItems((int) $value['hero']['uid'], $value['heroItems']['bag'], $bandages);
                 }
@@ -1896,7 +1902,7 @@ class BattleModel
     private function defendingSupply(array $wave): int
     {
         $supply = 0;
-        for ($unit = 1; $unit <= 10; ++$unit) {
+        for ($unit = 1; $unit <= Unit::LAST_TROOP; ++$unit) {
             $supply += (int)($wave['units']['num'][$unit] ?? 0)
                 * Formulas::uUpkeep(nrToUnitId($unit, (int)$wave['race']), 0, true);
         }
@@ -1940,7 +1946,7 @@ class BattleModel
         //modify bounty.
         $total_bounty = $maxCarryLoad = $this->attacker['total_bounty'];
         $resources = $this->get_available_resources_to_raid();
-        if ($this->isFarm || $this->defender['uid'] == 1) {
+        if ($this->isFarm || $this->defender['uid'] == UserId::NATARS) {
             $resources = array_map(function ($x) {
                 return floor($x * 0.5);
             }, $resources);
@@ -2009,7 +2015,7 @@ class BattleModel
             $this->isTopOff = true;
             $db->query("UPDATE users SET max_off_time=" . $this->row['end_time_seconds'] . " WHERE id={$this->attacker['uid']}");
         }
-        if ($this->defender['uid'] > 2) {
+        if ($this->defender['uid'] > UserId::LAST_SYSTEM) {
             $db->query("UPDATE users SET max_def_point=GREATEST(max_def_point, $total_def_point) WHERE id={$this->defender['uid']}");
             if ($db->affectedRows()) {
                 $this->isTopDef = true;
@@ -2021,10 +2027,10 @@ class BattleModel
     private function handleDailyQuestAchivements(): void
     {
         if ($this->defender['isOasis'] && !$this->defender['isOccupied']) {
-            (new DailyQuestModel())->setQuestAsCompleted($this->attacker['uid'], 2);
+            (new DailyQuestModel())->setQuestAsCompleted($this->attacker['uid'], DailyQuestModel::QUEST_RAID_UNOCCUPIED_OASIS);
         }
-        if (!$this->defender['isOasis'] && $this->defender['uid'] == 1) {
-            (new DailyQuestModel())->setQuestAsCompleted($this->attacker['uid'], 3);
+        if (!$this->defender['isOasis'] && $this->defender['uid'] == UserId::NATARS) {
+            (new DailyQuestModel())->setQuestAsCompleted($this->attacker['uid'], DailyQuestModel::QUEST_ATTACK_NATARS);
         }
     }
 
@@ -2053,10 +2059,10 @@ class BattleModel
                 if ($this->row['attack_type'] == MovementsModel::ATTACKTYPE_RAID) {
                     // A won raid takes a free oasis; it never lowers an occupied oasis's loyalty.
                     if ($slots > 0 && !$this->defender['isOccupied']) {
-                        $this->info['oasisCapture'] = 0;
+                        $this->info['oasisCapture'] = OasisCaptureResult::CAPTURED;
                         OasesModel::captureOasis($this->row['to_kid'], $this->attacker['uid'], $this->row['kid']);
                     } elseif ($slots <= 0 && !$this->defender['isOccupied']) {
-                        $this->info['oasisCapture'] = -1;
+                        $this->info['oasisCapture'] = OasisCaptureResult::NO_FREE_SLOT;
                     }
                 } else {
                     LoyaltyHelper::updateOasisLoyalty($this->row['to_kid']);
@@ -2066,7 +2072,7 @@ class BattleModel
                         : (int)$db->fetchScalar('SELECT COUNT(kid) FROM odata WHERE did=' . (int)$oasis['did']);
                     if ($oasis['did'] != $this->row['kid']) {
                         if ($slots <= 0) {
-                            $this->info['oasisCapture'] = -1;
+                            $this->info['oasisCapture'] = OasisCaptureResult::NO_FREE_SLOT;
                         } else {
                             // One won attack takes a free oasis.
                             $loyaltyChange = (int)$oasis['did'] === 0
@@ -2075,7 +2081,7 @@ class BattleModel
                             if ($loyaltyChange >= $oasis['loyalty']) {
                                 OasesModel::releaseOasis($this->row['to_kid'], (int) $oasis['did']);
                                 OasesModel::captureOasis($this->row['to_kid'], $this->attacker['uid'], $this->row['kid']);
-                                $this->info['oasisCapture'] = 0;
+                                $this->info['oasisCapture'] = OasisCaptureResult::CAPTURED;
                             } else {
                                 $this->info['oasisCapture'] = [
                                     $oasis['loyalty'],
@@ -2173,11 +2179,11 @@ class BattleModel
         if ($this->row['attack_type'] == MovementsModel::ATTACKTYPE_NORMAL && !$this->defender['isOasis'] && $this->getAlive($this->attacker['wave'], Unit::CHIEF)) {
             //king.
             if ($this->model->is_capital($this->row['to_kid'])) {
-                $this->info['captureResult'] = -1;
+                $this->info['captureResult'] = CaptureResult::CAPITAL;
             } else {
                 //Only 1 WW village can be captured at a time
                 if (getCustom("allowOnlyOneWWVillagePerAccount") && $this->defender['isWW'] && ($db->fetchScalar("SELECT COUNT(kid) FROM vdata WHERE isWW=1 AND owner={$this->attacker['uid']}")) >= 1) {
-                    $this->info['captureResult'] = -4;
+                    $this->info['captureResult'] = CaptureResult::ONE_WONDER_LIMIT;
                 } else {
                     return $this->handleVillageCaptured($no_morale, $pop_ratio);
                 }
@@ -2199,28 +2205,28 @@ class BattleModel
         if ((int)$this->attacker['uid'] !== (int)$this->defender['uid'] && $defenderVillages <= 1) {
             return false;
         }
-        if (!empty($this->defender['isWW']) && $this->model->get_building_lvl(-1, 40, $this->defender['buildings']) >= 1) {
+        if (!empty($this->defender['isWW']) && $this->model->get_building_lvl(-1, Gid::WONDER_OF_THE_WORLD, $this->defender['buildings']) >= 1) {
             return false;
         }
         $total_villages = $db->fetchScalar("SELECT COUNT(kid) FROM vdata WHERE owner={$this->attacker['uid']}");
         if (!($this->attacker['uid'] == $this->defender['uid']) &&
             $this->attacker['player']['cp'] < Formulas::newVillageCP($total_villages + 1)) {
-            $this->info['captureResult'] = -2;
+            $this->info['captureResult'] = CaptureResult::NOT_ENOUGH_CULTURE_POINTS;
         } else {
-            if ($this->model->get_building_lvl(-1, 25, $this->defender['buildings']) > 0 ||
-                $this->model->get_building_lvl(-1, 26, $this->defender['buildings']) > 0 ||
-                $this->model->get_building_lvl(-1, 44, $this->defender['buildings']) > 0) {
-                $this->info['captureResult'] = -3;
+            if ($this->model->get_building_lvl(-1, Gid::RESIDENCE, $this->defender['buildings']) > 0 ||
+                $this->model->get_building_lvl(-1, Gid::PALACE, $this->defender['buildings']) > 0 ||
+                $this->model->get_building_lvl(-1, Gid::COMMAND_CENTER, $this->defender['buildings']) > 0) {
+                $this->info['captureResult'] = CaptureResult::RESIDENCE_OR_PALACE_STANDS;
             } elseif (($blocked = LoyaltyProtection::blockedBy((int) $this->attacker['uid'], (int) $this->defender['uid'], (int) $this->row['to_kid'])) !== null) {
                 // Allies cannot lower the loyalty and the report says nothing; a NAP is reported.
                 if ($blocked === LoyaltyProtection::NAP) {
-                    $this->info['captureResult'] = -5;
+                    $this->info['captureResult'] = CaptureResult::NAP;
                 }
-            } elseif ((int)$this->attacker['uid'] !== 1
+            } elseif ((int)$this->attacker['uid'] !== UserId::NATARS
                 && (int)$this->attacker['uid'] !== (int)$this->defender['uid']
                 && TrainingHelper::freeExpansionSlots((int)$this->row['kid']) <= 0) {
                 // Chiefs need a free expansion slot in the village they come from, which may have been lost after training.
-                $this->info['captureResult'] = -6;
+                $this->info['captureResult'] = CaptureResult::NO_EXPANSION_SLOT;
             } else {
                 $alive_admins = $this->getAlive($this->attacker['wave'], Unit::CHIEF);
                 $af = self::ADMINISTRATOR_EFFECT[$this->row['race']];
@@ -2244,13 +2250,13 @@ class BattleModel
                 LoyaltyHelper::updateVillageLoyalty($this->row['to_kid']);
                 $village = $db->query("SELECT loyalty FROM vdata WHERE kid={$this->row['to_kid']}")->fetch_assoc();
                 if ($loyaltyChange >= floor((float) $village['loyalty'])) {
-                    $this->info['captureResult'] = 0;
+                    $this->info['captureResult'] = CaptureResult::CAPTURED;
                     $p = new VillageModel();
                     $captured = $p->captureVillage($this->defender['uid'], $this->row['to_kid'], $this->defender['total_pop'], $this->attacker['uid'], $this->attacker['total_pop'], $this->row['race'], $this->row['kid']);
                     if ($captured) {
                         $move = new MovementsModel();
                         $units = [];
-                        for ($i = 1; $i <= 11; ++$i) {
+                        for ($i = 1; $i <= Unit::LAST; ++$i) {
                             $units[$i] = $this->getAlive($this->attacker['wave'], $i);
                             if ($i == Unit::CHIEF) {
                                 $units[$i]--;
@@ -2300,7 +2306,7 @@ class BattleModel
                 continue;
             }
             $total_sum = 0;
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= Unit::LAST_TROOP; ++$i) {
                 $total_all += $trappedRow['u' . $i];
                 $trappedRow['u' . $i] = ceil($trappedRow['u' . $i] * 0.75);
                 $total_sum += $trappedRow['u' . $i];
@@ -2337,8 +2343,8 @@ class BattleModel
         $calculator->isReturn();
         $calculator->setTournamentSqLvl($this->attacker['buildings'][Gid::TOURNAMENT_SQUARE]);
         $speeds = $alive = $units_id = [];
-        $alive = array_fill(1, 11, 0);
-        for ($i = 1; $i <= 11; ++$i) {
+        $alive = array_fill(1, Unit::LAST, 0);
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $alive[$i] = $this->getAlive($this->attacker['wave'], $i);
             if ($i == Unit::HERO) {
                 continue;
@@ -2389,7 +2395,7 @@ class BattleModel
         $calculator->setMinSpeed($speeds);
         $calculator->setShip($this->row['ship'], (int)$this->row['race']);
         $move = new MovementsModel();
-        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], $alive, 0, 0, 0, 0, 1, $this->row['attack_type'], $this->row['end_time'], $this->row['end_time'] + $calculator->calc() * 1000, $data, $this->row['ship']);
+        $move->addMovement($this->row['to_kid'], $this->row['kid'], $this->row['race'], $alive, 0, 0, 0, 0, MovementsModel::MODE_RETURN, $this->row['attack_type'], $this->row['end_time'], $this->row['end_time'] + $calculator->calc() * 1000, $data, $this->row['ship']);
         return true;
     }
 
@@ -2463,7 +2469,7 @@ class BattleModel
         }
         $this->endProfile("sendBattleReports:sendAttackerReport");
         unset($tmp);
-        if ($this->defender['uid'] <= 1) {
+        if ($this->defender['uid'] <= UserId::NATARS) {
             return false;
         }
         $this->startProfile("sendBattleReports:sendDefendersReport");
@@ -2504,7 +2510,7 @@ class BattleModel
                     ($reportType == NoticeHelper::TYPE_LOST_AS_DEFENDER_WITHOUT_CASUALTIES ? 0 : $def_losses) * 100);
             }
         }
-        if ($this->defender['uid'] > 1) {
+        if ($this->defender['uid'] > UserId::NATARS) {
             if ($this->attacker['uid'] != $this->defender['uid']) {
                 $noticeId = NoticeHelper::addNotice($this->defender['player']['aid'],
                     $this->defender['uid'],
@@ -2610,7 +2616,7 @@ class BattleModel
      */
     private function find_building_by_gid(int $gid, array $buildings): int
     {
-        if ($gid != 99) {
+        if ($gid != CatapultTargets::RANDOM) {
             $targets = [];
             foreach ($buildings as $key => $build) {
                 if (!$build['level'] || in_array($gid, \Game\Formulas::WALL_BUILDINGS)) {
@@ -2663,7 +2669,7 @@ class BattleModel
         BuildingAction::downgrade($this->row['to_kid'], $field, $damage[1] - $damage[2], $damage[2] == 0);
         $level = (int) $damage[2];
         $itemId = $this->defender['buildings'][$field]['item_id'];
-        if (($field > 18 && $field < 99) && $level == 0 && !BuildingAction::building_upgrade_state($this->row['to_kid'], $field)) {
+        if (($field > Slot::LAST_FIELD && $field < Slot::WONDER) && $level == 0 && !BuildingAction::building_upgrade_state($this->row['to_kid'], $field)) {
             $itemId = 0;
             BuildingAction::removeDemolitionsOnField($this->row['to_kid'], $field);
         }

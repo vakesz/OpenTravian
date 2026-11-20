@@ -46,7 +46,7 @@ class ResourceFieldsModel
      */
     public function getIncomingAttacksToMyOases(string $oasesString): array
     {
-        return $this->oasesMovements($oasesString, 'attack_type IN(3,4)');
+        return $this->oasesMovements($oasesString, 'attack_type IN(' . MovementsModel::ATTACKTYPE_NORMAL . ',' . MovementsModel::ATTACKTYPE_RAID . ')');
     }
 
     /**
@@ -61,43 +61,43 @@ class ResourceFieldsModel
     /** @return array{end_time: int, count: int} */
     public function getIncomingAttacksToMe(int $kid): array
     {
-        return $this->movements('to_kid=? AND mode=0 AND attack_type IN(3,4)', $kid);
+        return $this->movements('to_kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type IN(' . MovementsModel::ATTACKTYPE_NORMAL . ',' . MovementsModel::ATTACKTYPE_RAID . ')', $kid);
     }
 
     /** @return array{end_time: int, count: int} */
     public function getIncomingReinforcementToMe(int $kid): array
     {
-        return $this->movements('to_kid=? AND ((mode=0 AND attack_type=2) OR (mode=1))', $kid);
+        return $this->movements('to_kid=? AND ((mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_REINFORCEMENT . ') OR (mode=' . MovementsModel::MODE_RETURN . '))', $kid);
     }
 
     /** @return array{end_time: int, count: int} */
     public function getOutgoingAttacks(int $kid): array
     {
-        return $this->movements('kid=? AND mode=0 AND attack_type IN(3,4,1)', $kid);
+        return $this->movements('kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type IN(' . MovementsModel::ATTACKTYPE_NORMAL . ',' . MovementsModel::ATTACKTYPE_RAID . ',' . MovementsModel::ATTACKTYPE_SPY . ')', $kid);
     }
 
     /** @return array{end_time: int, count: int} */
     public function getOutGoingReinforcements(int $kid): array
     {
-        return $this->movements('kid=? AND mode=0 AND attack_type=2', $kid);
+        return $this->movements('kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_REINFORCEMENT, $kid);
     }
 
     /** @return array{end_time: int, count: int} */
     public function getOutgoingAdventure(int $kid): array
     {
-        return $this->movements('kid=? AND mode=0 AND attack_type=7', $kid);
+        return $this->movements('kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_ADVENTURE, $kid);
     }
 
     /** @return array{end_time: int, count: int} */
     public function getOutgoingEvasion(int $kid): array
     {
-        return $this->movements('kid=? AND mode=0 AND attack_type=6', $kid);
+        return $this->movements('kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_EVASION, $kid);
     }
 
     /** @return array{end_time: int, count: int} */
     public function getOutgoingSettlers(int $kid): array
     {
-        return $this->movements('kid=? AND mode=0 AND attack_type=5', $kid);
+        return $this->movements('kid=? AND mode=' . MovementsModel::MODE_GOING . ' AND attack_type=' . MovementsModel::ATTACKTYPE_SETTLERS, $kid);
     }
 
     /**
@@ -109,7 +109,7 @@ class ResourceFieldsModel
             return ['end_time' => 0, 'count' => 0];
         }
 
-        return $this->movements("to_kid IN($oasesString) AND mode=0 AND $condition", null);
+        return $this->movements("to_kid IN($oasesString) AND mode=" . MovementsModel::MODE_GOING . " AND $condition", null);
     }
 
     /**

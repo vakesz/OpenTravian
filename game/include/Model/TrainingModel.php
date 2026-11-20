@@ -6,6 +6,7 @@ namespace Model;
 
 use Core\Config;
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\ResourcesHelper;
 use Game\Ships;
@@ -87,7 +88,7 @@ class TrainingModel
         if (Config::getProperty('game', 'useNanoseconds')) {
             $rate = 1e9;
         } elseif (Config::getProperty('game', 'useMilSeconds')) {
-            $rate = 1000;
+            $rate = Time::SECOND_MS;
         }
         $totalTrainingTime = (int) DB::getInstance()->fetchScalar(
             'SELECT SUM(training_time*num) FROM training WHERE kid=?',

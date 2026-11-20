@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Model\Movements;
 
 use Core\Database\DB;
+use Core\Time;
 use Game\Formulas;
 use Game\Hero\HeroHelper;
 use Game\NoticeHelper;
@@ -12,6 +13,7 @@ use Game\ResourcesHelper;
 use Game\SpeedCalculator;
 use Game\Tribes;
 use Game\Unit;
+use Game\UserId;
 use Model\AutomationModel;
 use Model\ArtefactsModel;
 use Model\MovementsModel;
@@ -29,8 +31,8 @@ class ReinforcementProcessor
         $kid = (int) $row['kid'];
         $toKid = (int) $row['to_kid'];
         $race = (int) $row['race'];
-        $startSeconds = (int) ceil($row['start_time'] / 1000);
-        $endSeconds = (int) ceil($row['end_time'] / 1000);
+        $startSeconds = (int) ceil($row['start_time'] / Time::SECOND_MS);
+        $endSeconds = (int) ceil($row['end_time'] / Time::SECOND_MS);
 
         $m = new AutomationModel();
         $db = DB::getInstance();
@@ -47,7 +49,7 @@ class ReinforcementProcessor
         $to_uid = (int) ($isOasis
             ? $db->query("SELECT owner FROM odata WHERE kid=$toKid")->fetch_assoc()['owner']
             : $m->getVillage($toKid, 'owner')['owner']);
-        if ($to_uid === 1 || ($to_uid <= 10 && (int) $m->getUser($to_uid, 'hidden')['hidden'] === 1)) {
+        if ($to_uid === UserId::NATARS || ($to_uid <= UserId::LEGACY_HIDDEN_MAX && (int) $m->getUser($to_uid, 'hidden')['hidden'] === 1)) {
             $this->returnTroops($row);
             return;
         }
@@ -58,7 +60,7 @@ class ReinforcementProcessor
             $redeployHero = (int) $row['u11'] > 0 && $uid === $to_uid && $this->getRallyPoint($toKid) > 0;
         }
         $units = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $units[$i] = $i === Unit::HERO && $redeployHero ? 0 : (int) $row['u' . $i];
         }
         if (array_sum($units) > 0) {
@@ -66,7 +68,7 @@ class ReinforcementProcessor
             $enforceId = false;
             if (!$isOasis && $race === Tribes::NATURE) {
                 //Oasis troops coming!
-                $enforceId = $db->fetchScalar("SELECT e.id FROM enforcement e WHERE e.race=4 AND e.to_kid=$toKid LIMIT 1");
+                $enforceId = $db->fetchScalar("SELECT e.id FROM enforcement e WHERE e.race=" . Tribes::NATURE . " AND e.to_kid=$toKid LIMIT 1");
             }
             if (!$enforceId) {
                 $enforceId = $move->isSameVillageReinforcementExists($kid, $toKid);
@@ -96,7 +98,7 @@ class ReinforcementProcessor
         //add report here.
         $consumption = 0;
         $units = [];
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $units[$i] = (int) $row['u' . $i];
             $consumption += $units[$i] * Formulas::uUpkeep(nrToUnitId($i, $race));
             //here consumption doesn't include effect of artefact or horse drinking pool
@@ -114,7 +116,7 @@ class ReinforcementProcessor
             'sender' => [
                 'uid' => $uid,
                 'kid' => $kid,
-                'uname' => $uid === 0 ? '' : $db->fetchScalar("SELECT name FROM users WHERE id=$uid"),
+                'uname' => $uid === UserId::NATURE ? '' : $db->fetchScalar("SELECT name FROM users WHERE id=$uid"),
             ],
             'receiver' => [
                 'uid' => $to_uid,
@@ -153,8 +155,8 @@ class ReinforcementProcessor
         $calculator->hasCata((int) $row['u8'] > 0);
         $speeds = [];
         $units_id = [];
-        $units = array_fill(1, 11, 0);
-        for ($i = 1; $i <= 11; ++$i) {
+        $units = array_fill(1, Unit::LAST, 0);
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $count = (int) $row['u' . $i];
             if ($count === 0) {
                 continue;
@@ -197,10 +199,10 @@ class ReinforcementProcessor
             0,
             0,
             0,
-            1,
+            MovementsModel::MODE_RETURN,
             (int) $row['attack_type'],
             $row['end_time'],
-            $row['end_time'] + 1000 * $calculator->calc()
+            $row['end_time'] + Time::SECOND_MS * $calculator->calc()
         );
     }
 

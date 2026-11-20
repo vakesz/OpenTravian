@@ -6,6 +6,7 @@ namespace Game\FarmList;
 
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Game\Unit;
 
 use function get_locale;
 use function nrToUnitId;
@@ -206,7 +207,7 @@ final class FarmListPage
     private function unitTitles(int $race): array
     {
         $titles = [];
-        for ($unit = 1; $unit <= 10; $unit++) {
+        for ($unit = 1; $unit <= Unit::LAST_TROOP; $unit++) {
             $titles[$unit] = (string)T('Troops', nrToUnitId($unit, $race) . '.title');
         }
 

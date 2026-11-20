@@ -20,8 +20,8 @@ foreach ([
     '$calc->setTo($row[\'kid\']);',
     '$calc->isReturn();',
     '$timeNeeded = $calc->calc();',
-    '$row[\'end_time\'] + 1000 * $timeNeeded',
-    '1,',
+    '$row[\'end_time\'] + Time::SECOND_MS * $timeNeeded',
+    'MovementsModel::MODE_RETURN,',
 ] as $required) {
     if (!str_contains($adventure, $required)) {
         failHeroReturnMovementContract("Adventure completion must create a timed mode-1 hero return: missing $required");

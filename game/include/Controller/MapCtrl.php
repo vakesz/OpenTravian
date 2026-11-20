@@ -6,6 +6,7 @@ use Core\Config;
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
 use Core\Session;
+use Core\Time;
 use Core\Village;
 use Game\Formulas;
 use Game\Unit;
@@ -25,7 +26,7 @@ class MapCtrl extends GameCtrl
     public function __construct()
     {
         parent::__construct();
-        Quest::getInstance()->setQuestBitwise("world", 5, 1);
+        Quest::getInstance()->setQuestBitwise("world", Quest::WORLD_OPEN_MAP, 1);
         $this->view = new GameView();
         $this->view->vars['bodyCssClass'] = 'map perspectiveBuildings';
         $this->view->vars['contentCssClass'] = 'map';
@@ -158,17 +159,17 @@ class MapCtrl extends GameCtrl
             $m = new MapPageModel();
             $AllKids = $m->getVillageOasesIds($kid);
             $AllKids[] = $kid;
-            $outGoing = $db->query("SELECT * FROM movement WHERE kid=$kid AND mode=0 AND attack_type NOT IN(5,6,7)");
+            $outGoing = $db->query("SELECT * FROM movement WHERE kid=$kid AND mode=" . MovementsModel::MODE_GOING . " AND attack_type NOT IN(" . MovementsModel::ATTACKTYPE_SETTLERS . "," . MovementsModel::ATTACKTYPE_EVASION . "," . MovementsModel::ATTACKTYPE_ADVENTURE . ")");
             while ($row = $outGoing->fetch_assoc()) {
-                $row['start_time_seconds'] = ceil($row['start_time'] / 1000);
-                $row['end_time_seconds'] = ceil($row['end_time'] / 1000);
+                $row['start_time_seconds'] = ceil($row['start_time'] / Time::SECOND_MS);
+                $row['end_time_seconds'] = ceil($row['end_time'] / Time::SECOND_MS);
                 self::addElement($result, $row);
             }
             $inComingGoing = $db->query("SELECT * FROM movement WHERE to_kid IN(" . implode(",",
-                    $AllKids) . ") AND attack_type NOT IN(1,5,6,7)");
+                    $AllKids) . ") AND attack_type NOT IN(" . MovementsModel::ATTACKTYPE_SPY . "," . MovementsModel::ATTACKTYPE_SETTLERS . "," . MovementsModel::ATTACKTYPE_EVASION . "," . MovementsModel::ATTACKTYPE_ADVENTURE . ")");
             while ($row = $inComingGoing->fetch_assoc()) {
-                $row['start_time_seconds'] = ceil($row['start_time'] / 1000);
-                $row['end_time_seconds'] = ceil($row['end_time'] / 1000);
+                $row['start_time_seconds'] = ceil($row['start_time'] / Time::SECOND_MS);
+                $row['end_time_seconds'] = ceil($row['end_time'] / Time::SECOND_MS);
                 self::addElement($result, $row);
             }
         }
@@ -185,10 +186,10 @@ class MapCtrl extends GameCtrl
      */
     private static function addElement(&$result, $row): void
     {
-        if ($row['kid'] != Session::getInstance()->getKid() && $row['mode'] == 0 && ($row['attack_type'] == MovementsModel::ATTACKTYPE_NORMAL || $row['attack_type'] == MovementsModel::ATTACKTYPE_RAID)) {
+        if ($row['kid'] != Session::getInstance()->getKid() && $row['mode'] == MovementsModel::MODE_GOING && ($row['attack_type'] == MovementsModel::ATTACKTYPE_NORMAL || $row['attack_type'] == MovementsModel::ATTACKTYPE_RAID)) {
             return;
         }
-        if ($row['mode'] == 1) {
+        if ($row['mode'] == MovementsModel::MODE_RETURN) {
             $attackType = 'return';
         } else if ($row['attack_type'] == MovementsModel::ATTACKTYPE_REINFORCEMENT) {
             $attackType = 'reinforcement';
@@ -213,7 +214,7 @@ class MapCtrl extends GameCtrl
             $title = '{k.ssupport}';
         }
 
-        $xy = Formulas::kid2xy($row['mode'] == 0 ? $row['to_kid'] : $row['kid']);
+        $xy = Formulas::kid2xy($row['mode'] == MovementsModel::MODE_GOING ? $row['to_kid'] : $row['kid']);
         $result['elements'][] = [
             'position' => [
                 "x" => $xy['x'],
@@ -240,7 +241,7 @@ class MapCtrl extends GameCtrl
     private static function addReinforcementElement(&$result, $row): void
     {
         $units = null;
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             if (!$row['u' . $i]) continue;
             if ($i == Unit::HERO) {
                 $unitId = 'hero';

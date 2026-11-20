@@ -6,7 +6,12 @@ namespace Game\FarmList;
 
 use Core\Database\DB;
 use Core\Session;
+use Core\Time;
 use Game\Formulas;
+use Game\Gid;
+use Game\NoticeHelper;
+use Game\Slot;
+use Game\Unit;
 use Model\MovementsModel;
 
 use function nrToUnitId;
@@ -96,13 +101,13 @@ final class FarmListData
         $villages = [];
         foreach ($this->rows('SELECT v.kid, v.name, f.* FROM vdata v LEFT JOIN fdata f ON f.kid = v.kid WHERE v.owner = ? ORDER BY v.kid', [$this->uid]) as $row) {
             $harbour = false;
-            for ($slot = 19; $slot <= 40; $slot++) {
+            for ($slot = Slot::FIRST_BUILDING; $slot <= Slot::LAST; $slot++) {
                 $harbour = $harbour || ((int)($row['f' . $slot . 't'] ?? 0) === 49 && (int)$row['f' . $slot] > 0);
             }
             $villages[] = [
                 'id' => (int)$row['kid'],
                 'name' => self::plain((string)$row['name']),
-                'hasRallyPoint' => (int)($row['f39t'] ?? 0) === 16 && (int)$row['f39'] > 0,
+                'hasRallyPoint' => (int)($row['f39t'] ?? 0) === Gid::RALLY_POINT && (int)$row['f39'] > 0,
                 'hasHarbour' => $harbour,
                 'tribeId' => $race,
             ];
@@ -257,7 +262,7 @@ final class FarmListData
     {
         $booty = 0;
         $raids = 0;
-        foreach ($this->rows('SELECT bounty FROM ndata WHERE uid = ? AND to_kid = ? AND type IN (1, 2, 3) AND deleted = 0', [$this->uid, $targetKid]) as $row) {
+        foreach ($this->rows('SELECT bounty FROM ndata WHERE uid = ? AND to_kid = ? AND type IN (' . NoticeHelper::TYPE_WON_AS_ATTACK_WITHOUT_CASUALTIES . ', ' . NoticeHelper::TYPE_WON_AS_ATTACK_WITH_CASUALTIES . ', ' . NoticeHelper::TYPE_LOST_AS_ATTACKER . ') AND deleted = 0', [$this->uid, $targetKid]) as $row) {
             $booty += array_sum(array_map('intval', explode(',', (string)$row['bounty'])));
             $raids++;
         }
@@ -291,10 +296,10 @@ final class FarmListData
         $targets = [];
         foreach ($this->rows(
             'SELECT m.to_kid, COUNT(m.id) AS amount, MIN(m.end_time) AS nextAt, MAX(m.attack_type = ?) AS spy FROM movement m'
-            . ' INNER JOIN raidlist r ON r.kid = m.to_kid AND r.lid = ? WHERE m.kid = ? AND m.mode = 0 AND m.attack_type IN (?, ?, ?) GROUP BY m.to_kid',
+            . ' INNER JOIN raidlist r ON r.kid = m.to_kid AND r.lid = ? WHERE m.kid = ? AND m.mode = ' . MovementsModel::MODE_GOING . ' AND m.attack_type IN (?, ?, ?) GROUP BY m.to_kid',
             [MovementsModel::ATTACKTYPE_SPY, $listId, $kid, MovementsModel::ATTACKTYPE_SPY, MovementsModel::ATTACKTYPE_NORMAL, MovementsModel::ATTACKTYPE_RAID]
         ) as $row) {
-            $targets[(int)$row['to_kid']] = ['count' => (int)$row['amount'], 'next' => intdiv((int)$row['nextAt'], 1000), 'spy' => (int)$row['spy'] === 1];
+            $targets[(int)$row['to_kid']] = ['count' => (int)$row['amount'], 'next' => intdiv((int)$row['nextAt'], Time::SECOND_MS), 'spy' => (int)$row['spy'] === 1];
         }
 
         return $targets;
@@ -332,7 +337,7 @@ final class FarmListData
     private function troops(array $row): array
     {
         $troops = [];
-        for ($unit = 1; $unit <= 10; $unit++) {
+        for ($unit = 1; $unit <= Unit::LAST_TROOP; $unit++) {
             $troops['t' . $unit] = (int)($row['u' . $unit] ?? 0);
         }
 

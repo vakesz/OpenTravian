@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Game;
 
 use Core\Database\DB;
+use Core\Time;
 
 /**
  * Wounded troops (Hospital gid 46, Asclepeion gid 48).
@@ -51,7 +52,7 @@ final class Wounded
 
     public static function decayed(float $amount, int $seconds): float
     {
-        return $amount * pow(self::DECAY_PER_DAY, max(0, $seconds) / 86400);
+        return $amount * pow(self::DECAY_PER_DAY, max(0, $seconds) / Time::DAY);
     }
 
     /** Wounded produced for a village's losses of one unit type. */
@@ -70,7 +71,7 @@ final class Wounded
         if (!$row) {
             return 0;
         }
-        for ($field = 19; $field <= 40; ++$field) {
+        for ($field = Slot::FIRST_BUILDING; $field <= Slot::LAST; ++$field) {
             if ((int)$row['f' . $field . 't'] === $building) {
                 $level = max($level, (int)$row['f' . $field]);
             }

@@ -48,7 +48,7 @@ if ($starvation === false) {
 if (!str_contains($starvation, 'crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid} AND lastmupdate=" . (int)$this->villageRow[\'lastmupdate\']')) {
     failAccrualGuardContract('Starvation must credit its accrual relatively, guarded by the lastmupdate it read.');
 }
-if (!preg_match('/affectedRows\(\) === 0\) \{\s*\$starvedRefund = \$crop - \$elapsedTime \* \(\$cropProduction \/ 3600000\);/', $starvation)
+if (!preg_match('/affectedRows\(\) === 0\) \{\s*\$starvedRefund = \$crop - \$elapsedTime \* \(\$cropProduction \/ Time::HOUR_MS\);/', $starvation)
     || !str_contains($starvation, 'UPDATE vdata SET crop=LEAST(maxcrop, crop+$starvedRefund) WHERE kid={$this->kid}')) {
     failAccrualGuardContract('when the Starvation guard misses, only the crop given back by the starved troops may be credited.');
 }

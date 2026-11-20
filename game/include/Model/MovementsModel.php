@@ -7,6 +7,7 @@ namespace Model;
 use Core\Database\DB;
 use Core\Log;
 use Game\Mail\EventMail;
+use Game\Unit;
 
 class MovementsModel
 {
@@ -34,7 +35,7 @@ class MovementsModel
         $sum = DB::getInstance()->fetchScalar(
             "SELECT COALESCE(SUM(m.u1+m.u2+m.u3+m.u4+m.u5+m.u6+m.u7+m.u8+m.u9+m.u10+m.u11),0)
              FROM movement m INNER JOIN vdata v ON v.kid=m.kid
-             WHERE v.owner=$uid AND m.mode=0"
+             WHERE v.owner=$uid AND m.mode=" . self::MODE_GOING
         );
 
         return (int)$sum;
@@ -83,7 +84,7 @@ class MovementsModel
             ]
         );
         $result = $statement === false ? 0 : (int) $db->lastInsertId();
-        if ($result > 0 && $mode === 0 && in_array($attack_type, [self::ATTACKTYPE_NORMAL, self::ATTACKTYPE_RAID], true)) {
+        if ($result > 0 && $mode === self::MODE_GOING && in_array($attack_type, [self::ATTACKTYPE_NORMAL, self::ATTACKTYPE_RAID], true)) {
             EventMail::attackIncoming($kid, $to_kid);
         }
         if ($result === 0) {
@@ -120,7 +121,7 @@ class MovementsModel
     public function setMovementMarkState(int $to_kid, int $moveId, int $state): bool
     {
         $statement = DB::getInstance()->run(
-            'UPDATE movement SET markState=? WHERE id=? AND to_kid=? AND mode=0 AND attack_type IN(3,4)',
+            'UPDATE movement SET markState=? WHERE id=? AND to_kid=? AND mode=' . self::MODE_GOING . ' AND attack_type IN(' . self::ATTACKTYPE_NORMAL . ',' . self::ATTACKTYPE_RAID . ')',
             [$state, $moveId, $to_kid]
         );
 
@@ -137,7 +138,7 @@ class MovementsModel
     public static function typedRow(array $row): array
     {
         $columns = ['id', 'kid', 'to_kid', 'race', 'ctar1', 'ctar2', 'spyType', 'redeployHero', 'ship', 'mode', 'attack_type', 'start_time', 'end_time', 'markState'];
-        for ($unit = 1; $unit <= 11; ++$unit) {
+        for ($unit = 1; $unit <= Unit::LAST; ++$unit) {
             $columns[] = 'u' . $unit;
         }
         foreach ($columns as $column) {
@@ -153,7 +154,7 @@ class MovementsModel
     public function countIncomingAttacks(int $toKid): int
     {
         return (int)DB::getInstance()->fetchScalar(
-            'SELECT COUNT(*) FROM movement WHERE to_kid=? AND mode=0 AND attack_type IN(3,4)',
+            'SELECT COUNT(*) FROM movement WHERE to_kid=? AND mode=' . self::MODE_GOING . ' AND attack_type IN(' . self::ATTACKTYPE_NORMAL . ',' . self::ATTACKTYPE_RAID . ')',
             [$toKid],
             0
         );
@@ -184,7 +185,7 @@ class MovementsModel
     private static function unitCounts(array $units): array
     {
         $counts = [];
-        for ($i = 1; $i <= 11; $i++) {
+        for ($i = 1; $i <= Unit::LAST; $i++) {
             $counts[] = (int) ($units[$i] ?? 0);
         }
 

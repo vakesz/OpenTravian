@@ -3,7 +3,9 @@
 namespace Game;
 
 use Core\Database\DB;
+use Core\Time;
 use Model\Movements\ReturnProcessor;
+use Model\MovementsModel;
 use Model\VillageModel;
 use const SORT_DESC;
 
@@ -45,7 +47,7 @@ class Starvation
             return;
         }
         //  Disable for Natars
-        if (!($this->villageRow['owner'] > 2)) {
+        if (!($this->villageRow['owner'] > UserId::LAST_SYSTEM)) {
             return;
         }
         $this->userRow = $this->getUser($this->villageRow['owner']);
@@ -56,7 +58,7 @@ class Starvation
         $now = miliseconds();
         $elapsedTime = ($now - $this->villageRow['lastmupdate']);
         $cropProduction = $this->villageRow['cropp'] - $this->villageRow['pop'] - $this->villageRow['upkeep'];
-        $this->currentCrop = $this->villageRow['crop'] + $elapsedTime * ($cropProduction / 3600000);
+        $this->currentCrop = $this->villageRow['crop'] + $elapsedTime * ($cropProduction / Time::HOUR_MS);
         if ($this->currentCrop >= 0) {
             return;
         }
@@ -66,9 +68,9 @@ class Starvation
             $this->db->query("UPDATE vdata SET crop=crop+$crop WHERE kid={$this->kid}");
             return;
         }
-        $truce = TruceDay::isActive() || (TruceDay::getTo() + 86400) > time();
-        if ($truce || $this->userRow['access'] == 0 || $this->userRow['id'] == 1) {
-            if ($truce || $this->userRow['access'] == 0) {
+        $truce = TruceDay::isActive() || (TruceDay::getTo() + Time::DAY) > time();
+        if ($truce || $this->userRow['access'] == AccessLevel::BANNED || $this->userRow['id'] == UserId::NATARS) {
+            if ($truce || $this->userRow['access'] == AccessLevel::BANNED) {
                 //no starvation while banned
                 $this->db->query("UPDATE vdata SET crop=0 WHERE kid={$this->kid}");
             } else {
@@ -83,9 +85,9 @@ class Starvation
 
         $crop = $this->currentCrop - $this->villageRow['crop'];
 
-        $wood = $elapsedTime * ($this->villageRow['woodp'] / 3600000);
-        $clay = $elapsedTime * ($this->villageRow['clayp'] / 3600000);
-        $iron = $elapsedTime * ($this->villageRow['ironp'] / 3600000);
+        $wood = $elapsedTime * ($this->villageRow['woodp'] / Time::HOUR_MS);
+        $clay = $elapsedTime * ($this->villageRow['clayp'] / Time::HOUR_MS);
+        $iron = $elapsedTime * ($this->villageRow['ironp'] / Time::HOUR_MS);
 
         // Guarded by the lastmupdate we read, so the interval is credited once (see ResourcesHelper::updateVillageResources).
         // On a miss another writer has already accrued it. The crop that the starved troops gave back is
@@ -93,7 +95,7 @@ class Starvation
         // nothing changed. The fallback then adds the same refund, which is zero or capped at maxcrop, so that is harmless.
         $this->db->query("UPDATE vdata SET lastmupdate=$now, wood=LEAST(maxstore, wood+$wood), clay=LEAST(maxstore, clay+$clay), iron=LEAST(maxstore, iron+$iron), crop=LEAST(maxcrop, crop+$crop) WHERE kid={$this->kid} AND lastmupdate=" . (int)$this->villageRow['lastmupdate']);
         if ((int)$this->db->affectedRows() === 0) {
-            $starvedRefund = $crop - $elapsedTime * ($cropProduction / 3600000);
+            $starvedRefund = $crop - $elapsedTime * ($cropProduction / Time::HOUR_MS);
             if ($starvedRefund > 0) {
                 $this->db->query("UPDATE vdata SET crop=LEAST(maxcrop, crop+$starvedRefund) WHERE kid={$this->kid}");
             }
@@ -114,7 +116,7 @@ class Starvation
      */
     private function getVillage()
     {
-        $stmt = $this->db->query("SELECT kid, maxcrop, owner, woodp, clayp, ironp, cropp, crop, upkeep, pop, lastmupdate, isWW, isFarm FROM vdata WHERE kid={$this->kid} AND owner>1");
+        $stmt = $this->db->query("SELECT kid, maxcrop, owner, woodp, clayp, ironp, cropp, crop, upkeep, pop, lastmupdate, isWW, isFarm FROM vdata WHERE kid={$this->kid} AND owner>" . UserId::NATARS);
         if ($stmt->num_rows) {
             return $stmt->fetch_assoc();
         }
@@ -173,14 +175,14 @@ class Starvation
         $order = $onlyNr !== null ? [$onlyNr] : $this->getUnitKillOrder($row['race'], $row);
         $total_killed = 0;
         $sum = 0;
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $sum += (int)($row['u' . $i] ?? 0);
         }
         foreach ($order as $nr) {
             if ($row['u' . $nr] <= 0) continue;
             if ($this->currentCrop > 0) break;
             if ($nr == Unit::HERO) {
-                $heroKid = $isMovement && (int)$row['mode'] === 1 ? $row['to_kid'] : $row['kid'];
+                $heroKid = $isMovement && (int)$row['mode'] === MovementsModel::MODE_RETURN ? $row['to_kid'] : $row['kid'];
                 $experience = (int)$this->db->fetchScalar(
                     'SELECT exp FROM hero WHERE kid=' . (int)$heroKid . ' LIMIT 1',
                     [],
@@ -248,7 +250,7 @@ class Starvation
         if ((int) ($row['mode'] ?? 0) !== 1) {
             return;
         }
-        for ($i = 1; $i <= 11; ++$i) {
+        for ($i = 1; $i <= Unit::LAST; ++$i) {
             $row['u' . $i] = 0;
         }
         new ReturnProcessor($row);
@@ -261,7 +263,7 @@ class Starvation
      */
     private function getUnitKillOrder($race, $unitsRow)
     {
-        $slots = range(1, 11);
+        $slots = range(1, Unit::LAST);
         usort($slots, static function (int $a, int $b) use ($unitsRow): int {
             $count = (int)$unitsRow['u' . $b] <=> (int)$unitsRow['u' . $a];
             return $count !== 0 ? $count : $a <=> $b;
@@ -284,7 +286,7 @@ class Starvation
             $tied = [];
             foreach ($rows as $index => $row) {
                 $count = 0;
-                for ($i = 1; $i <= 11; ++$i) {
+                for ($i = 1; $i <= Unit::LAST; ++$i) {
                     $count += (int)$row['u' . $i];
                 }
                 if ($count <= 0) {
@@ -319,7 +321,7 @@ class Starvation
             ["SELECT * FROM enforcement WHERE uid>0 AND uid!={$this->villageRow['owner']} AND to_kid IN($children)", 'enforcement'],
             ["SELECT * FROM enforcement WHERE uid>0 AND uid={$this->villageRow['owner']} AND to_kid IN($children)", 'enforcement'],
             ["SELECT * FROM units WHERE kid={$this->kid}", 'units'],
-            ["SELECT * FROM movement WHERE race!=4 AND ((kid={$this->kid} AND mode=0) OR (to_kid={$this->kid} AND mode=1))", 'movement'],
+            ["SELECT * FROM movement WHERE race!=" . Tribes::NATURE . " AND ((kid={$this->kid} AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid={$this->kid} AND mode=" . MovementsModel::MODE_RETURN . "))", 'movement'],
         ];
         foreach ($queries as [$sql, $kind]) {
             $stmt = $this->db->query($sql);
@@ -354,7 +356,7 @@ class Starvation
                 $home['_parts'] = [$row];
                 continue;
             }
-            for ($i = 1; $i <= 11; ++$i) {
+            for ($i = 1; $i <= Unit::LAST; ++$i) {
                 $home['u' . $i] = (int)$home['u' . $i] + (int)$row['u' . $i];
             }
             $home['_parts'][] = $row;
@@ -463,7 +465,7 @@ class Starvation
         if ($this->currentCrop >= 0) {
             return;
         }
-        $stmt = $this->db->query("SELECT *, (u1+u2+u3+u4+u5+u6+u7+u8+u9+u10+u11) as `total_sum` FROM movement WHERE race != 4 AND ((kid={$this->kid} AND mode=0) OR (to_kid={$this->kid} AND mode=1)) ORDER BY `total_sum` DESC LIMIT {$this->rowLimit}");
+        $stmt = $this->db->query("SELECT *, (u1+u2+u3+u4+u5+u6+u7+u8+u9+u10+u11) as `total_sum` FROM movement WHERE race != " . Tribes::NATURE . " AND ((kid={$this->kid} AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid={$this->kid} AND mode=" . MovementsModel::MODE_RETURN . ")) ORDER BY `total_sum` DESC LIMIT {$this->rowLimit}");
         while ($this->currentCrop < 0 && ($row = $stmt->fetch_assoc())) {
             $this->starveRow($row, false, false, false, true);
         }

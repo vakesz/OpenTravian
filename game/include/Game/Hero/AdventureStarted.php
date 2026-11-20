@@ -6,6 +6,7 @@ namespace Game\Hero;
 
 use Core\Database\DB;
 use Core\Helper\TimezoneHelper;
+use Game\Gid;
 use resources\View\PHPBatchView;
 use function appendTimer;
 
@@ -32,7 +33,7 @@ final class AdventureStarted
             'place' => AdventurePlace::listImageClass(AdventurePlace::fromWorldData($wdata, $villageRace)),
             'timer' => appendTimer(max(0, $arrival - time())),
             'arrivalAt' => TimezoneHelper::date('H:i', $arrival),
-            'rallyPointUrl' => '/build.php?gid=16&tt=1&newdid=' . $heroKid,
+            'rallyPointUrl' => '/build.php?gid=' . Gid::RALLY_POINT . '&tt=1&newdid=' . $heroKid,
         ]);
     }
 }

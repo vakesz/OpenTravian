@@ -23,7 +23,7 @@ if ($ctrl === false || $queue === false || $fixes === false) {
 }
 
 foreach ([
-    '/build.php?gid=16&amp;tt=1&amp;filter=',
+    '/build.php?gid=\' . Gid::RALLY_POINT . \'&amp;tt=1&amp;filter=',
     'src="/img/spacer.gif"',
 ] as $needle) {
     if (!str_contains($ctrl, $needle)) {

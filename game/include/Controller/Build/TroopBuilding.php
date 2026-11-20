@@ -152,7 +152,7 @@ class TroopBuilding extends AnyCtrl
     private function researchedTroops($technology): array
     {
         $numbers = array_map('unitIdToNr', $this->_getTroopBuildingTroops());
-        $researched = array_filter($numbers, static fn (int $nr): bool => in_array($nr, [1, 10, 99], true) || !empty($technology['u' . $nr]));
+        $researched = array_filter($numbers, static fn (int $nr): bool => in_array($nr, [Unit::FIRST, Unit::SETTLER, Unit::TRAP], true) || !empty($technology['u' . $nr]));
         sort($researched, SORT_NUMERIC);
 
         return $researched;
@@ -196,12 +196,12 @@ class TroopBuilding extends AnyCtrl
         $dailyQuest = new DailyQuestModel();
         $quest = Quest::getInstance();
         if ($num >= 20 && ($this->building_id == Gid::BARRACKS || $this->building_id == Gid::GREAT_BARRACKS)) {
-            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), 8);
+            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), DailyQuestModel::QUEST_TRAIN_INFANTRY);
         } else if ($num >= 20 && ($this->building_id == Gid::STABLE || $this->building_id == Gid::GREAT_STABLE)) {
-            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), 9);
+            $dailyQuest->setQuestAsCompleted(Session::getInstance()->getPlayerId(), DailyQuestModel::QUEST_TRAIN_CAVALRY);
         }
         if ($this->building_id == Gid::BARRACKS && $num >= 2) {
-            $quest->setQuestBitwise('battle', 5, 1);
+            $quest->setQuestBitwise('battle', Quest::BATTLE_TRAIN_TROOPS, 1);
         }
         $cost = Formulas::uTrainingCost(nrToUnitId($u, Session::getInstance()->getRace()), $great);
         foreach ($cost as &$v) {
