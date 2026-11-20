@@ -5156,6 +5156,7 @@ $Definition['Reports']['VillageCaptured'] = 'Village %s people decided to join y
 $Definition['Reports']['CantCaptureCapital'] = 'You can\'t capture capital.';
 $Definition['Reports']['culturePointsErr'] = 'Not enough culture points.';
 $Definition['Reports']['rpExists'] = 'Residence or Palace exists.';
+$Definition['Reports']['noExpansionSlot'] = 'The attacking village has no free expansion slot.';
 $Definition['Reports']['You can only have 1 ww village at a time'] = 'You can only have 1 ww village at a time.';
 $Definition['Reports']["Couldn't decrease loyalty because you have NAP with that alliance"] = "Couldn't decrease loyalty because you have NAP with that alliance";
 $Definition['Reports']['randomTargetsWereChosen'] = 'Random target was selected.';

@@ -9,6 +9,7 @@ use Game\Formulas;
 use Game\Helpers\CulturePointsHelper;
 use Game\NoticeHelper;
 use Game\SpeedCalculator;
+use Game\TrainingHelper;
 use Game\Unit;
 use Model\AllianceModel;
 use Model\ArtefactsModel;
@@ -50,6 +51,11 @@ class SettlersProcessor
         CulturePointsHelper::updateUserCP($owner);
         [$cp, $total_villages, $aid, $name] = $db->query("SELECT cp, total_villages, aid, name FROM users WHERE id=$owner")->fetch_row();
         if ($cp < Formulas::newVillageCP($total_villages + 1)) {
+            $this->returnSettlers($row, $owner);
+            return;
+        }
+        // The sending village needs a free expansion slot; it may have lost it after the settlers were trained.
+        if (TrainingHelper::freeExpansionSlots($kid) <= 0) {
             $this->returnSettlers($row, $owner);
             return;
         }
@@ -104,22 +110,26 @@ class SettlersProcessor
             }
         }
         $calc->setArtefactEffect(ArtefactsModel::getArtifactEffectByType($owner, $toKid, ArtefactsModel::ARTIFACT_INCREASE_SPEED));
+        // The settlers that actually arrived go home; the founding payment is refunded once, whatever their number.
         $units = array_fill(1, 11, 0);
-        $units[Unit::SETTLER] = 3;
-        (new MovementsModel())->addMovement(
-            $toKid,
-            $kid,
-            (int) $row['race'],
-            $units,
-            0,
-            0,
-            0,
-            0,
-            1,
-            (int) $row['attack_type'],
-            $row['end_time'],
-            $row['end_time'] + 1000 * $calc->calc()
-        );
-        $db->query("UPDATE vdata SET wood=wood+750, clay=clay+750, iron=iron+750, crop=crop+750 WHERE kid=$kid");
+        $units[Unit::SETTLER] = max(0, (int) $row['u' . Unit::SETTLER]);
+        if ($units[Unit::SETTLER] > 0) {
+            (new MovementsModel())->addMovement(
+                $toKid,
+                $kid,
+                (int) $row['race'],
+                $units,
+                0,
+                0,
+                0,
+                0,
+                1,
+                (int) $row['attack_type'],
+                $row['end_time'],
+                $row['end_time'] + 1000 * $calc->calc()
+            );
+        }
+        $cost = Formulas::newVillageCost();
+        $db->query("UPDATE vdata SET wood=wood+$cost, clay=clay+$cost, iron=iron+$cost, crop=crop+$cost WHERE kid=$kid");
     }
 }

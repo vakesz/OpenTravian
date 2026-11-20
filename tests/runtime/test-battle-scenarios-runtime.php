@@ -246,6 +246,16 @@ $reset();
 $pdo->run('UPDATE users SET cp=1000000 WHERE id=?', [$attacker['id']]);
 $pdo->run('UPDATE vdata SET capital=0, loyalty=1 WHERE kid=?', [$defender['kid']]);
 $demolish($defender, [25, 26, 44]);
+// Without a free expansion slot in the attacking village the chiefs cannot take the village.
+$demolish($attacker, [25, 26, 44]);
+$send('conquest without a free expansion slot', MovementsModel::ATTACKTYPE_NORMAL, [1 => 600, 9 => 3]);
+$expect('conquest without a free expansion slot', (int)$scalar('SELECT owner FROM vdata WHERE kid=?', [$defender['kid']]) === $defender['id'], 'the village changed hands without a free expansion slot.');
+$expect('conquest without a free expansion slot', str_contains((string)$scalar('SELECT data FROM ndata WHERE uid=? ORDER BY id DESC LIMIT 1', [$attacker['id']]), '-6'), 'the report must say that no expansion slot is free.');
+$reset();
+$pdo->run('UPDATE vdata SET capital=0, loyalty=1 WHERE kid=?', [$defender['kid']]);
+$demolish($defender, [25, 26, 44]);
+// A level-10 Residence gives the attacking village one free expansion slot.
+$build($attacker, 32, 25, 10);
 $send('village conquest', MovementsModel::ATTACKTYPE_NORMAL, [1 => 600, 9 => 3]);
 $expect('village conquest', (int)$scalar('SELECT owner FROM vdata WHERE kid=?', [$defender['kid']]) === $attacker['id'], 'the village did not change hands.');
 $pdo->run('UPDATE users SET cp=0 WHERE id=?', [$attacker['id']]);

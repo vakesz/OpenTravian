@@ -8,6 +8,7 @@ use Core\Caching\Caching;
 use Core\Database\DB;
 use Core\Session;
 use Core\Village;
+use Game\Formulas;
 use InvalidArgumentException;
 use Model\MovementsModel;
 use mysqli_result;
@@ -106,7 +107,9 @@ class RallyPointModel
 
         if ($attackType === MovementsModel::ATTACKTYPE_SETTLERS && (int) $task['mode'] === 0) {
             // Add resources
-            $db->query("UPDATE vdata SET wood=wood+750, clay=clay+750, iron=iron+750, crop=crop+750 WHERE kid=$taskKid");
+            // Refund exactly the founding payment procSettlers() took.
+            $cost = Formulas::newVillageCost();
+            $db->query("UPDATE vdata SET wood=wood+$cost, clay=clay+$cost, iron=iron+$cost, crop=crop+$cost WHERE kid=$taskKid");
         }
     }
 

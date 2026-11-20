@@ -118,12 +118,21 @@ class ArtefactsModel
             return 0;
         }
         $effect = $db->fetchScalar(
-            'SELECT effect FROM artefacts a WHERE uid=? AND status=1 AND active=1 AND effecttype=? AND ((aoe=1 AND kid=?) OR aoe>1) ORDER BY size ASC LIMIT 1',
+            'SELECT effect FROM artefacts a WHERE uid=? AND status=1 AND active=1 AND effecttype=? AND ((aoe=1 AND kid=?) OR aoe>1) ORDER BY effect ' . self::strongestFirst($type) . ', size DESC LIMIT 1',
             [$uid, $type, $kid],
             0
         );
 
         return is_numeric($effect) ? $effect + 0 : 0;
+    }
+
+    /**
+     * SQL order that puts the strongest effect of a type first when several artifacts apply. Diet and
+     * training-time effects are multipliers where smaller is stronger; every other effect is stronger when larger.
+     */
+    public static function strongestFirst(int $type): string
+    {
+        return in_array($type, [self::ARTIFACT_DIET, self::ARTIFACT_INCREASE_TRAINING_SPEED], true) ? 'ASC' : 'DESC';
     }
 
     public static function artifactsReleased(): bool

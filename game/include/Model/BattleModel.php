@@ -23,6 +23,7 @@ use Game\NoticeHelper;
 use Game\ResourcesHelper;
 use Game\SpeedCalculator;
 use Game\Starvation;
+use Game\TrainingHelper;
 use Game\Tribes;
 use Game\TruceDay;
 use Game\Unit;
@@ -294,7 +295,8 @@ class BattleModel
             }
             $this->endProfile('cagedAttack');
         }
-        $no_morale = $this->defender['isWW'] || $this->defender['uid'] == 1;
+        // Morale (the population bonus) exists only between players: not against Natars, Wonders or free oases.
+        $no_morale = $this->defender['isWW'] || $this->defender['uid'] == 1 || ($this->defender['isOasis'] && !$this->defender['isOccupied']);
         $wall_b = \Game\Formulas::WALL_BASE[$this->defender['wave'][0]['race']];
         $pop_ratio = $this->attacker['total_pop'] / $this->defender['total_pop'];
         if (getGame("ignoreMoralPointsInAttacks")) {
@@ -2214,6 +2216,11 @@ class BattleModel
                 if ($blocked === LoyaltyProtection::NAP) {
                     $this->info['captureResult'] = -5;
                 }
+            } elseif ((int)$this->attacker['uid'] !== 1
+                && (int)$this->attacker['uid'] !== (int)$this->defender['uid']
+                && TrainingHelper::freeExpansionSlots((int)$this->row['kid']) <= 0) {
+                // Chiefs need a free expansion slot in the village they come from, which may have been lost after training.
+                $this->info['captureResult'] = -6;
             } else {
                 $alive_admins = $this->getAlive($this->attacker['wave'], Unit::CHIEF);
                 $af = self::ADMINISTRATOR_EFFECT[$this->row['race']];

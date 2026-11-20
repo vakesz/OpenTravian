@@ -132,6 +132,10 @@ class Simulator
                 $off_pop = $this->battle->int_check_limit($wave, 'p', 1, 199999);
                 $def_pop = max($def_pop, 1);
                 $pop_ratio = $off_pop / $def_pop;
+                if ($def_nature_only) {
+                    // No morale against nature, as in battles.
+                    $pop_ratio = 1;
+                }
                 if (getGame("ignoreMoralPointsInAttacks")) {
                     $pop_ratio = 1;
                 }

@@ -1343,6 +1343,8 @@ class ReportsCtrl extends GameCtrl
                 $text .= T('Reports', 'You can only have 1 ww village at a time');
             } elseif ($result == -5) {
                 $text .= T('Reports', "Couldn't decrease loyalty because you have NAP with that alliance");
+            } elseif ($result == -6) {
+                $text .= T('Reports', 'noExpansionSlot', 'The attacking village has no free expansion slot.');
             } else {
                 $text .= sprintf(T('Reports', 'LoyaltyLowered'), round($result[0]), round($result[1]));
             }

@@ -618,7 +618,7 @@ class BattleSetter
         $uid = (int) $uid;
         $kid = (int) $kid;
         foreach ([ArtefactsModel::ARTIFACT_CRANNY, ArtefactsModel::ARTIFACT_INCREASE_BUILDINGS_STABILITY] as $effectType) {
-            $artifact = $this->fetchRow("SELECT num, type, size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND effecttype=" . $effectType . ' ORDER BY size ASC LIMIT 1');
+            $artifact = $this->fetchRow("SELECT num, type, size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND effecttype=" . $effectType . ' ORDER BY effect ' . ArtefactsModel::strongestFirst($effectType) . ', size DESC LIMIT 1');
             if ($artifact !== null) {
                 $result[] = ['type' => $artifact['type'], 'size' => $artifact['size'], 'num' => $artifact['num']];
             }
@@ -637,7 +637,7 @@ class BattleSetter
         }
         $uid = (int) $uid;
         $kid = (int) $kid;
-        $size = DB::getInstance()->fetchScalar("SELECT size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND type=" . ArtefactsModel::ARTIFACT_CRANNY . ' ORDER BY size ASC LIMIT 1');
+        $size = DB::getInstance()->fetchScalar("SELECT size FROM artefacts WHERE uid=$uid AND IF(size=1, kid=$kid, true) AND active=1 AND status=1 AND type=" . ArtefactsModel::ARTIFACT_CRANNY . ' ORDER BY size DESC LIMIT 1');
 
         return $size ? (string) $size : false;
     }

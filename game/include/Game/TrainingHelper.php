@@ -149,13 +149,19 @@ class TrainingHelper
         $m = new VillageOverviewModel();
         $residencePalace = $m->getResidencePalaceLevel($kid);
         $db = DB::getInstance();
-        $filledSlots = $db->fetchScalar("SELECT COUNT(kid) FROM vdata WHERE expandedfrom=$kid LIMIT 3");
+        $filledSlots = (int)$db->fetchScalar("SELECT COUNT(kid) FROM vdata WHERE expandedfrom=" . (int)$kid);
         $maxslots = self::unlockedSlots((int)($residencePalace['item_id'] ?? 0), (int)($residencePalace['level'] ?? 0));
         return [
             'maxSlots'    => $maxslots,
             'filledSlots' => $filledSlots,
             'freeSlots'   => $maxslots - $filledSlots,
         ];
+    }
+
+    /** Expansion slots of a village not yet used by a founded or conquered village; needs no session. */
+    public static function freeExpansionSlots(int $kid): int
+    {
+        return (int)(new self())->getSlots($kid)['freeSlots'];
     }
 
     /**
