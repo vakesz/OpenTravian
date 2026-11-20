@@ -260,16 +260,20 @@ class ResourcesHelper
                 }
                 $resources[$key] = round($resources[$key], 4);
             }
-            $crop = $row['crop'];
+            $absoluteCrop = false;
             if ($row['owner'] == 1 && $row['crop'] + $resources[3] < 0) {
                 $resources[3] = $row['maxcrop'] * 2 / 3;
-                $crop = 0;
+                $absoluteCrop = true;
             }
             if (!getGame("starvation") && ($row['crop'] + $resources[3]) <= 0) {
                 $resources[3] = -($row['crop'] + $resources[3]) + 1000;
-                $crop = 0;
+                $absoluteCrop = true;
             }
-            $db->query("UPDATE vdata SET wood=wood+{$resources[0]}, clay=clay+{$resources[1]}, iron=iron+{$resources[2]}, crop={$crop}+{$resources[3]}, lastmupdate=$lastmupdate WHERE kid={$row['kid']}");
+            // Relative credits, so a debit committed after our read is kept. The lastmupdate guard makes sure
+            // only one writer credits a given interval: when it matches nothing, another writer has already
+            // accrued up to its own lastmupdate and there is nothing left to add.
+            $cropSql = $absoluteCrop ? "crop={$resources[3]}" : "crop=LEAST(maxcrop, crop+{$resources[3]})";
+            $db->query("UPDATE vdata SET wood=LEAST(maxstore, wood+{$resources[0]}), clay=LEAST(maxstore, clay+{$resources[1]}), iron=LEAST(maxstore, iron+{$resources[2]}), $cropSql, lastmupdate=$lastmupdate WHERE kid={$row['kid']} AND lastmupdate=" . (int)$row['lastmupdate']);
             $master = new MasterBuilder();
             $master->updateCommence($row['kid'], FALSE);
             return;
@@ -381,26 +385,35 @@ class ResourcesHelper
             ])) {
             $updateWithMaster = TRUE;
         }
-        $crop = $row['crop'];
+        $absoluteCrop = false;
         if ($row['owner'] == 1 && $row['crop'] + $resources[3] < 0) {
             $resources[3] = $row['maxcrop'] * 2 / 3;
-            $crop = 0;
+            $absoluteCrop = true;
         }
         if (!getGame("starvation") && ($row['crop'] + $resources[3]) <= 0) {
             $resources[3] = -($row['crop'] + $resources[3]) + 1000;
-            $crop = 0;
+            $absoluteCrop = true;
         }
 //        else if (getGame("starvation") && ($row['crop'] + $resources[3]) <= 0 && $upkeep <= 0) {
 //            $resources[3] = -($row['crop'] + $resources[3]) + 1000;
 //            $crop = 0;
 //        }
 
+        // Same relative, guarded credit as the simple mode above. The new production must be stored even when the
+        // guard misses (another writer accrued first, at the old rate, up to its own lastmupdate): otherwise the
+        // village would keep a stale rate after a building, hero or item change.
+        // affected_rows counts changed rows, so it is also 0 when the guard matched but nothing changed (same
+        // millisecond, same production). The production-only write is then a no-op, so that case is harmless.
+        $cropSql = $absoluteCrop ? "crop={$resources[3]}" : "crop=LEAST(maxcrop, crop+{$resources[3]})";
         $db->query("UPDATE vdata SET
-                                            wood=wood+{$resources[0]}, woodp={$production[0]},
-                                            clay=clay+{$resources[1]}, clayp={$production[1]},
-                                            iron=iron+{$resources[2]}, ironp={$production[2]},
-                                            crop={$crop}+{$resources[3]}, cropp={$production[3]},
-                                            lastmupdate=$lastmupdate WHERE kid=$kid");
+                                            wood=LEAST(maxstore, wood+{$resources[0]}), woodp={$production[0]},
+                                            clay=LEAST(maxstore, clay+{$resources[1]}), clayp={$production[1]},
+                                            iron=LEAST(maxstore, iron+{$resources[2]}), ironp={$production[2]},
+                                            $cropSql, cropp={$production[3]},
+                                            lastmupdate=$lastmupdate WHERE kid=$kid AND lastmupdate=" . (int)$row['lastmupdate']);
+        if ((int)$db->affectedRows() === 0) {
+            $db->query("UPDATE vdata SET woodp={$production[0]}, clayp={$production[1]}, ironp={$production[2]}, cropp={$production[3]} WHERE kid=$kid");
+        }
         if ($updateWithMaster) {
             $master = new MasterBuilder();
             $master->updateCommence($kid, FALSE);
