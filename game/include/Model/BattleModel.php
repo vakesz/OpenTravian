@@ -1692,10 +1692,6 @@ class BattleModel
     }
 
     /**
-     * @param Wave|AttackerWave $army
-     * @return array<int, int|float>
-     */
-    /**
      * @param array<int, int|float> $dead
      * @param array<int, int|float> $revived
      * @return array<int, int|float> the dead that bandages did not revive
@@ -1709,6 +1705,10 @@ class BattleModel
         return $dead;
     }
 
+    /**
+     * @param Wave|AttackerWave $army
+     * @return array<int, int|float>
+     */
     private function get_revived(array $army): array
     {
         if (empty($army['units']['num'][Unit::HERO])) {
