@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 
+require_once dirname(__DIR__, 2) . '/game/include/Core/Time.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/UserId.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/AccessLevel.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Slot.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/ResearchMode.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Conquest/CaptureResult.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Gid.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Unit.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Tribes.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemBtype.php';
+require_once dirname(__DIR__, 2) . '/game/include/Game/Hero/ItemType.php';
 require_once dirname(__DIR__, 2) . '/game/include/functions.general.php';
 
 $expected = [

@@ -8,6 +8,17 @@ use Model\NatarsModel;
 // Natar farm villages: the install option, the headless variable, the spread, and the Natar AI rules.
 
 $root = dirname(__DIR__, 2);
+require_once $root . '/game/include/Core/Time.php';
+require_once $root . '/game/include/Game/UserId.php';
+require_once $root . '/game/include/Game/AccessLevel.php';
+require_once $root . '/game/include/Game/Slot.php';
+require_once $root . '/game/include/Game/ResearchMode.php';
+require_once $root . '/game/include/Game/Conquest/CaptureResult.php';
+require_once $root . '/game/include/Game/Conquest/OasisCaptureResult.php';
+require_once $root . '/game/include/Game/Gid.php';
+require_once $root . '/game/include/Game/Unit.php';
+require_once $root . '/game/include/Game/Hero/ItemBtype.php';
+require_once $root . '/game/include/Game/Hero/ItemType.php';
 foreach (['WorldSpeedProfile', 'FinishConstruction', 'Tribes', 'WorldOverrides', 'SupportContact', 'SmtpConfig', 'Installer/InstallInput'] as $class) {
     require_once $root . '/game/include/Game/' . $class . '.php';
 }

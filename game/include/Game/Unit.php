@@ -24,4 +24,11 @@ final class Unit
     public const HERO_ID = 98;
     /** Gaul trapper traps: number and global id 99, column u99. */
     public const TRAP = 99;
+
+    /** First unit of every tribe; it never needs research (TroopBuilding). */
+    public const FIRST = 1;
+    /** Last non-hero unit column (u10): `$i <= Unit::LAST_TROOP`, `array_fill(1, Unit::LAST_TROOP, 0)`. */
+    public const LAST_TROOP = self::SETTLER;
+    /** Last unit column including the hero (u11): `$i <= Unit::LAST`, `array_fill(1, Unit::LAST, 0)`, `range(1, Unit::LAST)`. */
+    public const LAST = self::HERO;
 }

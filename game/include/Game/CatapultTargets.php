@@ -12,6 +12,9 @@ use Model\ArtefactsModel;
  */
 final class CatapultTargets
 {
+    /** Random target: always allowed, not part of the groups. */
+    public const RANDOM = 99;
+
     private const RESOURCES = [Gid::WOODCUTTER, Gid::CLAY_PIT, Gid::IRON_MINE, Gid::CROPLAND, Gid::SAWMILL, Gid::BRICKYARD, Gid::IRON_FOUNDRY, Gid::GRAIN_MILL, Gid::BAKERY];
     private const INFRASTRUCTURE = [Gid::WAREHOUSE, Gid::GRANARY, Gid::MAIN_BUILDING, Gid::MARKETPLACE, Gid::EMBASSY, Gid::TOWN_HALL, Gid::RESIDENCE, Gid::PALACE, Gid::COMMAND_CENTER, Gid::TREASURY, Gid::TRADE_OFFICE, Gid::GREAT_WAREHOUSE, Gid::GREAT_GRANARY, Gid::HORSE_DRINKING_TROUGH, Gid::WATERWORKS, Gid::HARBOR];
     private const MILITARY = [Gid::SMITHY, Gid::TOURNAMENT_SQUARE, Gid::RALLY_POINT, Gid::BARRACKS, Gid::STABLE, Gid::WORKSHOP, Gid::ACADEMY, Gid::GREAT_BARRACKS, Gid::GREAT_STABLE, Gid::BREWERY, Gid::HEROS_MANSION, Gid::HOSPITAL, Gid::ASCLEPEION];
@@ -47,7 +50,7 @@ final class CatapultTargets
      */
     public static function allowed(int $rallyPointLevel, ?bool $wonderPlansReleased = null): array
     {
-        return array_merge([99], ...array_values(self::groups($rallyPointLevel, $wonderPlansReleased)));
+        return array_merge([self::RANDOM], ...array_values(self::groups($rallyPointLevel, $wonderPlansReleased)));
     }
 
     /**
@@ -60,13 +63,13 @@ final class CatapultTargets
     public static function aim(int $requestedGid, bool $breweryCelebration, int $crannyArtefactSize): int
     {
         if ($breweryCelebration) {
-            return 99;
+            return self::RANDOM;
         }
         if ($crannyArtefactSize === 0) {
             return $requestedGid;
         }
         $exempt = $crannyArtefactSize < 3 ? [Gid::TREASURY, self::WORLD_WONDER] : [self::WORLD_WONDER];
 
-        return in_array($requestedGid, $exempt, true) ? $requestedGid : 99;
+        return in_array($requestedGid, $exempt, true) ? $requestedGid : self::RANDOM;
     }
 }

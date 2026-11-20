@@ -10,8 +10,14 @@ use Game\Mail\EventMail;
 
 class MovementsModel
 {
-    public const SORTTYPE_GOING = 0;
-    public const SORTTYPE_RETURN = 1;
+    /** movement.mode and send.mode: on the way from kid to to_kid. */
+    public const MODE_GOING = 0;
+    /** movement.mode and send.mode: returning home; to_kid is the home village. */
+    public const MODE_RETURN = 1;
+    /** @deprecated use MODE_GOING (unused; kept so the public name does not disappear). */
+    public const SORTTYPE_GOING = self::MODE_GOING;
+    /** @deprecated use MODE_RETURN */
+    public const SORTTYPE_RETURN = self::MODE_RETURN;
 
     public const ATTACKTYPE_SPY = 1;
     public const ATTACKTYPE_REINFORCEMENT = 2;

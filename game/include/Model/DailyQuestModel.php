@@ -18,6 +18,35 @@ use function logError;
 
 class DailyQuestModel
 {
+    /*
+     * Daily quest ids: the quest_data keys, the daily_quest.qstN columns and the
+     * DailyQuest.questData.N translation keys.
+     */
+    /** Complete an adventure. */
+    public const QUEST_ADVENTURE = 1;
+    /** Raid an unoccupied oasis. */
+    public const QUEST_RAID_UNOCCUPIED_OASIS = 2;
+    /** Raid or attack a Natarian village. */
+    public const QUEST_ATTACK_NATARS = 3;
+    /** Win an auction. */
+    public const QUEST_WIN_AUCTION = 4;
+    /** Gain or spend gold. */
+    public const QUEST_GOLD = 5;
+    /** Upgrade a building. */
+    public const QUEST_UPGRADE_BUILDING = 6;
+    /** Upgrade a resource field. */
+    public const QUEST_UPGRADE_FIELD = 7;
+    /** Build 20 infantry units of one type at once. */
+    public const QUEST_TRAIN_INFANTRY = 8;
+    /** Build 20 cavalry units of one type at once. */
+    public const QUEST_TRAIN_CAVALRY = 9;
+    /** Hold a small or big celebration. */
+    public const QUEST_CELEBRATION = 10;
+    /** Contribute resources to an alliance bonus. */
+    public const QUEST_ALLIANCE_CONTRIBUTION = 11;
+    /** Number of daily quests (qst1..qst11): `for ($i = 1; $i <= self::QUEST_COUNT; ++$i)`. */
+    public const QUEST_COUNT = 11;
+
     /** The milestones: 25, 50, 75 and 100 points. */
     public const MILESTONES = [1 => 25, 2 => 50, 3 => 75, 4 => 100];
 

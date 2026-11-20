@@ -11,19 +11,30 @@ declare(strict_types=1);
  * stay the source of truth; the constants only name them.
  */
 
+use Core\Time;
+use Game\AccessLevel;
+use Game\Admin\AdminAccounts;
+use Game\CatapultTargets;
+use Game\Conquest\CaptureResult;
+use Game\Conquest\OasisCaptureResult;
 use Game\Formulas;
 use Game\Gid;
 use Game\Hero\HeroItems;
 use Game\Hero\ItemBtype;
 use Game\Hero\ItemType;
 use Game\OasisType;
+use Game\ResearchMode;
 use Game\Ships;
+use Game\Slot;
 use Game\Tribes;
 use Game\Unit;
+use Game\UserId;
 use Game\Wounded;
+use Model\DailyQuestModel;
 use Model\HeroResourceInventory;
 use Model\MovementsModel;
 use Model\OasesModel;
+use Model\Quest;
 
 $root = dirname(__DIR__, 2);
 require_once $root . '/game/deployment/include/env.php';
@@ -127,5 +138,53 @@ assertDomainConstants(
     [MovementsModel::ATTACKTYPE_SPY, MovementsModel::ATTACKTYPE_REINFORCEMENT, MovementsModel::ATTACKTYPE_NORMAL, MovementsModel::ATTACKTYPE_RAID, MovementsModel::ATTACKTYPE_SETTLERS, MovementsModel::ATTACKTYPE_EVASION, MovementsModel::ATTACKTYPE_ADVENTURE] === range(1, 7),
     'Movement attack types are 1 spy to 7 adventure.'
 );
+
+// Round 2. Time units.
+assertDomainConstants(Time::MINUTE === 60 && Time::HOUR === 60 * Time::MINUTE && Time::DAY === 24 * Time::HOUR && Time::WEEK === 7 * Time::DAY, 'Time units are 60 s, 1 h, 1 day and 1 week.');
+assertDomainConstants(Time::SECOND_MS === 1000 && Time::HOUR_MS === Time::HOUR * Time::SECOND_MS, 'Millisecond factors are 1000 per second and 3600000 per hour.');
+
+// System accounts (InstallerModel::finalize renumbers Support, Natars and Multihunter to 0, 1, 2).
+assertDomainConstants(UserId::SUPPORT === 0 && UserId::NATURE === 0 && UserId::NATARS === 1 && UserId::MULTIHUNTER === 2, 'Support and Nature are 0, Natars 1, Multihunter 2.');
+assertDomainConstants(UserId::LAST_SYSTEM === UserId::MULTIHUNTER && UserId::FIRST_PLAYER === UserId::LAST_SYSTEM + 1 && UserId::LEGACY_HIDDEN_MAX === 10, 'Players start at id 3; the legacy hidden range ends at 10.');
+assertDomainConstants(AdminAccounts::BUILT_IN === [UserId::SUPPORT, UserId::MULTIHUNTER], 'The built-in administrators are Support and Multihunter.');
+$installer = (string)file_get_contents($root . '/game/include/Model/InstallerModel.php');
+assertDomainConstants(str_contains($installer, 'UPDATE users SET id=1 WHERE id=2') && str_contains($installer, 'UPDATE users SET id=2 WHERE id=3'), 'The installer renumbers Natars to 1 and Multihunter to 2.');
+
+// users.access, movement/send mode, research mode.
+assertDomainConstants([AccessLevel::BANNED, AccessLevel::PLAYER, AccessLevel::ADMIN, AccessLevel::FAKE_USER] === [0, 1, 2, 3], 'Access levels are 0 banned, 1 player, 2 admin, 3 fake user.');
+assertDomainConstants(MovementsModel::MODE_GOING === 0 && MovementsModel::MODE_RETURN === 1, 'Movement mode is 0 going, 1 returning.');
+assertDomainConstants(MovementsModel::SORTTYPE_GOING === MovementsModel::MODE_GOING && MovementsModel::SORTTYPE_RETURN === MovementsModel::MODE_RETURN, 'The SORTTYPE names alias the movement modes.');
+assertDomainConstants(ResearchMode::SMITHY === 0 && ResearchMode::ACADEMY === 1, 'Research mode is 0 smithy, 1 academy.');
+
+// Building slots.
+assertDomainConstants([Slot::FIRST_FIELD, Slot::LAST_FIELD, Slot::FIRST_BUILDING, Slot::LAST_BUILDING, Slot::RALLY_POINT, Slot::WALL, Slot::WONDER] === [1, 18, 19, 38, 39, 40, 99], 'Slots: fields 1-18, buildings 19-38, rally point 39, wall 40, wonder 99.');
+assertDomainConstants(Slot::LAST === Slot::WALL && Slot::LAST_BUILDING + 1 === Slot::RALLY_POINT, 'The last regular slot is the wall.');
+
+// Unit bounds.
+assertDomainConstants(Unit::FIRST === 1 && Unit::LAST === Unit::HERO && Unit::LAST_TROOP === Unit::SETTLER, 'Unit columns run 1..10 for troops and 1..11 with the hero.');
+
+// Capture results and the random catapult target.
+$capture = array_values(intConstants(CaptureResult::class));
+assertDomainConstants($capture === [0, -1, -2, -3, -4, -5, -6], 'Village capture results are 0 and -1..-6.');
+assertDomainConstants(array_values(intConstants(OasisCaptureResult::class)) === [0, -1], 'Oasis capture results are 0 and -1.');
+assertDomainConstants(CatapultTargets::RANDOM === 99 && CatapultTargets::allowed(20, false)[0] === CatapultTargets::RANDOM, 'The random catapult target is 99 and always allowed.');
+
+// Daily quests: one constant per quest_data entry.
+$questData = (new ReflectionProperty(DailyQuestModel::class, 'quest_data'))->getValue(new DailyQuestModel());
+$dailyIds = array_filter(intConstants(DailyQuestModel::class), static fn (string $name): bool => str_starts_with($name, 'QUEST_') && $name !== 'QUEST_COUNT', ARRAY_FILTER_USE_KEY);
+assertDomainConstants(array_values($dailyIds) === array_keys($questData) && DailyQuestModel::QUEST_COUNT === count($questData), 'DailyQuestModel::QUEST_* names every daily quest, 1..QUEST_COUNT.');
+
+// Battle/economy/world quest bits: each id has an en-US quest name.
+$Definition = [];
+require $root . '/game/include/resources/Translation/en-US.php';
+$groups = ['BATTLE' => 15, 'ECONOMY' => 12, 'WORLD' => 16];
+foreach ($groups as $group => $count) {
+    $ids = array_filter(intConstants(Quest::class), static fn (string $name): bool => str_starts_with($name, $group . '_'), ARRAY_FILTER_USE_KEY);
+    assertDomainConstants(array_values($ids) === range(1, $count), "Quest::{$group}_* must be 1..$count.");
+    foreach ($ids as $name => $id) {
+        $key = sprintf('%s_%02d_name', strtolower($group), $id);
+        assertDomainConstants(isset($Definition['Quest'][$key]), "Quest::$name has no en-US text $key.");
+    }
+}
 
 echo "Domain constants contract passed.\n";
