@@ -19,7 +19,21 @@ const CONSTANT_CLASSES = [
     'Game\\Conquest\\CaptureResult', 'Game\\Conquest\\OasisCaptureResult',
 ];
 
-$entries = ['game/deployment/public/setup.php', 'tools/set-world-speed.php', 'tools/preflight.php'];
+// Every script in tools/ and game/deployment/public/ that requires game classes directly.
+$entries = [];
+foreach (array_merge(glob("$root/tools/*.php") ?: [], glob("$root/game/deployment/public/*.php") ?: []) as $script) {
+    $relative = substr($script, strlen($root) + 1);
+    if (directRequires($root, $relative) !== []) {
+        $entries[] = $relative;
+    }
+}
+// The installers and the setup wizard must be among them: if the way they load classes changes, update this contract.
+foreach (['tools/install.php', 'game/deployment/public/setup.php', 'tools/set-world-speed.php', 'tools/preflight.php'] as $expected) {
+    if (!in_array($expected, $entries, true)) {
+        fwrite(STDERR, "$expected no longer requires game classes the way this contract reads them; update the contract.\n");
+        exit(1);
+    }
+}
 
 /** @return list<string> game/include files the entry requires directly, in order */
 function directRequires(string $root, string $entry): array
@@ -80,10 +94,6 @@ function referencedConstantClasses(string $path): array
 $failures = [];
 foreach ($entries as $entry) {
     $files = directRequires($root, $entry);
-    if ($files === []) {
-        $failures[] = "$entry: no direct requires found (has the loading changed? update this contract)";
-        continue;
-    }
     $needed = [];
     foreach ($files as $file) {
         if (!is_file("$root/$file")) {
