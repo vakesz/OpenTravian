@@ -6144,3 +6144,7 @@ body.rtl.rearrangeBuildings .rearrangeBuildings .container button.confirm {
 
 /* Keyboard focus on the home news card: its link is a 0x0 stretched link without chrome, so ring the card (same ring as the other public controls). */
 .publicHomepage .homepageNewsCard .newsPreview:has(.linkToFullArticle a:focus-visible) { box-shadow: 2px 2px 6px 0 #0000004d, 0 0 2px 3px rgb(0 102 255 / 70%); }
+
+/* Resource cost rows inside tooltips (building upgrade costs): wrap within the tooltip box instead of running past it once values get long. */
+.tippy-box[data-theme~="travian"] .inlineIconList { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+.tippy-box[data-theme~="travian"] .inlineIconList .inlineIcon { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; margin: 0; }

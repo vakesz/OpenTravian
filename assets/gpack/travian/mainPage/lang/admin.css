@@ -10,7 +10,7 @@
 :root {
     --a-text: #5e463a;
     --a-text-strong: #664e40;
-    --a-text-muted: #8a7a6c;
+    --a-text-muted: #5c4e42;
     --a-bg: #fff9eb;
     --a-bg-2: #f4efe4;
     --a-bg-3: #efe3ca;
@@ -27,6 +27,14 @@
     --a-bg-warn: #fff4d6;
     --a-bg-ok: #eaf5d3;
     --a-bg-info: #eef3f8;
+    --a-row-alt: rgba(239, 227, 202, 0.45);
+    --a-head-bg: #664e40;
+    --a-head-text: #fff;
+    --a-accent: #99c01a;
+    --a-stat-red: #b00000;
+    --a-stat-orange: #9a5200;
+    --a-stat-green: #2f7d0a;
+    --a-link-dark: #9fc1ee;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,6 +60,14 @@
         --a-bg-warn: #4a3b1c;
         --a-bg-ok: #2f3d19;
         --a-bg-info: #24313f;
+        --a-row-alt: rgba(255, 255, 255, 0.045);
+        --a-head-bg: #5b4538;
+        --a-head-text: #fff;
+        --a-accent: #99c01a;
+        --a-stat-red: #ff9a8f;
+        --a-stat-orange: #f0b25a;
+        --a-stat-green: #a6d65a;
+        --a-link-dark: #9fc1ee;
         background-blend-mode: multiply;
     }
 
@@ -68,7 +84,7 @@
     }
 
     .adminMain a:not(.textButtonV2):not(.tabItem) {
-        color: #9fc1ee;
+        color: var(--a-link-dark);
     }
 
     /* Out-ranks the Gpack's fixed-label colour (.formV2 label.input.fixed .label). */
@@ -85,8 +101,31 @@
     }
 
     .adminMain table tr:nth-child(even) td {
-        background-color: var(--a-bg-3);
+        background-color: var(--a-row-alt);
     }
+
+    /* The Gpack's grey buttons are light chrome; tone them down on the dark panels. */
+    body.adminPanel .buttonFramed.rectangle.grey:before,
+    body.setupPage .buttonFramed.rectangle.grey:before {
+        background-image: linear-gradient(180deg, #5d5347, #433a30);
+        box-shadow: inset 0 -4px 0 -2px #2b251e, inset 0 4px 0 -2px #74685a, inset 0 0 0 1px #6a5e4e;
+    }
+
+    body.adminPanel .buttonFramed.rectangle.grey:hover:before,
+    body.setupPage .buttonFramed.rectangle.grey:hover:before {
+        background-image: linear-gradient(180deg, #6b6054, #4d4338);
+    }
+
+    body.adminPanel .buttonFramed.rectangle.withText.grey > div,
+    body.setupPage .buttonFramed.rectangle.withText.grey > div {
+        color: var(--a-text-strong);
+    }
+}
+
+/* Gpack checkbox labels are translucent brown, unreadable on the dark panels. */
+body.setupPage .formV2 label.checkbox .label,
+body.setupPage .formV2 label.checkbox.fixed .label {
+    color: var(--a-text);
 }
 
 body.adminPanel,
@@ -312,8 +351,8 @@ body.setupPage > div {
 
 .adminMenu a.current {
     background: var(--a-bg);
-    border-inline-start-color: #99c01a;
-    color: #000;
+    border-inline-start-color: var(--a-accent);
+    color: var(--a-text-strong);
     font-weight: 700;
 }
 
@@ -446,8 +485,8 @@ body.setupPage > div {
 
 .adminTable caption {
     padding: 7px 12px;
-    background: #664e40;
-    color: #fff;
+    background: var(--a-head-bg);
+    color: var(--a-head-text);
     font-weight: 700;
     text-align: start;
 }
@@ -461,8 +500,8 @@ body.setupPage > div {
 }
 
 .adminTable thead th {
-    background: #664e40;
-    color: #fff;
+    background: var(--a-head-bg);
+    color: var(--a-head-text);
     font-weight: 700;
 }
 
@@ -474,7 +513,7 @@ body.setupPage > div {
 }
 
 .adminTable tbody tr:nth-child(even) td:not(.head) {
-    background: rgba(239, 227, 202, 0.45);
+    background: var(--a-row-alt);
 }
 
 .adminTable tbody tr:hover td:not(.head) {
@@ -798,7 +837,7 @@ a.mapDot:focus-visible {
     display: inline-block;
     vertical-align: top;
     box-sizing: border-box;
-    inline-size: 49%;
+    inline-size: 48.5%;
     margin-inline-end: 1%;
 }
 
@@ -817,9 +856,9 @@ a.mapDot:focus-visible {
     font-weight: 700;
 }
 
-.adminStat.red { color: #b00000; }
-.adminStat.orange { color: #c26a00; }
-.adminStat.green { color: #2f7d0a; }
+.adminStat.red { color: var(--a-stat-red); }
+.adminStat.orange { color: var(--a-stat-orange); }
+.adminStat.green { color: var(--a-stat-green); }
 
 @media (max-width: 900px) {
     .adminCol {
@@ -963,6 +1002,7 @@ a.mapDot:focus-visible {
 .adminGrid label.input,
 .adminGrid label.select,
 .adminGrid label.textarea {
+    align-content: start;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
 }
@@ -1049,7 +1089,10 @@ a.mapDot:focus-visible {
 }
 
 .adminViewToggle a[aria-current="true"] {
-    background: rgba(201, 169, 97, 0.55);
+    background: #c9a961;
+    color: #2b1d12;
+    font-weight: 700;
+    text-shadow: none;
 }
 
 .adminViewNote {
@@ -1107,8 +1150,8 @@ a.mapDot:focus-visible {
 
 .adminPanel .adminMain label.checkbox .box {
     fill: var(--a-input);
-    stroke: var(--a-border-2);
-    stroke-width: 1;
+    stroke: var(--a-border-3);
+    stroke-width: 1.25;
 }
 
 .adminPanel .adminMain label.checkbox .checkmark {
@@ -1138,4 +1181,299 @@ a.mapDot:focus-visible {
 
 .adminPanel .adminMain label.checkbox .label {
     display: block;
+}
+
+/* Long labels wrap inside their column instead of running under the neighbour. */
+.adminGrid label .label {
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+/* Panel forms put the input before the label in the markup; show the label first. */
+body.adminPanel .adminGrid label.input .label,
+body.adminPanel .adminGrid label.select .label {
+    order: -1;
+    margin-block-end: 4px;
+    font-weight: 700;
+}
+
+.adminPanel .adminGrid > label.checkbox {
+    grid-column: 1 / -1;
+}
+
+.adminGrid label.select select {
+    font: 13px/18px Arial, Helvetica, Verdana, sans-serif;
+}
+
+.adminMain ol:not(.setupSteps),
+.setupPage ol:not(.setupSteps) {
+    padding-inline-start: 24px;
+}
+
+/* Live-world lock in the header, visible on every page. */
+.adminLock {
+    margin: 0;
+}
+
+.adminLock button {
+    padding: 4px 12px;
+    font: 700 13px/18px Arial, Helvetica, Verdana, sans-serif;
+    color: #fff;
+    text-shadow: none;
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid transparent;
+}
+
+.adminLock.locked button {
+    background: #8a4b08;
+    border-color: #f0b25a;
+}
+
+.adminLock.open button {
+    background: #2f6a0a;
+    border-color: #a6d65a;
+}
+
+.adminLock button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+body.adminPanel .adminGrid {
+    row-gap: 10px;
+}
+
+/* Standalone panel forms (not in an .adminGrid): label above the field, fields stack with a gap. */
+body.adminPanel .adminMain label.input,
+body.adminPanel .adminMain label.select,
+body.adminPanel .adminMain label.textarea {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0;
+    margin-block-end: 12px;
+}
+
+body.adminPanel .adminMain label.input .label,
+body.adminPanel .adminMain label.select .label,
+body.adminPanel .adminMain label.textarea .label {
+    order: -1;
+    margin-block-end: 4px;
+    font-weight: 700;
+}
+
+body.adminPanel .adminMain label.input input:not([type="checkbox"]),
+body.adminPanel .adminMain label.textarea textarea {
+    inline-size: min(100%, 420px);
+}
+
+body.adminPanel .adminMain label.textarea textarea {
+    min-block-size: 96px;
+    max-inline-size: 100%;
+    inline-size: min(100%, 720px);
+}
+
+body.adminPanel .adminMain label.select select {
+    min-inline-size: 180px;
+    max-inline-size: 100%;
+    block-size: 32px;
+}
+
+body.adminPanel .adminMain form.adminInline:has(label.input, label.select, label.textarea) {
+    display: block;
+    max-inline-size: 760px;
+    margin-inline-end: 0;
+    margin-block-end: 16px;
+}
+
+body.adminPanel .adminMain form.adminInline + .adminTable,
+body.adminPanel .adminMain form.adminInline + .adminBox {
+    margin-block-start: 14px;
+}
+
+.adminNotice {
+    color: var(--a-text);
+}
+
+/* Links in table captions and header cells stay readable on the brown bar. */
+.adminTable caption a,
+.adminTable thead th a {
+    color: #f4d58a;
+}
+
+/* Native selects inside tables and inline forms were collapsing to the width of their shortest option. */
+.adminMain select {
+    min-inline-size: 90px;
+}
+
+/* Legacy textareas carry rows="70"; cap them so the page does not run for screens. */
+.adminMain .adminTable textarea {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-block-size: 120px;
+    max-block-size: 260px;
+    resize: vertical;
+}
+
+.adminMain table tbody td.noData,
+.adminMain table td.none {
+    color: var(--a-text-muted);
+}
+
+/* Tabs (setup Quick/Advanced, Gpack subNavi): the active tab is the bright, bold one with a green bar; the others recede. */
+.contentNavi.subNavi .scrollingContainer .content a.normal,
+.contentNavi.subNavi .scrollingContainer .content a:not(.active) {
+    background-color: #4a362c;
+    color: #cdbca5;
+    font-weight: 400;
+}
+
+.contentNavi.subNavi .scrollingContainer .content a:not(.active):hover,
+.contentNavi.subNavi .scrollingContainer .content a:not(.active):focus {
+    background-color: #62493c;
+    color: #fff;
+}
+
+.contentNavi.subNavi .scrollingContainer .content a.active {
+    background-color: #f6ecd6;
+    color: #2b1d12;
+    font-weight: 700;
+    box-shadow: inset 0 -4px 0 #99c01a;
+}
+
+.contentNavi.subNavi .scrollingContainer .content a.active:before {
+    background-image: none;
+}
+
+/* The wizard's Gpack checkbox: a checked box shows a plain white tick (the Gpack draws it as a dash animation that can stall as a speck). */
+body.setupPage .formV2 label.checkbox input[type="checkbox"]:checked + svg.checkbox .checkmark {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    animation: none;
+    opacity: 1;
+}
+
+body.setupPage .formV2 label.checkbox input[type="checkbox"]:checked + svg.checkbox .box {
+    fill: #5a8a0a;
+    stroke: #5a8a0a;
+}
+
+body.setupPage .formV2 label.checkbox input[type="checkbox"] + svg.checkbox .box {
+    stroke: var(--a-border-3);
+}
+
+/* Native checkboxes (older panel forms, the settings table) follow the palette. */
+.adminMain input[type="checkbox"]:not(.adminCheckbox) {
+    accent-color: #5a8a0a;
+    inline-size: 16px;
+    block-size: 16px;
+    margin: 0 4px 0 0;
+    vertical-align: -3px;
+}
+
+.adminPanel .adminMain label:has(> input[type="checkbox"]:not(.adminCheckbox)) {
+    cursor: pointer;
+}
+
+/* Inline settings forms inside the Info and settings table: stack label above field, roomy, wrapping. */
+.adminMain .adminTable form.adminInline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0;
+}
+
+.adminMain .adminTable form.adminInline label {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+}
+
+.adminMain .adminTable form.adminInline input:not([type="checkbox"]):not([type="hidden"]) {
+    inline-size: min(100%, 220px);
+}
+
+.adminMain .adminTable form.adminInline textarea {
+    inline-size: min(100%, 360px);
+    min-block-size: 80px;
+}
+
+.adminMain .adminTable form.adminInline fieldset {
+    flex: 1 1 100%;
+    margin: 4px 0;
+    padding: 8px 10px;
+    border: 1px solid var(--a-border);
+    border-radius: 3px;
+}
+
+.adminMain .adminTable form.adminInline legend {
+    padding: 0 6px;
+    font-weight: 700;
+    color: var(--a-text-strong);
+}
+
+.adminMain fieldset {
+    border-color: var(--a-border);
+}
+
+.adminMain fieldset legend {
+    color: var(--a-text-strong);
+}
+
+.adminMain .adminTable td > small,
+.adminMain .adminTable td small {
+    display: block;
+    color: var(--a-text-muted);
+    overflow-wrap: anywhere;
+}
+
+/* Secret fields: the eye button sits inside the field, and stays visible in the dark scheme. */
+body.adminPanel .adminMain label.secret {
+    inline-size: min(100%, 420px);
+}
+
+body.adminPanel .adminMain label.secret input:not([type="checkbox"]) {
+    inline-size: 100%;
+}
+
+body.adminPanel .adminMain label.secret .adminSecretToggle {
+    inset-block-start: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .adminSecretToggle {
+        filter: invert(1) brightness(1.4);
+    }
+}
+
+/* Unchecked native checkboxes (payments table, settings) get a visible edge in both schemes. */
+.adminMain input[type="checkbox"]:not(.adminCheckbox):not(:checked) {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--a-input);
+    border: 1.5px solid var(--a-border-3);
+    border-radius: 3px;
+}
+
+.adminMain input[type="checkbox"]:not(.adminCheckbox):checked {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #5a8a0a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") center / 14px no-repeat;
+    border: 1.5px solid #5a8a0a;
+    border-radius: 3px;
+}
+
+.adminMain input[type="checkbox"]:not(.adminCheckbox):disabled {
+    opacity: 0.55;
+}
+
+.adminMain input[type="checkbox"]:not(.adminCheckbox):focus-visible {
+    outline: 2px solid #5e88c0;
+    outline-offset: 2px;
 }

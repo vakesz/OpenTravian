@@ -306,6 +306,25 @@ class SessionHero extends HeroHelper
     {
         $db = DB::getInstance();
         $kid = (int)$this->hero['kid'];
+        // A movement that failed repeatedly is parked in the quarantine ledger,
+        // not lost. Its hero comes home when an operator requeues it, so adding
+        // one here as well would leave the village with two heroes.
+        $quarantinedMode = $db->fetchScalar(
+            "SELECT JSON_VALUE(payload, '$.mode') FROM scheduled_task_failures
+             WHERE task_table='movement' AND quarantined_at IS NOT NULL
+               AND CAST(JSON_VALUE(payload, '$.u11') AS SIGNED) > 0
+               AND ((JSON_VALUE(payload, '$.mode') = ? AND JSON_VALUE(payload, '$.to_kid') = ?)
+                 OR (JSON_VALUE(payload, '$.mode') = ? AND JSON_VALUE(payload, '$.kid') = ?))
+             LIMIT 1",
+            [MovementsModel::MODE_RETURN, $kid, MovementsModel::MODE_GOING, $kid]
+        );
+        if ($quarantinedMode !== false && $quarantinedMode !== null) {
+            $returning = (int)$quarantinedMode === MovementsModel::MODE_RETURN;
+            $this->status = $returning ? self::STATUS_IN_RETURN : self::STATUS_ON_ATTACK;
+            $this->statusShortMessage = T("HeroGlobal", $returning ? "shortStatus.return" : "shortStatus.attack");
+            $this->statusLongMessage = $this->statusShortMessage;
+            return;
+        }
         logError('Hero of player %d was in no village or movement; returned to village %d.', [(int)$this->hero['uid'], $kid]);
         $db->query("UPDATE units SET u11=1 WHERE kid=$kid AND u11=0");
         $villageName = $kid == $village->getKid() ? $village->getName() : (string)$db->fetchScalar("SELECT name FROM vdata WHERE kid=$kid LIMIT 1");
@@ -346,10 +365,7 @@ class SessionHero extends HeroHelper
      */
     public function getAvailablePoints()
     {
-        $points = (Formulas::heroLevel($this->hero['exp']) >= 100 ? 100 : Formulas::heroLevel($this->hero['exp'])) * 4;
-        if (Formulas::heroLevel($this->hero['exp']) < 100) {
-            $points += 4;
-        }
+        $points = Formulas::heroAttributePoints(Formulas::heroLevel($this->hero['exp']));
         return $points - ($this->hero['power'] + $this->hero['offBonus'] + $this->hero['defBonus'] + $this->hero['production']);
     }
 
@@ -367,6 +383,9 @@ class SessionHero extends HeroHelper
     public function getHeroExpPercent()
     {
         $lvl = Formulas::heroLevel($this->hero['exp']);
+        if (Formulas::isHeroMaxLevel($lvl)) {
+            return 100;
+        }
         return 100 * ($this->hero['exp'] - Formulas::heroExperience($lvl)) / (Formulas::heroExperience($lvl + 1) - Formulas::heroExperience($lvl));
     }
 
@@ -545,6 +564,7 @@ class SessionHero extends HeroHelper
                 $items[$array]['isUsableIfDead'] = $itemData['isUsableIfDead'];
                 $items[$array]['tooltip'] = HeroItemTooltip::html((int)$row['btype'], (int)$row['type'], $this->status !== self::STATUS_DEAD);
                 $items[$array]['tileSlot'] = HeroItems::tileSlot((int)$row['btype'], (string)$itemData['slot']);
+                $items[$array]['tier'] = HeroItemTooltip::tileClass((int)$row['btype'], (int)$row['type']);
                 if ($items[$array]['isConsumable'] || $items[$array]['isMaterial']) {
                     $equipped = (int)$db->fetchScalar(
                         'SELECT COALESCE(SUM(num), 0) FROM items WHERE uid=? AND btype=? AND type=? AND proc=1',
@@ -772,12 +792,19 @@ class SessionHero extends HeroHelper
     public function getExperienceTitle($inventory): string
     {
         $level = $this->getLevel();
+        $title = T("HeroInventory", "experience") . ' ' . self::isolatedPercent((int)floor($this->getHeroExpPercent()));
+        if (Formulas::isHeroMaxLevel($level)) {
+            // There is no next level to describe.
+            $item = $this->calcMoreExp($inventory['helmet']);
+            return $item
+                ? $title . '||<span class="heroAttributeInformation">' . T("HeroInventory", "Bonus") . ': +' . $item . '%</span>'
+                : $title;
+        }
         $expNeeded = Formulas::heroExperience($level + 1) - $this->hero['exp'];
         $text = sprintf(T("HeroInventory", "experienceNeededToNextLevel"), number_format_x($expNeeded), $level + 1);
         if (getDirection() == 'RTL') {
             $text = sprintf(T("HeroInventory", "experienceNeededToNextLevel"), $level + 1, number_format_x($expNeeded));
         }
-        $title = T("HeroInventory", "experience") . ' ' . self::isolatedPercent((int)floor($this->getHeroExpPercent()));
         $item = $this->calcMoreExp($inventory['helmet']);
 
         return $item

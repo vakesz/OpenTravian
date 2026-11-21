@@ -17,6 +17,9 @@ $automationLogFile = dirname(ERROR_LOG_FILE) . '/automation.log';
 $foreground = getenv('TRAVIAN_FOREGROUND') === '1';
 
 if (!$foreground) {
+    // bootstrap.php already connected; the launcher process exits right after forking and would
+    // end the daemon's inherited session on the way out.
+    \Core\Database\DB::getInstance()->disconnectForFork();
     $autoPID = pcntl_fork();
     if ($autoPID === -1) {
         exit(1);
@@ -24,6 +27,7 @@ if (!$foreground) {
     if ($autoPID > 0) {
         exit(0);
     }
+    \Core\Database\DB::getInstance()->forceNewDatabase();
     fclose(STDIN);
     fclose(STDOUT);
     fclose(STDERR);

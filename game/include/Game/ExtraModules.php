@@ -340,22 +340,28 @@ class ExtraModules
             return self::ACTION_UNAVAILABLE;
         }
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $f = new FarmListModel();
-        $count = $f->addUniqueFarms(
-            Session::getInstance()->getPlayerId(),
-            Session::getInstance()->getSelectedVillageID(),
-            100
-        );
-        if (!$count) {
-            $db->rollback();
-            return self::ACTION_UNAVAILABLE;
+        try {
+            $f = new FarmListModel();
+            $count = $f->addUniqueFarms(
+                Session::getInstance()->getPlayerId(),
+                Session::getInstance()->getSelectedVillageID(),
+                100
+            );
+            if (!$count) {
+                $db->rollback();
+                return self::ACTION_UNAVAILABLE;
+            }
+            if (!self::reduceGold(__FUNCTION__, 1, true)) {
+                $db->rollback();
+                return self::ACTION_NOT_ENOUGH_GOLD;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        if (!self::reduceGold(__FUNCTION__, 1, true)) {
-            $db->rollback();
-            return self::ACTION_NOT_ENOUGH_GOLD;
-        }
-        $db->commit();
         return self::ACTION_COMPLETED;
     }
 
@@ -420,18 +426,24 @@ class ExtraModules
     {
         $kid = Session::getInstance()->getSelectedVillageID();
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $db->query("DELETE FROM research WHERE mode=" . ResearchMode::ACADEMY . " AND kid={$kid}");
-        $db->query("UPDATE tdata SET u2=1, u3=1, u4=1, u5=1, u6=1, u7=1, u8=1, u9=1 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        if (!$db->affectedRows()) {
-            $db->rollback();
-            return self::ACTION_UNAVAILABLE;
+        try {
+            $db->query("DELETE FROM research WHERE mode=" . ResearchMode::ACADEMY . " AND kid={$kid}");
+            $db->query("UPDATE tdata SET u2=1, u3=1, u4=1, u5=1, u6=1, u7=1, u8=1, u9=1 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
+            if (!$db->affectedRows()) {
+                $db->rollback();
+                return self::ACTION_UNAVAILABLE;
+            }
+            if (!self::reduceGold(__FUNCTION__, 1, true)) {
+                $db->rollback();
+                return self::ACTION_NOT_ENOUGH_GOLD;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        if (!self::reduceGold(__FUNCTION__, 1, true)) {
-            $db->rollback();
-            return self::ACTION_NOT_ENOUGH_GOLD;
-        }
-        $db->commit();
         $response['reload'] = true;
         return self::ACTION_COMPLETED;
     }
@@ -443,18 +455,24 @@ class ExtraModules
     {
         $db = DB::getInstance();
         $kid = Session::getInstance()->getSelectedVillageID();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $db->query("DELETE FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid={$kid}");
-        $db->query("UPDATE smithy SET u1=20, u2=20, u3=20, u4=20, u5=20, u6=20, u7=20, u8=20 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        if (!$db->affectedRows()) {
-            $db->rollback();
-            return self::ACTION_UNAVAILABLE;
+        try {
+            $db->query("DELETE FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid={$kid}");
+            $db->query("UPDATE smithy SET u1=20, u2=20, u3=20, u4=20, u5=20, u6=20, u7=20, u8=20 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
+            if (!$db->affectedRows()) {
+                $db->rollback();
+                return self::ACTION_UNAVAILABLE;
+            }
+            if (!self::reduceGold(__FUNCTION__, 1, true)) {
+                $db->rollback();
+                return self::ACTION_NOT_ENOUGH_GOLD;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        if (!self::reduceGold(__FUNCTION__, 1, true)) {
-            $db->rollback();
-            return self::ACTION_NOT_ENOUGH_GOLD;
-        }
-        $db->commit();
         $response['reload'] = true;
         return self::ACTION_COMPLETED;
     }
@@ -498,18 +516,24 @@ class ExtraModules
         if ($level >= 20) {
             return self::ACTION_UNAVAILABLE;
         }
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $db->query("DELETE FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid={$kid} AND nr=$nr");
-        $db->query("UPDATE smithy SET u{$nr}=20 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        if (!$db->affectedRows()) {
-            $db->rollback();
-            return self::ACTION_UNAVAILABLE;
+        try {
+            $db->query("DELETE FROM research WHERE mode=" . ResearchMode::SMITHY . " AND kid={$kid} AND nr=$nr");
+            $db->query("UPDATE smithy SET u{$nr}=20 WHERE kid=" . Session::getInstance()->getSelectedVillageID());
+            if (!$db->affectedRows()) {
+                $db->rollback();
+                return self::ACTION_UNAVAILABLE;
+            }
+            if (!self::reduceGold(__FUNCTION__, 1, true)) {
+                $db->rollback();
+                return self::ACTION_NOT_ENOUGH_GOLD;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        if (!self::reduceGold(__FUNCTION__, 1, true)) {
-            $db->rollback();
-            return self::ACTION_NOT_ENOUGH_GOLD;
-        }
-        $db->commit();
         $response['reload'] = true;
         return self::ACTION_COMPLETED;
     }
@@ -625,21 +649,27 @@ class ExtraModules
 
         $storage *= $times;
         $kid = Session::getInstance()->getSelectedVillageID();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        if ($isWarehouse) {
-            $db->query("UPDATE vdata SET extraMaxstore=extraMaxstore+$times, maxstore=maxstore+$storage WHERE kid=" . $kid);
-        } else {
-            $db->query("UPDATE vdata SET extraMaxcrop=extraMaxcrop+$times, maxcrop=maxcrop+$storage WHERE kid=" . $kid);
+        try {
+            if ($isWarehouse) {
+                $db->query("UPDATE vdata SET extraMaxstore=extraMaxstore+$times, maxstore=maxstore+$storage WHERE kid=" . $kid);
+            } else {
+                $db->query("UPDATE vdata SET extraMaxcrop=extraMaxcrop+$times, maxcrop=maxcrop+$storage WHERE kid=" . $kid);
+            }
+            if (!$db->affectedRows()) {
+                $db->rollback();
+                return self::ACTION_UNAVAILABLE;
+            }
+            if (!self::reduceGold(__FUNCTION__, $times, true)) {
+                $db->rollback();
+                return self::ACTION_NOT_ENOUGH_GOLD;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        if (!$db->affectedRows()) {
-            $db->rollback();
-            return self::ACTION_UNAVAILABLE;
-        }
-        if (!self::reduceGold(__FUNCTION__, $times, true)) {
-            $db->rollback();
-            return self::ACTION_NOT_ENOUGH_GOLD;
-        }
-        $db->commit();
         $response['reload'] = true;
         return self::ACTION_COMPLETED;
     }

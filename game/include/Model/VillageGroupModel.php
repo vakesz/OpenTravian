@@ -212,12 +212,18 @@ class VillageGroupModel
 
     private function begin(DB $db, int $uid): void
     {
+        $entryLevel = $db->transactionLevel();
         if (!$db->begin_transaction()) {
             throw new RuntimeException('Could not start the village-group update.');
         }
-        $user = $db->run('SELECT id FROM users WHERE id=? FOR UPDATE', [$uid]);
-        if ($user === false || $user->get_result()->fetch_row() === null) {
-            throw new RuntimeException('Player not found.');
+        try {
+            $user = $db->run('SELECT id FROM users WHERE id=? FOR UPDATE', [$uid]);
+            if ($user === false || $user->get_result()->fetch_row() === null) {
+                throw new RuntimeException('Player not found.');
+            }
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
     }
 

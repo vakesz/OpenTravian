@@ -104,81 +104,87 @@ class EditVillageCtrl
                     } else if ($newTroops[$i] < $currentTroops[$i]) {
                         //loop though whole system
                         $failed = false;
-                        $this->db->mysqli->begin_transaction();
-                        $diff = $currentTroops[$i] - $newTroops[$i];
-                        $units = $this->db->query("SELECT kid, u{$i} FROM units WHERE kid=$kid AND u{$i} > 0");
-                        while ($row = $units->fetch_assoc()) {
-                            $count = min($row['u' . $i], $diff);
-                            $query = $this->db->query("UPDATE units SET u{$i}=u{$i}-$count WHERE kid={$row['kid']}");
-                            if ($query && $this->db->affectedRows()) {
-                                $diff -= $count;
+                        $entryLevel = $this->db->transactionLevel();
+                        $this->db->begin_transaction();
+                        try {
+                            $diff = $currentTroops[$i] - $newTroops[$i];
+                            $units = $this->db->query("SELECT kid, u{$i} FROM units WHERE kid=$kid AND u{$i} > 0");
+                            while ($row = $units->fetch_assoc()) {
+                                $count = min($row['u' . $i], $diff);
+                                $query = $this->db->query("UPDATE units SET u{$i}=u{$i}-$count WHERE kid={$row['kid']}");
+                                if ($query && $this->db->affectedRows()) {
+                                    $diff -= $count;
+                                } else {
+                                    $failed = true;
+                                    break;
+                                }
+                                if ($diff <= 0) break;
+                            }
+                            if ($diff > 0 && !$failed) {
+                                $enforcements = $this->db->query("SELECT * FROM enforcement WHERE kid=$kid AND u{$i} > 0");
+                                while ($row = $enforcements->fetch_assoc()) {
+                                    $troops_in_row = array_filter_units($row);
+                                    $count = min($row['u' . $i], $diff);
+                                    $query = $this->db->query("UPDATE enforcement SET u{$i}=u{$i}-$count WHERE id={$row['id']}");
+                                    if ($query && $this->db->affectedRows()) {
+                                        $diff -= $count;
+                                        $troops_in_row[$i] -= $count;
+                                        if (array_sum($troops_in_row) <= 0) {
+                                            $this->db->query("DELETE FROM enforcement WHERE id={$row['id']}");
+                                        }
+                                    } else {
+                                        $failed = true;
+                                        break;
+                                    }
+                                    if ($diff <= 0) break;
+                                }
+                            }
+                            if ($diff > 0 && !$failed) {
+                                $trapped = $this->db->query("SELECT * FROM trapped WHERE kid=$kid AND u{$i} > 0");
+                                while ($row = $trapped->fetch_assoc()) {
+                                    $count = min($row['u' . $i], $diff);
+                                    $troops_in_row = array_filter_units($row);
+                                    $query = $this->db->query("UPDATE trapped SET u{$i}=u{$i}-$count WHERE id={$row['id']}");
+                                    if ($query && $this->db->affectedRows()) {
+                                        $diff -= $count;
+                                        $troops_in_row[$i] -= $count;
+                                        if (array_sum($troops_in_row) <= 0) {
+                                            $this->db->query("DELETE FROM trapped WHERE id={$row['id']}");
+                                        }
+                                    } else {
+                                        $failed = true;
+                                        break;
+                                    }
+                                    if ($diff <= 0) break;
+                                }
+                            }
+                            if ($diff > 0 && !$failed) {
+                                $movements = $this->db->query("SELECT * FROM movement WHERE ((kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")) AND u{$i} > 0");
+                                while ($row = $movements->fetch_assoc()) {
+                                    $count = min($row['u' . $i], $diff);
+                                    $troops_in_row = array_filter_units($row);
+                                    $query = $this->db->query("UPDATE movement SET u{$i}=u{$i}-$count WHERE id={$row['id']}");
+                                    if ($query && $this->db->affectedRows()) {
+                                        $diff -= $count;
+                                        $troops_in_row[$i] -= $count;
+                                        if (array_sum($troops_in_row) <= 0) {
+                                            $this->db->query("DELETE FROM movement WHERE id={$row['id']}");
+                                        }
+                                    } else {
+                                        $failed = true;
+                                        break;
+                                    }
+                                    if ($diff <= 0) break;
+                                }
+                            }
+                            if (!$failed && $diff == 0) {
+                                $this->db->commit();
                             } else {
-                                $failed = true;
-                                break;
+                                $this->db->rollback();
                             }
-                            if ($diff <= 0) break;
-                        }
-                        if ($diff > 0 && !$failed) {
-                            $enforcements = $this->db->query("SELECT * FROM enforcement WHERE kid=$kid AND u{$i} > 0");
-                            while ($row = $enforcements->fetch_assoc()) {
-                                $troops_in_row = array_filter_units($row);
-                                $count = min($row['u' . $i], $diff);
-                                $query = $this->db->query("UPDATE enforcement SET u{$i}=u{$i}-$count WHERE id={$row['id']}");
-                                if ($query && $this->db->affectedRows()) {
-                                    $diff -= $count;
-                                    $troops_in_row[$i] -= $count;
-                                    if (array_sum($troops_in_row) <= 0) {
-                                        $this->db->query("DELETE FROM enforcement WHERE id={$row['id']}");
-                                    }
-                                } else {
-                                    $failed = true;
-                                    break;
-                                }
-                                if ($diff <= 0) break;
-                            }
-                        }
-                        if ($diff > 0 && !$failed) {
-                            $trapped = $this->db->query("SELECT * FROM trapped WHERE kid=$kid AND u{$i} > 0");
-                            while ($row = $trapped->fetch_assoc()) {
-                                $count = min($row['u' . $i], $diff);
-                                $troops_in_row = array_filter_units($row);
-                                $query = $this->db->query("UPDATE trapped SET u{$i}=u{$i}-$count WHERE id={$row['id']}");
-                                if ($query && $this->db->affectedRows()) {
-                                    $diff -= $count;
-                                    $troops_in_row[$i] -= $count;
-                                    if (array_sum($troops_in_row) <= 0) {
-                                        $this->db->query("DELETE FROM trapped WHERE id={$row['id']}");
-                                    }
-                                } else {
-                                    $failed = true;
-                                    break;
-                                }
-                                if ($diff <= 0) break;
-                            }
-                        }
-                        if ($diff > 0 && !$failed) {
-                            $movements = $this->db->query("SELECT * FROM movement WHERE ((kid=$kid AND mode=" . MovementsModel::MODE_GOING . ") OR (to_kid=$kid AND mode=" . MovementsModel::MODE_RETURN . ")) AND u{$i} > 0");
-                            while ($row = $movements->fetch_assoc()) {
-                                $count = min($row['u' . $i], $diff);
-                                $troops_in_row = array_filter_units($row);
-                                $query = $this->db->query("UPDATE movement SET u{$i}=u{$i}-$count WHERE id={$row['id']}");
-                                if ($query && $this->db->affectedRows()) {
-                                    $diff -= $count;
-                                    $troops_in_row[$i] -= $count;
-                                    if (array_sum($troops_in_row) <= 0) {
-                                        $this->db->query("DELETE FROM movement WHERE id={$row['id']}");
-                                    }
-                                } else {
-                                    $failed = true;
-                                    break;
-                                }
-                                if ($diff <= 0) break;
-                            }
-                        }
-                        if (!$failed && $diff == 0) {
-                            $this->db->mysqli->commit();
-                        } else {
-                            $this->db->mysqli->rollback();
+                        } catch (\Throwable $exception) {
+                            $this->db->unwindTo($entryLevel);
+                            throw $exception;
                         }
 
                     }

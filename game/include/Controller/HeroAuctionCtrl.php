@@ -408,15 +408,15 @@ class HeroAuctionCtrl extends GameCtrl
             'UTF-8'
         );
 
-        return '<td class="heroItemImage heroV2"><div class="heroItem ' . $this->heroItemTileClasses($btype, $slot) . ' heroItemV1"'
+        return '<td class="heroItemImage heroV2"><div class="heroItem ' . $this->heroItemTileClasses($btype, $type, $slot) . ' heroItemV1"'
             . $this->itemTooltipAttribute($btype, $type) . '>' . HeroItemTile::ARROWS_SVG
             . '<div class="item item' . $type . ' neutral"></div></div></td>';
     }
 
     /** Tier or consumable class plus the slot class the inventory shows for the item. */
-    private function heroItemTileClasses(int $btype, string $slot): string
+    private function heroItemTileClasses(int $btype, int $type, string $slot): string
     {
-        return ($btype >= ItemBtype::FIRST_CONSUMABLE ? 'consumable' : 'tier1') . ' neutral ' . HeroItems::tileSlot($btype, $slot);
+        return HeroItemTooltip::tileClass($btype, $type) . ' neutral ' . HeroItems::tileSlot($btype, $slot);
     }
 
     /** Hero item tiles carry their reference tooltip in the title attribute: an empty tip title and the markup as text. */
@@ -704,7 +704,7 @@ class HeroAuctionCtrl extends GameCtrl
         $item = (new HeroItems())->getHeroItemProperties((int)$row['btype'], (int)$row['type']);
         $itemSlot = htmlspecialchars((string)$item['slot'], ENT_QUOTES, 'UTF-8');
         $consumable = (int)$row['btype'] >= ItemBtype::FIRST_CONSUMABLE;
-        $slotClasses = $this->heroItemTileClasses((int)$row['btype'], $itemSlot);
+        $slotClasses = $this->heroItemTileClasses((int)$row['btype'], (int)$row['type'], $itemSlot);
 
         return '<div class="heroItem ' . $slotClasses . ' heroItemV1" id="item_' . (int)$row['id']
             . '" data-slot="' . $itemSlot . '" data-amount="' . (int)$row['num'] . '" data-min-amount="'
@@ -1070,15 +1070,21 @@ HTML;
             }
             if ((int)$item['type'] === 103) {
                 $silver = 100 * $amount;
+                $entryLevel = $db->transactionLevel();
                 if (!$db->begin_transaction()) {
                     return (string)T('Auction', 'AuctionNotFound');
                 }
-                $sold = $m->getItemFromUser($item['id'], $item['num'], $amount)
-                    && $db->run('UPDATE users SET silver=silver+? WHERE id=?', [$silver, $session->getPlayerId()]);
-                if ($sold && $db->commit()) {
-                    Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_AUCTIONS, 1);
+                try {
+                    $sold = $m->getItemFromUser($item['id'], $item['num'], $amount)
+                        && $db->run('UPDATE users SET silver=silver+? WHERE id=?', [$silver, $session->getPlayerId()]);
+                    if ($sold && $db->commit()) {
+                        Quest::getInstance()->setQuestBitwise('battle', Quest::BATTLE_AUCTIONS, 1);
 
-                    return null;
+                        return null;
+                    }
+                } catch (\Throwable $exception) {
+                    $db->unwindTo($entryLevel);
+                    throw $exception;
                 }
                 if ($db->inTransaction()) {
                     $db->rollback();
@@ -1087,19 +1093,26 @@ HTML;
                 return (string)T('Auction', 'AuctionNotFound');
             }
         }
+        $entryLevel = $db->transactionLevel();
         if (!$db->begin_transaction()) {
             return (string)T('Auction', 'AuctionNotFound');
         }
-        $added = $m->getItemFromUser($item['id'], $item['num'], $amount)
-            && $m->addAuction(
-                false,
-                $session->getPlayerId(),
-                $item['btype'],
-                $item['type'],
-                $amount,
-                time() + Config::getInstance()->auction->auctionTime
-            );
-        if (!$added || !$db->commit()) {
+        try {
+            $added = $m->getItemFromUser($item['id'], $item['num'], $amount)
+                && $m->addAuction(
+                    false,
+                    $session->getPlayerId(),
+                    $item['btype'],
+                    $item['type'],
+                    $amount,
+                    time() + Config::getInstance()->auction->auctionTime
+                );
+            $committed = $added && $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
+        }
+        if (!$committed) {
             $db->inTransaction() && $db->rollback();
 
             return (string)T('Auction', 'AuctionNotFound');
@@ -1121,16 +1134,22 @@ HTML;
         }
         $m = new AuctionModel();
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         if (!$db->begin_transaction()) {
             return (string)T('Auction', 'AuctionNotFound');
         }
-        $result = $db->query("SELECT * FROM auction WHERE id=$auctionId AND uid=" . (int)$session->getPlayerId() . ' FOR UPDATE');
-        $auction = $result ? $result->fetch_assoc() : false;
-        if ($auction && AuctionModel::canCancel($auction)
-            && $m->cancelAuction($auctionId)
-            && $m->addItemToUser((int)$session->getPlayerId(), (int)$auction['btype'], (int)$auction['type'], (int)$auction['num'])
-            && $db->commit()) {
-            return null;
+        try {
+            $result = $db->query("SELECT * FROM auction WHERE id=$auctionId AND uid=" . (int)$session->getPlayerId() . ' FOR UPDATE');
+            $auction = $result ? $result->fetch_assoc() : false;
+            if ($auction && AuctionModel::canCancel($auction)
+                && $m->cancelAuction($auctionId)
+                && $m->addItemToUser((int)$session->getPlayerId(), (int)$auction['btype'], (int)$auction['type'], (int)$auction['num'])
+                && $db->commit()) {
+                return null;
+            }
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
         if ($db->inTransaction()) {
             $db->rollback();
@@ -1149,7 +1168,7 @@ HTML;
     private function itemInformationVars(int $btype, int $type, array $properties, array $prices): array
     {
         return [
-            'tileClasses' => $this->heroItemTileClasses($btype, (string)$properties['slot']),
+            'tileClasses' => $this->heroItemTileClasses($btype, $type, (string)$properties['slot']),
             'tileTooltip' => $this->itemTooltipAttribute($btype, $type),
             'arrows' => HeroItemTile::ARROWS_SVG,
             'type' => $type,

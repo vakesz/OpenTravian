@@ -71,7 +71,7 @@ class attributes extends AjaxBase
             }
 
             $level = Formulas::heroLevel((int)$hero['exp']);
-            $budget = (int)$level * 4 + 4;
+            $budget = Formulas::heroAttributePoints($level);
             // Saved points are permanent; only a Book of Wisdom gives them back.
             foreach ($requested as $column => $value) {
                 if ($value < (int)$hero[$column]) {

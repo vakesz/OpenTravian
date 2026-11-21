@@ -6,9 +6,11 @@
  *   success  card -> `collected`, button -> `collect collected disabled`
  *   +2000ms  `animated` removed, HUD hero bars refreshed (collect response,
  *            then hero/dataForHUD), then progressive-tasks/reload swaps the
- *            server-rendered card for the next milestone in place; when the
- *            visible page has nothing left to collect but the scope does,
- *            it goes back to page 1, where those tasks are listed first.
+ *            server-rendered card for the next milestone in place; a task
+ *            whose every level is now collected gives its slot to the next
+ *            task (server order) not yet on the page; when the visible page
+ *            has nothing left to collect but the scope does, it goes back to
+ *            page 1, where those tasks are listed first.
  */
 (function () {
   "use strict";
@@ -200,13 +202,59 @@
     }
   }
 
-  function refreshOverviewMarkup(rows, rewardBonus) {
+  /*
+   * Task keys of one scope in server order (collectable, open, collected), each flagged `finished` once every
+   * level has been collected.
+   */
+  function scopeTaskOrder(data, scope) {
+    var tasks = (data.tasksData && data.tasksData[scope === "general" ? "generalTasks" : "activeVillageTasks"]) || [];
+    return tasks.map(function (task) {
+      var levels = task.levels || [];
+      return {
+        key: String(task.taskIndex),
+        finished: levels.length > 0 && levels.every(function (level) {
+          return !!level.wasCollected;
+        }),
+      };
+    });
+  }
+
+  /*
+   * A collected task with no level left to collect hands its slot to the first unfinished task, in server order,
+   * that is not on the page yet, so one new task surfaces per finished item. Without such a task the row stays.
+   */
+  function replaceFinishedRow(overview, key, rows, order) {
+    if (!overview || !key) {
+      return;
+    }
+    var row = directTaskChild(overview, key);
+    var finished = order.some(function (task) {
+      return task.key === key && task.finished;
+    });
+    if (!row || !finished) {
+      return;
+    }
+    for (var index = 0; index < order.length; index += 1) {
+      var candidate = order[index];
+      if (candidate.finished || !rows[candidate.key] || directTaskChild(overview, candidate.key)) {
+        continue;
+      }
+      var replacement = elementFromHtml(rows[candidate.key]);
+      if (replacement) {
+        row.replaceWith(replacement);
+      }
+      return;
+    }
+  }
+
+  function refreshOverviewMarkup(rows, rewardBonus, collectedKey, order) {
     if (!overviewMarkup) {
       return;
     }
     var holder = document.createElement("div");
     holder.innerHTML = overviewMarkup;
     var overview = holder.querySelector(".taskOverview");
+    replaceFinishedRow(overview, collectedKey, rows, order);
     replaceOverviewRows(overview, rows, rewardBonus);
     if (overview) {
       overviewMarkup = overview.outerHTML;
@@ -256,7 +304,7 @@
     return true;
   }
 
-  function reload() {
+  function reload(collectedKey) {
     Travian.api(
       "progressive-tasks/reload",
       {
@@ -264,13 +312,15 @@
           var scope = activeScope();
           var rows = (data.rows && data.rows[scope]) || {};
           var details = (data.details && data.details[scope]) || {};
+          var order = scopeTaskOrder(data, scope);
           replaceDetailTemplates(details);
           var overview = document.querySelector("#tasks .taskOverview");
           if (overview) {
+            replaceFinishedRow(overview, collectedKey, rows, order);
             replaceOverviewRows(overview, rows, data.rewardBonus);
             overviewMarkup = overview.outerHTML;
           } else {
-            refreshOverviewMarkup(rows, data.rewardBonus);
+            refreshOverviewMarkup(rows, data.rewardBonus, collectedKey, order);
           }
           if (detailKey !== null) {
             showDetail(detailKey);
@@ -337,6 +387,8 @@
 
   function collect(button) {
     var row = button.closest(".task");
+    // Overview cards carry their key; detail-view level cards belong to the open detail.
+    var key = row.getAttribute("data-task-key") || detailKey;
     var boxes = row.querySelectorAll(".iconValueBox");
     var payload = {
       questType: row.getAttribute("data-quest-type"),
@@ -370,7 +422,9 @@
           });
           button.classList.add("preventAnimation");
           applyHeroBlock(response.hero);
-          refreshHud(reload);
+          refreshHud(function () {
+            reload(key);
+          });
         }, ANIMATION_MS);
       },
       error: function () {

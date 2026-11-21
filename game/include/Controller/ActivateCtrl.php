@@ -133,50 +133,56 @@ class ActivateCtrl extends OutOfGameCtrl
             $activationEnabled = $server['activation'] == 1;
         }
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $db->run("DELETE FROM activation WHERE id=? AND token=?", [
-            (int)$this->activationRow['id'],
-            $this->token,
-        ]);
-        $uid = $register->addUser($this->activationRow['name'],
-            $this->activationRow['password'],
-            $this->activationRow['email'],
-            $tribe,
-            $kid,
-            1,
-            true,
-            false,
-            !empty($this->activationRow['newsletter']));
-        if (!$uid) {
-            $db->rollback();
-            $db->query("UPDATE available_villages SET occupied=0 WHERE kid=" . (int)$kid);
-            return ['message' => T("ActivationNew", "unableToGenerateBase")];
+        try {
+            $db->run("DELETE FROM activation WHERE id=? AND token=?", [
+                (int)$this->activationRow['id'],
+                $this->token,
+            ]);
+            $uid = $register->addUser($this->activationRow['name'],
+                $this->activationRow['password'],
+                $this->activationRow['email'],
+                $tribe,
+                $kid,
+                1,
+                true,
+                false,
+                !empty($this->activationRow['newsletter']));
+            if (!$uid) {
+                $db->rollback();
+                $db->query("UPDATE available_villages SET occupied=0 WHERE kid=" . (int)$kid);
+                return ['message' => T("ActivationNew", "unableToGenerateBase")];
+            }
+            $result = $register->createBaseVillage($uid, $this->activationRow['name'], $tribe, $kid);
+            if (!$result) {
+                $db->rollback();
+                return ['message' => T("ActivationNew", "unableToGenerateBase")];
+            }
+            // A social sign-up's email was verified by the provider: treat it like
+            // an activated account (no verification mail or reminder).
+            $pendingSocial = \Game\SocialAuth\PendingSignup::fromGlobals();
+            $socialVerified = $pendingSocial->isBoundTo($this->token) && ($pendingSocial->current()->emailVerified ?? false);
+            if ($activationEnabled || $socialVerified) {
+                $db->query("UPDATE users SET email_verified=1 WHERE id=$uid");
+            } else {
+                $this->sendVerificationEmail($this->activationRow['name'], $uid, $this->activationRow['email']);
+                (new InfoBoxModel())->addInfo($uid, false, 16, '', 0, time() + Formulas::getTotalProtectionTime(time()));
+            }
+            $register->populateUserRank($uid);
+            (new \Model\MessageModel())->sendWelcomeMessage($uid, (string) $this->activationRow['name']);
+            if (!empty($this->activationRow['refUid'])) {
+                $this->processReferences($this->activationRow['refUid'], $uid);
+            }
+            $level = Config::getProperty("game", "firstVillageCreationFieldsLevel");
+            if ($level > 0) {
+                $_SESSION[WebService::fixSessionPrefix('needQuestCheck')] = true;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        $result = $register->createBaseVillage($uid, $this->activationRow['name'], $tribe, $kid);
-        if (!$result) {
-            $db->rollback();
-            return ['message' => T("ActivationNew", "unableToGenerateBase")];
-        }
-        // A social sign-up's email was verified by the provider: treat it like
-        // an activated account (no verification mail or reminder).
-        $pendingSocial = \Game\SocialAuth\PendingSignup::fromGlobals();
-        $socialVerified = $pendingSocial->isBoundTo($this->token) && ($pendingSocial->current()->emailVerified ?? false);
-        if ($activationEnabled || $socialVerified) {
-            $db->query("UPDATE users SET email_verified=1 WHERE id=$uid");
-        } else {
-            $this->sendVerificationEmail($this->activationRow['name'], $uid, $this->activationRow['email']);
-            (new InfoBoxModel())->addInfo($uid, false, 16, '', 0, time() + Formulas::getTotalProtectionTime(time()));
-        }
-        $register->populateUserRank($uid);
-        (new \Model\MessageModel())->sendWelcomeMessage($uid, (string) $this->activationRow['name']);
-        if (!empty($this->activationRow['refUid'])) {
-            $this->processReferences($this->activationRow['refUid'], $uid);
-        }
-        $level = Config::getProperty("game", "firstVillageCreationFieldsLevel");
-        if ($level > 0) {
-            $_SESSION[WebService::fixSessionPrefix('needQuestCheck')] = true;
-        }
-        $db->commit();
         // Link the provider identity only now that the user row is committed
         // (the repository uses its own connection). A failure leaves a normal
         // account that can recover through password reset; it is not fatal.

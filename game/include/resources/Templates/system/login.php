@@ -137,7 +137,7 @@ $createLobbyAccount = $showLobbyAccountBanner ? $loginCopy('createLobbyAccount',
                                 <?php endif; ?>
                             </form>
                         <?php else: ?>
-                            <form method="get" action="<?= $escape($loginAction); ?>" accept-charset="UTF-8">
+                            <form method="post" action="<?= $escape($loginAction); ?>" accept-charset="UTF-8">
                                 <div class="dialogDragBar"></div>
                                 <div class="content" id="dialogContent">
                                     <h1><?= $escape($title); ?></h1>

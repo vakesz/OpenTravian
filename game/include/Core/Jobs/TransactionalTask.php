@@ -57,6 +57,7 @@ final class TransactionalTask
         }
 
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         if (!$db->begin_transaction()) {
             throw new \RuntimeException('Unable to begin requeue transaction.');
         }
@@ -109,7 +110,7 @@ final class TransactionalTask
 
             return true;
         } catch (\Throwable $exception) {
-            self::safeRollback();
+            self::safeRollback($entryLevel);
 
             throw $exception;
         }
@@ -157,6 +158,7 @@ final class TransactionalTask
         ?callable $beforeLock
     ): bool {
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         if (!$db->begin_transaction()) {
             throw new \RuntimeException('Unable to begin scheduled task transaction.');
         }
@@ -211,7 +213,7 @@ final class TransactionalTask
 
             return true;
         } catch (\Throwable $exception) {
-            self::safeRollback();
+            self::safeRollback($entryLevel);
 
             throw $exception;
         }
@@ -227,10 +229,21 @@ final class TransactionalTask
         return (bool)preg_match('/Deadlock found|Lock wait timeout exceeded/i', $exception->getMessage());
     }
 
-    private static function safeRollback(): void
+    /**
+     * Unwind every level opened since $entryLevel. An effect that throws from
+     * inside its own nested transaction leaves a savepoint open; rolling back
+     * only once would undo that savepoint and leave the task's transaction
+     * open on the worker connection for good.
+     */
+    private static function safeRollback(int $entryLevel): void
     {
+        $db = DB::getInstance();
         try {
-            DB::getInstance()->rollback();
+            while ($db->transactionLevel() > $entryLevel) {
+                if (!$db->rollback()) {
+                    break;
+                }
+            }
         } catch (\Throwable $rollbackError) {
             \logError('Scheduled task rollback failed: ' . $rollbackError->getMessage());
         }
@@ -253,6 +266,7 @@ final class TransactionalTask
 
             return;
         }
+        $entryLevel = $db->transactionLevel();
         if (!$db->begin_transaction()) {
             throw new \RuntimeException('Unable to begin scheduled task failure transaction.');
         }
@@ -323,7 +337,7 @@ final class TransactionalTask
                 throw new \RuntimeException('Unable to commit scheduled task failure transition.');
             }
         } catch (\Throwable $exception) {
-            self::safeRollback();
+            self::safeRollback($entryLevel);
 
             throw $exception;
         }

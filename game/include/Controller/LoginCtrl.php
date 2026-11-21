@@ -107,7 +107,10 @@ class LoginCtrl extends OutOfGameCtrl
         $this->LoginView = new PHPBatchView("system/login");
         $this->LoginView->vars['WelcomeText'] = sprintf(T("Login", "Welcome"), $title);
         $this->LoginView->vars['worldTitle'] = $title;
-        $credentials = WebService::isPost() ? $_POST : $_GET;
+        // Credentials are accepted only in a POST body. A query string ends up
+        // in browser history, proxy logs and the nginx access log, so any
+        // name/password in it is ignored.
+        $credentials = WebService::isPost() ? $_POST : [];
         $name = $credentials['name'] ?? $_SESSION[WebService::fixSessionPrefix('user')] ?? '';
         $this->LoginView->vars['name'] = is_string($name) ? $name : '';
         $this->LoginView->vars['password'] = isset($credentials['password']) && is_string($credentials['password'])
@@ -129,11 +132,9 @@ class LoginCtrl extends OutOfGameCtrl
         $forgotPassword = $_REQUEST['forgotPassword'] ?? '';
         $this->LoginView->vars['forgotPassword'] = is_string($forgotPassword)
             && in_array($forgotPassword, ['true', '1'], true);
-        $isLoginGet = WebService::isGet()
-            && (array_key_exists('name', $_GET) || array_key_exists('password', $_GET));
         if (WebService::isPost() && is_string($_POST['twoFactorToken'] ?? null)) {
             $this->twoFactorStep((string)$_POST['twoFactorToken']);
-        } elseif (WebService::isPost() || $isLoginGet) {
+        } elseif (WebService::isPost()) {
             if ($this->LoginView->vars['forgotPassword']) {
                 $this->passwordForgotten();
             } else {

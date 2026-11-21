@@ -919,11 +919,11 @@ class BuildCtrl extends GameCtrl
                 foreach ($levels as $lvl) {
                     $overall += $callback($params, $lvl);
                 }
-                $contract['valueTable'] .= '<tr class="overall"><th>' . T("Buildings", $item_id . ".overall_storage") . '</th><td><span class="number">' . (int) round($overall) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td></tr>';
+                $contract['valueTable'] .= '<tr class="overall"><th>' . T("Buildings", $item_id . ".overall_storage") . '</th><td><span class="number">' . number_format_x((int) round($overall)) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td></tr>';
             }
         }
         $current_value = $callback($params, $village->getField($this->selectedBuildingIndex)['level']);
-        $contract['valueTable'] .= '<tr class="currentLevel"><th>' . T("Buildings", $item_id . ".current_prod") . ':</th><td><span class="number">' . (int) round($current_value) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td></tr>';
+        $contract['valueTable'] .= '<tr class="currentLevel"><th>' . T("Buildings", $item_id . ".current_prod") . ':</th><td><span class="number">' . number_format_x((int) round($current_value)) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td></tr>';
         $tmp = $village->getField($this->selectedBuildingIndex)['level'];
         $upgrade_state = $village->getField($this->selectedBuildingIndex)['upgrade_state'];
         $maxLvl = Formulas::buildingMaxLvl($item_id, $village->isCapital());
@@ -937,7 +937,7 @@ class BuildCtrl extends GameCtrl
                 $contract['valueTable'] .= '<tr class="underConstruction">';
                 $contract['valueTable'] .= '<th>' . $msg . '</th>';
                 $value = $callback($params, $i);
-                $contract['valueTable'] .= '<td><span class="number">' . (int) round($value) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td>';
+                $contract['valueTable'] .= '<td><span class="number">' . number_format_x((int) round($value)) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td>';
                 $contract['valueTable'] .= '</tr>';
             }
         }
@@ -946,7 +946,7 @@ class BuildCtrl extends GameCtrl
         } else {
             $nextLevel = ($village->getField($this->selectedBuildingIndex)['level'] + $upgrade_state) + 1;
             $value = $callback($params, $nextLevel);
-            $contract['valueTable'] .= '<tr class="nextPossible"><th>' . T("Buildings", $item_id . ".next_prod") . ' ' . $nextLevel . ':</th><td><span class="number">' . (int) round($value) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td></tr>';
+            $contract['valueTable'] .= '<tr class="nextPossible"><th>' . T("Buildings", $item_id . ".next_prod") . ' ' . $nextLevel . ':</th><td><span class="number">' . number_format_x((int) round($value)) . '</span> ' . T("Buildings", $item_id . ".unit") . '</td></tr>';
         }
     }
 }

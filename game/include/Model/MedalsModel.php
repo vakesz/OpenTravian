@@ -35,7 +35,7 @@ class MedalsModel
     /** Appearance counts that earn a ribbon, with the image-name digit for each. */
     private const RIBBON_STEPS = [3 => 0, 5 => 1, 10 => 2];
 
-    private function handlePrizeBonus(string $type, int $uid, int $rank): void
+    protected function handlePrizeBonus(string $type, int $uid, int $rank): void
     {
         $bonus = Config::getInstance()->bonus->top10->{$type};
         if (!$bonus->enabled || !array_key_exists($rank, $bonus->ranks) || $bonus->ranks[$rank] <= 0) {
@@ -66,10 +66,23 @@ class MedalsModel
         if ($lastMedalsGiven + $config->game->medals_interval > time()) {
             return;
         }
+        // The whole week's award is one transaction with the marker written last, so a failure part-way leaves
+        // the week due and retries it instead of skipping it.
+        $db->transactional(function (DB $db) use ($config, $lastMedalsGiven): void {
+            $this->awardWeek($db);
+            // Guarded on the old value, so a concurrent run cannot award the same week twice.
+            $db->query('UPDATE config SET lastMedalsGiven=' . ($lastMedalsGiven + $config->game->medals_interval) . " WHERE lastMedalsGiven=$lastMedalsGiven");
+            if ($db->affectedRows() !== 1) {
+                throw new \RuntimeException('The weekly medals were already awarded.');
+            }
+        });
+    }
+
+    private function awardWeek(DB $db): void
+    {
         if (getCustom('refillFarmsOnTop10Reset')) {
             $db->query('UPDATE vdata SET wood=wood+woodp*2, clay=clay+clayp*2, iron=iron+ironp*2, crop=crop+cropp*2 WHERE isFarm=1');
         }
-        $db->query('UPDATE config SET lastMedalsGiven=' . ($lastMedalsGiven + $config->game->medals_interval));
         $week = (int) $db->fetchScalar('SELECT week FROM medal ORDER BY week DESC LIMIT 1', [], 0) + 1;
         $statistics = new StatisticsModel();
 

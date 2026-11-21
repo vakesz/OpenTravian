@@ -200,8 +200,23 @@ class ArtefactsModel
      */
     public function reSpawnArtifact(array $row): void
     {
-        DB::getInstance()->run('DELETE FROM artefacts WHERE id=?', [(int) $row['id']]);
-        $this->respawnAtReleaseSpot($row);
+        // Delete and respawn together: if the new village cannot be made, the artifact keeps its old row
+        // instead of disappearing from the world.
+        $db = DB::getInstance();
+        $db->begin_transaction();
+        try {
+            $db->run('DELETE FROM artefacts WHERE id=?', [(int) $row['id']]);
+            $respawned = $this->respawnAtReleaseSpot($row);
+        } catch (\Throwable $exception) {
+            $db->rollback();
+            throw $exception;
+        }
+        if ($respawned) {
+            $db->commit();
+        } else {
+            $db->rollback();
+            logError('Artifact #' . (int) $row['id'] . ' could not be respawned; it stays where it was.');
+        }
     }
 
     /**
@@ -218,15 +233,14 @@ class ArtefactsModel
     /**
      * @param array<string, mixed> $row artefacts row
      */
-    private function respawnAtReleaseSpot(array $row): void
+    private function respawnAtReleaseSpot(array $row): bool
     {
         $releaseKid = (int) $row['release_kid'];
         if ($releaseKid && (int) DB::getInstance()->fetchScalar("SELECT occupied FROM wdata WHERE id=$releaseKid") !== 1) {
-            $this->Artifact((int) $row['type'], (int) $row['size'], (int) $row['num'], $row['effect'], $releaseKid);
-
-            return;
+            return $this->Artifact((int) $row['type'], (int) $row['size'], (int) $row['num'], $row['effect'], $releaseKid) !== false;
         }
-        $this->Artifact((int) $row['type'], (int) $row['size'], (int) $row['num'], $row['effect']);
+
+        return $this->Artifact((int) $row['type'], (int) $row['size'], (int) $row['num'], $row['effect']) !== false;
     }
 
     /**
@@ -238,7 +252,7 @@ class ArtefactsModel
     public function Artifact(int $type, int $size, int $num, string|int|float $effect, int|false $kid = false, ?array $units = null): int|false
     {
         $db = DB::getInstance();
-        $db->begin_transaction();
+        // The spot search only reads, so it runs before the transaction; every write below is inside it.
         if (!$kid) {
             $min_r = (int) ceil(MAP_SIZE / 8);
             $max_r = Formulas::getMapMinDistanceFromCenter() + 15;
@@ -251,7 +265,6 @@ class ArtefactsModel
             }
 
             if ($find <= 0) {
-                $db->rollback();
                 logError('Unable to find a suitable village to create artifact on.');
 
                 return false;
@@ -260,15 +273,27 @@ class ArtefactsModel
             $kid = $find;
         }
         $units ??= $this->getArtifactUnits()[$size === 1 ? 'small' : ($size === 2 ? 'big' : 'unique')];
-        if ((new RegisterModel())->createArtifactVillage($kid, $type, $size, $units)) {
-            $db->run(
-                'INSERT INTO artefacts (uid, type, kid, release_kid, size, conquered, num, effecttype, effect, aoe) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [$type, $kid, $kid, $size, time(), $num, $type, self::effectValue($effect), $size]
-            );
-            $db->commit();
-        } else {
+        $db->begin_transaction();
+        try {
+            $created = (new RegisterModel())->createArtifactVillage($kid, $type, $size, $units);
+            if ($created) {
+                $db->run(
+                    'INSERT INTO artefacts (uid, type, kid, release_kid, size, conquered, num, effecttype, effect, aoe) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [$type, $kid, $kid, $size, time(), $num, $type, self::effectValue($effect), $size]
+                );
+            }
+        } catch (\Throwable $exception) {
+            // Without this the transaction stays open on the engine connection and every later
+            // write from that worker joins it and is lost.
             $db->rollback();
+            throw $exception;
         }
+        if (!$created) {
+            $db->rollback();
+
+            return false;
+        }
+        $db->commit();
 
         return $kid;
     }
@@ -409,15 +434,22 @@ class ArtefactsModel
 
     public function releaseArtifacts(): void
     {
-        Config::getInstance()->dynamic->ArtifactsReleased = 1;
         $db = DB::getInstance();
-        $db->query('UPDATE config SET ArtifactsReleased=1');
-        \Game\Webhook\WorldEvents::record('artifactsReleased');
+        $natarArtifacts = (int) $db->fetchScalar('SELECT COUNT(*) FROM artefacts WHERE uid=' . UserId::NATARS);
+        // A retry after a partial release starts over, unless players already took some of those artifacts:
+        // then the partial release is accepted as it is, so a player's artifact is never wiped.
+        if ($natarArtifacts > 0 && (int) $db->fetchScalar('SELECT COUNT(*) FROM artefacts WHERE uid<>' . UserId::NATARS) > 0) {
+            logError('Artifact release is incomplete, but players already hold artifacts; accepting it as it is.');
+            $this->finishArtifactRelease();
+
+            return;
+        }
         $stmt = $db->query('SELECT kid FROM artefacts WHERE uid=' . UserId::NATARS);
         while ($stmt && ($row = $stmt->fetch_assoc())) {
             (new AccountDeleter())->deleteVillage((int) $row['kid']);
         }
-        $db->query('TRUNCATE TABLE artefacts');
+        // Only the Natars' artifacts are cleared; a TRUNCATE would also take players' ones.
+        $db->query('DELETE FROM artefacts WHERE uid=' . UserId::NATARS);
         $units = [];
         foreach ([
             self::ARTIFACT_INCREASE_BUILDINGS_STABILITY,
@@ -434,20 +466,40 @@ class ArtefactsModel
         $scale = MAP_SIZE / 100;
         $min = 10 * $scale;
 
-        $this->releaseSmallArtifacts($min + 6 * $scale + (3 * $scale * 2), $scale * 2, $units); //far
-        $this->releaseBigArtifacts($min + 4 * $scale, $scale * 2, $units); //near
-        $this->releaseUniqueArtifacts($min, $units); //nearest
+        $expected = $this->releaseSmallArtifacts($min + 6 * $scale + (3 * $scale * 2), $scale * 2, $units); //far
+        $expected += $this->releaseBigArtifacts($min + 4 * $scale, $scale * 2, $units); //near
+        $expected += $this->releaseUniqueArtifacts($min, $units); //nearest
 
-        $this->updateFoolArtes();
-        (new PublicMsgModel())->haveNewMessage('[ArtifactsReleaseMessage]');
-        (new InfoBoxModel())->deleteInfoByTypeInServer(8);
+        // Mark the release only once every artifact that found a spot is really there (a missing spot is
+        // already logged and accepted), so a partial release is retried instead of recorded as done.
+        $created = (int) $db->fetchScalar('SELECT COUNT(*) FROM artefacts WHERE uid=' . UserId::NATARS);
+        if ($created === 0 || $created !== $expected) {
+            logError("Artifact release created $created of $expected artifacts; it will be retried.");
+
+            return;
+        }
+        $this->finishArtifactRelease();
+    }
+
+    /** The follow-up work and the ArtifactsReleased marker, in one transaction with the marker last. */
+    private function finishArtifactRelease(): void
+    {
+        DB::getInstance()->transactional(function (DB $db): void {
+            \Game\Webhook\WorldEvents::record('artifactsReleased');
+            $this->updateFoolArtes();
+            (new PublicMsgModel())->haveNewMessage('[ArtifactsReleaseMessage]');
+            (new InfoBoxModel())->deleteInfoByTypeInServer(8);
+            $db->query('UPDATE config SET ArtifactsReleased=1');
+        });
+        Config::getInstance()->dynamic->ArtifactsReleased = 1;
     }
 
     /**
      * @param array<int, array{small: array<int, int|float>, big: array<int, int|float>, unique: array<int, int|float>}> $units
      */
-    private function releaseSmallArtifacts(int|float $r, int|float $scalePart, array $units): void
+    private function releaseSmallArtifacts(int|float $r, int|float $scalePart, array $units): int
     {
+        $placed = 0;
         $types = [
             self::ARTIFACT_INCREASE_BUILDINGS_STABILITY => '4',
             self::ARTIFACT_INCREASE_SPEED => '2',
@@ -469,6 +521,7 @@ class ArtefactsModel
                     $angle -= 360;
                 }
                 if (($kid = $this->findArtifactVillageWithDegree($r, $angle))) {
+                    ++$placed;
                     $this->Artifact((int) $type, 1, $i, $effect, $kid, $units[$type]['small']);
                 } else {
                     logError("Failed to find a spot for artifact (small) at angle $angle and radii $r.");
@@ -476,6 +529,8 @@ class ArtefactsModel
             }
             $r += $scalePart;
         }
+
+        return $placed;
     }
 
     private function findArtifactVillageWithDegree(int|float $r, int|float $degree): int
@@ -486,8 +541,9 @@ class ArtefactsModel
     /**
      * @param array<int, array{small: array<int, int|float>, big: array<int, int|float>, unique: array<int, int|float>}> $units
      */
-    private function releaseBigArtifacts(int|float $r, int|float $scalePart, array $units): void
+    private function releaseBigArtifacts(int|float $r, int|float $scalePart, array $units): int
     {
+        $placed = 0;
         $types = [
             self::ARTIFACT_INCREASE_BUILDINGS_STABILITY => '3',
             self::ARTIFACT_INCREASE_SPEED => '1.5',
@@ -507,6 +563,7 @@ class ArtefactsModel
                     $angle -= 360;
                 }
                 if (($kid = $this->findArtifactVillageWithDegree($r, $angle))) {
+                    ++$placed;
                     $this->Artifact((int) $type, 2, $i, $effect, $kid, $units[$type]['big']);
                 } else {
                     logError("Failed to find a spot for artifact (big) at angle $angle and radii $r.");
@@ -514,13 +571,16 @@ class ArtefactsModel
             }
             $r += $scalePart;
         }
+
+        return $placed;
     }
 
     /**
      * @param array<int, array{small: array<int, int|float>, big: array<int, int|float>, unique: array<int, int|float>}> $units
      */
-    private function releaseUniqueArtifacts(int|float $r, array $units): void
+    private function releaseUniqueArtifacts(int|float $r, array $units): int
     {
+        $placed = 0;
         $types = [
             self::ARTIFACT_INCREASE_BUILDINGS_STABILITY => '5',
             self::ARTIFACT_INCREASE_SPEED => '2',
@@ -536,11 +596,14 @@ class ArtefactsModel
         foreach ($types as $type => $effect) {
             $angle = $angles[$x++];
             if (($kid = $this->findArtifactVillageWithDegree($r, $angle))) {
+                ++$placed;
                 $this->Artifact((int) $type, 3, 0, $effect, $kid, $units[$type]['unique']);
             } else {
                 logError("Failed to find a spot for artifact (unique) at angle $angle and radii $r.");
             }
         }
+
+        return $placed;
     }
 
     /**
@@ -640,26 +703,63 @@ class ArtefactsModel
 
     public function releaseWWPlans(): void
     {
-        Config::getInstance()->dynamic->WWPlansReleased = 1;
         $db = DB::getInstance();
-        $db->query('UPDATE config SET WWPlansReleased=1');
-        \Game\Webhook\WorldEvents::record('wwPlansReleased');
         $plansEnabled = (bool) Config::getProperty('custom', 'wwPlansEnabled');
-        if ($plansEnabled) {
-            $count = (int) Config::getProperty('custom', 'wwCount');
-            foreach ((new WonderOfTheWorldModel())->findPositionsForWWPlan($count) as $kid) {
-                $this->Artifact(12, 1, 0, 0, (int) $kid);
+        if ($plansEnabled && !$this->releaseWWPlanArtifacts()) {
+            return;
+        }
+        // The follow-up work and the marker commit together, the marker last.
+        $db->transactional(function (DB $db) use ($plansEnabled): void {
+            \Game\Webhook\WorldEvents::record('wwPlansReleased');
+            $find = $db->query('SELECT kid, isWW, owner FROM vdata WHERE isWW=1');
+            while ($find && ($row = $find->fetch_assoc())) {
+                ResourcesHelper::updateVillageUpkeep((int) $row['owner'], (int) $row['kid'], (int) $row['isWW'] === 1, VillageModel::getHDP((int) $row['kid']));
             }
+            (new PublicMsgModel())->haveNewMessage($plansEnabled ? '[WWPlansReleaseMessage]' : '[WWConstructStart]');
+            (new InfoBoxModel())->deleteInfoByTypeInServer(9);
+            if (Config::getProperty('custom', 'removeProtectionAfterReleaseOfWWPlans')) {
+                $db->run('UPDATE users SET protection=? WHERE protection > ?', [time(), time()]);
+                (new InfoBoxModel())->deleteInfoByTypeInServer(6);
+            }
+            $db->query('UPDATE config SET WWPlansReleased=1');
+        });
+        Config::getInstance()->dynamic->WWPlansReleased = 1;
+    }
+
+    /**
+     * Places the WW construction plans; true once every position found holds a plan. A retry first removes
+     * the plans of the failed attempt, so plans are never duplicated, unless a player already took one:
+     * then the partial release is accepted as it is.
+     */
+    private function releaseWWPlanArtifacts(): bool
+    {
+        $db = DB::getInstance();
+        $natarPlans = 'SELECT %s FROM artefacts WHERE type=' . self::WW_PLAN . ' AND uid=' . UserId::NATARS;
+        $previous = (int) $db->fetchScalar(sprintf($natarPlans, 'COUNT(*)'));
+        if ($previous > 0) {
+            if ((int) $db->fetchScalar('SELECT COUNT(*) FROM artefacts WHERE type=' . self::WW_PLAN . ' AND uid<>' . UserId::NATARS) > 0) {
+                logError('WW construction plan release is incomplete, but players already hold plans; accepting it as it is.');
+
+                return true;
+            }
+            $stmt = $db->query(sprintf($natarPlans, 'kid'));
+            while ($stmt && ($row = $stmt->fetch_assoc())) {
+                (new AccountDeleter())->deleteVillage((int) $row['kid']);
+            }
+            $db->query('DELETE FROM artefacts WHERE type=' . self::WW_PLAN . ' AND uid=' . UserId::NATARS);
         }
-        $find = $db->query('SELECT kid, isWW, owner FROM vdata WHERE isWW=1');
-        while ($find && ($row = $find->fetch_assoc())) {
-            ResourcesHelper::updateVillageUpkeep((int) $row['owner'], (int) $row['kid'], (int) $row['isWW'] === 1, VillageModel::getHDP((int) $row['kid']));
+        $positions = array_unique(array_map('intval', (new WonderOfTheWorldModel())->findPositionsForWWPlan((int) Config::getProperty('custom', 'wwCount'))));
+        foreach ($positions as $kid) {
+            $this->Artifact(self::WW_PLAN, 1, 0, 0, $kid);
         }
-        (new PublicMsgModel())->haveNewMessage($plansEnabled ? '[WWPlansReleaseMessage]' : '[WWConstructStart]');
-        (new InfoBoxModel())->deleteInfoByTypeInServer(9);
-        if (Config::getProperty('custom', 'removeProtectionAfterReleaseOfWWPlans')) {
-            $db->run('UPDATE users SET protection=? WHERE protection > ?', [time(), time()]);
-            (new InfoBoxModel())->deleteInfoByTypeInServer(6);
+        // Mark the release only once every position holds a plan, so a failed or partial release is retried.
+        $created = (int) $db->fetchScalar('SELECT COUNT(*) FROM artefacts WHERE type=' . self::WW_PLAN);
+        if ($created === 0 || $created !== count($positions)) {
+            logError("WW construction plan release created $created of " . count($positions) . ' plans; it will be retried.');
+
+            return false;
         }
+
+        return true;
     }
 }

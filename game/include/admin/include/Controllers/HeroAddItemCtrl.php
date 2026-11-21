@@ -13,7 +13,7 @@ class HeroAddItemCtrl
             Dispatcher::getInstance()->appendContent(\Game\AdminUi::page(
                 'Add hero item',
                 'Add or remove a hero inventory item for one player.',
-                \Game\AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the footer to use this page.', 'error')
+                \Game\AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the header to use this page.', 'error')
             ));
             return;
         }

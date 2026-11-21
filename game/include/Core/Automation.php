@@ -67,6 +67,11 @@ class Automation
         'Archer', 'Smith', 'Miller', 'Baker', 'Rider', 'Ranger', 'Scout', 'Brewer', 'Falcon', 'Badger', 'Pike', 'Oak',
     ];
 
+    /** End-of-round voucher reasons with many recipients; every other one goes to a single player. */
+    private const PER_PLAYER_VOUCHER_REASONS = ['remaining', 'winnerAlliance'];
+    /** The only end-of-round club medal type given to many players (the winner's alliance members). */
+    private const CLUB_MEDAL_WINNER_ALLIANCE = 18;
+
     /** @var \Core\Automation|null */
     private static $_self;
     /** @var int */
@@ -97,6 +102,26 @@ class Automation
             }
             logError("$what failed: " . $exception->getMessage());
         }
+    }
+
+    /**
+     * Locks a queue row, runs $work on it and deletes the row last, all in one transaction, so a failure
+     * leaves the row queued for the next pass. Returns false when another worker already consumed it.
+     *
+     * @param callable(array<string, mixed>): void $work
+     */
+    private function consumeQueueRow(string $table, int $id, callable $work): bool
+    {
+        return DB::getInstance()->transactional(function (DB $db) use ($table, $id, $work): bool {
+            $result = $db->query("SELECT * FROM $table WHERE id=$id FOR UPDATE");
+            if (!$result->num_rows) {
+                return false;
+            }
+            $work($result->fetch_assoc());
+            $db->query("DELETE FROM $table WHERE id=$id");
+
+            return true;
+        });
     }
 
     public function buildComplete(): void
@@ -223,15 +248,27 @@ class Automation
         }
         if (!(($lastDonateReset + $donate_reset_interval) > time())) {
             $lastDonateReset = $lastDonateReset + $donate_reset_interval;
-            $db->query("UPDATE config SET lastAllianceContributeReset=" . $lastDonateReset);
-            $db->query("UPDATE users SET alliance_contributions=0");
+            $db->transactional(function (DB $db) use ($lastDonateReset): void {
+                $db->query("UPDATE users SET alliance_contributions=0");
+                $db->query("UPDATE config SET lastAllianceContributeReset=" . $lastDonateReset);
+            });
         }
         $m = new AllianceBonusModel();
-        $stmt = $db->query("SELECT * FROM alliance_bonus_upgrade_queue WHERE time < " . time() . " LIMIT 100");
+        $stmt = $db->query("SELECT id FROM alliance_bonus_upgrade_queue WHERE time < " . time() . " LIMIT 100");
         while ($row = $stmt->fetch_assoc()) {
-            $db->query("DELETE FROM alliance_bonus_upgrade_queue WHERE id={$row['id']}");
-            $m->levelUpBonus($row['aid'], $row['type']);
+            $this->guardRow("Alliance bonus upgrade {$row['id']}", function () use ($row, $m): void {
+                $this->processAllianceBonusRow((int)$row['id'], $m);
+            });
         }
+    }
+
+    public function processAllianceBonusRow(int $id, ?AllianceBonusModel $model = null): bool
+    {
+        $model ??= new AllianceBonusModel();
+
+        return $this->consumeQueueRow('alliance_bonus_upgrade_queue', $id, function (array $row) use ($model): void {
+            $model->levelUpBonus((int)$row['aid'], (int)$row['type']);
+        });
     }
 
     public function marketComplete(): void
@@ -358,17 +395,21 @@ class Automation
     {
         $db = DB::getInstance();
         $message = new MessageModel();
-        $result = $db->query("SELECT * FROM buyGoldMessages LIMIT 50");
+        $result = $db->query("SELECT id FROM buyGoldMessages LIMIT 50");
         while ($row = $result->fetch_assoc()) {
-            $db->query("DELETE FROM buyGoldMessages WHERE id={$row['id']}");
-            if ($row['type'] == 1) {
-                $title = T("Global", "BuyGoldSubject");
-                $msg = sprintf(T("Global", "BuyGoldText"), $row['gold'], $row['trackingCode']);
-            } else {
-                $title = T("Global", "voucherTitle");
-                $msg = sprintf(T("Global", "voucherText"), $row['gold'], $row['trackingCode']);
-            }
-            $message->sendMessage(0, $row['uid'], $title, $msg);
+            // The in-game message is a plain mdata row, so it is sent and the queue row removed in one transaction.
+            $this->guardRow("Bought gold message {$row['id']}", function () use ($row, $message): void {
+                $this->consumeQueueRow('buyGoldMessages', (int)$row['id'], function (array $row) use ($message): void {
+                    if ($row['type'] == 1) {
+                        $title = T("Global", "BuyGoldSubject");
+                        $msg = sprintf(T("Global", "BuyGoldText"), $row['gold'], $row['trackingCode']);
+                    } else {
+                        $title = T("Global", "voucherTitle");
+                        $msg = sprintf(T("Global", "voucherText"), $row['gold'], $row['trackingCode']);
+                    }
+                    $message->sendMessage(0, (int)$row['uid'], $title, $msg);
+                });
+            });
         }
     }
 
@@ -376,13 +417,25 @@ class Automation
     {
         (new MultiAccount())->runProgress();
         $db = DB::getInstance();
-        $result = $db->query("SELECT * FROM banQueue WHERE end>0 AND end < " . time() . " LIMIT 10");
+        $result = $db->query("SELECT id FROM banQueue WHERE end>0 AND end < " . time() . " LIMIT 10");
         $infoBox = new InfoBoxModel();
         while ($row = $result->fetch_assoc()) {
-            $db->query("DELETE FROM banQueue WHERE id={$row['id']}");
-            $db->query("UPDATE users SET access=" . AccessLevel::PLAYER . " WHERE id={$row['uid']}");
-            $infoBox->deleteInfoByType($row['uid'], 14);
+            $this->guardRow("Ban expiry {$row['id']}", function () use ($row, $infoBox): void {
+                $this->processBanRow((int)$row['id'], $infoBox);
+            });
         }
+    }
+
+    /** Lifts an expired ban; the queue row is only removed together with the unban. */
+    public function processBanRow(int $id, ?InfoBoxModel $infoBox = null): bool
+    {
+        $infoBox ??= new InfoBoxModel();
+
+        return $this->consumeQueueRow('banQueue', $id, function (array $row) use ($infoBox): void {
+            $uid = (int)$row['uid'];
+            DB::getInstance()->query("UPDATE users SET access=" . AccessLevel::PLAYER . " WHERE id=$uid");
+            $infoBox->deleteInfoByType($uid, 14);
+        });
     }
 
     public function referenceCheck(): void
@@ -407,9 +460,17 @@ class Automation
 
                     return;
                 }
-                $db->query("UPDATE player_references SET rewardGiven=1 WHERE id={$row['id']} AND rewardGiven=0");
-                if ($db->affectedRows() === 1) {
+                // The claim and the gold go in one transaction: a failed credit leaves the reference unrewarded.
+                $credited = $db->transactional(function (DB $db) use ($row, $refUid, $inviteGold): bool {
+                    $db->query("UPDATE player_references SET rewardGiven=1 WHERE id={$row['id']} AND rewardGiven=0");
+                    if ($db->affectedRows() !== 1) {
+                        return false;
+                    }
                     $db->query("UPDATE users SET gift_gold=gift_gold+$inviteGold WHERE id=$refUid");
+
+                    return true;
+                });
+                if ($credited) {
                     ++$rewarded[$refUid];
                 }
             });
@@ -419,19 +480,24 @@ class Automation
     public function deleteOasisComplete(): void
     {
         $db = DB::getInstance();
-        $result = $db->query("SELECT * FROM odelete WHERE end_time <= " . (time()) . " ORDER BY end_time ASC, id ASC LIMIT 10");
+        $result = $db->query("SELECT id FROM odelete WHERE end_time <= " . (time()) . " ORDER BY end_time ASC, id ASC LIMIT 10");
         $m = new AccountDeleter();
         while ($row = $result->fetch_assoc()) {
-            $db->query("DELETE FROM odelete WHERE id={$row['id']}");
-            OasesModel::releaseOasis($row['oid'], $row['kid']);
-            $enforces = $db->query("SELECT * FROM enforcement WHERE to_kid={$row['oid']}");
-            while ($enforce = $enforces->fetch_assoc()) {
-                $m->returnTrappedOrEnforcementRow($enforce, true);
-            }
-            $find = $db->query("SELECT * FROM movement WHERE to_kid={$row['oid']} AND mode=" . MovementsModel::MODE_GOING);
-            while ($row = $find->fetch_assoc()) {
-                $m->cancelMovement($row['id'], $row['to_kid'], $row['kid']);
-            }
+            $this->guardRow("Oasis release {$row['id']}", function () use ($row, $m): void {
+                $this->consumeQueueRow('odelete', (int)$row['id'], function (array $row) use ($m): void {
+                    $db = DB::getInstance();
+                    $oid = (int)$row['oid'];
+                    OasesModel::releaseOasis($oid, (int)$row['kid']);
+                    $enforces = $db->query("SELECT * FROM enforcement WHERE to_kid=$oid");
+                    while ($enforce = $enforces->fetch_assoc()) {
+                        $m->returnTrappedOrEnforcementRow($enforce, true);
+                    }
+                    $find = $db->query("SELECT * FROM movement WHERE to_kid=$oid AND mode=" . MovementsModel::MODE_GOING);
+                    while ($movement = $find->fetch_assoc()) {
+                        $m->cancelMovement((int)$movement['id'], (int)$movement['to_kid'], (int)$movement['kid']);
+                    }
+                });
+            });
         }
     }
 
@@ -634,9 +700,15 @@ class Automation
         $conf = Config::getInstance();
         $startEmailsSent = $db->fetchScalar("SELECT startEmailsSent FROM config");
         if (!$startEmailsSent && time() >= ($conf->game->start_time - Time::HOUR)) {
-            $db = DB::getInstance();
-            $db->query("UPDATE config SET startEmailsSent=1");
+            // The farms, the fake players and the marker commit together, so a failure retries all of them.
+            $db->transactional(function (DB $db): void {
+                (new NatarsModel())->createFarmVillages();
+                $this->addFakeUsers();
+                $db->query("UPDATE config SET startEmailsSent=1");
+            });
             $conf->dynamic->startEmailsSent = 1;
+            // The emails go to the global mail queue, which cannot join the transaction above. They are queued
+            // only after it committed, so a retry can never mail every player twice (at most once).
             $totalCount = 0;
             //server emails
             $order = ['[PLAYERNAME]', '[SERVER_NAME]', '[SERVER_URL]', '[SERVER_START_TIME]'];
@@ -652,30 +724,30 @@ class Automation
                 Mailer::sendEmail($row['email'], T("Email", "serverStartEmailSubject"), $emailHTML);
             }
             $totalCount += $result->num_rows;
-            (new NatarsModel())->createFarmVillages();
-            $this->addFakeUsers();
             Notification::notify("StartEmail", "Start emails were sent to $totalCount emails.");
         }
         $startConfigurationDone = $db->fetchScalar("SELECT startConfigurationDone FROM config");
         if (!$startConfigurationDone && time() > $conf->game->start_time) {
-            $db->query("UPDATE config SET startConfigurationDone=1");
+            $db->transactional(function (DB $db) use ($conf): void {
+                $m = new InfoBoxModel();
+                $m->addInfo(0, 1, 8, '', 0, 0);
+                $m->addInfo(0, 1, 9, '', 0, 0);
+                if ($conf->game->catapultAvailableTime > $conf->game->start_time) {
+                    $m->addInfo(0, 1, 15, '', 0, 0);
+                }
+                if ($conf->timers->AutoFinishTime > 0) {
+                    //$m->addInfo(0, 1, 10, '', $conf->timers->AutoFinishTime - 3 * Time::DAY, $conf->timers->AutoFinishTime);
+                }
+                //(new NatarsModel())->createLotsOfNatarsVillages(max(min(2*$conf->game->speed, 600), 300));
+                Notification::notify(
+                    "System notification",
+                    sprintf("Game server %s started.", Config::getProperty("settings", "serverName"))
+                );
+                Log::addLog(0, "Server started", "Game server is now started.");
+                \Game\Webhook\WorldEvents::record('worldStart');
+                $db->query("UPDATE config SET startConfigurationDone=1");
+            });
             $conf->dynamic->startConfigurationDone = 1;
-            $m = new InfoBoxModel();
-            $m->addInfo(0, 1, 8, '', 0, 0);
-            $m->addInfo(0, 1, 9, '', 0, 0);
-            if ($conf->game->catapultAvailableTime > $conf->game->start_time) {
-                $m->addInfo(0, 1, 15, '', 0, 0);
-            }
-            if ($conf->timers->AutoFinishTime > 0) {
-                //$m->addInfo(0, 1, 10, '', $conf->timers->AutoFinishTime - 3 * Time::DAY, $conf->timers->AutoFinishTime);
-            }
-            //(new NatarsModel())->createLotsOfNatarsVillages(max(min(2*$conf->game->speed, 600), 300));
-            Notification::notify(
-                "System notification",
-                sprintf("Game server %s started.", Config::getProperty("settings", "serverName"))
-            );
-            Log::addLog(0, "Server started", "Game server is now started.");
-            \Game\Webhook\WorldEvents::record('worldStart');
         }
     }
 
@@ -733,9 +805,10 @@ class Automation
         }
         $stmt = $stmt->fetch_assoc();
         if (!$stmt['WWAlertSent'] && time() > Config::getProperty("timers", "WWConstructStartTime")) {
-            $db->query("UPDATE config SET WWAlertSent=1");
-            $m = new PublicMsgModel();
-            $m->haveNewMessage('[NatarsAreBuildingWW]');
+            $db->transactional(function (DB $db): void {
+                (new PublicMsgModel())->haveNewMessage('[NatarsAreBuildingWW]');
+                $db->query("UPDATE config SET WWAlertSent=1");
+            });
         }
         $config = Config::getInstance();
         if (!$stmt['serverFinished']) {
@@ -765,15 +838,18 @@ class Automation
         }
         if ($dailyGold && (time() - $lastDailyGold) >= Time::DAY) {
             $count = floor((time() - $lastDailyGold) / Time::DAY);
-            for ($i = 1; $i <= $count; ++$i) {
-                $db->query("UPDATE config SET lastDailyGold=" . time());
+            // Every gift of the catch-up and the marker commit together, the marker last.
+            $db->transactional(function (DB $db) use ($count, $dailyGold): void {
                 $m = new MessageModel();
-                $db->query("UPDATE users SET gift_gold=gift_gold+$dailyGold WHERE id>" . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
-                $users = $db->query("SELECT id FROM users WHERE id > " . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
-                while ($row = $users->fetch_assoc()) {
-                    $m->sendMessage(0, $row['id'], null, $dailyGold, 4);
+                for ($i = 1; $i <= $count; ++$i) {
+                    $db->query("UPDATE users SET gift_gold=gift_gold+$dailyGold WHERE id>" . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
+                    $users = $db->query("SELECT id FROM users WHERE id > " . UserId::LAST_SYSTEM . " AND access<>" . AccessLevel::ADMIN);
+                    while ($row = $users->fetch_assoc()) {
+                        $m->sendMessage(0, (int)$row['id'], null, $dailyGold, 4);
+                    }
+                    $db->query("UPDATE config SET lastDailyGold=" . time());
                 }
-            }
+            });
             Log::addLog(0, "DailyGold Reset", "Daily gold has been gifted to all players.");
         }
     }
@@ -789,7 +865,8 @@ class Automation
         if (!$configDB['serverFinished'] || $configDB['finishStatusSet']) {
             return;
         }
-        $db->query("UPDATE config SET finishStatusSet=1");
+        // finishStatusSet is written last: a failure part-way is retried on the next pass, and the vouchers and
+        // club medals already granted are not granted again (grantVoucherOnce, addClubMedalOnce).
         $resultCode = $configDB['serverFinished'];
         \Game\Webhook\WorldEvents::finished((int) $resultCode);
         $config = Config::getInstance();
@@ -797,7 +874,6 @@ class Automation
         $globalDB = GlobalDB::getInstance();
         $globalDB->query("DELETE FROM preregistration_keys WHERE worldId='{$worldId}'");
         $globalDB->query("UPDATE gameServers SET finished=1, registerClosed=1 WHERE id='{$worldId}'");
-        $automationModel = new AutomationModel();
         $gameWorldDetails = $globalDB->query("SELECT * FROM gameServers WHERE id=$worldId")->fetch_assoc();
         if (Config::getAdvancedProperty("voucherEnabled")) {
             $users = $db->query("SELECT id, name, email, bought_gold FROM users WHERE email_verified=1 AND id>" . UserId::LAST_SYSTEM . " AND bought_gold>0 AND access=" . AccessLevel::PLAYER . " AND hidden=0");
@@ -805,7 +881,7 @@ class Automation
                 if ($row['bought_gold'] <= 0) {
                     continue;
                 }
-                $automationModel->addVoucher($row['email'], floor($row['bought_gold'] * (100 - Config::getProperty("gold", "voucherTaxPercent")) / 100), "remaining", sprintf('%s-%s', $row['id'], $row['name']));
+                $this->grantVoucherOnce($row['email'], floor($row['bought_gold'] * (100 - Config::getProperty("gold", "voucherTaxPercent")) / 100), "remaining", sprintf('%s-%s', $row['id'], $row['name']));
             }
             $db->query("UPDATE users SET bought_gold=0");
         }
@@ -815,7 +891,7 @@ class Automation
             $wData = $db->query("SELECT name, owner FROM vdata WHERE kid=$kid")->fetch_assoc();
             $uData = $db->query("SELECT id, name, access, email, aid, email_verified FROM users WHERE id={$wData['owner']}")->fetch_assoc();
             if ($config->bonus->bonusGoldWinner && $uData['access'] == AccessLevel::PLAYER && $uData['email_verified'] == 1) {
-                $automationModel->addVoucher($uData['email'], $config->bonus->bonusGoldWinner, 'winner', sprintf('[%s] %s', $uData['id'], $uData['name']));
+                $this->grantVoucherOnce($uData['email'], $config->bonus->bonusGoldWinner, 'winner', sprintf('[%s] %s', $uData['id'], $uData['name']));
             }
             if ($uData['aid'] && $config->bonus->bonusGoldTopAlliance) {
                 $count = $config->bonus->bonusGoldTopAllianceCount;
@@ -823,7 +899,7 @@ class Automation
                 $result = $db->query("SELECT id, name, email, email_verified FROM users WHERE aid={$uData['aid']} AND id!={$uData['id']} AND total_pop >= $minPop AND access=" . AccessLevel::PLAYER . " ORDER BY total_pop DESC LIMIT $count");
                 while ($row = $result->fetch_assoc()) {
                     if ($row['email_verified'] == 1) {
-                        $automationModel->addVoucher(
+                        $this->grantVoucherOnce(
                             $row['email'],
                             $config->bonus->bonusGoldTopAlliance,
                             'winnerAlliance',
@@ -845,14 +921,14 @@ class Automation
                         $uData = $uData->fetch_assoc();
                         if ($uData['email_verified'] == 1) {
                             if ($rank == 2 && $config->bonus->bonusGoldSecondWinner) {
-                                $automationModel->addVoucher(
+                                $this->grantVoucherOnce(
                                     $uData['email'],
                                     $config->bonus->bonusGoldSecondWinner,
                                     '2ndWinner',
                                     sprintf('[%s] %s', $uData['id'], $uData['name'])
                                 );
                             } elseif ($rank == 3 && $config->bonus->bonusGoldThirdWinner) {
-                                $automationModel->addVoucher(
+                                $this->grantVoucherOnce(
                                     $uData['email'],
                                     $config->bonus->bonusGoldThirdWinner,
                                     '3rdWinner',
@@ -870,7 +946,7 @@ class Automation
             if ($topAttacker->num_rows) {
                 $topAttacker = $topAttacker->fetch_assoc();
                 if ($topAttacker['email_verified'] == 1) {
-                    $automationModel->addVoucher(
+                    $this->grantVoucherOnce(
                         $topAttacker['email'],
                         $config->bonus->bonusGoldTopOff,
                         'topOff',
@@ -884,7 +960,7 @@ class Automation
             if ($topDefender->num_rows) {
                 $topDefender = $topDefender->fetch_assoc();
                 if ($topDefender['email_verified'] == 1) {
-                    $automationModel->addVoucher(
+                    $this->grantVoucherOnce(
                         $topDefender['email'],
                         $config->bonus->bonusGoldTopDef,
                         'topDef',
@@ -898,7 +974,7 @@ class Automation
             if ($topClimber->num_rows) {
                 $topClimber = $topClimber->fetch_assoc();
                 if ($topClimber['email_verified'] == 1) {
-                    $automationModel->addVoucher(
+                    $this->grantVoucherOnce(
                         $topClimber['email'],
                         $config->bonus->bonusGoldTopClimber,
                         'topClimber',
@@ -912,7 +988,7 @@ class Automation
             if ($topClimber->num_rows) {
                 $topClimber = $topClimber->fetch_assoc();
                 if ($topClimber['email_verified'] == 1) {
-                    $automationModel->addVoucher(
+                    $this->grantVoucherOnce(
                         $topClimber['email'],
                         $config->bonus->bonusGoldTopOffHammer,
                         'topOffHammer',
@@ -926,7 +1002,7 @@ class Automation
             if ($topClimber->num_rows) {
                 $topClimber = $topClimber->fetch_assoc();
                 if ($topClimber['email_verified'] == 1) {
-                    $automationModel->addVoucher(
+                    $this->grantVoucherOnce(
                         $topClimber['email'],
                         $config->bonus->bonusGoldTopDefHammer,
                         'topDefHammer',
@@ -956,7 +1032,7 @@ class Automation
                     $alliance['tag'] = $alliance['name'] = '';
                 }
                 if ($info['email_verified'] == 1) {
-                    ClubApi::addMedal(
+                    $this->addClubMedalOnce(
                         $info['name'],
                         $info['race'],
                         $info['email'],
@@ -972,7 +1048,7 @@ class Automation
         $result = $db->query("SELECT id, name, email, email_verified, race, total_attack_points, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_attack_points DESC LIMIT 3");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
-                ClubApi::addMedal(
+                $this->addClubMedalOnce(
                     $row['name'],
                     $row['race'],
                     $row['email'],
@@ -987,7 +1063,7 @@ class Automation
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
 
-                ClubApi::addMedal(
+                $this->addClubMedalOnce(
                     $row['name'],
                     $row['race'],
                     $row['email'],
@@ -1001,7 +1077,7 @@ class Automation
         $result = $db->query("SELECT id, name, email, email_verified, race, total_pop, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " ORDER BY total_pop DESC LIMIT 3");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
-                ClubApi::addMedal(
+                $this->addClubMedalOnce(
                     $row['name'],
                     $row['race'],
                     $row['email'],
@@ -1017,7 +1093,7 @@ class Automation
         $result = $db->query("SELECT id, name, email, email_verified, race, max_off_point, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " AND max_off_point > 0 ORDER BY max_off_point DESC LIMIT 1");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
-                ClubApi::addMedal(
+                $this->addClubMedalOnce(
                     $row['name'],
                     $row['race'],
                     $row['email'],
@@ -1030,7 +1106,7 @@ class Automation
         $result = $db->query("SELECT id, name, email, email_verified, race, max_def_point, countryFlag FROM users WHERE id>" . UserId::LAST_SYSTEM . " AND hidden=0 AND access=" . AccessLevel::PLAYER . " AND max_def_point > 0 ORDER BY max_def_point DESC LIMIT 1");
         while ($row = $result->fetch_assoc()) {
             if ($row['email_verified'] == 1) {
-                ClubApi::addMedal(
+                $this->addClubMedalOnce(
                     $row['name'],
                     $row['race'],
                     $row['email'],
@@ -1055,7 +1131,7 @@ class Automation
                         $result = $db->query("SELECT id, name, email, email_verified, race, total_pop, countryFlag FROM users WHERE aid={$uData['aid']} AND id!={$uData['id']}");
                         while ($row = $result->fetch_assoc()) {
                             if ($row['email_verified'] == 1) {
-                                ClubApi::addMedal(
+                                $this->addClubMedalOnce(
                                     $row['name'],
                                     $row['race'],
                                     $row['email'],
@@ -1069,7 +1145,48 @@ class Automation
                 }
             }
         }
-        $db->query("UPDATE config SET serverFinishTime=" . time());
+        $db->query("UPDATE config SET serverFinishTime=" . time() . ", finishStatusSet=1");
+    }
+
+    /**
+     * End-of-round vouchers live in the global database, so they cannot be rolled back with the world. Each
+     * one is granted at most once per round: rank rewards with one recipient are matched on the reason alone
+     * (a retry must not reward a different top player again), the rest on the reason and the player.
+     */
+    private function grantVoucherOnce(?string $email, int|float $goldNum, string $reason, string $player): void
+    {
+        if ($goldNum <= 0 || (string)$email === '') {
+            return;
+        }
+        $worldKey = \Core\Voucher::worldKey();
+        $sql = 'SELECT COUNT(*) FROM paymentVoucher WHERE worldId=? AND reason=? AND time>=?';
+        $params = [$worldKey, $reason, (int)Config::getProperty('game', 'start_time')];
+        if (in_array($reason, self::PER_PLAYER_VOUCHER_REASONS, true)) {
+            $sql .= ' AND player=?';
+            $params[] = $player;
+        }
+        if ((int)GlobalDB::getInstance()->fetchScalar($sql, $params) > 0) {
+            return;
+        }
+        (new AutomationModel())->addVoucher($email, $goldNum, $reason, $player);
+    }
+
+    /** Like grantVoucherOnce(): a club medal type is awarded once per round, the alliance winner medal once per member. */
+    private function addClubMedalOnce(string $nickname, int $tribe, string $email, array|string $points, int $type, bool $hidden): void
+    {
+        if ($email === '') {
+            return;
+        }
+        $sql = 'SELECT COUNT(*) FROM clubMedals WHERE worldId=? AND type=? AND time>=?';
+        $params = [(string)Config::getInstance()->settings->serverName, $type, (int)Config::getProperty('game', 'start_time')];
+        if ($type === self::CLUB_MEDAL_WINNER_ALLIANCE) {
+            $sql .= ' AND email=?';
+            $params[] = $email;
+        }
+        if ((int)GlobalDB::getInstance()->fetchScalar($sql, $params) > 0) {
+            return;
+        }
+        ClubApi::addMedal($nickname, $tribe, $email, $points, $type, $hidden);
     }
 
     public function cleanupIndex(): void
@@ -1098,8 +1215,12 @@ class Automation
         $db = DB::getInstance();
         $result = $db->query("SELECT * FROM notificationQueue LIMIT 100");
         while ($row = $result->fetch_assoc()) {
-            $db->query("DELETE FROM notificationQueue WHERE id={$row['id']}");
-            Notification::notifyReal($row['message']);
+            // notifyReal() writes to the global database, outside any world transaction, so the row is only
+            // removed after a successful send (at least once; a failed delete repeats an admin notice).
+            $this->guardRow("Notification {$row['id']}", function () use ($db, $row): void {
+                Notification::notifyReal($row['message']);
+                $db->query("DELETE FROM notificationQueue WHERE id={$row['id']}");
+            });
         }
         if (time() > $config->game->start_time) {
             $startTime = $config->game->start_time;

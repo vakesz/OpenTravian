@@ -33,8 +33,14 @@ final class CostChips
         $resources = ['lumber', 'clay', 'iron', 'crop'];
         foreach (['r1Big', 'r2Big', 'r3Big', 'r4Big'] as $index => $icon) {
             $title = $transfer ? T('Buildings', 'transferFromHero.' . $resources[$index]) : T('inGame', 'resources.r' . ($index + 1));
+            // Large costs show as 88.6M so all five chips fit the row; the tooltip keeps the exact amount.
+            $compact = number_format_compact($cost[$index]);
+            $exact = number_format_x($cost[$index]);
+            if ($compact !== $exact) {
+                $title .= ': ' . $exact;
+            }
             $html .= '<div class="inlineIcon resource' . ($transfer ? ' transfer' : '') . '" title="' . htmlspecialchars((string)$title, ENT_QUOTES, 'UTF-8') . '"' . $onclick . '>'
-                . '<i class="' . $icon . '"></i><span class="value value">' . self::wrapLtr(number_format_x($cost[$index])) . '</span></div>';
+                . '<i class="' . $icon . '"></i><span class="value value">' . self::wrapLtr($compact) . '</span></div>';
         }
         $html .= '<div class="inlineIcon resource" title="' . htmlspecialchars((string)T('Manual', 'freeCrop'), ENT_QUOTES, 'UTF-8')
             . '"><i class="cropConsumptionBig"></i><span class="value value">' . self::wrapLtr((string)$freeCrop) . '</span></div></div>';

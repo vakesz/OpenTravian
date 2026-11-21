@@ -160,9 +160,9 @@
     <div class="heroProduction">
         <div class="productionTotal" title="<?=htmlspecialchars((string)($vars['heroTips']['production'] ?? ''), ENT_QUOTES, 'UTF-8');?>">
             <strong><?=htmlspecialchars(T('HeroGlobal', 'HeroProduction'), ENT_QUOTES, 'UTF-8');?></strong>
-            <div class="productionItem"><span class="value">+ <?=number_format_x($heroCropProduction);?></span><i class="crop_tiny"></i></div>
+            <div class="productionItem"><span class="value">+ <?=number_format_compact($heroCropProduction);?></span><i class="crop_tiny"></i></div>
             <?php if ($heroProductionType !== 4): ?>
-            <div class="productionItem"><span class="value">+ <?=number_format_x($heroProductionAmount);?></span><i class="<?=$heroProductionIcons[$heroProductionType];?>"></i></div>
+            <div class="productionItem"><span class="value">+ <?=number_format_compact($heroProductionAmount);?></span><i class="<?=$heroProductionIcons[$heroProductionType];?>"></i></div>
             <?php endif; ?>
         </div>
         <div class="changeProduction">
@@ -170,7 +170,7 @@
             <?php $resourceIcon = $resource === 0 ? 'resources_medium' : $icon; ?>
             <div class="resource <?=$resourceIcon;?>">
                 <button class="textButtonV2 buttonFramed pickProductionType rectangle withIcon toggle activeNotClickable <?=$heroProductionType === $resource ? 'active orange' : 'grey';?>" type="button" data-resource="<?=$resource;?>"><i class="<?=$resourceIcon;?>"></i></button>
-                <span class="value"><?=number_format_x($resource === 0 ? (float)$vars['hero']['allResourcesProduct'] : (float)$vars['hero']['eachResourceProduct']);?></span>
+                <span class="value"><?=number_format_compact($resource === 0 ? (float)$vars['hero']['allResourcesProduct'] : (float)$vars['hero']['eachResourceProduct']);?></span>
             </div>
             <?php endforeach; ?>
         </div>

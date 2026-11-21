@@ -18,6 +18,7 @@ class Job
     private $callback;
     /** @var (callable(): (int|float|null|false))|null */
     private $nextDue;
+    private string $name;
 
     private const CONFIG_REFRESH_SECONDS = 1.0;
     private const MIN_IDLE_SLEEP_US = 100000;
@@ -36,6 +37,7 @@ class Job
     {
         global $prgName;
         $this->lastReload = time();
+        $this->name = $name;
         $prgName = $name;
         $this->callback = $callBack;
         $this->nextDue = $nextDue;
@@ -45,7 +47,12 @@ class Job
                 throw new \RuntimeException('Automation worker registry is not initialized.');
             }
             $identity = $workerRegistry->nextIdentity($name);
+            DB::getInstance()->disconnectForFork();
             $pid = pcntl_fork();
+            if ($pid !== 0) {
+                // The parent keeps supervising (heartbeat, registry) on a link of its own.
+                DB::getInstance()->forceNewDatabase();
+            }
             if ($pid === -1) {
                 throw new \RuntimeException("Unable to fork automation worker $identity.");
             }
@@ -151,6 +158,38 @@ class Job
             return;
         }
         $this->updateLastReload();
+        try {
+            $this->invoke($callBack);
+        } finally {
+            $this->closeLeakedTransaction($db);
+        }
+    }
+
+    /**
+     * A job that returns or throws with a transaction still open would leave
+     * the long-lived worker connection inside it: every later write from that
+     * worker then joins a transaction that never commits, holds its row locks
+     * and is lost on the next disconnect. Roll it back and say which job did it.
+     */
+    private function closeLeakedTransaction(DB $db): void
+    {
+        if (!$db->inTransaction()) {
+            return;
+        }
+        logError('Job ' . $this->name . ' left a database transaction open; rolling it back.');
+        $guard = 0;
+        while ($db->inTransaction() && $guard++ < 64) {
+            if (!$db->rollback()) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param callable|list<object> $callBack
+     */
+    private function invoke(callable|array $callBack): void
+    {
         if (is_callable($callBack)) {
             $callBack();
         } else {

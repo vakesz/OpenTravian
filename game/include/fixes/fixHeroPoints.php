@@ -12,10 +12,7 @@ $db = DB::getInstance();
 $stmt = $db->query("SELECT * FROM hero");
 while ($row = $stmt->fetch_assoc()) {
     $lvl = Formulas::heroLevel($row['exp']);
-    $points = ($lvl >= 100 ? 100 : $lvl) * 4;
-    if ($lvl < 100) {
-        $points += 4;
-    }
+    $points = Formulas::heroAttributePoints($lvl);
     $available = $points - ($row['power'] + $row['offBonus'] + $row['defBonus'] + $row['production']);
     if ($available >= 0) continue;
     $min = floor($points / 4);

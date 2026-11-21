@@ -22,6 +22,7 @@ require_once $root . '/game/include/Game/Tribes.php';
 require_once $root . '/game/include/Game/Hero/ItemType.php';
 require_once $root . '/game/include/Game/Hero/ItemBtype.php';
 require_once $root . '/game/include/Game/Hero/HeroItems.php';
+require_once $root . '/game/include/Game/Hero/HeroItemTooltip.php';
 require_once $root . '/game/include/Game/Hero/HeroItemTile.php';
 
 function expectReportsReference(bool $condition, string $message): void

@@ -114,11 +114,13 @@ final class HeroHud
             'health' => (int)round($healthPercent),
             'level' => $level,
             'statusInlineIcon' => '<i class="' . $statusClass . '" ></i>',
-            'tooltipForExperience' => $experienceLabel . '||' . sprintf(
-                T('HeroGlobal', 'experienceMissing', 'Your hero needs %1$s experience to achieve level %2$s.'),
-                $missing,
-                $level + 1
-            ),
+            'tooltipForExperience' => Formulas::isHeroMaxLevel($level)
+                ? $experienceLabel
+                : $experienceLabel . '||' . sprintf(
+                    T('HeroGlobal', 'experienceMissing', 'Your hero needs %1$s experience to achieve level %2$s.'),
+                    $missing,
+                    $level + 1
+                ),
             'bars' => [
                 'health' => [
                     'startAngle' => -self::HEALTH_START,

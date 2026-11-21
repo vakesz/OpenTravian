@@ -60,11 +60,14 @@ class AdventureModel
     public function checkForNewAdventures(): void
     {
         $db = DB::getInstance();
-        $interval = 1 * Time::HOUR;
         $now = time();
+        // Each player is looked at once per adventure interval of their current
+        // stage, and gets at most one adventure per look, so adventures arrive
+        // one by one at the spawn rate instead of in hourly batches.
         $find = $db->query(
             'SELECT id, total_adventures, last_adventure_time, signupTime FROM users'
-            . ' WHERE id>' . UserId::NATARS . ' AND access=' . AccessLevel::PLAYER . ' AND last_adventure_time <= ' . ($now - $interval)
+            . ' WHERE id>' . UserId::NATARS . ' AND access=' . AccessLevel::PLAYER
+            . ' AND last_adventure_time <= ' . $now . ' - ' . $this->spawnIntervalSql($now)
             . ' ORDER BY last_adventure_time ASC LIMIT 100'
         );
         while ($find && ($row = $find->fetch_assoc())) {
@@ -79,7 +82,7 @@ class AdventureModel
                 $totalAdventures = $entitled;
             }
 
-            $toGrant = (int)min(max(0, $entitled - $totalAdventures), 10);
+            $toGrant = (int)min(max(0, $entitled - $totalAdventures), 1);
             $openCount = (int)$db->fetchScalar("SELECT COUNT(id) FROM adventure WHERE end=0 AND uid={$uid}");
 
             $db->query("UPDATE users SET last_adventure_time={$now} WHERE id={$uid}");
@@ -94,6 +97,27 @@ class AdventureModel
                 --$toGrant;
             }
         }
+    }
+
+    /** Shortest gap between two adventures for one player, however fast the world runs. */
+    public const MIN_SPAWN_INTERVAL = 5 * Time::MINUTE;
+
+    /**
+     * SQL for one player's seconds between adventures at their account age:
+     * a day divided by the daily rate of the stage they are in, never shorter
+     * than MIN_SPAWN_INTERVAL.
+     */
+    private function spawnIntervalSql(int $now): string
+    {
+        $age = '(' . $now . ' - signupTime)';
+        $case = 'CASE';
+        foreach ($this->getAdventureIntervals() as $stage) {
+            $seconds = max(self::MIN_SPAWN_INTERVAL, (int)floor(Time::DAY / max(0.000001, (float)$stage['rate'])));
+            $case .= ' WHEN ' . $age . ' < ' . (int)ceil($stage['time']) . ' THEN ' . $seconds;
+        }
+        $last = $this->getAdventureIntervals()[4];
+
+        return $case . ' ELSE ' . max(self::MIN_SPAWN_INTERVAL, (int)floor(Time::DAY / max(0.000001, (float)$last['rate']))) . ' END';
     }
 
     private function calcAdventuresUntilNow(int|float $seconds_past): float

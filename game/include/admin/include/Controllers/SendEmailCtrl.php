@@ -25,7 +25,7 @@ class SendEmailCtrl
             $dispatcher->appendContent(AdminUi::page(
                 'Newsletter',
                 'Queue one personalised mail to every opted-in player with a verified address.',
-                AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the footer to use this page.', 'error')
+                AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the header to use this page.', 'error')
             ));
             return;
         }

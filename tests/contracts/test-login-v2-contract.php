@@ -93,7 +93,7 @@ foreach ([
     'class="dialogWrapper dialogV2"',
     'class="dialogDragBar"',
     'class="formV2"',
-    '<form method="get" action="<?= $escape($loginAction); ?>" accept-charset="UTF-8">',
+    '<form method="post" action="<?= $escape($loginAction); ?>" accept-charset="UTF-8">',
     'name="name"',
     'name="password"',
     'id="recaptcha"',
@@ -398,20 +398,26 @@ foreach ([
     'autocomplete="username"',
     'autocomplete="current-password"',
     'document.login',
-    'method="post" action="<?= $escape($loginAction); ?>"',
+    'method="get" action="<?= $escape($loginAction); ?>"',
 ] as $retiredLoginFormContract) {
     if (str_contains($template, $retiredLoginFormContract)) {
         failLoginV2Contract('The public login must not retain the legacy credential-form control: ' . $retiredLoginFormContract);
     }
 }
 
+// Credentials travel only in a POST body: a query string lands in browser
+// history and every access log. A GET carrying them is ignored.
 foreach ([
-    "\$credentials = WebService::isPost() ? \$_POST : \$_GET;",
-    "array_key_exists('name', \$_GET) || array_key_exists('password', \$_GET)",
-    'if (WebService::isPost() || $isLoginGet)',
+    "\$credentials = WebService::isPost() ? \$_POST : [];",
+    '} elseif (WebService::isPost()) {',
 ] as $requiredLoginTransportContract) {
     if (!str_contains($controller, $requiredLoginTransportContract)) {
-        failLoginV2Contract('The public login must process the captured GET credential submission: ' . $requiredLoginTransportContract);
+        failLoginV2Contract('The public login must accept credentials only by POST: ' . $requiredLoginTransportContract);
+    }
+}
+foreach (['$isLoginGet', '? $_POST : $_GET', 'dropCredentialsFromQuery'] as $retiredLoginTransportContract) {
+    if (str_contains($controller, $retiredLoginTransportContract)) {
+        failLoginV2Contract('The public login must not read credentials from the query string: ' . $retiredLoginTransportContract);
     }
 }
 

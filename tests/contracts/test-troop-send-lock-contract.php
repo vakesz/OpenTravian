@@ -23,7 +23,7 @@ $body = $start === false ? '' : substr($send, $start, 6000);
 if (!str_contains($body, '$row = $db->query("SELECT * FROM units WHERE kid=" . (int)Village::getInstance()->getKid() . " FOR UPDATE")->fetch_assoc();')) {
     failTroopSendLock('sendTroops() must read the troops it clamps with SELECT ... FOR UPDATE.');
 }
-if (!str_contains($send, 'if ($db->mysqli->begin_transaction()) {') || !str_contains($send, 'if ($this->sendTroops($a2b)) {')) {
+if (!str_contains($send, 'if ($db->begin_transaction()) {') || !str_contains($send, 'if ($this->sendTroops($a2b)) {')) {
     failTroopSendLock('sendTroops() must run inside the send transaction.');
 }
 

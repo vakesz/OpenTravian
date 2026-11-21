@@ -476,23 +476,29 @@ class SendTroops extends RallyPointHTML
             } elseif (isset($_POST['troopsSent'])) {
                 //do troops send :( and remove proc
                 if ($this->removeA2b($a2b['timestamp'], $a2b['timestamp_checksum'])) {
-                    if ($db->mysqli->begin_transaction()) {
-                        if ($this->sendTroops($a2b)) {
-                            $db->mysqli->commit();
-                        } else {
-                            $db->mysqli->rollback();
-                            // A refusal with a reason (e.g. the outgoing-troops cap) goes back to the send form with
-                            // the troops still filled in, instead of a silent redirect to the overview.
-                            if (!empty($this->result['errorMsg'])) {
-                                $this->result['beforeError'] = true;
-                                $this->result['beforeErrorMsg'] = $this->result['errorMsg'];
-                                $this->result['error'] = false;
-                                $this->result['errorMsg'] = null;
-                                $timestamp_params = $this->generateTimestampParams();
-                                $this->result['settings']['timestamp'] = $timestamp_params['timestamp'];
-                                $this->result['settings']['timestamp_checksum'] = $timestamp_params['checksum'];
-                                return $this->procSendTroopsContent();
+                    $entryLevel = $db->transactionLevel();
+                    if ($db->begin_transaction()) {
+                        try {
+                            if ($this->sendTroops($a2b)) {
+                                $db->commit();
+                            } else {
+                                $db->rollback();
+                                // A refusal with a reason (e.g. the outgoing-troops cap) goes back to the send form with
+                                // the troops still filled in, instead of a silent redirect to the overview.
+                                if (!empty($this->result['errorMsg'])) {
+                                    $this->result['beforeError'] = true;
+                                    $this->result['beforeErrorMsg'] = $this->result['errorMsg'];
+                                    $this->result['error'] = false;
+                                    $this->result['errorMsg'] = null;
+                                    $timestamp_params = $this->generateTimestampParams();
+                                    $this->result['settings']['timestamp'] = $timestamp_params['timestamp'];
+                                    $this->result['settings']['timestamp_checksum'] = $timestamp_params['checksum'];
+                                    return $this->procSendTroopsContent();
+                                }
                             }
+                        } catch (\Throwable $exception) {
+                            $db->unwindTo($entryLevel);
+                            throw $exception;
                         }
                     }
                 }

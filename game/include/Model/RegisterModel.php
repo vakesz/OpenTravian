@@ -273,34 +273,34 @@ class RegisterModel
             return false;
         }
         $db = DB::getInstance();
-        $db->query("UPDATE available_villages SET occupied=1 WHERE kid=$kid");
         CulturePointsHelper::updateUserCP($uid);
         $village_name = str_replace("'", '`', $village_name);
         $maxRes = 800 * getGame('storage_multiplier');
         $minRes = ceil($maxRes * 0.9375);
         $fieldType = (int) $db->fetchScalar("SELECT fieldtype FROM wdata WHERE id=$kid");
-        $db->query("UPDATE wdata SET occupied=1 WHERE id=$kid");
-        $db->begin_transaction();
-        try {
-            $good = $db->run(
-                'INSERT INTO vdata (kid, owner, fieldtype, name, capital, pop, cp, wood, clay, iron, crop, maxstore, maxcrop, last_loyalty_update, lastmupdate, created, isWW, expandedfrom, lastVillageCheck) VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [
-                    $kid, $uid, $fieldType, $village_name, $capital ? 1 : 0,
-                    $minRes, $minRes, $minRes, $minRes, $maxRes, $maxRes,
-                    time(), miliseconds(), time(), $isWW ? 1 : 0, $expandedFrom, $isArtifact ? 1 : 0,
-                ]
-            );
-        } catch (\mysqli_sql_exception) {
-            $good = false;
-        }
-        if (!$good || !$good->affected_rows) {
-            $db->query("UPDATE available_villages SET occupied=0 WHERE kid=$kid");
-            $db->query("UPDATE wdata SET occupied=0 WHERE id=$kid");
-            $db->rollback();
+        // The occupied flags and the village row commit together: a failed insert rolls the flags back to
+        // what they were, with no manual reset (which the rollback would itself undo).
+        $created = $db->transactional(function (DB $db) use ($kid, $uid, $fieldType, $village_name, $capital, $minRes, $maxRes, $isWW, $expandedFrom, $isArtifact): bool {
+            $db->query("UPDATE available_villages SET occupied=1 WHERE kid=$kid");
+            $db->query("UPDATE wdata SET occupied=1 WHERE id=$kid");
+            try {
+                $good = $db->run(
+                    'INSERT INTO vdata (kid, owner, fieldtype, name, capital, pop, cp, wood, clay, iron, crop, maxstore, maxcrop, last_loyalty_update, lastmupdate, created, isWW, expandedfrom, lastVillageCheck) VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        $kid, $uid, $fieldType, $village_name, $capital ? 1 : 0,
+                        $minRes, $minRes, $minRes, $minRes, $maxRes, $maxRes,
+                        time(), miliseconds(), time(), $isWW ? 1 : 0, $expandedFrom, $isArtifact ? 1 : 0,
+                    ]
+                );
+            } catch (\mysqli_sql_exception) {
+                $good = false;
+            }
 
+            return $good && $good->affected_rows;
+        });
+        if (!$created) {
             return false;
         }
-        $db->commit();
         $this->addUnits($kid, $race);
         $this->addTech($kid);
         $this->addSmithy($kid);

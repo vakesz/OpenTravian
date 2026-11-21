@@ -13,6 +13,10 @@ use function is_null;
 
 class Formulas
 {
+    /** Highest level a hero can reach. Experience keeps counting past it. */
+    const HERO_MAX_LEVEL = 100;
+    /** Attribute points a hero has at level 0 and gains per level, until the last level-up. */
+    const HERO_POINTS_PER_LEVEL = 4;
     /** Buildings lost when a village changes hands: walls, trapper, brewery, trough, command center, waterworks, hospital and asclepeion. */
     /** City wall equivalents, one per tribe (Natars use the Roman wall). */
     const WALL_BUILDINGS = Gid::WALLS;
@@ -4593,7 +4597,21 @@ Crannies have 20% less capacity against teuton raids with hero + 10-20% from any
     {
         $x = self::getHeroExpLevelMultiplier();
         $exp = ceil($exp / $x);
-        return floor((sqrt(4 * $exp + 25) - 5) / 10);
+        return (float)min(self::HERO_MAX_LEVEL, floor((sqrt(4 * $exp + 25) - 5) / 10));
+    }
+
+    public static function isHeroMaxLevel(int|float $level): bool
+    {
+        return $level >= self::HERO_MAX_LEVEL;
+    }
+
+    /**
+     * Total attribute points a hero of this level may distribute: 4 at level 0
+     * plus 4 per level, ending at 400 when level 99 becomes 100.
+     */
+    public static function heroAttributePoints(int|float $level): int
+    {
+        return self::HERO_POINTS_PER_LEVEL * (int)min((int)$level + 1, self::HERO_MAX_LEVEL);
     }
 
     /**

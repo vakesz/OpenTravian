@@ -40,7 +40,7 @@ foreach ([
 }
 
 foreach ([
-    '<div class="productionItem"><span class="value">+ <?=number_format_x($heroCropProduction);?></span><i class="crop_tiny"></i></div>',
+    '<div class="productionItem"><span class="value">+ <?=number_format_compact($heroCropProduction);?></span><i class="crop_tiny"></i></div>',
     'resources_small', 'lumber_small', 'clay_small', 'iron_small', 'crop_small',
     'textButtonV2 buttonFramed pickProductionType rectangle withIcon toggle activeNotClickable',
     "'active orange' : 'grey'",
