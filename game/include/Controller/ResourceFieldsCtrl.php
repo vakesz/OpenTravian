@@ -345,17 +345,19 @@ class ResourceFieldsCtrl extends GameCtrl
         if ($shortTitle === self::ATTACK_LABEL) {
             $shortTitle = T('Dorf1', (int)$count === 1 ? 'movements.attack' : 'movements.attacks');
         }
-        // overview filters: 1=incoming (sub 1 attacks / 2–3 reinforce),
+        // overview filters: 1=incoming (sub 1 attacks / 2 returning / 3 reinforcements),
         // 2=outgoing (sub 4 attacks / 5 reinforce / adventures share outgoing).
+        // The incoming "Rein." row counts returning troops too (bandage-revived
+        // troops, raids coming home), so its link opens both sub-filters.
         [$filter, $subfilter] = match ($attackType) {
-            'att1', 'att3' => [1, 1],
-            'def1', 'def3' => [1, 3],
-            'att2' => [2, 4],
-            'def2' => [2, 5],
-            'hero_on_adventure', 'settlersOnTheWay' => [2, 4],
-            default => [2, 4],
+            'att1', 'att3' => [1, '1'],
+            'def1', 'def3' => [1, '2,3'],
+            'att2' => [2, '4'],
+            'def2' => [2, '5'],
+            'hero_on_adventure', 'settlersOnTheWay' => [2, '4'],
+            default => [2, '4'],
         };
-        $href = '/build.php?gid=' . Gid::RALLY_POINT . '&amp;tt=1&amp;filter=' . $filter . '&amp;subfilters=' . $subfilter;
+        $href = '/build.php?gid=' . Gid::RALLY_POINT . '&amp;tt=1&amp;filter=' . $filter . '&amp;subfilters=' . rawurlencode($subfilter);
         $hour = T('Dorf1', "movements.hour");
         $in = T('Dorf1', "movements.in");
         $title = T('Dorf1', 'movementTitles.' . ($attackType === 'settlersOnTheWay' ? 'settler' : $attackType));

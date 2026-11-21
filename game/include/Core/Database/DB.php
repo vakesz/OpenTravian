@@ -72,16 +72,10 @@ class DB
             $config->db->database,
             $config->db->charset,
         ];
-        if ($this->isCLI()) {
-            $this->real_connect("p:" . $this->details[0],
-                $this->details[1],
-                $this->details[2],
-                $this->details[3],
-                3306,
-                NULL);
-        } else {
-            $this->real_connect($this->details[0], $this->details[1], $this->details[2], $this->details[3], 3306, NULL);
-        }
+        // Never a persistent ("p:") link on the command line: the engine forks its workers, and a
+        // pooled link handed back after fork is the parent's socket, so workers would share it and a
+        // worker's exit would end the parent's session.
+        $this->real_connect($this->details[0], $this->details[1], $this->details[2], $this->details[3], 3306, NULL);
         if ($this->mysqli->connect_error) {
             trigger_error("Failed to connect to mysql server thought socket.");
             echo 'Failed to connect to mysql server thought socket.';
@@ -103,16 +97,10 @@ class DB
                 $config->db->charset,
             ];
         }
-        if ($this->isCLI()) {
-            $this->real_connect("p:" . $this->details[0],
-                $this->details[1],
-                $this->details[2],
-                $this->details[3],
-                3306,
-                NULL);
-        } else {
-            $this->real_connect($this->details[0], $this->details[1], $this->details[2], $this->details[3], 3306, NULL);
-        }
+        // Never a persistent ("p:") link on the command line: the engine forks its workers, and a
+        // pooled link handed back after fork is the parent's socket, so workers would share it and a
+        // worker's exit would end the parent's session.
+        $this->real_connect($this->details[0], $this->details[1], $this->details[2], $this->details[3], 3306, NULL);
         if ($this->mysqli->connect_error) {
             trigger_error("Failed to connect to mysql server thought socket.");
             echo 'Failed to connect to mysql server thought socket.';
@@ -274,9 +262,85 @@ class DB
         return true;
     }
 
+    /**
+     * Close the link before pcntl_fork(), so no process inherits it. A shared socket mixes the
+     * replies of parent and child, and whichever one frees it sends QUIT for both. Each side must
+     * call forceNewDatabase() after the fork.
+     */
+    public function disconnectForFork(): void
+    {
+        if ($this->transactionDepth > 0) {
+            throw new \LogicException('Cannot fork inside an open database transaction.');
+        }
+        if ($this->mysqli instanceof \mysqli) {
+            try {
+                $this->mysqli->close();
+            } catch (\Throwable) {
+                // Already gone; nothing to release.
+            }
+        }
+        $this->mysqli = null;
+    }
+
+    /**
+     * Run $work inside a transaction (a savepoint when one is already open) and commit when it returns.
+     * On any throw, every level opened since entry is rolled back before the exception continues, so no
+     * caller can leave the connection inside a transaction. Return false from $work to roll back
+     * without throwing; the return value is passed through.
+     *
+     * @template T
+     * @param callable(self): T $work
+     * @return T
+     */
+    public function transactional(callable $work): mixed
+    {
+        $entryLevel = $this->transactionDepth;
+        if (!$this->begin_transaction()) {
+            throw new \RuntimeException('Unable to begin a database transaction.');
+        }
+        try {
+            $result = $work($this);
+        } catch (\Throwable $exception) {
+            $this->unwindTo($entryLevel);
+            throw $exception;
+        }
+        if ($result === false) {
+            $this->unwindTo($entryLevel);
+
+            return $result;
+        }
+        if (!$this->commit()) {
+            $this->unwindTo($entryLevel);
+            throw new \RuntimeException('Unable to commit a database transaction.');
+        }
+
+        return $result;
+    }
+
+    /** Roll back every level above $level; never throws, so it is safe inside a catch. */
+    public function unwindTo(int $level): void
+    {
+        try {
+            while ($this->transactionDepth > $level) {
+                if (!$this->rollback()) {
+                    break;
+                }
+            }
+        } catch (\Throwable) {
+            // The connection is gone; the server already discarded the transaction.
+            $this->transactionDepth = min($this->transactionDepth, $level);
+        }
+    }
+
     public function inTransaction(): bool
     {
         return $this->transactionDepth > 0;
+    }
+
+    /** How many begin_transaction() calls are open (1 = the real transaction, more = savepoints). */
+    public function transactionLevel(): int
+    {
+        return $this->transactionDepth;
     }
 
     public function commit(): bool

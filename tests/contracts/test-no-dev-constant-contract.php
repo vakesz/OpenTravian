@@ -10,7 +10,7 @@ $root = dirname(__DIR__, 2);
 $offenders = [];
 $iterator = new RecursiveIteratorIterator(new RecursiveCallbackFilterIterator(
     new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
-    static fn (SplFileInfo $file): bool => !in_array($file->getFilename(), ['.git', 'node_modules', 'vendor', 'assets', 'runtime'], true)
+    static fn (SplFileInfo $file): bool => !in_array($file->getFilename(), ['.git', '.claude', 'node_modules', 'vendor', 'assets', 'runtime'], true)
 ));
 foreach ($iterator as $file) {
     if ($file->isFile() && in_array($file->getExtension(), ['php', 'md', 'yaml', 'sh'], true) && $file->getPathname() !== __FILE__) {

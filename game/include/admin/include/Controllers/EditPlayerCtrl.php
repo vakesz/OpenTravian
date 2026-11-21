@@ -234,40 +234,49 @@ class EditPlayerCtrl
         set_time_limit(0);
         ignore_user_abort(true);
         $db = DB::getInstance();
-        $db->mysqli->begin_transaction();
-        $oldRace = $this->db->fetchScalar("SELECT race FROM users WHERE id=$uid");
-        if (!$oldRace) return;
-        $helper = new AccountDeleter();
-        $db->query("UPDATE users SET race=$race WHERE id=$uid");
-        if ($db->affectedRows()) {
-            $user_villages = $db->query("SELECT kid FROM vdata WHERE owner=$uid");
-            $villageModel = new VillageModel();
-            $kids = [];
-            while ($row = $user_villages->fetch_assoc()) {
-                $villageModel->removeTribeSpecificBuildings($row['kid']);
-                if ($oldRace == 3) {
-                    $traps = $db->query("SELECT * FROM trapped WHERE to_kid={$row['kid']}");
-                    while ($trapped = $traps->fetch_assoc()) {
-                        $helper->returnTrappedOrEnforcementRow($trapped, FALSE);
+        $entryLevel = $db->transactionLevel();
+        $db->begin_transaction();
+        try {
+            $oldRace = $db->fetchScalar("SELECT race FROM users WHERE id=$uid");
+            if (!$oldRace) {
+                $db->rollback();
+                return;
+            }
+            $helper = new AccountDeleter();
+            $db->query("UPDATE users SET race=$race WHERE id=$uid");
+            if ($db->affectedRows()) {
+                $user_villages = $db->query("SELECT kid FROM vdata WHERE owner=$uid");
+                $villageModel = new VillageModel();
+                $kids = [];
+                while ($row = $user_villages->fetch_assoc()) {
+                    $villageModel->removeTribeSpecificBuildings($row['kid']);
+                    if ($oldRace == 3) {
+                        $traps = $db->query("SELECT * FROM trapped WHERE to_kid={$row['kid']}");
+                        while ($trapped = $traps->fetch_assoc()) {
+                            $helper->returnTrappedOrEnforcementRow($trapped, FALSE);
+                        }
                     }
+                    $kids[] = $row['kid'];
+                    Map::villageDestroyOrCaptureOrNewVillageUpdate($row['kid']);
                 }
-                $kids[] = $row['kid'];
-                Map::villageDestroyOrCaptureOrNewVillageUpdate($row['kid']);
+                if (sizeof($kids)) {
+                    $implode = implode(",", $kids);
+                    $db->query("UPDATE enforcement SET race=$race WHERE kid IN($implode)");
+                    $db->query("UPDATE movement SET race=$race WHERE kid IN($implode) OR (to_kid IN($implode) AND mode=" . MovementsModel::MODE_RETURN . ")");
+                    $db->query("UPDATE trapped SET race=$race WHERE kid IN($implode)");
+                    $db->query("UPDATE units SET race=$race, u99=0 WHERE kid IN($implode)");
+                }
+                (new SummaryModel())->deletePlayerFromSummary($oldRace);
+                (new SummaryModel())->addPlayerToSummary($race);
+                $db->commit();
+                $dispatcher = Dispatcher::getInstance();
+                $dispatcher->appendContent(\Game\AdminUi::notice('Tribe was changed.', 'success'));
+            } else {
+                $db->rollback();
             }
-            if (sizeof($kids)) {
-                $implode = implode(",", $kids);
-                $db->query("UPDATE enforcement SET race=$race WHERE kid IN($implode)");
-                $db->query("UPDATE movement SET race=$race WHERE kid IN($implode) OR (to_kid IN($implode) AND mode=" . MovementsModel::MODE_RETURN . ")");
-                $db->query("UPDATE trapped SET race=$race WHERE kid IN($implode)");
-                $db->query("UPDATE units SET race=$race, u99=0 WHERE kid IN($implode)");
-            }
-            (new SummaryModel())->deletePlayerFromSummary($oldRace);
-            (new SummaryModel())->addPlayerToSummary($race);
-            $db->mysqli->commit();
-            $dispatcher = Dispatcher::getInstance();
-            $dispatcher->appendContent(\Game\AdminUi::notice('Tribe was changed.', 'success'));
-        } else {
-            $db->mysqli->rollback();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
     }
 
@@ -278,7 +287,7 @@ class EditPlayerCtrl
     {
         $dispatcher = Dispatcher::getInstance();
         if (!getCustom('allowInterruptionInGame')) {
-            $dispatcher->appendContent(\Game\AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the footer to use this page.', 'error'));
+            $dispatcher->appendContent(\Game\AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the header to use this page.', 'error'));
 
             return;
         }

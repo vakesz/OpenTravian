@@ -5132,15 +5132,17 @@ function ShopUIV2() {
   Inventory.prototype.fill = function (tile, item) {
     var consumable = item.isConsumable || item.slot === "bag";
     // Live DOM: "heroItem consumable neutral bag heroItemV1" for bag consumables, "... inventory ..." for
-    // materials and the artwork, and "heroItem tier1 neutral <slot> heroItemV1" for gear (tileSlot, from the server).
-    var classes = ["heroItem", consumable ? "consumable" : "tier1", "neutral", item.tileSlot, "heroItemV1"];
+    // materials and the artwork, and "heroItem tierN neutral <slot> heroItemV1" for gear: tier1 green, tier2 blue,
+    // tier3 purple (item.tier and tileSlot come from the server).
+    var tier = consumable ? "consumable" : item.tier || "tier1";
+    var classes = ["heroItem", tier, "neutral", item.tileSlot, "heroItemV1"];
     if (!item.usable) {
       classes.push("notClickable");
     }
     tile
       .attr("class", classes.join(" "))
       .attr("data-id", item.id)
-      .attr("data-tier", consumable ? "consumable" : "tier1");
+      .attr("data-tier", tier);
     if (item.equipped) {
       tile.attr("data-placeid", SLOT_PLACE[item.slot]);
     } else {

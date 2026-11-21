@@ -761,7 +761,7 @@ class Village
             . '<div class="inlineIconList resourceWrapper">';
         foreach ($cost as $i => $amount) {
             $html .= '<div class="inlineIcon resources" title=""><i class="r' . ($i + 1) . 'Big"></i>'
-                . '<span class="value ">' . (int) $amount . '</span></div>';
+                . '<span class="value ">' . number_format_compact((int) $amount) . '</span></div>';
         }
         return $html . '</div><br /><div class="inlineIconList resourceWrapper">'
             . '<div class="inlineIcon duration" title=""><i class="clock_medium"></i>'

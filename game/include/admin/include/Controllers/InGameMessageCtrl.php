@@ -27,7 +27,7 @@ class InGameMessageCtrl
                 AdminUi::page(
                     'In-game message',
                     'Send a Multihunter message into every playable inbox.',
-                    AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the footer to use this page.', 'error')
+                    AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the header to use this page.', 'error')
                 )
             );
 

@@ -108,7 +108,8 @@ class ResourcesHelper
             $units = $db->query("SELECT * FROM units WHERE kid=$kid")->fetch_assoc();
             $heroHealth = (int)$db->fetchScalar("SELECT health FROM hero WHERE uid=$uid AND kid=$kid");
             for ($i = 1; $i <= Unit::LAST; ++$i) {
-                if (!$units['u' . $i]) {
+                // No units row while a village is being captured or deleted: no own troops to feed.
+                if (!$units || !$units['u' . $i]) {
                     continue;
                 }
                 // A dead hero keeps the flat 6 crop production and does not eat.
@@ -281,6 +282,10 @@ class ResourcesHelper
             return;
         }
         $fields = $db->query("SELECT * FROM fdata WHERE kid={$row['kid']}")->fetch_assoc();
+        if (!$fields) {
+            // The village is being created or removed; there are no fields to produce from yet.
+            return;
+        }
         $production = [0, 0, 0, 0];
         $bonusPercent = [0, 0, 0, 0];
         $plusBonusPercent = [0, 0, 0, 0];

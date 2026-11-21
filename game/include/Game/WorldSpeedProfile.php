@@ -458,6 +458,16 @@ final class WorldSpeedProfile
         return $speed <= 10 ? 10.0 : 10 * sqrt($speed / 10);
     }
 
+    /**
+     * Shortest time troops revived by bandages take to get home, in seconds:
+     * 24 h at 1x, shortened like map movement so speed worlds are not stuck
+     * waiting a full day (x10000: 24 h / 800 = 108 s).
+     */
+    public static function bandageReturnFloor(int $speed): int
+    {
+        return (int)max(1, round(Time::DAY / self::movementSpeedMultiplier($speed)));
+    }
+
     /** Divisor of the hero revival time: floor(s/3)+1 through x20, then ceil(7*sqrt(s/20)) capped at 100. */
     public static function heroRevivalDivisor(int $speed): int
     {

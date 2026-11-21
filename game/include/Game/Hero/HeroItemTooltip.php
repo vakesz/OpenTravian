@@ -27,7 +27,7 @@ final class HeroItemTooltip
     ];
 
     /** Lowest item type of each three-tier family; the tier is the offset within it, modulo 3. */
-    private static function tier(int $btype, int $type): int
+    public static function tier(int $btype, int $type): int
     {
         $base = match ($btype) {
             ItemBtype::HELMET => 1,
@@ -40,6 +40,15 @@ final class HeroItemTooltip
         };
 
         return (($type - $base) % 3) + 1;
+    }
+
+    /**
+     * Tile colour class: "consumable" for bag items and materials, otherwise tier1 (green), tier2 (blue)
+     * or tier3 (purple), the same tier the tooltip names.
+     */
+    public static function tileClass(int $btype, int $type): string
+    {
+        return $btype >= ItemBtype::FIRST_CONSUMABLE ? 'consumable' : 'tier' . self::tier($btype, $type);
     }
 
     /** The reference's Left-to-right isolate: LRO sign LRO number PDF suffix PDF. */

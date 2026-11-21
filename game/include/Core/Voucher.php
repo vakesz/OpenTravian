@@ -89,7 +89,7 @@ class Voucher
         return $gold;
     }
 
-    private static function worldKey(): string
+    public static function worldKey(): string
     {
         return sprintf('%s-%s', Config::getProperty('settings', 'worldUniqueId'), Config::getProperty('settings', 'worldId'));
     }

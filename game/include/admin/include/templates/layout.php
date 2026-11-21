@@ -37,6 +37,8 @@ $uidLabel = $adminUid === 0 ? 'Administrator' : ($adminUid === 2 ? 'Multihunter'
             </span>
         </a>
         <div class="adminHeaderMeta">
+            <?php $liveChangesAllowed = (bool) getCustom('allowInterruptionInGame'); ?>
+            <form method="post" action="admin.php" class="adminLock <?= $liveChangesAllowed ? 'open' : 'locked'; ?>"><?= Core\Session::getCheckerInput(); ?><input type="hidden" name="toggleInterruption" value="1"><button type="submit"><?= $liveChangesAllowed ? 'Live-world changes allowed' : 'Live-world changes locked'; ?></button></form>
             <?= AdminUi::viewToggle((string)($params['view'] ?? 'simple'), Game\AdminView::withoutParameter((string)($_SERVER['REQUEST_URI'] ?? 'admin.php'))); ?>
             <span><?= AdminUi::esc(Core\Session::getInstance()->getName()); ?> (<?= $uidLabel; ?>)</span>
             <a class="adminHeaderLink" href="<?= AdminUi::esc($params['gameWorldUrl']); ?>">Open the game</a>
@@ -74,7 +76,6 @@ $uidLabel = $adminUid === 0 ? 'Administrator' : ($adminUid === 2 ? 'Multihunter'
     <footer class="adminFooter">
         <span><?= sprintf('Calculated in %s ms', round(1000 * (microtime(true) - $params['loadStartTime']), 2)); ?></span>
         <span>Server time <b><?= AdminUi::esc($params['currentTime']); ?></b></span>
-        <form method="post" action="admin.php" class="adminInline"><?= Core\Session::getCheckerInput(); ?><input type="hidden" name="toggleInterruption" value="1"><?= AdminUi::button(getCustom('allowInterruptionInGame') ? 'Live-world changes allowed' : 'Live-world changes locked', 'grey'); ?></form>
     </footer>
 </div>
 <script src="/admin-menu.js?v=<?= (int)filemtime(PUBLIC_INTERNAL_PATH . 'admin-menu.js'); ?>"></script>

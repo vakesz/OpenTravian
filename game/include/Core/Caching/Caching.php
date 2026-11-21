@@ -13,6 +13,10 @@ use function getWorldUniqueId;
 class Caching
 {
     private static ?Redis $instance = null;
+    /** Process that opened $instance; a forked engine worker must not reuse its parent's socket. */
+    private static ?int $instancePid = null;
+    /** @var list<Redis> inherited connections kept alive so their destructor never touches the parent's socket */
+    private static array $inherited = [];
     private static ?self $_self = null;
 
     public static function getInstance(): self
@@ -26,6 +30,13 @@ class Caching
     public static function singleton(?string $key = null): Redis
     {
         $config = Config::getInstance();
+        if (self::$instance instanceof Redis && self::$instancePid !== getmypid()) {
+            // Inherited across pcntl_fork: parent and child would read each other's replies on the
+            // shared socket (a GET could return another worker's 3-byte reply). Set it aside without
+            // closing, since close() or the destructor could end the parent's session, and connect afresh.
+            self::$inherited[] = self::$instance;
+            self::$instance = null;
+        }
         if (!(self::$instance instanceof Redis)) {
             if ($key === null) {
                 $indexUrlParts = explode('.', (string)$config->settings->indexUrl);
@@ -46,6 +57,7 @@ class Caching
                 }
                 $redis->setOption(Redis::OPT_PREFIX, $key);
                 self::$instance = $redis;
+                self::$instancePid = getmypid();
             } catch (\Exception $e) {
                 throw new CacheUnavailableException('Cache server unavailable: ' . $e->getMessage(), 0, $e);
             }
@@ -229,8 +241,22 @@ class Caching
     public function get(string $key): mixed
     {
         $value = self::singleton()->get($key);
+        if (!is_string($value)) {
+            return false;
+        }
+        // A corrupt entry must read as a miss, not as a warning: the engine turns warnings into
+        // exceptions, and one bad cache value would fail every attack or battle that reads it.
+        set_error_handler(static fn (): bool => true);
+        try {
+            $decoded = unserialize($value, ['allowed_classes' => false]);
+        } finally {
+            restore_error_handler();
+        }
+        if ($decoded === false && $value !== serialize(false)) {
+            self::singleton()->del([$key]);
+        }
 
-        return is_string($value) ? unserialize($value, ['allowed_classes' => false]) : false;
+        return $decoded;
     }
 
     public function exists(string $key): bool

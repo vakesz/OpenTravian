@@ -177,14 +177,20 @@ final class BuildingRearranger
             $assignments[] = "f" . (int)$slot . "=" . (int)$row['l' . $source];
             $assignments[] = "f" . (int)$slot . "t=" . (int)$row['t' . $source];
         }
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $ok = $db->run("UPDATE fdata SET " . implode(', ', $assignments) . " WHERE kid=?", [$kid]);
-        if ($ok === false) {
-            $db->rollback();
+        try {
+            $ok = $db->run("UPDATE fdata SET " . implode(', ', $assignments) . " WHERE kid=?", [$kid]);
+            if ($ok === false) {
+                $db->rollback();
 
-            return false;
+                return false;
+            }
+
+            return (bool)$db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-
-        return (bool)$db->commit();
     }
 }

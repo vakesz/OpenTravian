@@ -63,7 +63,7 @@ class WorldRulesCtrl
         }
 
         return '<form method="post" action="admin.php?action=worldRules" class="adminInline">' . Session::getCheckerInput()
-            . AdminUi::box('Rules', $fields)
+            . AdminUi::box('Rules', '<div class="adminGrid">' . $fields . '</div>')
             . AdminUi::button('Save world rules', 'green', ['name' => 'saveRules', 'value' => '1']) . '</form>';
     }
 }

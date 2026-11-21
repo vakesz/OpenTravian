@@ -377,6 +377,17 @@ function number_format_compact($number, $threshold = 1e6)
     if (!is_numeric($number) || abs((float) $number) < $threshold) {
         return number_format_x($number);
     }
+    $value = (float) $number;
+    $abs = abs($value);
+    foreach ([1e18 => 'Qi', 1e15 => 'Q', 1e12 => 'T', 1e9 => 'B', 1e6 => 'M', 1e3 => 'K'] as $unit => $suffix) {
+        if ($abs >= $unit) {
+            // Three significant digits keep every value to about five characters (4.47M, 44.7M, 147.9M).
+            $scaled = $value / $unit;
+            $decimals = abs($scaled) >= 100 ? 1 : 2;
+
+            return rtrim(rtrim(number_format($scaled, $decimals, '.', ''), '0'), '.') . $suffix;
+        }
+    }
 
     return number_to_string($number, $threshold);
 }

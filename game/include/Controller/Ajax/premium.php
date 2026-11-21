@@ -353,20 +353,26 @@ class premium extends AjaxBase
             $duration += Formulas::getProtectionExtendTime($session->get("signupTime"));
         }
         $coins = $feature['coins'];
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        if (!$this->spendGold($coins, true)) {
-            $db->rollback();
-            return;
+        try {
+            if (!$this->spendGold($coins, true)) {
+                $db->rollback();
+                return;
+            }
+            $infoBox = new InfoBoxModel();
+            if ($infoBox->hasInfoByType($session->getPlayerId(), 6)) {
+                $db->query("UPDATE infobox SET showTo=" . $duration . " WHERE uid={$session->getPlayerId()} AND type=6");
+            } else {
+                $infoBox->addInfo($session->getPlayerId(), false, 6, '', time() - 1, $duration);
+            }
+            $protectionExtend = time();
+            $db->query("UPDATE users SET protection=$duration, protectionBoughtHours=protectionBoughtHours+{$feature['duration']}, protectionLastExtend=" . $protectionExtend . " WHERE id=" . $session->getPlayerId());
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        $infoBox = new InfoBoxModel();
-        if ($infoBox->hasInfoByType($session->getPlayerId(), 6)) {
-            $db->query("UPDATE infobox SET showTo=" . $duration . " WHERE uid={$session->getPlayerId()} AND type=6");
-        } else {
-            $infoBox->addInfo($session->getPlayerId(), false, 6, '', time() - 1, $duration);
-        }
-        $protectionExtend = time();
-        $db->query("UPDATE users SET protection=$duration, protectionBoughtHours=protectionBoughtHours+{$feature['duration']}, protectionLastExtend=" . $protectionExtend . " WHERE id=" . $session->getPlayerId());
-        $db->commit();
         InfoBoxModel::invalidateUserInfoBoxCache($session->getPlayerId());
         $this->response['functionToCall'] = 'reloadUrl';
         $this->response['context'] = 'paymentWizard';
@@ -435,28 +441,34 @@ class premium extends AjaxBase
 
         $move = new MovementsModel();
         $delivery = $config->extraSettings->buyAnimal['packages'][$packageId]['delivery'];
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $move->addMovement(
-            $kid,
-            Village::getInstance()->getKid(),
-            4,
-            $units,
-            0,
-            0,
-            0,
-            0,
-            MovementsModel::MODE_GOING,
-            MovementsModel::ATTACKTYPE_REINFORCEMENT,
-            miliseconds(),
-            miliseconds() + $delivery * Time::MINUTE * Time::SECOND_MS
-        );
-        $coins = $config->extraSettings->buyAnimal['packages'][$packageId]['coins'];
-        if (!$this->spendGold($coins, true)) {
-            $db->rollback();
-            return;
+        try {
+            $move->addMovement(
+                $kid,
+                Village::getInstance()->getKid(),
+                4,
+                $units,
+                0,
+                0,
+                0,
+                0,
+                MovementsModel::MODE_GOING,
+                MovementsModel::ATTACKTYPE_REINFORCEMENT,
+                miliseconds(),
+                miliseconds() + $delivery * Time::MINUTE * Time::SECOND_MS
+            );
+            $coins = $config->extraSettings->buyAnimal['packages'][$packageId]['coins'];
+            if (!$this->spendGold($coins, true)) {
+                $db->rollback();
+                return;
+            }
+            $db->query("UPDATE users SET lastBuyAnimals=" . time() . " WHERE id=" . Session::getInstance()->getPlayerId());
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        $db->query("UPDATE users SET lastBuyAnimals=" . time() . " WHERE id=" . Session::getInstance()->getPlayerId());
-        $db->commit();
         $this->response = [];
         $this->response['functionToCall'] = 'productPurchased';
         $this->response['options']['type'] = 'animal';
@@ -508,16 +520,22 @@ class premium extends AjaxBase
             }
         }
 
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $db->query($q = "UPDATE vdata SET wood=wood+{$resources[0]}, clay=clay+{$resources[1]}, iron=iron+{$resources[2]}, crop=crop+{$resources[3]} WHERE kid=" . Session::getInstance()->getSelectedVillageID());
-        ResourcesHelper::updateVillageResources(Village::getInstance()->getKid(), true);
-        $coins = $realPackage['coins'];
-        if (!$this->spendGold($coins, true)) {
-            $db->rollback();
-            return;
+        try {
+            $db->query($q = "UPDATE vdata SET wood=wood+{$resources[0]}, clay=clay+{$resources[1]}, iron=iron+{$resources[2]}, crop=crop+{$resources[3]} WHERE kid=" . Session::getInstance()->getSelectedVillageID());
+            ResourcesHelper::updateVillageResources(Village::getInstance()->getKid(), true);
+            $coins = $realPackage['coins'];
+            if (!$this->spendGold($coins, true)) {
+                $db->rollback();
+                return;
+            }
+            $db->query("UPDATE users SET lastBuyResources=" . time() . " WHERE id=" . Session::getInstance()->getPlayerId());
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        $db->query("UPDATE users SET lastBuyResources=" . time() . " WHERE id=" . Session::getInstance()->getPlayerId());
-        $db->commit();
         $this->response = [];
         $this->response['functionToCall'] = 'productPurchased';
         $this->response['options']['type'] = 'resources';
@@ -572,16 +590,22 @@ class premium extends AjaxBase
         $unitAmt =  round(($realPackage['hours'] * Time::HOUR * $rate) / Formulas::uTrainingTime($unitId, 20));
         $coins = $realPackage['coins'];
 
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        if (!$this->spendGold($coins, true)) {
-            $db->rollback();
-            return;
+        try {
+            if (!$this->spendGold($coins, true)) {
+                $db->rollback();
+                return;
+            }
+            $db->query("UPDATE users SET lastBuyTroops=" . time() . " WHERE id=" . Session::getInstance()->getPlayerId());
+            //$db->query("UPDATE units SET u1=u1+{$units[0]}, u2=u2+{$units[1]}, u3=u3+{$units[2]}, u4=u4+{$units[3]}, u5=u5+{$units[4]}, u6=u6+{$units[5]}, u7=u7+{$units[6]}, u8=u8+{$units[7]} WHERE kid=" . Session::getInstance()->getKid());
+            $db->query("UPDATE units SET u{$troopId}=u{$troopId}+{$unitAmt} WHERE kid=" . Session::getInstance()->getKid());
+            ResourcesHelper::updateVillageResources(Village::getInstance()->getKid(), false);
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        $db->query("UPDATE users SET lastBuyTroops=" . time() . " WHERE id=" . Session::getInstance()->getPlayerId());
-        //$db->query("UPDATE units SET u1=u1+{$units[0]}, u2=u2+{$units[1]}, u3=u3+{$units[2]}, u4=u4+{$units[3]}, u5=u5+{$units[4]}, u6=u6+{$units[5]}, u7=u7+{$units[6]}, u8=u8+{$units[7]} WHERE kid=" . Session::getInstance()->getKid());
-        $db->query("UPDATE units SET u{$troopId}=u{$troopId}+{$unitAmt} WHERE kid=" . Session::getInstance()->getKid());
-        ResourcesHelper::updateVillageResources(Village::getInstance()->getKid(), false);
-        $db->commit();
         $this->response = [];
         $this->response['functionToCall'] = 'productPurchased';
         $this->response['options']['type'] = 'troops';
@@ -1011,20 +1035,26 @@ class premium extends AjaxBase
         }
         // Gold and the swap commit together: a failed swap gives the gold back.
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        if (!GoldHelper::decreaseGold($session->getPlayerId(), Config::getInstance()->gold->rearrangeBuildingsGold, true)) {
-            $db->rollback();
-            $this->response['error'] = true;
-            $this->response['message'] = T('Auction', 'notEnoughGold');
-            return;
+        try {
+            if (!GoldHelper::decreaseGold($session->getPlayerId(), Config::getInstance()->gold->rearrangeBuildingsGold, true)) {
+                $db->rollback();
+                $this->response['error'] = true;
+                $this->response['message'] = T('Auction', 'notEnoughGold');
+                return;
+            }
+            if (!BuildingRearranger::apply($did, $plan['target'])) {
+                $db->rollback();
+                $this->response['error'] = true;
+                $this->response['message'] = T('Buildings', 'rearrangeMode.error');
+                return;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        if (!BuildingRearranger::apply($did, $plan['target'])) {
-            $db->rollback();
-            $this->response['error'] = true;
-            $this->response['message'] = T('Buildings', 'rearrangeMode.error');
-            return;
-        }
-        $db->commit();
         $this->response['redirectTo'] = '/dorf2.php';
     }
 
@@ -1129,19 +1159,25 @@ class premium extends AjaxBase
         }
         $session = Session::getInstance();
         $db = DB::getInstance();
+        $entryLevel = $db->transactionLevel();
         $db->begin_transaction();
-        $db->query("DELETE FROM training WHERE kid={$session->getSelectedVillageID()}");
-        if (!$db->affectedRows()) {
-            $db->rollback();
-            $this->unavailablePremiumAction();
-            return;
+        try {
+            $db->query("DELETE FROM training WHERE kid={$session->getSelectedVillageID()}");
+            if (!$db->affectedRows()) {
+                $db->rollback();
+                $this->unavailablePremiumAction();
+                return;
+            }
+            $coins = $config->extraSettings->generalOptions->cancelTrainingQueue->coins;
+            if (!$this->spendGold($coins, true)) {
+                $db->rollback();
+                return;
+            }
+            $db->commit();
+        } catch (\Throwable $exception) {
+            $db->unwindTo($entryLevel);
+            throw $exception;
         }
-        $coins = $config->extraSettings->generalOptions->cancelTrainingQueue->coins;
-        if (!$this->spendGold($coins, true)) {
-            $db->rollback();
-            return;
-        }
-        $db->commit();
         $this->response['functionToCall'] = 'reloadUrl';
         $this->response['context'] = 'paymentWizard';
     }

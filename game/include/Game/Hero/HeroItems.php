@@ -5,6 +5,7 @@ namespace Game\Hero;
 use Core\Config;
 use Core\Time;
 use Game\Formulas;
+use Game\WorldSpeedProfile;
 use Game\Tribes;
 
 class HeroItems
@@ -468,12 +469,12 @@ class HeroItems
                 break;
             case ItemBtype::SMALL_BANDAGE:
                 $result['revive'] = 25 * $heroItemsSettings['heroReviveRate'];
-                $result['arrival_time'] = 24 / $heroItemsSettings['heroReviveArrivalTimeRate'];
+                $result['arrival_time'] = self::bandageArrivalHours($heroItemsSettings);
                 $result['attributes'] = sprintf($result['attributes'], $result['revive'], $result['arrival_time']);
                 break;
             case ItemBtype::BANDAGE:
                 $result['revive'] = 33 * $heroItemsSettings['heroReviveRate'];
-                $result['arrival_time'] = 24 / $heroItemsSettings['heroReviveArrivalTimeRate'];
+                $result['arrival_time'] = self::bandageArrivalHours($heroItemsSettings);
                 $result['attributes'] = sprintf($result['attributes'], $result['revive'], $result['arrival_time']);
                 break;
             case ItemBtype::CAGE:
@@ -509,5 +510,19 @@ class HeroItems
         $result['attributes'] = explode("<br />", $result['attributes']);
 
         return $result;
+    }
+
+    /**
+     * Hours shown on a bandage: the shortest trip home for revived troops on
+     * this world, so the tooltip matches what BattleModel schedules.
+     *
+     * @param array<string, mixed> $heroItemsSettings
+     */
+    private static function bandageArrivalHours(array $heroItemsSettings): float
+    {
+        $rate = max(1.0, (float)($heroItemsSettings['heroReviveArrivalTimeRate'] ?? 1));
+        $seconds = WorldSpeedProfile::bandageReturnFloor((int)getGameSpeed()) / $rate;
+
+        return round($seconds / Time::HOUR, 2);
     }
 }

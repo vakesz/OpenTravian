@@ -51,4 +51,10 @@ if (str_contains($source, 'min($adventures_until_now - $row[\'total_adventures\'
     failAdventureSpawnContract('Remove the legacy entitlement subtraction that stalls forever when totals exceed the curve.');
 }
 
+if (!str_contains($source, 'public const MIN_SPAWN_INTERVAL = 5 * Time::MINUTE;')
+    || substr_count($source, 'max(self::MIN_SPAWN_INTERVAL, (int)floor(') !== 2
+    || str_contains($source, 'max(10, (int)floor(')) {
+    failAdventureSpawnContract('Adventures spawn at most once every 5 minutes per player, at any world speed.');
+}
+
 echo "Adventure spawn contract passed.\n";

@@ -8,6 +8,7 @@ use function array_sum;
 use Core\Config;
 use Core\Database\DB;
 use Core\Time;
+use Game\WorldSpeedProfile;
 use Game\AllianceBonus\AllianceBonus;
 use Game\Buildings\BuildingAction;
 use Game\CatapultTargets;
@@ -1677,7 +1678,9 @@ class BattleModel
         }
         $rate = max(1.0, (float) (Config::getInstance()->heroConfig->heroItemsSettings->heroReviveArrivalTimeRate ?? 1));
 
-        return Time::SECOND_MS * max((int) round(Time::DAY / $rate), $travel);
+        $floor = WorldSpeedProfile::bandageReturnFloor((int) getGameSpeed());
+
+        return Time::SECOND_MS * max((int) round($floor / $rate), $travel);
     }
 
     private function tournamentSquareLevel(int $kid): int
@@ -2066,7 +2069,9 @@ class BattleModel
                     }
                 } else {
                     LoyaltyHelper::updateOasisLoyalty($this->row['to_kid']);
-                    $oasis = $db->query("SELECT loyalty, did FROM odata WHERE kid={$this->row['to_kid']}")->fetch_assoc();
+                    // The oasis row can vanish between sending and arrival; treat it as already ours (no capture).
+                    $oasis = $db->query("SELECT loyalty, did FROM odata WHERE kid={$this->row['to_kid']}")->fetch_assoc()
+                        ?: ['loyalty' => 0, 'did' => $this->row['kid']];
                     $ownerOases = (int)$oasis['did'] === 0
                         ? 0
                         : (int)$db->fetchScalar('SELECT COUNT(kid) FROM odata WHERE did=' . (int)$oasis['did']);
@@ -2249,7 +2254,9 @@ class BattleModel
                 }
                 LoyaltyHelper::updateVillageLoyalty($this->row['to_kid']);
                 $village = $db->query("SELECT loyalty FROM vdata WHERE kid={$this->row['to_kid']}")->fetch_assoc();
-                if ($loyaltyChange >= floor((float) $village['loyalty'])) {
+                if (!$village) {
+                    // The target village was deleted or taken over before the chiefs arrived: nothing to conquer.
+                } elseif ($loyaltyChange >= floor((float) $village['loyalty'])) {
                     $this->info['captureResult'] = CaptureResult::CAPTURED;
                     $p = new VillageModel();
                     $captured = $p->captureVillage($this->defender['uid'], $this->row['to_kid'], $this->defender['total_pop'], $this->attacker['uid'], $this->attacker['total_pop'], $this->row['race'], $this->row['kid']);

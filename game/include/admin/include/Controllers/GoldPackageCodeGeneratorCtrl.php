@@ -25,7 +25,7 @@ class GoldPackageCodeGeneratorCtrl
             Dispatcher::getInstance()->appendContent(\Game\AdminUi::page(
                 $title,
                 $lead,
-                \Game\AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the footer to use this page.', 'error')
+                \Game\AdminUi::notice('Live-world changes are locked. Allow them with the toggle in the header to use this page.', 'error')
             ));
             return;
         }

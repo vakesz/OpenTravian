@@ -174,7 +174,9 @@ class HeroHelper extends HeroItems
         ) {
             $item = $this->getHeroItemProperties($bag['btype'], $bag['type']);
 
-            return ["num" => $bag['num'], "eff" => $item['revive']];
+            // The bag row comes from the database as strings; battle code passes
+            // num into int|float parameters under strict types.
+            return ["num" => (int)$bag['num'], "eff" => $item['revive']];
         }
 
         return ["num" => 0, "eff" => 0];

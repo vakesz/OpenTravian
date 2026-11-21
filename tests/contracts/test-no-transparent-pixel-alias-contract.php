@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__, 2);
 $needle = '/img/x' . '.gif';
-$skip = ['/assets/i18n/reference/', '/.git/', '/node_modules/', '/vendor/'];
+$skip = ['/assets/i18n/reference/', '/.git/', '/.claude/', '/node_modules/', '/vendor/'];
 $allowedFiles = ['/assets/gpack/travian/mainPage/NAME_MAP.json', '/assets/gpack/travian/mainPage/ASSET_PROVENANCE.md', '/tests/contracts/test-no-transparent-pixel-alias-contract.php'];
 $hits = [];
 
