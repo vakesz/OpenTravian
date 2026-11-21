@@ -50,3 +50,6 @@ tmp-qa/
 # Local reference-world hosts
 /reference.local
 __pycache__/
+
+# Local agent worktrees (Claude Code); never part of the repository.
+.claude/worktrees/
